@@ -1,0 +1,70 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>ph.txtdis</groupId>
+		<artifactId>pcppi-parent</artifactId>
+		<version>0.9.2.2</version>
+	</parent>
+
+	<artifactId>rest-sms-pcppi</artifactId>
+	<name>txtDIS PCPPI Server</name>
+
+	<properties>
+		<icon.name>txtdis-pcppi</icon.name>
+		<key.store>pc</key.store>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.neuronrobotics</groupId>
+			<artifactId>nrjavaserial</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.smslib</groupId>
+			<artifactId>smslib</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>ph.txtdis</groupId>
+			<artifactId>txtdis-phone</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ph.txtdis</groupId>
+			<artifactId>txtdis-rest</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>pcppi</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>com.akathist.maven.plugins.launch4j</groupId>
+						<artifactId>launch4j-maven-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>
