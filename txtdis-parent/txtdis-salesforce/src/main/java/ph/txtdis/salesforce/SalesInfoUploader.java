@@ -29,6 +29,7 @@ public class SalesInfoUploader extends AccountUploader {
 	private List<SalesforceSalesInfo> invoices;
 
 	public static void main(String[] args) {
+		/*
 		SalesforceAccount c = new SalesforceAccount();
 		c.setDistributor("MAGNUM GROWTH DISTRIBUTION");
 		c.setAccountName("TEST");
@@ -63,13 +64,14 @@ public class SalesInfoUploader extends AccountUploader {
 		invoice.setDsp("HOMER");
 		invoice.setProducts(asList(product1, product2));
 		List<SalesforceSalesInfo> i = asList(invoice);
-
+		
 		for (SalesforceEntity u : new SalesInfoUploader().invoices(i).accounts(a).start()) {
 			String s = "Invoice";
 			if (u instanceof SalesforceAccount)
 				s = "Customer";
 			System.out.println(s + " = " + u);
 		}
+		*/
 	}
 
 	public SalesInfoUploader invoices(List<SalesforceSalesInfo> invoices) {

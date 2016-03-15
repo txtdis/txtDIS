@@ -210,7 +210,7 @@ public interface BillingRepository extends CrudRepository<Billing, Long> {
 			@Param("start") LocalDate s, @Param("end") LocalDate e, @Param("item") Item i);
 
 	// open B/O or RMA
-	Billing findFirstByNumIdNullAndRmaNotNullAndCustomer(@Param("customer") Customer c);
+	List<Billing> findByNumIdNullAndRmaNotNullAndCustomer(@Param("customer") Customer c);
 
 	Billing findFirstByPrefixAndSuffixAndNumIdBetweenOrderByNumIdDesc(@Param("prefix") String p,
 			@Param("suffix") String s, @Param("first") Long f, @Param("last") Long l);

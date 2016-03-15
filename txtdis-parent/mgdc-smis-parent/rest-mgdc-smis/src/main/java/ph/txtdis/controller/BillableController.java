@@ -136,8 +136,8 @@ public class BillableController {
 		LocalDate start = now().minusDays(180L);
 		Billable a = new Billable();
 		if (!start.isBefore(goLive())) {
-			Billing b = repository.findFirstByNumIdNotNullAndRmaNullAndCustomerAndOrderDateBetweenAndDetailsItem(c,
-					start, now(), i);
+			Billing b = repository.findFirstByNumIdNotNullAndRmaNullAndCustomerAndOrderDateBetweenAndDetailsItem(c, start,
+					now(), i);
 			a = idOnlyBillable(b);
 		}
 		return new ResponseEntity<>(a, OK);
@@ -147,8 +147,8 @@ public class BillableController {
 	public ResponseEntity<?> findByDate(@RequestParam("on") Date d) {
 		ZonedDateTime start = startOfDay(d.toLocalDate());
 		ZonedDateTime end = endOfDay(d.toLocalDate());
-		Billing b = repository.findFirstByNumIdNotNullAndNumIdGreaterThanAndCreatedOnBetweenOrderByCreatedOnAsc(0L,
-				start, end);
+		Billing b = repository.findFirstByNumIdNotNullAndNumIdGreaterThanAndCreatedOnBetweenOrderByCreatedOnAsc(0L, start,
+				end);
 		Billable i = fromBilling.toBillable(b);
 		return new ResponseEntity<>(i, OK);
 	}
@@ -180,8 +180,8 @@ public class BillableController {
 	@RequestMapping(path = "/notFullyPaidCOD", method = GET)
 	public ResponseEntity<?> findNotFullyPaidCOD(@RequestParam("seller") String s, @RequestParam("upTo") Date d) {
 		List<Billing> l = repository
-				.findByNumIdNotNullAndRmaNullAndCustomerNotAndFullyPaidFalseAndOrderDateBetweenOrderByOrderDateAsc(
-						vendor(), goLive(), billingCutoff(d, s));
+				.findByNumIdNotNullAndRmaNullAndCustomerNotAndFullyPaidFalseAndOrderDateBetweenOrderByOrderDateAsc(vendor(),
+						goLive(), billingCutoff(d, s));
 		Optional<Billing> o = l.stream().filter(codCustomerOf(s)).findFirst();
 		Billable b = o.isPresent() ? orderNoOnlyBillable(o.get()) : null;
 		return new ResponseEntity<>(b, OK);
@@ -189,11 +189,19 @@ public class BillableController {
 
 	@RequestMapping(path = "/pendingReturn", method = GET)
 	public ResponseEntity<?> findOpenBadOrReturnOrderByCustomer(@RequestParam("customer") Customer c) {
-		Billing b = repository.findFirstByNumIdNullAndRmaNotNullAndCustomer(c);
-		logger.info("Open bad or return order = " + b);
-		Billable a = bookingIdOnlyBillable(b);
-		logger.info("ID only open bad or return order = " + a);
+		List<Billing> b = repository.findByNumIdNullAndRmaNotNullAndCustomer(c);
+		Billable a = removeCancelled(b);
+		logger.info("Open bad or return order = " + a);
 		return new ResponseEntity<>(a, OK);
+	}
+
+	private Billable removeCancelled(List<Billing> l) {
+		try {
+			Billing i = l.stream().filter(b -> b.getIsValid() != null && b.getIsValid() == false).findFirst().get();
+			return bookingIdOnlyBillable(i);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@RequestMapping(path = "/purchaseOrder", method = GET)

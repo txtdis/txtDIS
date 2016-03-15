@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>mgdc-smis-parent</artifactId>
-		<version>0.9.2.2</version>
+		<version>0.9.2.3</version>
 	</parent>
 
 	<artifactId>javafx-mgdc-smis</artifactId>
@@ -13,7 +13,7 @@
 
 	<properties>
 		<header.type>gui</header.type>
-		<host.type>client</host.type>
+		<host.type>${project.artifactId}</host.type>
 		<icon.name>txtdis-smis</icon.name>
 		<start-class>ph.txtdis.App</start-class>
 	</properties>

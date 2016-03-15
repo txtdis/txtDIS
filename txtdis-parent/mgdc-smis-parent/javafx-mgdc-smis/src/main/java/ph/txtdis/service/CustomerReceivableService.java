@@ -12,6 +12,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ph.txtdis.dto.Customer;
 import ph.txtdis.dto.CustomerReceivable;
 import ph.txtdis.dto.CustomerReceivableReport;
 import ph.txtdis.excel.ExcelWriter;
@@ -135,7 +136,7 @@ public class CustomerReceivableService implements Spreadsheet<CustomerReceivable
 		report = readOnlyService.module(getModule()).getOne(//
 				"?customer=" + ids[CUSTOMER_ID] + "&lowerDayCount=" + lowerDayCount() + //
 						"&upperDayCount=" + upperDayCount());
-		customerName = customerService.find(ids[CUSTOMER_ID]).getName();
+		customerName = ((Customer) customerService.find(ids[CUSTOMER_ID])).getName();
 	}
 
 	public List<CustomerReceivable> listReceivables(String... ids) throws NoServerConnectionException,

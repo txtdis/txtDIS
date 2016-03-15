@@ -52,11 +52,14 @@ import ph.txtdis.exception.NotAllowedOffSiteTransactionException;
 import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.exception.RestException;
 import ph.txtdis.exception.StoppedServerException;
+import ph.txtdis.exception.UnauthorizedUserException;
 import ph.txtdis.info.SuccessfulSaveInfo;
 import ph.txtdis.salesforce.AccountUploader;
 import ph.txtdis.type.PartnerType;
 import ph.txtdis.type.ScriptType;
+import ph.txtdis.type.UserType;
 import ph.txtdis.type.VisitFrequency;
+import ph.txtdis.util.SpringUtil;
 import ph.txtdis.util.TypeMap;
 import ph.txtdis.util.Util;
 
@@ -143,20 +146,10 @@ public class CustomerService implements DateValidated, DecisionNeeded, Excel<Cus
 		return createRouteAssignment(route, startDate);
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public Customer find(String id) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException, NotFoundException {
-		Customer c = Serviced.super.find(id);
-		if (c.getDeactivatedOn() != null)
-			throw new DeactivatedException(c.getName());
-		return c;
-	}
-
 	public Customer findByName(String text) throws NoServerConnectionException, StoppedServerException,
 			FailedAuthenticationException, RestException, InvalidException {
 		Customer c = customerService.module(getModule()).getOne("/find?name=" + text);
-		if (c.getDeactivatedOn() != null)
+		if (c != null && c.getDeactivatedOn() != null)
 			throw new DeactivatedException(c.getName());
 		return c;
 	}
@@ -450,11 +443,16 @@ public class CustomerService implements DateValidated, DecisionNeeded, Excel<Cus
 		customer = (Customer) t;
 	}
 
-	public void setNameIfUnique(String text)
-			throws NotAllowedOffSiteTransactionException, DuplicateException, NoServerConnectionException,
-			StoppedServerException, FailedAuthenticationException, RestException, InvalidException {
-		if (isNew() && isOffSite())
-			throw new NotAllowedOffSiteTransactionException();
+	public void setNameIfUnique(String text) throws NotAllowedOffSiteTransactionException, DuplicateException,
+			NoServerConnectionException, StoppedServerException, FailedAuthenticationException, RestException,
+			InvalidException, UnauthorizedUserException {
+		if (isNew()) {
+			if (isOffSite())
+				throw new NotAllowedOffSiteTransactionException();
+			if (!(SpringUtil.isUser(UserType.MANAGER) || SpringUtil.isUser(UserType.SALES)))
+				throw new UnauthorizedUserException("Customer Data Encoders only");
+		}
+
 		if (findByName(text) != null)
 			throw new DuplicateException(text);
 		get().setName(text);

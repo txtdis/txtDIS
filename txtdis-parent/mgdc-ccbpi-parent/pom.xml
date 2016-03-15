@@ -5,20 +5,17 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>txtdis-parent</artifactId>
-		<version>0.9.2.2</version>
+		<version>0.9.2.3</version>
 	</parent>
 
 	<artifactId>mgdc-ccbpi-parent</artifactId>
 	<packaging>pom</packaging>
-	<name>MGDC SMIS Parent</name>
+	<name>MGDC CCBPI Parent</name>
 
 	<modules>
 		<module>txtdis-mgdc-ccbpi</module>
 		<module>rest-mgdc-ccbpi</module>
 		<module>javafx-mgdc-ccbpi</module>
-		<module>../txtdis-shared</module>
-		<module>../txtdis-rest</module>
-		<module>../txtdis-javafx</module>
 	</modules>
 
 	<build>

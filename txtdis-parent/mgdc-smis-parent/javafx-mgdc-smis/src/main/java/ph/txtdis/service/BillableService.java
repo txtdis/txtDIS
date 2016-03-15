@@ -102,6 +102,7 @@ import ph.txtdis.exception.NotPickedBookingIdException;
 import ph.txtdis.exception.RestException;
 import ph.txtdis.exception.StoppedServerException;
 import ph.txtdis.exception.ToBeReturnedItemNotPurchasedWithinTheLastSixMonthException;
+import ph.txtdis.exception.UnauthorizedUserException;
 import ph.txtdis.exception.UnbilledPickedSalesOrderException;
 import ph.txtdis.exception.UnissuedInvoiceIdException;
 import ph.txtdis.info.SuccessfulSaveInfo;
@@ -238,15 +239,6 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 
 		public PickedUpSalesOrderDateNotTodayException() {
 			super("To-be-picked-up S/O's must be booked today");
-		}
-	}
-
-	private class UnauthorizedUserException extends Exception {
-
-		private static final long serialVersionUID = -3598117990987605127L;
-
-		public UnauthorizedUserException(String error) {
-			super(error);
 		}
 	}
 
@@ -890,11 +882,13 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 		get().setOrderDate(d);
 		get().setBilledBy(username());
 		get().setUnpaidValue(ZERO);
+		get().setFullyPaid(true);
 		scriptService.set(ScriptType.RETURN_PAYMENT, createItemReturnPaymentScript(d));
 	}
 
 	private String createItemReturnPaymentScript(LocalDate d) {
-		return getId() + "|" + d + "|" + username() + "|" + ZonedDateTime.now();
+		return getId() + "|" + d + "|" + get().getPrefix() + "|" + get().getNumId() + "|" + get().getSuffix() + "|"
+				+ username() + "|" + ZonedDateTime.now();
 	}
 
 	public void saveItemReturnReceiptData() throws Exception {
@@ -1040,7 +1034,7 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 		logger.info("allowOnlyIfOnSite@updateUponCustomerIdValidation(id)");
 		if (isNew() && isOffSite())
 			throw new NotAllowedOffSiteTransactionException();
-		setCustomer(customerService.find(id));
+		setCustomer(findCustomerById(id));
 		verifyNonPickupSalesOrderDateIsNextWorkingDate();
 		verifyCurrentUserIsTheCustomerAssignedSeller();
 		// verifyAllCollectionsHaveBeenDeposited(CASH);
@@ -1051,6 +1045,14 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 		verifyCustomerHasNoOverdues();
 		verifyCustomerHasNotExceededItsCreditLimit(ZERO);
 		setCustomerRelatedData();
+	}
+
+	private Customer findCustomerById(Long id) throws NoServerConnectionException, StoppedServerException,
+			FailedAuthenticationException, RestException, InvalidException, NotFoundException {
+		Customer c = customerService.find(id);
+		if (c.getDeactivatedOn() != null)
+			throw new DeactivatedException(c.getName());
+		return c;
 	}
 
 	public void updateUponOrderNoValidation(String prefix, Long id, String suffix) throws Exception {

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>pcppi-parent</artifactId>
-		<version>0.9.2.2</version>
+		<version>0.9.2.3</version>
 	</parent>
 
 	<artifactId>rest-sms-pcppi</artifactId>
@@ -17,7 +17,7 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
+		<dependency> 
 			<groupId>com.neuronrobotics</groupId>
 			<artifactId>nrjavaserial</artifactId>
 		</dependency>

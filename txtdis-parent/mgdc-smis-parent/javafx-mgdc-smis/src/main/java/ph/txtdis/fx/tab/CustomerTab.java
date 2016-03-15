@@ -203,6 +203,7 @@ public class CustomerTab extends AbstractTab {
 		try {
 			service.setNameIfUnique(nameField.getValue());
 		} catch (Exception e) {
+			e.printStackTrace();
 			handleError(nameField, e);
 		}
 	}

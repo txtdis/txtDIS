@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>txtdis-parent</artifactId>
-		<version>0.9.2.2</version>
+		<version>0.9.2.3</version>
 	</parent>
 
 	<artifactId>mgdc-smis-parent</artifactId>
@@ -17,10 +17,5 @@
 		<module>txtdis-mgdc-smis</module>
 		<module>rest-mgdc-smis</module>
 		<module>javafx-mgdc-smis</module>
-		<module>../txtdis-salesforce</module>
-		<module>../txtdis-shared</module>
-		<module>../txtdis-rest</module>
-		<module>../txtdis-phone</module>
-		<module>../txtdis-javafx</module>
 	</modules>
 </project>

@@ -53,9 +53,13 @@ public class BillingService implements DecisionDataUpdate {
 	public void updateItemReturnPayment(String[] s) {
 		Billing b = repository.findOne(Long.valueOf(s[1]));
 		b.setOrderDate(toDate(s[2]));
-		b.setBilledBy(s[3]);
-		b.setBilledOn(ZonedDateTime.parse(s[4]));
+		b.setPrefix(s[3]);
+		b.setNumId(Long.valueOf(s[4]));
+		b.setSuffix(s[5]);
+		b.setBilledBy(s[6]);
+		b.setBilledOn(ZonedDateTime.parse(s[7]));
 		b.setUnpaidValue(ZERO);
+		b.setFullyPaid(true);
 		repository.save(b);
 	}
 }
