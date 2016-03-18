@@ -104,13 +104,13 @@ public class RemittanceRestService implements DecisionDataUpdate {
 		return date.minusDays(day);
 	}
 
-	private Remittance getOneUndepositedPaymentOfACustomerOf(String seller, List<Remittance> l) {
-		Optional<RemittanceDetail> o = l.stream()//
+	private Remittance getOneUndepositedPaymentOfACustomerOf(String seller,
+			List<Remittance> remittancesWithUndepostedPayment) {
+		Optional<RemittanceDetail> o = remittancesWithUndepostedPayment.stream()//
 				.flatMap(r -> r.getDetails().stream())//
 				.filter(rd -> customerOf(rd, seller)).findFirst();
-		if (!o.isPresent())
-			return null;
-		return l.stream().filter(r -> r.equals(o.get())).findFirst().get();
+		return !o.isPresent() ? null
+				: remittancesWithUndepostedPayment.stream().filter(r -> r.getDetails().contains(o.get())).findFirst().get();
 	}
 
 	private Remittance getRemittance(String s) {

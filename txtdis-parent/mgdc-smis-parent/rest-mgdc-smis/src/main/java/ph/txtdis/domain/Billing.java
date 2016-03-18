@@ -46,7 +46,7 @@ import lombok.EqualsAndHashCode;
 		@Index(columnList = "id_no, created_on"), //
 		@Index(columnList = "receiving_id") }, //
 		uniqueConstraints = @UniqueConstraint(columnNames = { "prefix", "id_no", "suffix" }) )
-public class Billing extends DecisionNeeded implements Detailed, Discounted {
+public class Billing extends AbstractDecisionNeededEntity implements Detailed, Discounted {
 
 	private static final long serialVersionUID = -4363805360652350591L;
 

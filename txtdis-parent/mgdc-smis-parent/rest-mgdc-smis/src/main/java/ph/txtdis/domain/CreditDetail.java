@@ -16,7 +16,7 @@ import ph.txtdis.dto.CustomerCredit;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "credit_detail", uniqueConstraints = @UniqueConstraint(columnNames = { "customer_id", "start_date" }) )
-public class CreditDetail extends DecisionNeeded implements CustomerCredit {
+public class CreditDetail extends AbstractDecisionNeededEntity implements CustomerCredit {
 
 	private static final long serialVersionUID = 1655742390812653142L;
 

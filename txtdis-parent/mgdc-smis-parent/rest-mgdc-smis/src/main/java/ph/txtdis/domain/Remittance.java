@@ -29,7 +29,7 @@ import lombok.EqualsAndHashCode;
 		@Index(columnList = "payment_date"), //
 		@Index(columnList = "received_on, check_id, payment_date") }, //
 		uniqueConstraints = @UniqueConstraint(columnNames = { "check_id", "drawee_bank_id" }) )
-public class Remittance extends DecisionNeeded {
+public class Remittance extends AbstractDecisionNeededEntity {
 
 	private static final long serialVersionUID = -5860334462169889589L;
 

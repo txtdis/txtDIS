@@ -14,14 +14,20 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class DateTimeUtils {
 
-	public static ZonedDateTime endOfDay(LocalDate d) {
-		return d == null ? null : d.plusDays(1L).atStartOfDay(zoneHere());
+	private static DateTimeFormatter dateFormat() {
+		return ofPattern("M/d/yyyy");
 	}
 
 	public static ZonedDateTime endOfDay(Date d) {
 		return d == null ? null : endOfDay(d.toInstant().atZone(zoneHere()).toLocalDate());
+	}
+
+	public static ZonedDateTime endOfDay(LocalDate d) {
+		return d == null ? null : d.plusDays(1L).atStartOfDay(zoneHere());
 	}
 
 	public static LocalDate endOfMonth(LocalDate d) {
@@ -32,16 +38,34 @@ public class DateTimeUtils {
 		return toUtilDate(LocalDate.of(1970, 1, 1));
 	}
 
-	public static ZonedDateTime startOfDay(LocalDate d) {
-		return d == null ? null : d.atStartOfDay(zoneHere());
+	public static LocalDate fromVersionToDate(String version) {
+		String[] d = StringUtils.split(version, ".");
+		String date = "20" + d[0] + d[1] + "-0" + d[2] + "-0" + d[3];
+		return LocalDate.parse(date);
+	}
+
+	private static LocalDate parseDate(String date) {
+		try {
+			return LocalDate.parse(date, dateFormat());
+		} catch (Exception e) {
+			return LocalDate.parse(date);
+		}
 	}
 
 	public static ZonedDateTime startOfDay(Date d) {
 		return d == null ? null : startOfDay(d.toInstant().atZone(zoneHere()).toLocalDate());
 	}
 
+	public static ZonedDateTime startOfDay(LocalDate d) {
+		return d == null ? null : d.atStartOfDay(zoneHere());
+	}
+
 	public static LocalDate startOfMonth(LocalDate d) {
 		return d == null ? now() : of(d.getYear(), d.getMonthValue(), 1);
+	}
+
+	private static DateTimeFormatter timestampFormat() {
+		return ofPattern("M/d/yyyy h:mma");
 	}
 
 	public static LocalDate toDate(String date) {
@@ -103,22 +127,6 @@ public class DateTimeUtils {
 
 	public static ZonedDateTime toZonedDateTime(String zdt) {
 		return zdt == null ? null : parse(zdt, timestampFormat());
-	}
-
-	private static DateTimeFormatter dateFormat() {
-		return ofPattern("M/d/yyyy");
-	}
-
-	private static LocalDate parseDate(String date) {
-		try {
-			return LocalDate.parse(date, dateFormat());
-		} catch (Exception e) {
-			return LocalDate.parse(date);
-		}
-	}
-
-	private static DateTimeFormatter timestampFormat() {
-		return ofPattern("M/d/yyyy h:mma");
 	}
 
 	private static ZoneId zoneHere() {

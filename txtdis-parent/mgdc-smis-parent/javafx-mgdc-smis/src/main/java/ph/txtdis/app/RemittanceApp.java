@@ -168,6 +168,7 @@ public class RemittanceApp extends AbstractIdApp<RemittanceService, Long, Long> 
 	}
 
 	private AppGridPane gridPane() {
+		remarksDisplay.build();
 		gridPane.getChildren().clear();
 		gridPane.add(label.field("Date"), 0, 0);
 		gridPane.add(basicInfoBox(), 1, 0);

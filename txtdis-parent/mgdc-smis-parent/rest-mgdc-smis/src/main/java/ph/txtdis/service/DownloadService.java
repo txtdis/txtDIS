@@ -8,6 +8,7 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
 import static javax.mail.Folder.READ_ONLY;
 import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.util.DateTimeUtils.epochDate;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -32,8 +33,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import static ph.txtdis.util.DateTimeUtils.epochDate;
 
 import ph.txtdis.exception.FailedReplicationException;
 import ph.txtdis.exception.NoNewerFileException;

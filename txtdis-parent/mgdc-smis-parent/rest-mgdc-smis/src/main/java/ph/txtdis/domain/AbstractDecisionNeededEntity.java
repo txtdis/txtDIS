@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class DecisionNeeded extends CreationTracked<Long> {
+public abstract class AbstractDecisionNeededEntity extends CreationTracked<Long> {
 
 	private static final long serialVersionUID = -805511847282135281L;
 

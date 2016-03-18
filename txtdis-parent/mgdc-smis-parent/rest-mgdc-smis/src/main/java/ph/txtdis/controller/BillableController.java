@@ -197,7 +197,7 @@ public class BillableController {
 
 	private Billable removeCancelled(List<Billing> l) {
 		try {
-			Billing i = l.stream().filter(b -> b.getIsValid() != null && b.getIsValid() == false).findFirst().get();
+			Billing i = l.stream().filter(b -> b.getIsValid() != null && b.getIsValid()).findFirst().get();
 			return bookingIdOnlyBillable(i);
 		} catch (Exception e) {
 			return null;

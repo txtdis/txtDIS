@@ -11,14 +11,11 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.exception.RestException;
 import ph.txtdis.exception.StoppedServerException;
 
-public interface SalesforceUploadable {
+public interface SalesforceUploadable<T extends SalesforceEntity> {
 
 	String getUploadedBy();
 
 	ZonedDateTime getUploadedOn();
-
-	<T extends SalesforceEntity> T save(T t) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, InvalidException, RestException;
 
 	void upload() throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException,
 			RestException, InvalidException, NotFoundException;
@@ -26,6 +23,6 @@ public interface SalesforceUploadable {
 	void saveUploadedData(List<? extends SalesforceEntity> list) throws NoServerConnectionException,
 			StoppedServerException, FailedAuthenticationException, RestException, InvalidException, NotFoundException;
 
-	List<? extends SalesforceEntity> forUpload() throws NoServerConnectionException, StoppedServerException,
+	List<T> forUpload() throws NoServerConnectionException, StoppedServerException,
 			FailedAuthenticationException, RestException, InvalidException;
 }

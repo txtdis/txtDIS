@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 		indexes = { @Index(columnList = "customer_id, start_date") }, //
 		uniqueConstraints = //
 		@UniqueConstraint(columnNames = { "customer_id", "start_date", "level", "family_limit_id" }) )
-public class CustomerDiscount extends DecisionNeeded {
+public class CustomerDiscount extends AbstractDecisionNeededEntity {
 
 	private static final long serialVersionUID = -455882680349394952L;
 

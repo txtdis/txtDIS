@@ -18,7 +18,7 @@ import ph.txtdis.type.VolumeDiscountType;
 @Entity
 @Table(name = "volume_discount")
 @EqualsAndHashCode(callSuper = true)
-public class VolumeDiscount extends DecisionNeeded {
+public class VolumeDiscount extends AbstractDecisionNeededEntity {
 
 	private static final long serialVersionUID = 7710563453808768120L;
 

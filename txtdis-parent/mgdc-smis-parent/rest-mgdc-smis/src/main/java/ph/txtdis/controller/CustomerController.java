@@ -3,6 +3,9 @@ package ph.txtdis.controller;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static ph.txtdis.type.LocationType.BARANGAY;
+import static ph.txtdis.type.LocationType.CITY;
+import static ph.txtdis.type.LocationType.PROVINCE;
 import static ph.txtdis.type.PartnerType.CUSTOMER;
 import static ph.txtdis.type.PartnerType.FINANCIAL;
 import static ph.txtdis.util.SpringUtils.username;
@@ -16,10 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import static ph.txtdis.type.LocationType.BARANGAY;
-import static ph.txtdis.type.LocationType.CITY;
-import static ph.txtdis.type.LocationType.PROVINCE;
 
 import ph.txtdis.domain.Customer;
 import ph.txtdis.domain.WeeklyVisit;
@@ -112,7 +111,7 @@ public class CustomerController extends SpunController<CustomerRepository, Custo
 	@RequestMapping(path = "/notTheSameVisitFrequencyAndSchedule", method = GET)
 	public ResponseEntity<?> findNotTheSameVisitFrequencyAndSchedule() {
 		List<Customer> l = repository
-				.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNull(
+				.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNullOrderByVisitScheduleWeekNoAsc(
 						CUSTOMER);
 		l = l.stream().filter(u -> count(u.getVisitFrequency()) != count(u.getVisitSchedule()))
 				.collect(Collectors.toList());
@@ -123,7 +122,7 @@ public class CustomerController extends SpunController<CustomerRepository, Custo
 	@RequestMapping(path = "/notTheSameWeeksOneAndFiveVisitSchedules", method = GET)
 	public ResponseEntity<?> findNotTheSameWeeksOneAndFiveVisitSchedule() {
 		List<Customer> l = repository
-				.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNull(
+				.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNullOrderByVisitScheduleWeekNoAsc(
 						CUSTOMER);
 		l = l.stream().filter(v -> !v.getVisitSchedule().get(0).equals(v.getVisitSchedule().get(4)))
 				.collect(Collectors.toList());
@@ -175,19 +174,19 @@ public class CustomerController extends SpunController<CustomerRepository, Custo
 	private int count(List<WeeklyVisit> l) {
 		int i = 0;
 		for (WeeklyVisit v : l) {
-			if (v.getSun() != null && v.getSun())
+			if (v.isSun())
 				++i;
-			if (v.getMon() != null && v.getMon())
+			if (v.isMon())
 				++i;
-			if (v.getTue() != null && v.getTue())
+			if (v.isTue())
 				++i;
-			if (v.getWed() != null && v.getWed())
+			if (v.isWed())
 				++i;
-			if (v.getThu() != null && v.getThu())
+			if (v.isThu())
 				++i;
-			if (v.getFri() != null && v.getFri())
+			if (v.isFri())
 				++i;
-			if (v.getSat() != null && v.getSat())
+			if (v.isSat())
 				++i;
 		}
 		return i;

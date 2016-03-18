@@ -57,8 +57,9 @@ public class Customer extends ModificationTracked<Long> {
 	@Column(name = "visit_frequency")
 	private VisitFrequency visitFrequency;
 
-	@JoinColumn(name = "customer_id")
+	@OrderBy("weekNo ASC")
 	@OneToMany(cascade = ALL)
+	@JoinColumn(name = "customer_id")
 	private List<WeeklyVisit> visitSchedule;
 
 	@JoinColumn(name = "customer_id")
@@ -76,12 +77,12 @@ public class Customer extends ModificationTracked<Long> {
 
 	private String mobile;
 
-	@JoinColumn(name = "customer_id")
 	@OneToMany(cascade = ALL)
+	@JoinColumn(name = "customer_id")
 	private List<CreditDetail> creditDetails;
 
-	@JoinColumn(name = "customer_id")
 	@OneToMany(cascade = ALL)
+	@JoinColumn(name = "customer_id")
 	@OrderBy("startDate DESC, familyLimit DESC, level ASC")
 	private List<CustomerDiscount> customerDiscounts;
 
@@ -93,26 +94,6 @@ public class Customer extends ModificationTracked<Long> {
 
 	@Column(name = "uploaded_on")
 	private ZonedDateTime uploadedOn;
-
-	@JsonIgnore
-	public String getAddress() {
-		return street() + barangay() + city() + province();
-	}
-
-	public String getLocation() {
-		if (barangay == null)
-			return "";
-		return barangay + city();
-	}
-
-	@JsonIgnore
-	public String getSeller() {
-		try {
-			return getRoute().getSeller(now());
-		} catch (Exception e) {
-			return null;
-		}
-	}
 
 	private String barangay() {
 		if (barangay == null)
@@ -126,10 +107,34 @@ public class Customer extends ModificationTracked<Long> {
 		return (barangay != null || street != null ? ", " : "") + city;
 	}
 
+	@JsonIgnore
+	public String getAddress() {
+		return street() + barangay() + city() + province();
+	}
+
+	public String getIdNo() {
+		return getId() == null ? null :getId().toString();
+	}
+
+	public String getLocation() {
+		if (barangay == null)
+			return "";
+		return barangay + city();
+	}
+
 	private Route getRoute() {
 		try {
 			return getRouteHistory().stream().filter(p -> !p.getStartDate().isAfter(now()))
 					.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())).get().getRoute();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@JsonIgnore
+	public String getSeller() {
+		try {
+			return getRoute().getSeller(now());
 		} catch (Exception e) {
 			return null;
 		}
@@ -140,7 +145,7 @@ public class Customer extends ModificationTracked<Long> {
 			return "";
 		return (city != null || barangay != null || street != null ? ", " : "") + province;
 	}
-
+	
 	private String street() {
 		return street == null ? "" : street;
 	}

@@ -103,7 +103,7 @@ public class SyncService {
 		return REPLICATION_SUCCESSFUL;
 	}
 
-	private String runScripts() throws NoNewerFileException, FailedReplicationException {
+	public String runScripts() throws NoNewerFileException, FailedReplicationException {
 		Sync sync = getLatestSync();
 		Date latest = sync.getLastSync();
 		latest = downloadService.download(SCRIPT, latest);

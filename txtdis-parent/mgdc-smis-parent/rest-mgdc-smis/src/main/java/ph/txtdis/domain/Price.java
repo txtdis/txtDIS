@@ -17,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = { "item_id", "start_date", "type_id", "channel_limit_id" }) )
-public class Price extends DecisionNeeded {
+public class Price extends AbstractDecisionNeededEntity {
 
 	private static final long serialVersionUID = -5721868302278165093L;
 

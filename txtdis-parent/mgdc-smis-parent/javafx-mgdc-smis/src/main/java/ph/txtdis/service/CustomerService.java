@@ -65,7 +65,7 @@ import ph.txtdis.util.Util;
 
 @Service("customerService")
 public class CustomerService implements DateValidated, DecisionNeeded, Excel<Customer>, ItemFamilyLimited, Reset,
-		SalesforceUploadable, Serviced<Long>, ServiceDeactivated<Long> {
+		SalesforceUploadable<SalesforceAccount>, Serviced<Long>, ServiceDeactivated<Long> {
 
 	private static final String DISCOUNT_TAB = "Customer Discount";
 
@@ -416,15 +416,13 @@ public class CustomerService implements DateValidated, DecisionNeeded, Excel<Cus
 		scriptService.saveScripts();
 		PricingType type = pricingTypeService.findByName("DEALER");
 		get().setPrimaryPricingType(type);
-		save(get());
+		set(save(get()));
 		throw new SuccessfulSaveInfo(getModuleId() + getOrderNo());
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends SalesforceEntity> T save(T t) throws NoServerConnectionException, StoppedServerException,
+	public Customer save(Customer c) throws NoServerConnectionException, StoppedServerException,
 			FailedAuthenticationException, InvalidException, RestException {
-		return (T) savingService.module(getModule()).save((Customer) t);
+		return savingService.module(getModule()).save(c);
 	}
 
 	@Override

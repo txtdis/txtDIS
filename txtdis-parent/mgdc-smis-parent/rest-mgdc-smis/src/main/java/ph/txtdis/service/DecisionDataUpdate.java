@@ -6,18 +6,18 @@ import static ph.txtdis.util.TextUtils.toZonedDateTime;
 
 import org.springframework.data.repository.CrudRepository;
 
-import ph.txtdis.domain.DecisionNeeded;
+import ph.txtdis.domain.AbstractDecisionNeededEntity;
 
 public interface DecisionDataUpdate {
 
-	default <T extends DecisionNeeded, R extends CrudRepository<T, Long>> T updateDecisionData(R repository,
+	default <T extends AbstractDecisionNeededEntity, R extends CrudRepository<T, Long>> T updateDecisionData(R repository,
 			String[] s) {
 		T t = repository.findOne(Long.valueOf(s[1]));
 		t = updateDecisionData(t, s);
 		return repository.save(t);
 	}
 
-	default <T extends DecisionNeeded> T updateDecisionData(T d, String[] s) {
+	default <T extends AbstractDecisionNeededEntity> T updateDecisionData(T d, String[] s) {
 		d.setIsValid(toBoolean(s[2]));
 		d.setRemarks(s[3].replace("@", "\n"));
 		d.setDecidedBy(toText(s[4]));

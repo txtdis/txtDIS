@@ -117,7 +117,7 @@ import ph.txtdis.util.TypeMap;
 
 @Service("billableService")
 public class BillableService implements BilledAllPickedSalesOrder, CreationTracked, Detailed, ItemBased<BillableDetail>,
-		DecisionNeeded, LatestCredit, NextWorkDayDated, Reset, SalesforceUploadable, Serviced<Long> {
+		DecisionNeeded, LatestCredit, NextWorkDayDated, Reset, SalesforceUploadable<SalesforceSalesInfo>, Serviced<Long> {
 
 	private class AlreadyReceivedBookingIdException extends Exception {
 
@@ -144,8 +144,8 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 		private static final long serialVersionUID = -919387748993066310L;
 
 		public IncompleteOrErroneousCustomerDataException(Customer c, String error) {
-			super("No booking if customers have incomplete/erroneous data;\n"//
-					+ c + "\n" + error);
+			super("No booking allowed if customers have incomplete/erroneous data;\n"//
+					+ "#" + c.getId() + " " + c + "\n" + error);
 		}
 	}
 
@@ -864,11 +864,9 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 		throw new SuccessfulSaveInfo(saveInfo());
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T extends SalesforceEntity> T save(T t)
+	public Billable save(Billable t)
 			throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException, InvalidException {
-		return (T) savingService.module(getModule()).save((Billable) t);
+		return savingService.module(getModule()).save(t);
 	}
 
 	public void saveDisposalData() throws NotAllowedOffSiteTransactionException {
@@ -935,8 +933,8 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 			verifyNotInThePast(d);
 			verifyUserAuthorization();
 			// verifyCustomersHaveCompleteAndCorrectData();
-			verifyAllPickedSalesOrderHaveBeenBilled(d);
-			verifyAllCashBillablesHaveBeenFullyPaid(d);
+			// verifyAllPickedSalesOrderHaveBeenBilled(d);
+			// verifyAllCashBillablesHaveBeenFullyPaid(d);
 		}
 		get().setOrderDate(d);
 	}
@@ -1030,16 +1028,17 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 			FailedAuthenticationException, RestException, InvalidException, NotFoundException, DeactivatedException,
 			BadCreditException, ExceededCreditLimitException, NotAllowedOffSiteTransactionException,
 			PickedUpSalesOrderDateNotTodayException, NotNextWorkDayException, NoAssignedCustomerSellerException,
-			NotTheAssignedCustomerSellerException, OpenBadOrReturnOrderException, NotAllowedToReturnBadOrderException {
+			NotTheAssignedCustomerSellerException, OpenBadOrReturnOrderException, NotAllowedToReturnBadOrderException,
+			UndepositedPaymentException, ItemReturningCustomerIncompleteContactDetailsException {
 		logger.info("allowOnlyIfOnSite@updateUponCustomerIdValidation(id)");
 		if (isNew() && isOffSite())
 			throw new NotAllowedOffSiteTransactionException();
 		setCustomer(findCustomerById(id));
 		verifyNonPickupSalesOrderDateIsNextWorkingDate();
 		verifyCurrentUserIsTheCustomerAssignedSeller();
-		// verifyAllCollectionsHaveBeenDeposited(CASH);
-		// verifyAllCollectionsHaveBeenDeposited(CHECK);
-		// verifyItemReturningCustomerHasCompleteContactDetails();
+		verifyAllCollectionsHaveBeenDeposited(PaymentType.CASH);
+		verifyAllCollectionsHaveBeenDeposited(PaymentType.CHECK);
+		verifyItemReturningCustomerHasCompleteContactDetails();
 		verifyCustomerHasNoOpenBadOrReturnOrder();
 		verifyCustomerHasBadOrderReturnAllowance();
 		verifyCustomerHasNoOverdues();
@@ -1962,7 +1961,7 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 			InvalidException, IncompleteOrErroneousCustomerDataException {
 		Customer c = customerService.findNotTheSameWeeksOneAndFiveVisitSchedule();
 		if (c != null)
-			throw new IncompleteOrErroneousCustomerDataException(c, "have different week 1 & 5 visit schedule");
+			throw new IncompleteOrErroneousCustomerDataException(c, "has different week 1 & 5 visit schedules");
 	}
 
 	private void verifyCustomersWithCreditsOrDiscountsHaveContactDetails()
@@ -2088,7 +2087,6 @@ public class BillableService implements BilledAllPickedSalesOrder, CreationTrack
 	@Override
 	public void saveUploadedData(List<? extends SalesforceEntity> list) throws NoServerConnectionException,
 			StoppedServerException, FailedAuthenticationException, RestException, InvalidException, NotFoundException {
-		// TODO Auto-generated method stub
 		List<SalesforceAccount> a = new ArrayList<>();
 		for (SalesforceEntity entity : list)
 			if (entity instanceof SalesforceAccount)

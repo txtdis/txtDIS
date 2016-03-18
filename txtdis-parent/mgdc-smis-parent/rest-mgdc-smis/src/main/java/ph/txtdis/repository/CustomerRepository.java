@@ -18,7 +18,7 @@ public interface CustomerRepository extends NameListRepository<Customer>, SpunRe
 	List<Customer> findByDeactivatedOnNullAndTypeAndBarangayTypeNot(@Param("customer") PartnerType t,
 			@Param("barangay") LocationType b);
 
-	List<Customer> findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNull(
+	List<Customer> findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNullOrderByVisitScheduleWeekNoAsc(
 			@Param("customer") PartnerType t);
 
 	List<Customer> findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNull(

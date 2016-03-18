@@ -14,7 +14,7 @@ public class AccountUploader extends SalesforceUploader {
 
 	private static final String RESULT_PATH = ".//*[@id='new']/div/div[3]/div/div[2]/table/tbody/tr[2]/th/a";
 
-	private List<SalesforceAccount> customers;
+	private List<? extends SalesforceAccount> customers;
 
 	public AccountUploader accounts(List<SalesforceAccount> c) {
 		customers = c;

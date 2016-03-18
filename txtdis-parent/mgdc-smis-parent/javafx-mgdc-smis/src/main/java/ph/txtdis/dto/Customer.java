@@ -37,6 +37,18 @@ public class Customer extends EntityModificationTracked<Long> implements Salesfo
 	
 	private ZonedDateTime uploadedOn;
 
+	private String barangay() {
+		if (barangay == null)
+			return "";
+		return (street != null ? ", " : "") + barangay;
+	}
+
+	private String city() {
+		if (city == null)
+			return "";
+		return (barangay != null || street != null ? ", " : "") + city;
+	}
+
 	public String getAddress() {
 		return street() + barangay() + city() + province();
 	}
@@ -48,6 +60,11 @@ public class Customer extends EntityModificationTracked<Long> implements Salesfo
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	@Override
+	public String getIdNo() {
+		return getId() == null ? null :getId().toString();
 	}
 
 	public Route getRoute() {
@@ -71,23 +88,6 @@ public class Customer extends EntityModificationTracked<Long> implements Salesfo
 		}
 	}
 
-	@Override
-	public String toString() {
-		return name;
-	}
-
-	private String barangay() {
-		if (barangay == null)
-			return "";
-		return (street != null ? ", " : "") + barangay;
-	}
-
-	private String city() {
-		if (city == null)
-			return "";
-		return (barangay != null || street != null ? ", " : "") + city;
-	}
-
 	private String province() {
 		if (province == null)
 			return "";
@@ -99,7 +99,7 @@ public class Customer extends EntityModificationTracked<Long> implements Salesfo
 	}
 
 	@Override
-	public String getIdNo() {
-		return getId().toString();
+	public String toString() {
+		return name;
 	}
 }
