@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(indexes = { //
 		@Index(columnList = "start_date") }, //
 		uniqueConstraints = @UniqueConstraint(columnNames = { "item_id", "start_date" }) )
-public class Price extends AbstractId<Long> implements Comparable<Price> {
+public class Price extends AbstractEntityId<Long> implements Comparable<Price> {
 
 	private static final long serialVersionUID = -5721868302278165093L;
 

@@ -9,7 +9,7 @@ public class CurrencyConverter extends StringConverter<BigDecimal> {
 
     @Override
     public String toString(BigDecimal number) {
-        return NumberUtils.formatCurrency(number);
+        return NumberUtils.toCurrencyText(number);
     }
 
     @Override

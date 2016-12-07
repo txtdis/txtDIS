@@ -23,9 +23,10 @@ import ph.txtdis.fx.control.AppField;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.dialog.AuditDialog;
 import ph.txtdis.fx.dialog.MessageDialog;
-import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.info.Information;
 import ph.txtdis.service.DecisionNeeded;
-import ph.txtdis.util.TypeMap;
+import ph.txtdis.service.Saved;
+import ph.txtdis.util.ClientTypeMap;
 
 @Scope("prototype")
 @Component("decisionNeededApp")
@@ -56,7 +57,7 @@ public class DecisionNeededApp {
 	private MessageDialog dialog;
 
 	@Autowired
-	private TypeMap map;
+	private ClientTypeMap map;
 
 	private BooleanProperty canBeApproved = new SimpleBooleanProperty(false);
 
@@ -142,17 +143,17 @@ public class DecisionNeededApp {
 		decidedOnDisplay.setValue(service.getDecidedOn());
 	}
 
-	private void saveDecision(DecisionNeeded a) throws SuccessfulSaveInfo, Exception {
+	private void saveDecision(DecisionNeeded a) throws Information, Exception {
 		Boolean isValid = decisionDialog.isValid();
 		String remarks = decisionDialog.getFindings();
 		a.updatePerValidity(isValid, remarks);
-		a.save();
+		((Saved<?>) a).save();
 	}
 
 	private void saveDecision(Stage s, DecisionNeeded a) {
 		try {
 			saveDecision(a);
-		} catch (SuccessfulSaveInfo i) {
+		} catch (Information i) {
 			dialog.show(i).addParent(s).start();
 		} catch (Exception e) {
 			e.printStackTrace();

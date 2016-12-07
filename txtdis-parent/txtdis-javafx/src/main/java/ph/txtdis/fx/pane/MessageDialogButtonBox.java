@@ -9,7 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
-@Component
+@Component("messageDialogButtonBox")
 public class MessageDialogButtonBox extends HBox {
 
 	public MessageDialogButtonBox() {

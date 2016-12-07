@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "sales_order_item")
-public class SalesOrderItem extends AbstractId<Long> {
+public class SalesOrderItem extends AbstractEntityId<Long> {
 
 	private static final long serialVersionUID = -6178110363985848836L;
 

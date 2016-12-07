@@ -87,7 +87,7 @@ public class MessageDialog extends AbstractDialog {
 	public MessageDialog showError(String error) {
 		text = error;
 		withOption = false;
-		unicode = "\ue80f";
+		unicode = "\ue947";
 		color = "maroon";
 		closeText = "OK";
 		return this;
@@ -96,7 +96,7 @@ public class MessageDialog extends AbstractDialog {
 	public MessageDialog showInfo(String info) {
 		text = info;
 		withOption = false;
-		unicode = "\ue813";
+		unicode = "\ue92d";
 		color = "lime";
 		closeText = "OK";
 		return this;
@@ -107,7 +107,7 @@ public class MessageDialog extends AbstractDialog {
 		this.optionText = option;
 		this.closeText = close;
 		this.withOption = true;
-		unicode = "\ue916";
+		unicode = "\ue95c";
 		color = "yellow";
 		return this;
 	}

@@ -1,8 +1,8 @@
 package ph.txtdis.fx.dialog;
 
-import static ph.txtdis.type.Type.QUANTITY;
 import static ph.txtdis.type.Type.ID;
 import static ph.txtdis.type.Type.INTEGER;
+import static ph.txtdis.type.Type.QUANTITY;
 import static ph.txtdis.type.Type.TEXT;
 import static ph.txtdis.util.NumberUtils.isZero;
 
@@ -20,11 +20,12 @@ import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCombo;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.service.BillableService;
+import ph.txtdis.service.PurchasedBillableService;
 import ph.txtdis.type.UomType;
 
 @Scope("prototype")
 @Component("purchasingDialog")
-public class PurchasingDialog extends FieldDialog<BillableDetail> {
+public class PurchasingDialog extends AbstractFieldDialog<BillableDetail> implements BillableDialog {
 
 	@Autowired
 	private LabeledField<Long> itemIdField;
@@ -64,7 +65,7 @@ public class PurchasingDialog extends FieldDialog<BillableDetail> {
 			service.setItemUponValidation(id);
 			itemNameDisplay.setValue(service.getItemName());
 			uomCombo.items(service.getBuyingUoms());
-			onPurchaseDaysLevelDisplay.setValue(service.getOnPurchaseDaysLevel());
+			onPurchaseDaysLevelDisplay.setValue(((PurchasedBillableService) service).getOnPurchaseDaysLevel());
 		} catch (Exception e) {
 			resetNodesOnError(e);
 		}
@@ -81,7 +82,7 @@ public class PurchasingDialog extends FieldDialog<BillableDetail> {
 		BigDecimal qty = qtyField.getValue();
 		if (!isZero(qty)) {
 			try {
-				onReceiptDaysLevelDisplay.setValue(service.getOnReceiptDaysLevel(uom, qty));
+				onReceiptDaysLevelDisplay.setValue(((PurchasedBillableService) service).getOnReceiptDaysLevel(uom, qty));
 			} catch (Exception e) {
 				resetNodesOnError(e);
 			}
@@ -100,7 +101,7 @@ public class PurchasingDialog extends FieldDialog<BillableDetail> {
 
 	@Override
 	protected BillableDetail createEntity() {
-		return service.createDetail(uomCombo.getValue(), qtyField.getValue());
+		return service.createDetail();
 	}
 
 	@Override

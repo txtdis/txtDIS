@@ -1,6 +1,5 @@
 package ph.txtdis.salesforce;
 
-import static java.util.Arrays.asList;
 import static org.openqa.selenium.By.id;
 import static org.openqa.selenium.By.linkText;
 import static org.openqa.selenium.Keys.CONTROL;
@@ -10,7 +9,6 @@ import static org.openqa.selenium.Keys.chord;
 import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -18,8 +16,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.stereotype.Component;
 
-import ph.txtdis.dto.SalesforceAccount;
-import ph.txtdis.dto.SalesforceEntity;
 import ph.txtdis.dto.SalesforceSalesInfo;
 import ph.txtdis.dto.SalesforceSalesInfoProduct;
 
@@ -30,48 +26,35 @@ public class SalesInfoUploader extends AccountUploader {
 
 	public static void main(String[] args) {
 		/*
-		SalesforceAccount c = new SalesforceAccount();
-		c.setDistributor("MAGNUM GROWTH DISTRIBUTION");
-		c.setAccountName("TEST");
-		c.setAccountNumber("123");
-		c.setChannel("SARI - SARI STORE");
-		c.setProvince("BULACAN");
-		c.setCity("SANTA MARIA");
-		c.setBarangay("BAGBAGUIN");
-		c.setArea("Greater Manila Area");
-		c.setCluster("NORTH GMA");
-		c.setPaymentTerms(0);
-		c.setTaxClassification("Vatable");
-		c.setVisitFrequency("F2");
-		List<SalesforceAccount> a = Arrays.asList(c);
-
-		SalesforceSalesInfoProduct product1 = new SalesforceSalesInfoProduct();
-		product1.setSku("5011200230029");
-		product1.setUom("KG");
-		product1.setQuantity("1");
-		product1.setPercentDiscount("5");
-
-		SalesforceSalesInfoProduct product2 = new SalesforceSalesInfoProduct();
-		product2.setSku("5011200208450");
-		product2.setUom("KG");
-		product2.setQuantity("2");
-		product2.setPercentDiscount("3");
-
-		SalesforceSalesInfo invoice = new SalesforceSalesInfo();
-		invoice.setAccount("MHENG FROZEN PRODUCT");
-		invoice.setActualDate("2/14/2016");
-		invoice.setInvoiceNumber("1234567890");
-		invoice.setDsp("HOMER");
-		invoice.setProducts(asList(product1, product2));
-		List<SalesforceSalesInfo> i = asList(invoice);
-		
-		for (SalesforceEntity u : new SalesInfoUploader().invoices(i).accounts(a).start()) {
-			String s = "Invoice";
-			if (u instanceof SalesforceAccount)
-				s = "Customer";
-			System.out.println(s + " = " + u);
-		}
-		*/
+		 * SalesforceAccount c = new SalesforceAccount(); c.setDistributor(
+		 * "MAGNUM GROWTH DISTRIBUTION"); c.setAccountName("TEST");
+		 * c.setAccountNumber("123"); c.setChannel("SARI - SARI STORE");
+		 * c.setProvince("BULACAN"); c.setCity("SANTA MARIA");
+		 * c.setBarangay("BAGBAGUIN"); c.setArea("Greater Manila Area");
+		 * c.setCluster("NORTH GMA"); c.setPaymentTerms(0);
+		 * c.setTaxClassification("Vatable"); c.setVisitFrequency("F2");
+		 * List<SalesforceAccount> a = Arrays.asList(c);
+		 * 
+		 * SalesforceSalesInfoProduct product1 = new SalesforceSalesInfoProduct();
+		 * product1.setSku("5011200230029"); product1.setUom("KG");
+		 * product1.setQuantity("1"); product1.setPercentDiscount("5");
+		 * 
+		 * SalesforceSalesInfoProduct product2 = new SalesforceSalesInfoProduct();
+		 * product2.setSku("5011200208450"); product2.setUom("KG");
+		 * product2.setQuantity("2"); product2.setPercentDiscount("3");
+		 * 
+		 * SalesforceSalesInfo invoice = new SalesforceSalesInfo();
+		 * invoice.setAccount("MHENG FROZEN PRODUCT");
+		 * invoice.setActualDate("2/14/2016");
+		 * invoice.setInvoiceNumber("1234567890"); invoice.setDsp("HOMER");
+		 * invoice.setProducts(asList(product1, product2));
+		 * List<SalesforceSalesInfo> i = asList(invoice);
+		 * 
+		 * for (SalesforceEntity u : new
+		 * SalesInfoUploader().invoices(i).accounts(a).start()) { String s =
+		 * "Invoice"; if (u instanceof SalesforceAccount) s = "Customer";
+		 * System.out.println(s + " = " + u); }
+		 */
 	}
 
 	public SalesInfoUploader invoices(List<SalesforceSalesInfo> invoices) {
@@ -91,7 +74,7 @@ public class SalesInfoUploader extends AccountUploader {
 		inputDetails(invoice);
 		inputProducts(invoice);
 		clickProceedButton();
-		// clickSaveAndNewButton();
+		clickSaveAndNewButton();
 		invoice.setUploadedOn(ZonedDateTime.now());
 		uploads.add(invoice);
 	}

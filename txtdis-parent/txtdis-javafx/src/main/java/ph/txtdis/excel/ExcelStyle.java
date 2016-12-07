@@ -1,20 +1,20 @@
 package ph.txtdis.excel;
 
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_CENTER;
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_LEFT;
-import static org.apache.poi.ss.usermodel.CellStyle.ALIGN_RIGHT;
-import static org.apache.poi.ss.usermodel.CellStyle.BORDER_DOUBLE;
-import static org.apache.poi.ss.usermodel.CellStyle.BORDER_THIN;
-import static org.apache.poi.ss.usermodel.CellStyle.SOLID_FOREGROUND;
-import static org.apache.poi.ss.usermodel.CellStyle.VERTICAL_CENTER;
-import static org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD;
+import static org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
 import static org.apache.poi.ss.usermodel.IndexedColors.GREY_50_PERCENT;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DataFormat;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +29,11 @@ public class ExcelStyle {
 	private Font normalFont, greenFont, redFont, titleFont, boldFont;
 
 	private CellStyle bool, center, currency, currencySum, date, decimal, decimalSum, falseBool, header, id, integer,
-			left, red, right, title, trueBool;
+			left, red, right, title, trueBool, verticalHeader;
 
 	private DataFormat format;
+
+	private Map<Integer, CellStyle> styleMap;
 
 	public ExcelStyle add(HSSFWorkbook wb) {
 		this.wb = wb;
@@ -72,6 +74,13 @@ public class ExcelStyle {
 		return falseBool;
 	}
 
+	public CellStyle fraction(Integer denominator) {
+		CellStyle s = styleMap.get(denominator);
+		if (s == null)
+			setFraction(denominator);
+		return styleMap.get(denominator);
+	}
+
 	public CellStyle header() {
 		return header;
 	}
@@ -104,6 +113,10 @@ public class ExcelStyle {
 		return trueBool;
 	}
 
+	public CellStyle verticalHeader() {
+		return verticalHeader;
+	}
+
 	private Font boldFont() {
 		return boldFont;
 	}
@@ -118,6 +131,10 @@ public class ExcelStyle {
 
 	private short decimalFormat() {
 		return format.getFormat("_(#,##0.00_);[Red]_((#,##0.00);_(\"-\"??_);_(@_)");
+	}
+
+	private short fractionFormat(int denominator) {
+		return format.getFormat("# ??/" + denominator + ";-# ??/" + denominator + ";\"\"??");
 	}
 
 	private Font greenFont() {
@@ -141,6 +158,7 @@ public class ExcelStyle {
 	}
 
 	private void setAll() {
+		styleMap = new HashMap<>();
 		setFonts();
 		setStyles();
 	}
@@ -148,73 +166,65 @@ public class ExcelStyle {
 	private void setBoldFont() {
 		boldFont = wb.createFont();
 		boldFont.setFontName(CALIBRI);
-		boldFont.setBoldweight(BOLDWEIGHT_BOLD);
+		boldFont.setBold(true);
 		boldFont.setFontHeightInPoints((short) 11);
 	}
 
 	private void setBool() {
 		bool = wb.createCellStyle();
 		bool.setFont(normalFont());
-		bool.setAlignment(ALIGN_CENTER);
-		bool.setLocked(true);
+		bool.setAlignment(CENTER);
 	}
 
 	private void setCenter() {
 		center = wb.createCellStyle();
 		center.setFont(normalFont());
-		center.setAlignment(ALIGN_CENTER);
-		center.setLocked(true);
+		center.setAlignment(CENTER);
 	}
 
 	private void setCurrency() {
 		currency = wb.createCellStyle();
 		currency.setFont(normalFont());
 		currency.setDataFormat(currencyFormat());
-		currency.setAlignment(ALIGN_RIGHT);
-		currency.setLocked(true);
+		currency.setAlignment(HorizontalAlignment.RIGHT);
 	}
 
 	private void setCurrencySum() {
 		currencySum = wb.createCellStyle();
 		currencySum.setFont(normalFont());
 		currencySum.setDataFormat(currencyFormat());
-		currencySum.setAlignment(ALIGN_RIGHT);
-		currencySum.setBorderTop(BORDER_THIN);
-		currencySum.setBorderBottom(BORDER_DOUBLE);
-		currencySum.setLocked(true);
+		currencySum.setAlignment(HorizontalAlignment.RIGHT);
+		currencySum.setBorderTop(BorderStyle.THIN);
+		currencySum.setBorderBottom(BorderStyle.DOUBLE);
 	}
 
 	private void setDate() {
 		date = wb.createCellStyle();
 		date.setFont(normalFont());
 		date.setDataFormat(dateFormat());
-		date.setAlignment(ALIGN_CENTER);
-		date.setLocked(true);
+		date.setAlignment(CENTER);
 	}
 
 	private void setDecimal() {
 		decimal = wb.createCellStyle();
 		decimal.setFont(normalFont());
 		decimal.setDataFormat(decimalFormat());
-		decimal.setAlignment(ALIGN_RIGHT);
-		decimal.setLocked(true);
+		decimal.setAlignment(HorizontalAlignment.RIGHT);
 	}
 
 	private void setDecimalSum() {
 		decimalSum = wb.createCellStyle();
 		decimalSum.setFont(normalFont());
 		decimalSum.setDataFormat(decimalFormat());
-		decimalSum.setAlignment(ALIGN_RIGHT);
-		decimalSum.setBorderTop(BORDER_THIN);
-		decimalSum.setBorderBottom(BORDER_DOUBLE);
-		decimalSum.setLocked(true);
+		decimalSum.setAlignment(HorizontalAlignment.RIGHT);
+		decimalSum.setBorderTop(BorderStyle.THIN);
+		decimalSum.setBorderBottom(BorderStyle.DOUBLE);
 	}
 
 	private void setFalseBool() {
 		falseBool = wb.createCellStyle();
 		falseBool.setFont(redFont());
-		falseBool.setAlignment(ALIGN_CENTER);
-		falseBool.setLocked(true);
+		falseBool.setAlignment(CENTER);
 	}
 
 	private void setFonts() {
@@ -223,6 +233,14 @@ public class ExcelStyle {
 		setNormalFont();
 		setRedFont();
 		setTitleFont();
+	}
+
+	private void setFraction(Integer denominator) {
+		CellStyle fraction = wb.createCellStyle();
+		fraction.setFont(normalFont());
+		fraction.setDataFormat(fractionFormat(denominator));
+		fraction.setAlignment(HorizontalAlignment.RIGHT);
+		styleMap.put(denominator, fraction);
 	}
 
 	private void setGreenFont() {
@@ -234,14 +252,14 @@ public class ExcelStyle {
 
 	private void setHeader() {
 		header = wb.createCellStyle();
-		header.setBorderRight(BORDER_THIN);
-		header.setBorderLeft(BORDER_THIN);
 		header.setFillForegroundColor(GREY_50_PERCENT.getIndex());
-		header.setFillPattern(SOLID_FOREGROUND);
+		header.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 		header.setFont(boldFont());
-		header.setAlignment(ALIGN_CENTER);
-		header.setVerticalAlignment(VERTICAL_CENTER);
-		header.setLocked(true);
+		header.setAlignment(CENTER);
+		header.setVerticalAlignment(VerticalAlignment.CENTER);
+		header.setBorderRight(BorderStyle.THIN);
+		header.setBorderLeft(BorderStyle.THIN);
+		header.setBorderBottom(BorderStyle.THIN);
 		header.setWrapText(true);
 	}
 
@@ -249,23 +267,20 @@ public class ExcelStyle {
 		id = wb.createCellStyle();
 		id.setFont(normalFont());
 		id.setDataFormat(idFormat());
-		id.setAlignment(ALIGN_RIGHT);
-		id.setLocked(true);
+		id.setAlignment(HorizontalAlignment.RIGHT);
 	}
 
 	private void setInteger() {
 		integer = wb.createCellStyle();
 		integer.setFont(normalFont());
 		integer.setDataFormat(integerFormat());
-		integer.setAlignment(ALIGN_RIGHT);
-		integer.setLocked(true);
+		integer.setAlignment(HorizontalAlignment.RIGHT);
 	}
 
 	private void setLeft() {
 		left = wb.createCellStyle();
 		left.setFont(normalFont());
-		left.setAlignment(ALIGN_LEFT);
-		left.setLocked(true);
+		left.setAlignment(HorizontalAlignment.LEFT);
 	}
 
 	private void setNormalFont() {
@@ -277,8 +292,7 @@ public class ExcelStyle {
 	private void setRed() {
 		red = wb.createCellStyle();
 		red.setFont(redFont());
-		red.setAlignment(ALIGN_RIGHT);
-		red.setLocked(true);
+		red.setAlignment(HorizontalAlignment.RIGHT);
 	}
 
 	private void setRedFont() {
@@ -291,8 +305,7 @@ public class ExcelStyle {
 	private void setRight() {
 		right = wb.createCellStyle();
 		right.setFont(normalFont());
-		right.setAlignment(ALIGN_RIGHT);
-		right.setLocked(true);
+		right.setAlignment(HorizontalAlignment.RIGHT);
 	}
 
 	private void setStyles() {
@@ -312,29 +325,43 @@ public class ExcelStyle {
 		setRight();
 		setTitle();
 		setTrueBool();
+		setVerticalHeader();
 	}
 
 	private void setTitle() {
 		title = wb.createCellStyle();
 		title.setFont(titleFont());
-		title.setAlignment(ALIGN_LEFT);
-		title.setVerticalAlignment(VERTICAL_CENTER);
+		title.setAlignment(HorizontalAlignment.LEFT);
+		title.setVerticalAlignment(VerticalAlignment.CENTER);
+		title.setBorderRight(BorderStyle.THIN);
+		title.setBorderLeft(BorderStyle.THIN);
+		title.setBorderBottom(BorderStyle.THIN);
 		title.setWrapText(true);
-		title.setLocked(true);
 	}
 
 	private void setTitleFont() {
 		titleFont = wb.createFont();
 		titleFont.setFontName(CALIBRI);
-		titleFont.setBoldweight(BOLDWEIGHT_BOLD);
+		titleFont.setBold(true);
 		titleFont.setFontHeightInPoints((short) 15);
 	}
 
 	private void setTrueBool() {
 		trueBool = wb.createCellStyle();
 		trueBool.setFont(greenFont());
-		trueBool.setAlignment(ALIGN_CENTER);
-		trueBool.setLocked(true);
+		trueBool.setAlignment(CENTER);
+	}
+
+	private void setVerticalHeader() {
+		verticalHeader = wb.createCellStyle();
+		verticalHeader.setFont(boldFont());
+		verticalHeader.setAlignment(CENTER);
+		verticalHeader.setVerticalAlignment(VerticalAlignment.BOTTOM);
+		verticalHeader.setBorderRight(BorderStyle.THIN);
+		verticalHeader.setBorderLeft(BorderStyle.THIN);
+		verticalHeader.setBorderBottom(BorderStyle.THIN);
+		verticalHeader.setWrapText(false);
+		verticalHeader.setRotation((short) 90);
 	}
 
 	private Font titleFont() {

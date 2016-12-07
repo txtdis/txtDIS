@@ -1,12 +1,6 @@
 package ph.txtdis.app;
 
-import javafx.stage.Stage;
-
-public interface Launchable {
+public interface Launchable extends Startable {
 
 	void actOn(String... id);
-
-	Startable addParent(Stage stage);
-
-	void start();
 }

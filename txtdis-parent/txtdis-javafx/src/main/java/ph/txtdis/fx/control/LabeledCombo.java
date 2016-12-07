@@ -56,7 +56,7 @@ public class LabeledCombo<T> implements InputNode<T> {
 
 	public LabeledCombo<T> items(List<T> items) {
 		comboBox.setItems(items == null ? emptyObservableList() : observableArrayList(items));
-		comboBox.select(0);
+		comboBox.select(null);
 		return this;
 	}
 

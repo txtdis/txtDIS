@@ -1,0 +1,120 @@
+package ph.txtdis.app;
+
+import static javafx.collections.FXCollections.observableArrayList;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableList;
+import ph.txtdis.dto.StockTakeVariance;
+import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.dialog.AuditDialog;
+import ph.txtdis.fx.dialog.OpenByDateDialog;
+import ph.txtdis.fx.table.StockTakeVarianceTable;
+import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.service.StockTakeVarianceService;
+import ph.txtdis.util.TextUtils;
+
+public class AbstractStockTakeVarianceApp
+		extends AbstractReportApp<StockTakeVarianceTable, StockTakeVarianceService, StockTakeVariance>
+		implements StockTakeVarianceApp {
+
+	@Autowired
+	private AppButton decisionButton, saveButton;
+
+	@Autowired
+	private AuditDialog decisionDialog;
+
+	@Autowired
+	private OpenByDateDialog openDialog;
+
+	private BooleanProperty canBeApproved = new SimpleBooleanProperty(false);
+
+	private BooleanProperty canBeRejected = new SimpleBooleanProperty(false);
+
+	@Override
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
+		b.addAll(Arrays.asList( //
+				saveButton.icon("save").tooltip("Save...").build(), //
+				decisionButton.icon("decision").tooltip("Decide...").build()));
+		return b;
+	}
+
+	@Override
+	protected void displayOpenByDateDialog() {
+		openDialog.header("List Physical Count Variances");
+		openDialog.prompt("Enter date of the desired stock take");
+		openDialog.addParent(this).start();
+	}
+
+	@Override
+	protected void setDates() {
+		service.setEndDate(openDialog.getDate());
+	}
+
+	@Override
+	protected void setBindings() {
+		decisionButton.disableIf(saveButton.disabledProperty().not());
+	}
+
+	@Override
+	protected void setListeners() {
+		super.setListeners();
+		saveButton.setOnAction(e -> save());
+		decisionButton.setOnAction(e -> decide());
+	}
+
+	private void save() {
+		try {
+			service.saveUponValidation(table.getItems());
+		} catch (SuccessfulSaveInfo i) {
+			dialog.show(i).addParent(this).start();
+		} catch (Exception e) {
+			showErrorDialog(e);
+		}
+	}
+
+	private void decide() {
+		canBeApproved.set(service.canApprove());
+		canBeRejected.set(service.canReject());
+		decisionDialog//
+				.disableApprovalButtonIf(canBeApproved.not())//
+				.disableRejectionButtonIf(canBeRejected.not())//
+				.addParent(this).start();
+		if (decisionDialog.isValid() != null)
+			updateTableOnDecision();
+	}
+
+	private void updateTableOnDecision() {
+		ObservableList<StockTakeVariance> l = observableArrayList(table.getItems());
+		l.stream().map(v -> validate(v));
+		table.items(l);
+	}
+
+	private StockTakeVariance validate(StockTakeVariance v) {
+		if (v.getIsValid() == null) {
+			v.setIsValid(decisionDialog.isValid());
+			String prefix = "";
+			String justification = v.getJustification();
+			if (justification != null && !justification.isEmpty())
+				prefix = justification + "\n";
+			v.setJustification(prefix + decision());
+		}
+		return v;
+	}
+
+	private String decision() {
+		String prefix = "";
+		if (!decisionDialog.isValid())
+			prefix = "DIS";
+		return "[" + prefix + "APPROVED: " + service.getUsername() + " - " + toDateDisplay(service.getServerDate()) + "] "
+				+ TextUtils.blankIfNull(decisionDialog.getFindings());
+	}
+}

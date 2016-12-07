@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>mgdc-smis-parent</artifactId>
-		<version>0.9.3.1</version>
+		<version>0.9.4.6</version>
 	</parent>
 
 	<artifactId>rest-mgdc-smis</artifactId>
@@ -20,32 +20,23 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.neuronrobotics</groupId>
-			<artifactId>nrjavaserial</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-phone</artifactId>
+			<artifactId>txtdis-rest-mgdc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-mgdc-smis</artifactId>
+			<artifactId>txtdis-salesforce</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-rest</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
 		</dependency>
 	</dependencies>
 

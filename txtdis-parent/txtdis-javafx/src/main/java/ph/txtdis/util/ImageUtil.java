@@ -10,7 +10,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import ph.txtdis.util.BinaryUtils;
 
 public class ImageUtil {
 	public static byte[] defaultImageBytes(String name) {
@@ -18,7 +17,7 @@ public class ImageUtil {
 	}
 
 	public static InputStream defaultImageStream(String name) {
-		return UI.class.getResourceAsStream("/image/" + name + ".jpg");
+		return ImageUtil.class.getResourceAsStream("/image/" + name + ".jpg");
 	}
 
 	public static ImageView getDefaultImageView(String name) {

@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import ph.txtdis.domain.Customer;
+import ph.txtdis.domain.CustomerImpl;
 import ph.txtdis.domain.CustomerSalesVolume;
 import ph.txtdis.domain.Item;
 import ph.txtdis.domain.Price;
@@ -47,7 +47,7 @@ public class SalesOrderService {
 
 	private SalesOrder salesOrder;
 
-	public void processDecidedSalesOrder(SmsLog log, Customer c, String salesOrderId) throws NotFoundException {
+	public void processDecidedSalesOrder(SmsLog log, CustomerImpl c, String salesOrderId) throws NotFoundException {
 		Long id = Long.valueOf(salesOrderId);
 		SalesOrder so = salesOrderRepository.findByIdAndCustomer(id, c);
 		if (so == null)
@@ -56,7 +56,7 @@ public class SalesOrderService {
 		salesOrderRepository.save(so);
 	}
 
-	public void computeSalesOrderItemQuantitiesBasedOnStockOnHand(Customer customer, String itemSmsId,
+	public void computeSalesOrderItemQuantitiesBasedOnStockOnHand(CustomerImpl customer, String itemSmsId,
 			String stockOnHand) {
 		// TODO Quantity for new products
 		Item item = itemRepository.findBySmsId(itemSmsId.trim());
@@ -82,7 +82,7 @@ public class SalesOrderService {
 
 	}
 
-	private void addSalesOrderItem(Customer customer, Item item, BigDecimal stockDifference) {
+	private void addSalesOrderItem(CustomerImpl customer, Item item, BigDecimal stockDifference) {
 		int qty = stockDifference.negate().round(new MathContext(0, RoundingMode.CEILING)).intValue();
 		if (salesOrder == null)
 			salesOrder = new SalesOrder(LocalDate.now(), customer);

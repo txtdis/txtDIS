@@ -9,14 +9,14 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
-import ph.txtdis.util.TypeMap;
+import ph.txtdis.util.ClientTypeMap;
 
 @Component
 @Scope("prototype")
 public class AppButton extends Button {
 
 	@Autowired
-	private TypeMap typeMap;
+	private ClientTypeMap typeMap;
 
 	private String text, color, tooltip;
 

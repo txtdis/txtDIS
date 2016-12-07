@@ -6,6 +6,9 @@ import static java.math.RoundingMode.HALF_EVEN;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.Fraction;
+
 public class NumberUtils {
 
 	public final static DecimalFormat NO_COMMA_DECIMAL = new DecimalFormat("0.00;(0.00)");
@@ -30,7 +33,7 @@ public class NumberUtils {
 		return isZero(number) ? "" : FOUR_PLACE_DECIMAL.format(number);
 	}
 
-	public static String formatCurrency(BigDecimal number) {
+	public static String toCurrencyText(BigDecimal number) {
 		return isZero(number) ? "" : "₱" + format2Place(number);
 	}
 
@@ -49,6 +52,10 @@ public class NumberUtils {
 
 	public static String formatPercent(BigDecimal number) {
 		return isZero(number) ? "" : format2Place(number) + "%";
+	}
+
+	public static String formatWhole(BigDecimal number) {
+		return isZero(number) ? "" : NO_COMMA_INTEGER.format(number);
 	}
 
 	public static boolean isNegative(BigDecimal number) {
@@ -96,6 +103,14 @@ public class NumberUtils {
 		return new BigDecimal(text);
 	}
 
+	public static Fraction toFraction(String text) {
+		try {
+			return Fraction.getFraction(text);
+		} catch (Exception e) {
+			return Fraction.ZERO;
+		}
+	}
+
 	public static Integer toInteger(String text) {
 		return toBigDecimal(text).intValue();
 	}
@@ -111,12 +126,12 @@ public class NumberUtils {
 	public static BigDecimal parseBigDecimal(String text) {
 		if (text == null)
 			return ZERO;
-		text = text.trim()//
+		text = text.replace(" ", "")//
 				.replace(",", "")//
 				.replace("(", "-")//
 				.replace(")", "")//
 				.replace("₱", "");
-		if (text.equals("-") || text.isEmpty())
+		if (text.equals("-") || text.isEmpty() || StringUtils.isNumeric(text.replaceFirst("-", "")))
 			return ZERO;
 		return new BigDecimal(text);
 	}

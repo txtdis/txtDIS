@@ -1,6 +1,5 @@
 package ph.txtdis.fx.pane;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -12,7 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-@Component
+@Component("appBoxPaneFactory")
 public class AppBoxPaneFactory {
 
 	public HBox forGridGroup(Node... n) {
@@ -23,6 +22,14 @@ public class AppBoxPaneFactory {
 	}
 
 	public HBox forHorizontalPane(List<? extends Node> n) {
+		return forHorizontalPane(toArray(n));
+	}
+
+	private Node[] toArray(List<? extends Node> n) {
+		return n.toArray(new Node[n.size()]);
+	}
+
+	public HBox forHorizontalPane(Node... n) {
 		HBox b = forHorizontals(n);
 		b.setSpacing(10);
 		b.setPadding(new Insets(0, 10, 10, 10));
@@ -30,12 +37,8 @@ public class AppBoxPaneFactory {
 		return b;
 	}
 
-	public HBox forHorizontalPane(Node... n) {
-		return forHorizontalPane(Arrays.asList(n));
-	}
-
 	public HBox forHorizontals(List<? extends Node> n) {
-		return new HBox(n.toArray(new Node[n.size()]));
+		return new HBox(toArray(n));
 	}
 
 	public HBox forHorizontals(Node... n) {
@@ -64,7 +67,7 @@ public class AppBoxPaneFactory {
 	}
 
 	public VBox forVerticals(List<Node> n) {
-		return new VBox(n.toArray(new Node[n.size()]));
+		return new VBox(toArray(n));
 	}
 
 	public VBox forVerticals(Node... n) {

@@ -20,7 +20,7 @@ import ph.txtdis.fx.control.AppField;
 
 @Scope("prototype")
 @Component("auditDialog")
-public class AuditDialog extends InputDialog {
+public class AuditDialog extends AbstractInputDialog {
 
 	@Autowired
 	private AppField<String> textField;

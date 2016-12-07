@@ -22,7 +22,7 @@ import ph.txtdis.fx.validator.DateInputValidator;
 public class LocalDatePicker extends DatePicker implements InputControl<LocalDate> {
 
 	public LocalDatePicker() {
-		setStyle("-fx-opacity: 1; ");
+		editorProperty().get().setStyle("-fx-opacity: 1; ");
 		setPickerWidth(140);
 		traverseOnPressedEnterKey();
 		setPromptText("08/08/2008");

@@ -20,17 +20,19 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import ph.txtdis.fx.dialog.LoginDialog;
 import ph.txtdis.util.FontIcon;
-import ph.txtdis.util.UI;
 
 @SpringBootApplication
 @PropertySource("server.properties")
 @PropertySource("application.properties")
 public class App extends Application {
+
+	private HBox splash;
 
 	private interface Init {
 		void complete();
@@ -39,8 +41,6 @@ public class App extends Application {
 	public static void main(String[] args) {
 		launch();
 	}
-
-	private HBox splash;
 
 	@Override
 	public void init() throws Exception {
@@ -58,7 +58,7 @@ public class App extends Application {
 	private void createSplash() {
 		splash = new HBox(phoneInsideSpinningBallLogo(), textPane());
 		splash.setAlignment(Pos.CENTER);
-		splash.setPadding(new Insets(35, 25, 35, 60));
+		splash.setPadding(new Insets(35, 35, 35, 35));
 		splash.setStyle("-fx-base: slateblue; -fx-background-radius: 0.5em; ");
 	}
 
@@ -90,7 +90,7 @@ public class App extends Application {
 	}
 
 	private Node phoneLogo() {
-		Label p = new Label("\ue826");
+		Label p = new Label("\ue945");
 		p.setStyle("-fx-font: 72 'txtdis'; -fx-text-fill: midnightblue;");
 		p.setPadding(new Insets(10));
 		return p;
@@ -118,7 +118,7 @@ public class App extends Application {
 
 	private void showSplash(Stage stage) {
 		stage.setTitle("Starting txtDIS...");
-		stage.getIcons().add(new FontIcon("\ue826"));
+		stage.getIcons().add(new FontIcon("\ue945"));
 		stage.initStyle(StageStyle.TRANSPARENT);
 		stage.setScene(scene());
 		stage.show();
@@ -126,8 +126,8 @@ public class App extends Application {
 
 	private Node spinningBalls() {
 		ProgressIndicator pi = new ProgressIndicator();
-		pi.setScaleX(2.0);
-		pi.setScaleY(2.0);
+		pi.setScaleX(1.5);
+		pi.setScaleY(1.5);
 		pi.setStyle(" -fx-accent: white;");
 		return pi;
 	}
@@ -141,7 +141,7 @@ public class App extends Application {
 	}
 
 	private Node trademark() {
-		UI.loadFont("Ubuntu-BI");
+		Font.loadFont(this.getClass().getResourceAsStream("/font/Ubuntu-BI.ttf"), 24);
 		Label tm = new Label("txtDIS");
 		tm.setStyle("-fx-font: 48pt 'ubuntu'; -fx-text-fill: midnightblue;");
 		tm.setAlignment(Pos.TOP_CENTER);

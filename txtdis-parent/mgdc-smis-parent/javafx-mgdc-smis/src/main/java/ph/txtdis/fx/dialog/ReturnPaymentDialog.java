@@ -15,11 +15,11 @@ import javafx.beans.binding.BooleanBinding;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledDatePicker;
 import ph.txtdis.fx.control.LabeledField;
-import ph.txtdis.service.BillableService;
+import ph.txtdis.service.ItemReturnableBillableService;
 
 @Scope("prototype")
 @Component("returnPaymentDialog")
-public class ReturnPaymentDialog extends FieldDialog<LocalDate> {
+public class ReturnPaymentDialog extends AbstractFieldDialog<LocalDate> {
 
 	@Autowired
 	private LabeledField<String> prefixField;
@@ -34,7 +34,7 @@ public class ReturnPaymentDialog extends FieldDialog<LocalDate> {
 	private LabeledDatePicker datePicker;
 
 	@Autowired
-	private BillableService service;
+	private ItemReturnableBillableService service;
 
 	private LabeledField<String> suffixField() {
 		suffixField.name("Series").width(40).build(TEXT);
@@ -44,7 +44,7 @@ public class ReturnPaymentDialog extends FieldDialog<LocalDate> {
 
 	private void updateUponInvoiceIdValidation() {
 		try {
-			service.updateUponOrderNoValidation(prefixField.getValue(), idField.getValue(), suffixField.getValue());
+			//service.updateUponOrderNoValidation(prefixField.getValue(), idField.getValue(), suffixField.getValue());
 		} catch (Exception e) {
 			resetNodesOnError(e);
 		}

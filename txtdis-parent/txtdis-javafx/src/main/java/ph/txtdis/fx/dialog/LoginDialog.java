@@ -3,7 +3,6 @@ package ph.txtdis.fx.dialog;
 import static ph.txtdis.type.Type.TEXT;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +22,7 @@ import ph.txtdis.fx.control.AppField;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.control.PasswordInput;
 import ph.txtdis.fx.pane.AppGridPane;
-import ph.txtdis.service.ServerService;
+import ph.txtdis.service.RestServerService;
 import ph.txtdis.service.SyncService;
 import ph.txtdis.util.FontIcon;
 
@@ -34,14 +33,11 @@ public class LoginDialog extends Stage {
 	private static final String STYLE = "-fx-font-size: 11pt; -fx-base: #6a5acd; -fx-accent: -fx-base;"
 			+ " -fx-focus-color: white; -fx-faint-focus-color: #ffffff22; ";
 
-	@Value("${server.default}")
-	private String location;
-
 	@Autowired
 	private ph.txtdis.service.LoginService login;
 
 	@Autowired
-	private ServerService serverService;
+	private RestServerService serverService;
 
 	@Autowired
 	private SyncService syncService;
@@ -142,7 +138,7 @@ public class LoginDialog extends Stage {
 
 	private void logInIfAuthenticated() throws Exception {
 		validate();
-		validateVersionIsLatest();
+		validateVersionIsLatest_AndServerAndClientDatesAreInSync();
 	}
 
 	private Node passwordButton() {
@@ -165,10 +161,6 @@ public class LoginDialog extends Stage {
 		return new Scene(vb);
 	}
 
-	private String server() {
-		return serverService.getLocation() == null ? location : serverService.getLocation();
-	}
-
 	private Node serverButton() {
 		serverButton.text("Change Server").build();
 		serverButton.setOnAction(event -> changeServer());
@@ -176,14 +168,14 @@ public class LoginDialog extends Stage {
 	}
 
 	private void setScene() {
-		getIcons().add(new FontIcon("\ue826"));
+		getIcons().add(new FontIcon("\ue945"));
 		setTitle();
 		initModality(Modality.APPLICATION_MODAL);
 		setScene(scene());
 	}
 
 	private void setTitle() {
-		setTitle("Welcome to txtDIS@" + server() + "!");
+		setTitle("Welcome to txtDIS@" + serverService.getLocation() + "!");
 	}
 
 	private void tryChangingPasswordUponVerification() {
@@ -206,9 +198,10 @@ public class LoginDialog extends Stage {
 		login.validate(userField.getText(), passwordField.getText());
 	}
 
-	private void validateVersionIsLatest() {
+	private void validateVersionIsLatest_AndServerAndClientDatesAreInSync() {
 		try {
 			syncService.validateVersionIsLatest();
+			syncService.validateServerAndClientDatesAreInSync();
 			close();
 			mainMenu.display();
 		} catch (Exception e) {

@@ -17,7 +17,7 @@ import ph.txtdis.fx.pane.AppGridPane;
 
 @Scope("prototype")
 @Component("openByDateRangesDialog")
-public class OpenByDateRangesDialog extends InputDialog {
+public class OpenByDateRangesDialog extends AbstractInputDialog {
 
 	private class EndDateBeforeStartException extends Exception {
 

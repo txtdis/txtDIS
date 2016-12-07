@@ -20,44 +20,49 @@ public class LabelFactory {
 		return label;
 	}
 
-	public Label field(String name) {
-		Label label = new Label(name);
+	public Label field(String text) {
+		Label label = name(text);
 		label.setMinSize(Label.USE_PREF_SIZE, Label.USE_PREF_SIZE);
 		GridPane.setHalignment(label, RIGHT);
 		return label;
 	}
 
-	public Label group(String name) {
-		Label label = new Label(name);
+	public Label group(String text) {
+		Label label = name(text);
 		label.setStyle(" -fx-font-size: 16pt;");
 		return label;
 	}
 
 	public Label header(String text) {
-		Label label = new Label(text);
+		Label label = name(text);
 		label.setStyle(" -fx-font-size: 26pt;");
 		return label;
 	}
 
 	public Label icon(String unicode, String color) {
-		Label label = new Label(unicode);
+		Label label = name(unicode);
 		label.setStyle(" -fx-font: 90pt 'txtdis'; -fx-text-fill: " + color + ";");
 		label.setPadding(new Insets(20, 0, 20, 0));
 		return label;
 	}
 
 	public Label menu(String name) {
-		Label label = new Label(name);
+		Label label = name(name);
 		GridPane.setHalignment(label, HPos.CENTER);
 		return label;
 	}
 
 	public Label message(String text) {
-		Label label = new Label(text);
+		Label label = help(text);
+		label.setPrefHeight(75);
+		return label;
+	}
+
+	public Label help(String text) {
+		Label label = name(text);
 		label.setWrapText(true);
 		label.setAlignment(Pos.CENTER);
 		label.setTextAlignment(TextAlignment.CENTER);
-		label.setPrefHeight(75);
 		label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		return label;
 	}
@@ -67,7 +72,7 @@ public class LabelFactory {
 	}
 
 	public Label subheader(String text) {
-		Label label = new Label(text);
+		Label label = name(text);
 		label.setStyle("-fx-font-size: 18pt;");
 		label.setAlignment(Pos.CENTER);
 		return label;

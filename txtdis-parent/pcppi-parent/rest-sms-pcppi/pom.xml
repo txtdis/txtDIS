@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>pcppi-parent</artifactId>
-		<version>0.9.3.1</version>
+		<version>0.9.4.6</version>
 	</parent>
 
 	<artifactId>rest-sms-pcppi</artifactId>
@@ -20,6 +20,10 @@
 		<dependency> 
 			<groupId>com.neuronrobotics</groupId>
 			<artifactId>nrjavaserial</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.smslib</groupId>
@@ -37,7 +41,7 @@
 		</dependency>
 		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-rest</artifactId>
+			<artifactId>txtdis-rest-mgdc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

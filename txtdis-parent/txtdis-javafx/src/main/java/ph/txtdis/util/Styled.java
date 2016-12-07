@@ -5,12 +5,12 @@ import static ph.txtdis.util.DateTimeUtils.toTimeDisplay;
 import static ph.txtdis.util.DateTimeUtils.toTimestampText;
 import static ph.txtdis.util.NumberUtils.format2Place;
 import static ph.txtdis.util.NumberUtils.format4Place;
-import static ph.txtdis.util.NumberUtils.formatCurrency;
 import static ph.txtdis.util.NumberUtils.formatDecimal;
 import static ph.txtdis.util.NumberUtils.formatId;
 import static ph.txtdis.util.NumberUtils.formatInt;
 import static ph.txtdis.util.NumberUtils.formatPercent;
 import static ph.txtdis.util.NumberUtils.isNegative;
+import static ph.txtdis.util.NumberUtils.toCurrencyText;
 import static ph.txtdis.util.TextUtils.toBoolSign;
 import static ph.txtdis.util.TextUtils.toIdDisplay;
 
@@ -19,9 +19,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
+import org.apache.commons.lang3.math.Fraction;
+
 import ph.txtdis.fx.control.StylableTextField;
 
 public class Styled {
+
 	private static final String ALIGN = " -fx-alignment:";
 
 	private static final String COLOR = " -fx-t-fill:";
@@ -57,7 +60,7 @@ public class Styled {
 	}
 
 	public static void forCurrency(StylableTextField f, BigDecimal d) {
-		f.setText(formatCurrency(d));
+		f.setText(toCurrencyText(d));
 		setNumberStyle(f, d);
 	}
 
@@ -69,6 +72,15 @@ public class Styled {
 	public static <T> void forEnum(StylableTextField f, T t) {
 		f.setText(t.toString());
 		center(f);
+	}
+
+	public static void forFraction(StylableTextField t, Fraction f) {
+		t.setText(formatFraction(f));
+		t.setStyle(RIGHT_ALIGN);
+	}
+
+	private static String formatFraction(Fraction f) {
+		return f.compareTo(Fraction.ZERO) == 0 ? "" : f.toProperString();
 	}
 
 	public static void forIdNo(StylableTextField f, Long l) {

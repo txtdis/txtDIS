@@ -17,6 +17,7 @@ import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ComboBox;
 
@@ -25,13 +26,30 @@ import javafx.scene.control.ComboBox;
 @SuppressWarnings("restriction")
 public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 
+	private boolean singleItemIsNotAutoSelected;
+
 	public AppCombo() {
+		setEditable(false);
 		traversePressedEnterKey();
 		setMinWidth(120);
 	}
 
+	@SuppressWarnings("unchecked")
+	private void traversePressedEnterKey() {
+		addEventFilter(KEY_PRESSED, event -> {
+			if (event.getCode() == ENTER) {
+				ComboBoxListViewSkin<T> skin = (ComboBoxListViewSkin<T>) getSkin();
+				ComboBoxBaseBehavior<T> behavior = skin.getBehavior();
+				behavior.traverseNext();
+			}
+		});
+	}
+
 	public BooleanBinding are(List<T> items) {
-		BooleanBinding b = is(items.get(0));
+		BooleanBinding b = Bindings.not(new SimpleBooleanProperty(true));
+		if (items == null || items.isEmpty())
+			return b;
+		b = is(items.get(0));
 		for (int i = 1; i < items.size(); i++)
 			b = b.or(is(items.get(i)));
 		return b;
@@ -66,6 +84,10 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 		getItems().clear();
 	}
 
+	public boolean hasItems() {
+		return getItems() != null && getItems().size() > 1;
+	}
+
 	public BooleanBinding is(T item) {
 		return getSelectionModel().selectedItemProperty().isEqualTo(item);
 	}
@@ -96,8 +118,18 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 
 	public AppCombo<T> items(List<T> items) {
 		setItems(items == null ? emptyObservableList() : observableArrayList(items));
-		ifSingleItemSelectItAndDisableFocusTranversing();
+		selectSingleItemIfAutoSelectedAndDisableFocusTranversing();
 		return this;
+	}
+
+	private void selectSingleItemIfAutoSelectedAndDisableFocusTranversing() {
+		if (size() == 1 && !singleItemIsNotAutoSelected) {
+			select(0);
+			focusTraversableProperty().set(false);
+		} else {
+			select(null);
+			focusTraversableProperty().set(true);
+		}
 	}
 
 	public AppCombo<T> items(T[] items) {
@@ -112,6 +144,11 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 
 	public AppCombo<T> itemsSelectingFirst(T[] items) {
 		return itemsSelectingFirst(asList(items));
+	}
+
+	public AppCombo<T> noAutoSelectSingleItem() {
+		singleItemIsNotAutoSelected = true;
+		return this;
 	}
 
 	public AppCombo<T> readOnlyOfWidth(int width) {
@@ -135,26 +172,5 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 	public AppCombo<T> width(int width) {
 		setMinWidth(width);
 		return this;
-	}
-
-	private void ifSingleItemSelectItAndDisableFocusTranversing() {
-		if (size() == 1) {
-			select(0);
-			focusTraversableProperty().set(false);
-		} else {
-			select(null);
-			focusTraversableProperty().set(true);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void traversePressedEnterKey() {
-		addEventFilter(KEY_PRESSED, event -> {
-			if (event.getCode() == ENTER) {
-				ComboBoxListViewSkin<T> skin = (ComboBoxListViewSkin<T>) getSkin();
-				ComboBoxBaseBehavior<T> behavior = skin.getBehavior();
-				behavior.traverseNext();
-			}
-		});
 	}
 }

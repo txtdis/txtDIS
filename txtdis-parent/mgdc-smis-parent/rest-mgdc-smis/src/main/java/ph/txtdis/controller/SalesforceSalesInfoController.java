@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ph.txtdis.dto.SalesforceSalesInfo;
-import ph.txtdis.service.SalesforceService;
+import ph.txtdis.service.SalesforceServiceImpl;
 
 @RequestMapping("/salesforceSalesInfos")
 @RestController("salesforceSalesInfoController")
 public class SalesforceSalesInfoController {
 
 	@Autowired
-	private SalesforceService service;
+	private SalesforceServiceImpl service;
 
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> list() {

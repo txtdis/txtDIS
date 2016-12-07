@@ -1,105 +1,51 @@
 package ph.txtdis.fx.table;
 
-import static javafx.collections.FXCollections.emptyObservableList;
-import static javafx.collections.FXCollections.observableArrayList;
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.BooleanBinding;
-import javafx.collections.ObservableList;
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.text.TextAlignment;
-import lombok.Getter;
-import lombok.Setter;
-import ph.txtdis.excel.Tabular;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.value.ObservableBooleanValue;
+import ph.txtdis.fx.control.FocusRequested;
 
-@Getter
-@Setter
-public abstract class AppTable<S> extends TableView<S> implements Tabular {
+public interface AppTable<S> extends FocusRequested {
 
-	private S item;
+	AbstractTableView<S> build();
 
-	public AppTable() {
-		setStyle("-fx-opacity: 1; ");
-	}
+	ObservableBooleanValue disabledProperty();
 
-	public AppTable<S> build() {
-		addColumns();
-		setMinWidth(width());
-		addProperties();
-		return this;
-	}
+	void disableIf(BooleanBinding b);
 
-	public void disableIf(BooleanBinding b) {
-		disableProperty().bind(b);
-	}
+	void disableIf(BooleanProperty b);
 
-	@Override
-	public int getColumnCount() {
-		return getColumns().size();
-	}
+	int getColumnCount();
 
-	@Override
-	public int getColumnIndexOfFirstTotal() {
-		return getColumnCount() - getColumnTotals().size();
-	}
+	int getColumnIndexOfFirstTotal();
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<BigDecimal> getColumnTotals() {
-		return getUserData() == null ? new ArrayList<>() : (List<BigDecimal>) getUserData();
-	}
+	List<?> getColumns();
 
-	@Override
-	public int getLastRowIndex() {
-		return getItems().size();
-	}
+	List<BigDecimal> getColumnTotals();
 
-	public BooleanBinding isEmpty() {
-		return itemsProperty().isEqualTo(emptyObservableList());
-	}
+	String getId();
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void items(List<?> list) {
-		setItems(list == null ? emptyObservableList() : (ObservableList<S>) observableArrayList(list));
-	}
+	S getItem();
 
-	public void setOnEmpty(String text) {
-		setPlaceholder(message(text));
-	}
+	List<S> getItems();
 
-	public void setOnItemChange(InvalidationListener listener) {
-		itemsProperty().addListener(listener);
-	}
+	int getLastRowIndex();
 
-	private Label message(String text) {
-		Label label = new Label(text);
-		label.setWrapText(true);
-		label.setAlignment(Pos.CENTER);
-		label.setTextAlignment(TextAlignment.CENTER);
-		label.setPrefHeight(75);
-		label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-		return label;
-	}
+	BooleanBinding isEmpty();
 
-	protected abstract void addColumns();
+	void items(List<S> items);
 
-	protected void addProperties() {
-	}
+	void refresh();
 
-	protected double width() {
-		double width = 20;
-		for (TableColumn<S, ?> column : getColumns()) {
-			if (column.isVisible())
-				width = width + column.getMinWidth();
-		}
-		return width;
-	}
+	void setId(String id);
+
+	void setItem(S item);
+
+	void setOnEmpty(String message);
+
+	void setOnItemChange(InvalidationListener listener);
 }

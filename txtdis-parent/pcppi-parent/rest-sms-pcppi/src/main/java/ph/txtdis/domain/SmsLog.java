@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "sms_log", uniqueConstraints = @UniqueConstraint(columnNames = { "customer_id", "time_stamp" }) )
-public class SmsLog extends AbstractId<Long> {
+public class SmsLog extends AbstractEntityId<Long> {
 
 	private static final long serialVersionUID = -8780823487171491421L;
 	
@@ -27,7 +27,7 @@ public class SmsLog extends AbstractId<Long> {
 	private ZonedDateTime timeStamp;
 
 	@ManyToOne(optional = false)
-	private Customer customer;
+	private CustomerImpl customer;
 
 	@Column(nullable = false)
 	private String message;

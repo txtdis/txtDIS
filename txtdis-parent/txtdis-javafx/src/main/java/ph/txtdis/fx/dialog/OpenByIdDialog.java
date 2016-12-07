@@ -20,7 +20,7 @@ import ph.txtdis.type.Type;
 
 @Scope("prototype")
 @Component("openByIdDialog")
-public class OpenByIdDialog<PK> extends InputDialog {
+public class OpenByIdDialog<PK> extends AbstractInputDialog {
 
 	@Autowired
 	private AppGridPane grid;
@@ -34,10 +34,17 @@ public class OpenByIdDialog<PK> extends InputDialog {
 	@Autowired
 	private AppField<PK> idField;
 
+	private String labelName = "ID No";
+
 	private PK id;
 
+	public OpenByIdDialog<PK> idPrompt(String labelName) {
+		this.labelName = labelName;
+		return this;
+	}
+
 	public String getId() {
-		return id == null ? "" : id.toString();
+		return id == null ? null : id.toString();
 	}
 
 	@Override
@@ -70,8 +77,9 @@ public class OpenByIdDialog<PK> extends InputDialog {
 	@Override
 	protected List<Node> nodes() {
 		grid.getChildren().clear();
-		grid.add(label.field("ID No"), 0, 0);
-		grid.add(idField.build(getType()), 1, 0);
+		grid.add(label.help(prompt), 0, 0, 2, 1);
+		grid.add(label.field(labelName), 0, 1);
+		grid.add(idField.build(getType()), 1, 1);
 		return Arrays.asList(header(), grid, buttonBox());
 	}
 

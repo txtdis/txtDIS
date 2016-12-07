@@ -12,10 +12,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.BooleanExpression;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import ph.txtdis.dto.CreationTracked;
+import ph.txtdis.dto.Keyed;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppField;
 import ph.txtdis.fx.control.InputControl;
@@ -23,12 +25,13 @@ import ph.txtdis.fx.control.TextAreaDisplay;
 import ph.txtdis.fx.dialog.OpenByDateDialog;
 import ph.txtdis.fx.dialog.OpenByIdDialog;
 import ph.txtdis.fx.pane.AppGridPane;
-import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.info.Information;
 import ph.txtdis.service.Iconed;
 import ph.txtdis.service.Reset;
 import ph.txtdis.service.Serviced;
 
-public abstract class AbstractIdApp<AS extends Serviced<PK>, PK, ID> extends AbstractApp implements Launchable {
+public abstract class AbstractIdApp<AS extends Serviced<PK>, T extends Keyed<PK>, PK, ID> extends AbstractApp
+		implements Launchable {
 
 	@Autowired
 	protected AS service;
@@ -59,61 +62,18 @@ public abstract class AbstractIdApp<AS extends Serviced<PK>, PK, ID> extends Abs
 
 	protected HBox summaryBox, userHBox;
 
-	protected Boolean isNew;
-
 	@Override
 	public void actOn(String... id) {
 		try {
-			service.open(id[0]);
+			if (id.length > 1)
+				service.openById(id[0]);
+			else
+				service.open(id[0]);
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {
 			refresh();
 		}
-	}
-
-	@Override
-	public void refresh() {
-		updateLogNodes();
-		super.refresh();
-	}
-
-	public void save() {
-		try {
-			service.save();
-		} catch (SuccessfulSaveInfo i) {
-			dialog.show(i).addParent(this).start();
-		} catch (Exception e) {
-			showErrorDialog(e);
-		} finally {
-			refresh();
-		}
-	}
-
-	private void openNext() {
-		try {
-			isNew = false;
-			service.next();
-		} catch (Exception e) {
-			showErrorDialog(e);
-		} finally {
-			refresh();
-		}
-	}
-
-	private void openPrevious() {
-		try {
-			isNew = false;
-			service.previous();
-		} catch (Exception e) {
-			showErrorDialog(e);
-		} finally {
-			refresh();
-		}
-	}
-
-	private String prompt() {
-		return "Enter ID of " + getHeaderText() + " to open";
 	}
 
 	@Override
@@ -136,12 +96,6 @@ public abstract class AbstractIdApp<AS extends Serviced<PK>, PK, ID> extends Abs
 		clearControl(control);
 	}
 
-	protected String getDialogInput() {
-		String h = service.getOpenDialogHeading();
-		openByIdDialog.header(h).prompt(prompt()).addParent(this).start();
-		return openByIdDialog.getId();
-	}
-
 	@Override
 	protected String getFontIcon() {
 		return ((Iconed) service).getFontIcon();
@@ -154,21 +108,11 @@ public abstract class AbstractIdApp<AS extends Serviced<PK>, PK, ID> extends Abs
 
 	@Override
 	protected String getTitleText() {
-		return isNew() ? newModule() : service.getModuleId() + service.getId();
+		return service.getTitleText();
 	}
 
-	protected boolean isNew() {
-		if (isNew == null)
-			isNew = createdOnDisplay.isEmpty().get();
-		return isNew;
-	}
-
-	protected BooleanExpression isPosted() {
+	protected BooleanBinding isPosted() {
 		return createdOnDisplay.isNotEmpty();
-	}
-
-	protected String newModule() {
-		return "New " + getHeaderText();
 	}
 
 	protected BooleanBinding notPosted() {
@@ -191,15 +135,45 @@ public abstract class AbstractIdApp<AS extends Serviced<PK>, PK, ID> extends Abs
 			actOn(id);
 	}
 
+	protected String getDialogInput() {
+		openByIdDialog.header(openByIdDialogHeader()).prompt(openByIdDialogPrompt()).addParent(this).start();
+		return openByIdDialog.getId();
+	}
+
+	protected String openByIdDialogHeader() {
+		return service.getOpenDialogHeader();
+	}
+
+	protected String openByIdDialogPrompt() {
+		return "Enter ID of " + getHeaderText() + " to open";
+	}
+
+	@Override
+	public void refresh() {
+		updateLogNodes();
+		super.refresh();
+	}
+
 	protected void reset() {
 		((Reset) service).reset();
-		isNew = null;
 		refresh();
+	}
+
+	protected void save() {
+		try {
+			service.save();
+		} catch (Information i) {
+			dialog.show(i).addParent(this).start();
+		} catch (Exception e) {
+			showErrorDialog(e);
+		} finally {
+			refresh();
+		}
 	}
 
 	@Override
 	protected void setListeners() {
-		setOnHidden(e -> ((Reset) service).reset());
+		setOnCloseRequest(e -> reset());
 		newButton.setOnAction(e -> reset());
 		backButton.setOnAction(e -> openPrevious());
 		nextButton.setOnAction(e -> openNext());
@@ -207,15 +181,40 @@ public abstract class AbstractIdApp<AS extends Serviced<PK>, PK, ID> extends Abs
 		openByIdButton.setOnAction(e -> openSelected());
 	}
 
-	protected void showErrorDialog(Exception e) {
-		e.printStackTrace();
-		dialog.show(e).addParent(this).start();
+	private void openPrevious() {
+		try {
+			service.previous();
+		} catch (Exception e) {
+			showErrorDialog(e);
+		} finally {
+			refresh();
+		}
+	}
+
+	private void openNext() {
+		try {
+			service.next();
+		} catch (Exception e) {
+			showErrorDialog(e);
+		} finally {
+			refresh();
+		}
+	}
+
+	protected StackPane stackPane(Node... nodes) {
+		StackPane p = new StackPane(nodes);
+		p.setAlignment(Pos.CENTER_LEFT);
+		return p;
 	}
 
 	protected HBox trackedPane() {
 		return box.forHorizontalPane(asList(//
-				label.name("Created by"), createdByDisplay.readOnly().width(120).build(TEXT), //
+				label.name(trackedByLabelName()), createdByDisplay.readOnly().width(120).build(TEXT), //
 				label.name("on"), createdOnDisplay.readOnly().build(TIMESTAMP)));//
+	}
+
+	protected String trackedByLabelName() {
+		return "Created by";
 	}
 
 	protected void updateLogNodes() {

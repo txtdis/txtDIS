@@ -18,7 +18,7 @@ import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppField;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.dialog.MessageDialog;
-import ph.txtdis.service.SalesforceUploadable;
+import ph.txtdis.service.SalesforceUploadService;
 
 @Scope("prototype")
 @Component("SalesforceUploadApp")
@@ -38,16 +38,16 @@ public class SalesforceUploadApp {
 
 	@Autowired
 	private MessageDialog dialog;
-	
-	private SalesforceUploadable service;
-	
+
+	private SalesforceUploadService<?> service;
+
 	private Stage stage;
-	
-	public SalesforceUploadApp service(SalesforceUploadable service) {
+
+	public SalesforceUploadApp service(SalesforceUploadService<?> service) {
 		this.service = service;
 		return this;
 	}
-	
+
 	public SalesforceUploadApp stage(Stage stage) {
 		this.stage = stage;
 		return this;

@@ -2,9 +2,10 @@ package ph.txtdis.service;
 
 import java.io.IOException;
 
-import ph.txtdis.excel.Tabular;
+import ph.txtdis.fx.table.AppTable;
 
 public interface Excel<T> extends Listed<T> {
 
-	void saveAsExcel(Tabular... tables) throws IOException;
+	@SuppressWarnings("unchecked")
+	void saveAsExcel(AppTable<T>... tables) throws IOException;
 }

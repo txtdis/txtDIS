@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>mgdc-smis-parent</artifactId>
-		<version>0.9.3.1</version>
+		<version>0.9.4.6</version>
 	</parent>
 
 	<artifactId>javafx-mgdc-smis</artifactId>
@@ -21,20 +21,21 @@
 	<dependencies>
 		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-phone</artifactId>
+			<artifactId>txtdis-javafx-mgdc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-javafx</artifactId>
+			<artifactId>txtdis-mgdc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-mgdc-smis</artifactId>
+			<artifactId>txtdis-salesforce</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	
 	<profiles>
 		<profile>
 			<id>offsite</id>

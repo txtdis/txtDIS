@@ -13,14 +13,14 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import ph.txtdis.fx.control.RadioControl;
 import ph.txtdis.fx.pane.AppGridPane;
-import ph.txtdis.service.ServerService;
+import ph.txtdis.service.RestServerService;
 
 @Scope("prototype")
 @Component("serverSelectionDialog")
-public class ServerSelectionDialog extends InputDialog {
+public class ServerSelectionDialog extends AbstractInputDialog {
 
 	@Autowired
-	private ServerService serverUtil;
+	private RestServerService serverService;
 
 	@Autowired
 	private AppGridPane grid;
@@ -45,7 +45,7 @@ public class ServerSelectionDialog extends InputDialog {
 	}
 
 	private void selectTheDefaultServer() {
-		group.getToggles().stream().filter(t -> ((RadioButton) t).getText().equals(serverUtil.location())).findAny().get()
+		group.getToggles().stream().filter(t -> ((RadioButton) t).getText().equals(serverService.getLocation())).findAny().get()
 				.setSelected(true);
 	}
 
@@ -62,7 +62,7 @@ public class ServerSelectionDialog extends InputDialog {
 	@Override
 	protected List<Node> nodes() {
 		group = new ToggleGroup();
-		putButtonOnTheGrid(serverUtil.getLocations());
+		putButtonOnTheGrid(serverService.getLocations());
 		selectTheDefaultServer();
 		return Arrays.asList(header(), grid, buttonBox());
 	}
@@ -70,7 +70,7 @@ public class ServerSelectionDialog extends InputDialog {
 	@Override
 	protected void setOnFiredCloseButton() {
 		RadioButton rb = (RadioButton) group.getSelectedToggle();
-		serverUtil.location(rb.getText());
+		serverService.setLocation(rb.getText());
 		super.setOnFiredCloseButton();
 	}
 }

@@ -12,6 +12,8 @@ import javafx.scene.control.TextArea;
 @Component("textAreaDisplay")
 public class TextAreaDisplay {
 
+	private int width;
+
 	private TextArea textArea;
 
 	private ScrollPane scrollPane;
@@ -20,6 +22,8 @@ public class TextAreaDisplay {
 		scrollPane = new ScrollPane(textArea());
 		scrollPane.setFitToWidth(true);
 		scrollPane.setFitToHeight(true);
+		if (width > 0)
+			scrollPane.setMaxWidth(width);
 		return scrollPane;
 	}
 
@@ -33,6 +37,8 @@ public class TextAreaDisplay {
 		textArea.setPrefRowCount(4);
 		textArea.editableProperty().set(false);
 		textArea.focusTraversableProperty().set(false);
+		if (width > 0)
+			textArea.setMaxWidth(width);
 		return textArea;
 	}
 
@@ -54,5 +60,29 @@ public class TextAreaDisplay {
 
 	public BooleanBinding isNot(String text) {
 		return is(text).not();
+	}
+
+	public TextAreaDisplay editableIf(BooleanBinding bb) {
+		boolean b = bb.get();
+		return setEditable(b);
+	}
+
+	private TextAreaDisplay setEditable(boolean b) {
+		textArea.setEditable(b);
+		textArea.setFocusTraversable(b);
+		return this;
+	}
+
+	public TextAreaDisplay editable() {
+		return setEditable(true);
+	}
+
+	public TextAreaDisplay width(int width) {
+		this.width = width;
+		return this;
+	}
+
+	public String getValue() {
+		return textArea.getText();
 	}
 }

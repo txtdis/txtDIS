@@ -7,12 +7,11 @@ import static ph.txtdis.type.UserType.AUDITOR;
 import static ph.txtdis.type.UserType.CASHIER;
 import static ph.txtdis.type.UserType.COLLECTOR;
 import static ph.txtdis.type.UserType.DRIVER;
+import static ph.txtdis.type.UserType.HEAD_CASHIER;
 import static ph.txtdis.type.UserType.HELPER;
-import static ph.txtdis.type.UserType.LEAD_CHECKER;
-import static ph.txtdis.type.UserType.MAIN_CASHIER;
 import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.type.UserType.STOCK_CHECKER;
 import static ph.txtdis.type.UserType.STORE_KEEPER;
-import static ph.txtdis.util.SpringUtils.encode;
 
 import java.math.BigDecimal;
 
@@ -21,16 +20,17 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
-import ph.txtdis.domain.Authority;
-import ph.txtdis.domain.Customer;
+import ph.txtdis.domain.AuthorityEntity;
+import ph.txtdis.domain.CustomerImpl;
 import ph.txtdis.domain.CustomerSalesVolume;
 import ph.txtdis.domain.Item;
 import ph.txtdis.domain.Price;
-import ph.txtdis.domain.User;
+import ph.txtdis.domain.UserEntity;
 import ph.txtdis.repository.CustomerRepository;
 import ph.txtdis.repository.CustomerSalesVolumeRepository;
 import ph.txtdis.repository.ItemRepository;
 import ph.txtdis.repository.UserRepository;
+import ph.txtdis.service.CredentialService;
 
 @Configuration("persistenceConfiguration")
 public class PersistenceConfiguration {
@@ -47,62 +47,65 @@ public class PersistenceConfiguration {
 	@Autowired
 	private UserRepository userRepository;
 
+	@Autowired
+	private CredentialService credentialService;
+
 	@PostConstruct
 	private void start() {
 		if (userRepository.count() > 0)
 			return;
 
-		Authority manager = new Authority();
+		AuthorityEntity manager = new AuthorityEntity();
 		manager.setAuthority(MANAGER);
 
-		Authority auditor = new Authority();
+		AuthorityEntity auditor = new AuthorityEntity();
 		auditor.setAuthority(AUDITOR);
 
-		Authority admin = new Authority();
+		AuthorityEntity admin = new AuthorityEntity();
 		admin.setAuthority(ADMIN);
 
-		Authority collector = new Authority();
+		AuthorityEntity collector = new AuthorityEntity();
 		collector.setAuthority(COLLECTOR);
 
-		Authority driver = new Authority();
+		AuthorityEntity driver = new AuthorityEntity();
 		driver.setAuthority(DRIVER);
 
-		Authority helper = new Authority();
+		AuthorityEntity helper = new AuthorityEntity();
 		helper.setAuthority(HELPER);
 
-		Authority cashier = new Authority();
+		AuthorityEntity cashier = new AuthorityEntity();
 		cashier.setAuthority(CASHIER);
 
-		Authority mainCashier = new Authority();
-		mainCashier.setAuthority(MAIN_CASHIER);
+		AuthorityEntity mainCashier = new AuthorityEntity();
+		mainCashier.setAuthority(HEAD_CASHIER);
 
-		Authority storekeeper = new Authority();
+		AuthorityEntity storekeeper = new AuthorityEntity();
 		storekeeper.setAuthority(STORE_KEEPER);
 
-		Authority leadChecker = new Authority();
-		leadChecker.setAuthority(LEAD_CHECKER);
+		AuthorityEntity leadChecker = new AuthorityEntity();
+		leadChecker.setAuthority(STOCK_CHECKER);
 
-		User sysgen = new User();
+		UserEntity sysgen = new UserEntity();
 		sysgen.setUsername("SYSGEN");
 		sysgen.setEnabled(true);
-		sysgen.setPassword(encode("Vierski@1"));
+		sysgen.setPassword(credentialService.encode("Vierski@1"));
 		sysgen.setRoles(asList(manager));
 		sysgen.setMobile("+639498592927");
 		userRepository.save(sysgen);
 
-		User butch = new User();
+		UserEntity butch = new UserEntity();
 		butch.setUsername("RECHIE");
 		butch.setEnabled(true);
-		butch.setPassword(encode("password"));
+		butch.setPassword(credentialService.encode("password"));
 		butch.setRoles(asList(manager));
 		butch.setEmail("rechie.bobier@pcppi.com.ph");
 		butch.setMobile("+639175594323");
 		userRepository.save(butch);
 
-		User rechie = new User();
+		UserEntity rechie = new UserEntity();
 		rechie.setUsername("DONG");
 		rechie.setEnabled(true);
-		rechie.setPassword(encode("password"));
+		rechie.setPassword(credentialService.encode("password"));
 		rechie.setRoles(asList(manager, storekeeper));
 		rechie.setEmail("butchlim888@yahoo.com");
 		rechie.setMobile("+639175422348");
@@ -239,7 +242,7 @@ public class PersistenceConfiguration {
 		ses240.setPriceList(asList(new Price(parse("2000-01-01"), new BigDecimal("198.00"))));
 		ses330.setPriceList(asList(new Price(parse("2011-02-06"), new BigDecimal("360.00"))));
 		sep240.setPriceList(asList(new Price(parse("2000-01-01"), new BigDecimal("198.00"))));
-		
+
 		prg8oz = itemRepository.save(prg8oz);
 		prg12o = itemRepository.save(prg12o);
 		prg10l = itemRepository.save(prg10l);
@@ -306,10 +309,10 @@ public class PersistenceConfiguration {
 		ses330 = itemRepository.save(ses330);
 		sep240 = itemRepository.save(sep240);
 
-		Customer ws1 = new Customer("WHOLESALER ONE", "+639175393161");
+		CustomerImpl ws1 = new CustomerImpl("WHOLESALER ONE", "+639175393161");
 		ws1 = customerRepository.save(ws1);
 
-		Customer ws2 = new Customer("WHOLESALER TWO", "+639258307534");
+		CustomerImpl ws2 = new CustomerImpl("WHOLESALER TWO", "+639258307534");
 		ws2 = customerRepository.save(ws2);
 
 		customerSalesVolumeRepository.save(asList(//

@@ -29,7 +29,7 @@ public class FontIcon extends Image {
 	}
 
 	private static Font font() {
-		UI.loadFont(FONT);
+		Font.loadFont(FontIcon.class.getResourceAsStream("/font/" + FONT + ".ttf"), 24);
 		return new Font(FONT, SIZE * .9);
 	}
 

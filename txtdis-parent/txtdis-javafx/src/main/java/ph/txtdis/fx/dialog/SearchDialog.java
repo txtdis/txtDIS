@@ -18,7 +18,7 @@ import ph.txtdis.fx.pane.AppGridPane;
 
 @Scope("prototype")
 @Component("searchDialog")
-public class SearchDialog extends InputDialog {
+public class SearchDialog extends AbstractInputDialog {
 
 	@Autowired
 	protected AppGridPane grid;

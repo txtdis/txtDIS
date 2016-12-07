@@ -1,6 +1,6 @@
 package ph.txtdis.service;
 
-import ph.txtdis.util.TypeMap;
+import ph.txtdis.util.ClientTypeMap;
 
 public interface Iconed {
 
@@ -8,7 +8,7 @@ public interface Iconed {
 		return getTypeMap().icon(getModule());
 	}
 
-	TypeMap getTypeMap();
+	ClientTypeMap getTypeMap();
 
 	String getModule();
 }

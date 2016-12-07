@@ -20,12 +20,12 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 
-import ph.txtdis.domain.Customer;
+import ph.txtdis.domain.CustomerImpl;
 import ph.txtdis.domain.Item;
 import ph.txtdis.domain.SalesOrder;
 import ph.txtdis.domain.SalesOrderItem;
 import ph.txtdis.domain.SmsLog;
-import ph.txtdis.domain.User;
+import ph.txtdis.domain.UserEntity;
 import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.repository.CustomerRepository;
 import ph.txtdis.repository.ItemRepository;
@@ -90,7 +90,7 @@ public class SendMessage implements CommandLineRunner {
 			return;
 		}
 
-		Customer customer = customerRepository.findByMobile(senderPhone);
+		CustomerImpl customer = customerRepository.findByMobile(senderPhone);
 		if (customer == null) {
 			send(senderPhone, ERROR + "Unknown phone number");
 			return;
@@ -106,7 +106,7 @@ public class SendMessage implements CommandLineRunner {
 			send(senderPhone, malformedSmsMessage);
 	}
 
-	private void processDecidedSalesOrder(String senderPhone, Customer customer, String sms, String decision,
+	private void processDecidedSalesOrder(String senderPhone, CustomerImpl customer, String sms, String decision,
 			String salesOrderId) {
 		try {
 			SmsLog log = logSms(customer, sms);
@@ -114,22 +114,22 @@ public class SendMessage implements CommandLineRunner {
 			if (decision.equals("DELIVER"))
 				for (String mobile : getPhoneNosOfStorekeepers())
 					logger.info("Sent to " + mobile + ":\n"//
-							+ "S/O No. " + salesOrderId + " of " + customer.getName()
-							+ " has been approved for delivery");
+							+ "S/O No. " + salesOrderId + " of " + customer.getName() + " has been approved for delivery");
 		} catch (NotFoundException e) {
 			send(senderPhone, ERROR + e.getMessage());
 		}
 	}
 
-	private SmsLog logSms(Customer customer, String msg) {
+	private SmsLog logSms(CustomerImpl customer, String msg) {
 		ZonedDateTime zdt = toZonedDateTime(new Date());
 		SmsLog log = new SmsLog(zdt, customer, msg);
 		return smsLogRepository.save(log);
 	}
 
 	private List<String> getPhoneNosOfStorekeepers() {
-		List<User> users = userRepository.findByEnabledTrueAndRolesAuthorityInOrderByUsernameAsc(asList(STORE_KEEPER));
-		return users.stream().map(User::getMobile).collect(toList());
+		List<UserEntity> users = userRepository
+				.findByEnabledTrueAndRolesAuthorityInOrderByUsernameAsc(asList(STORE_KEEPER));
+		return users.stream().map(UserEntity::getMobile).collect(toList());
 	}
 
 	private boolean areValidItemNameAndQuantityPairs(String[] orders) {
@@ -180,7 +180,7 @@ public class SendMessage implements CommandLineRunner {
 		return stream.map(s -> s.getSmsId()).sorted().collect(Collectors.toList());
 	}
 
-	private void createNewSalesOrder(String originator, String[] orders, Customer customer) {
+	private void createNewSalesOrder(String originator, String[] orders, CustomerImpl customer) {
 		computeSalesOrderItemQuantitiesBasedOnInventoryLevel(orders, customer);
 		salesOrder = salesOrderService.save();
 		String msg = salesOrder(salesOrder);
@@ -193,7 +193,7 @@ public class SendMessage implements CommandLineRunner {
 		salesOrder = salesOrderService.save();
 	}
 
-	private void computeSalesOrderItemQuantitiesBasedOnInventoryLevel(String[] orders, Customer customer) {
+	private void computeSalesOrderItemQuantitiesBasedOnInventoryLevel(String[] orders, CustomerImpl customer) {
 		for (int i = 0; i < orders.length; i += 2)
 			salesOrderService.computeSalesOrderItemQuantitiesBasedOnStockOnHand(customer, orders[i], orders[i + 1]);
 	}

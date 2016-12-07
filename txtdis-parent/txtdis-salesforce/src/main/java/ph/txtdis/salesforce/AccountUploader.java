@@ -97,7 +97,7 @@ public class AccountUploader extends SalesforceUploader {
 		selectPaymentTerms(c.getPaymentTerms());
 		selectTaxClassification(c.getTaxClassification());
 		selectVisitFrequency(c.getVisitFrequency());
-		// clickSaveAndNew();
+		clickSaveAndNew();
 		c.setUploadedOn(ZonedDateTime.now());
 		uploads.add(c);
 	}

@@ -146,6 +146,11 @@ public abstract class AbstractApp extends Stage implements Startable {
 		setBounds();
 	}
 
+	protected void showErrorDialog(Exception e) {
+		e.printStackTrace();
+		dialog.show(e).addParent(this).start();
+	}
+
 	protected void updateTitleAndHeader() {
 		setTitle(getTitleText());
 		if (header != null)

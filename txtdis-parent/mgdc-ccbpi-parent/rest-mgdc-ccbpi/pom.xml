@@ -1,19 +1,21 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-    <groupId>ph.txtdis</groupId>
-    <artifactId>mgdc-ccbpi-parent</artifactId>
-    <version>0.9.3.1</version>
-  </parent>
-  
-  <artifactId>rest-mgdc-ccbpi</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>ph.txtdis</groupId>
+		<artifactId>mgdc-ccbpi-parent</artifactId>
+		<version>0.9.4.6</version>
+	</parent>
+
+	<artifactId>rest-mgdc-ccbpi</artifactId>
 	<name>txtDIS CCBPI ${server.site}Server</name>
 
 	<properties>
-		<start-class>ph.txtdis.ServerApp</start-class>
-		<icon.name>txtdis-mgdc-ccbpi</icon.name>
 		<header.type>console</header.type>
+		<host.type>${project.artifactId}</host.type>
+		<icon.name>txtdis-mgdc-ccbpi</icon.name>
+		<start-class>ph.txtdis.ServerApp</start-class>
 	</properties>
 
 	<dependencies>
@@ -23,17 +25,8 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-mgdc-ccbpi</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-rest</artifactId>
+			<artifactId>txtdis-rest-mgdc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
@@ -54,7 +47,7 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>mgdc-smis</id>
+			<id>mgdc-ccbpi</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -64,6 +57,15 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
+						<configuration>
+							<archive>
+								<manifest>
+									<addClasspath>true</addClasspath>
+									<classpathPrefix>lib/</classpathPrefix>
+									<mainClass>${start-class}</mainClass>
+								</manifest>
+							</archive>
+						</configuration>
 					</plugin>
 					<plugin>
 						<groupId>com.akathist.maven.plugins.launch4j</groupId>

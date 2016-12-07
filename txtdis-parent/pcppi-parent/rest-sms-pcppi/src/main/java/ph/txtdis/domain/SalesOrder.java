@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "sales_order")
-public class SalesOrder extends AbstractId<Long> {
+public class SalesOrder extends AbstractEntityId<Long> {
 
 	private static final long serialVersionUID = -7474940802227888900L;
 	
@@ -30,7 +30,7 @@ public class SalesOrder extends AbstractId<Long> {
 	private LocalDate orderDate;
 
 	@ManyToOne(optional = false)
-	private Customer customer;
+	private CustomerImpl customer;
 	
 	@ManyToOne
 	@JoinColumn(name = "sent_log_id")
@@ -44,7 +44,7 @@ public class SalesOrder extends AbstractId<Long> {
 	@JoinColumn(name = "sales_order_id")
 	private List<SalesOrderItem> details;
 
-	public SalesOrder(LocalDate orderDate, Customer customer) {
+	public SalesOrder(LocalDate orderDate, CustomerImpl customer) {
 		this.orderDate = orderDate;
 		this.customer = customer;
 	}

@@ -7,8 +7,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 
-@Component
-@Scope(value = "prototype")
+@Scope("prototype")
+@Component("appGridPane")
 public class AppGridPane extends GridPane {
 
 	public AppGridPane() {

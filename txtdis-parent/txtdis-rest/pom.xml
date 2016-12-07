@@ -5,13 +5,17 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>txtdis-parent</artifactId>
-		<version>0.9.3.1</version>
+		<version>0.9.4.6</version>
 	</parent>
 
 	<artifactId>txtdis-rest</artifactId>
-	<name>Shared REST Module</name>
+	<name>Shared txtDIS REST Module</name>
 
 	<dependencies>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.github.ulisesbocchio</groupId>
 			<artifactId>jasypt-spring-boot-starter</artifactId>
@@ -26,6 +30,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
@@ -35,6 +43,11 @@
 		<dependency>
 			<groupId>ph.txtdis</groupId>
 			<artifactId>txtdis-shared</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ph.txtdis</groupId>
+			<artifactId>txtdis-phone</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>

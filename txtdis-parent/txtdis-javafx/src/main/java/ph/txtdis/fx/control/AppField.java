@@ -23,9 +23,11 @@ import ph.txtdis.util.TypeStyle;
 @SuppressWarnings("restriction")
 public class AppField<T> extends TextField implements ErrorHandling, InputControl<T>, StylableTextField {
 
-	private Type type;
-
 	private int length, width;
+
+	private String prompt;
+
+	private Type type;
 
 	public AppField() {
 		setStyle("-fx-opacity: 1; ");
@@ -33,11 +35,17 @@ public class AppField<T> extends TextField implements ErrorHandling, InputContro
 		cancelEditOnLostFocus();
 	}
 
+	public AppField<T> prompt(String prompt) {
+		this.prompt = prompt;
+		return this;
+	}
+
 	public AppField<T> build(Type type) {
 		this.type = type;
 		setAlignment();
 		setFieldWidth(width());
 		setProperties();
+		setPromptText(prompt);
 		return this;
 	}
 
@@ -78,6 +86,7 @@ public class AppField<T> extends TextField implements ErrorHandling, InputContro
 	}
 
 	public AppField<T> readOnly() {
+		disableProperty().unbind();
 		disableProperty().set(true);
 		return this;
 	}
@@ -103,7 +112,7 @@ public class AppField<T> extends TextField implements ErrorHandling, InputContro
 		align(type, this);
 	}
 
-	private void setFieldWidth(int width) {
+	public void setFieldWidth(int width) {
 		setMinWidth(width);
 		setPrefWidth(width);
 		if (type != TEXT)

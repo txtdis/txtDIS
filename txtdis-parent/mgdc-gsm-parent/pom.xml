@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>ph.txtdis</groupId>
+		<artifactId>txtdis-parent</artifactId>
+		<version>0.9.4.6</version>
+	</parent>
+
+	<artifactId>mgdc-gsm-parent</artifactId>
+	<packaging>pom</packaging>
+	<name>MGDC GSM Parent</name>
+
+	<modules>
+		<module>edms-mgdc-gsm2</module>
+		<module>edms-mgdc-gsm3</module>
+		<module>rest-mgdc-gsm2</module>
+		<module>rest-mgdc-gsm3</module>
+		<module>javafx-mgdc-gsm2</module>
+		<module>javafx-mgdc-gsm3</module>
+		<module>txtdis-edms-mgdc-gsm</module>
+		<module>txtdis-javafx-mgdc-gsm</module>
+		<module>txtdis-rest-mgdc-gsm</module>
+	</modules>
+</project>

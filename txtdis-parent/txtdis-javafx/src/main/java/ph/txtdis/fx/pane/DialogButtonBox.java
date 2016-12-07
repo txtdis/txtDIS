@@ -8,8 +8,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
-@Component
 @Scope("prototype")
+@Component("dialogButtonBox")
 public class DialogButtonBox extends HBox {
 
 	public DialogButtonBox() {

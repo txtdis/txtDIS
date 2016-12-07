@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Table(indexes = { //
 		@Index(columnList = "sms_id"), //
 		@Index(columnList = "vendor_id") })
-public class Item extends AbstractId<Long> {
+public class Item extends AbstractEntityId<Long> {
 
 	private static final long serialVersionUID = -3012020260825126952L;
 

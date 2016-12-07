@@ -1,9 +1,14 @@
 package ph.txtdis.excel;
 
-import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.apache.commons.lang3.StringUtils.endsWith;
+import static org.apache.poi.ss.usermodel.Sheet.BottomMargin;
+import static org.apache.poi.ss.usermodel.Sheet.FooterMargin;
+import static org.apache.poi.ss.usermodel.Sheet.HeaderMargin;
+import static org.apache.poi.ss.usermodel.Sheet.LeftMargin;
+import static org.apache.poi.ss.usermodel.Sheet.RightMargin;
+import static org.apache.poi.ss.usermodel.Sheet.TopMargin;
 import static ph.txtdis.util.DateTimeUtils.toUtilDate;
 import static ph.txtdis.util.ReflectionUtils.invokeMethod;
 import static ph.txtdis.util.TextUtils.toBoolSign;
@@ -18,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.math.Fraction;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -27,6 +33,9 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.fx.table.AppTableColumn;
 
 @Scope("prototype")
 @Component("excelWriter")
@@ -38,7 +47,7 @@ public class ExcelWriter {
 
 	private HSSFWorkbook wb;
 
-	private List<List<Tabular>> tables;
+	private List<List<AppTable<?>>> tables;
 
 	private Sheet sheet;
 
@@ -46,9 +55,9 @@ public class ExcelWriter {
 
 	private String filename;
 
-	private Tabular table;
+	private AppTable<?> table;
 
-	private TabularColumn column;
+	private AppTableColumn column;
 
 	@Autowired
 	private ExcelStyle s;
@@ -64,50 +73,67 @@ public class ExcelWriter {
 	}
 
 	@SuppressWarnings("unchecked")
-	public ExcelWriter table(List<Tabular>... tables) {
+	public ExcelWriter table(List<AppTable<?>>... tables) {
 		this.tables = asList(tables);
 		return this;
 	}
 
-	public ExcelWriter table(Tabular... tables) {
+	public ExcelWriter table(AppTable<?>... tables) {
 		this.tables = asList(asList(tables));
 		return this;
 	}
 
 	public void write() throws IOException {
 		setup();
-		writeWorkbook(file());
+		writeWorkbook();
 	}
 
-	private void writeWorkbook(String fn) throws IOException {
-		File f = File.createTempFile(filename, ".xls");
-		FileOutputStream s = new FileOutputStream(f);
-		wb.write(s);
-		s.close();
-		wb.close();
+	private void writeWorkbook() throws IOException {
+		File f = File.createTempFile(filename + ".version.", ".xls");
+		writeWorkbook(f);
 		Desktop.getDesktop().open(f);
 		f.deleteOnExit();
 	}
 
-	private void addCell(CellStyle header, Row row, int i) {
+	private void writeWorkbook(File f) throws IOException {
+		FileOutputStream s = new FileOutputStream(f);
+		wb.write(s);
+		s.close();
+		wb.close();
+	}
+
+	private void addCell(CellStyle style, Row row, int i) {
 		Cell c = row.createCell(i);
 		c.setCellValue(column.getText());
-		c.setCellStyle(header);
+		c.setCellStyle(style);
 	}
 
 	private void addHeader() {
 		List<?> columns = filterVisibleColumns();
 		for (int i = 0; i < columns.size(); i++) {
-			column = (TabularColumn) columns.get(i);
+			column = (AppTableColumn) columns.get(i);
 			sheet.setColumnWidth(i + colIdx, getWidth());
-			addCell(s.header(), getRow(1), i + colIdx);
+			addCell(headerStyle(), headerRow(), i + colIdx);
 			getters.add("get" + capitalize(column.getId()));
 		}
 	}
 
+	private Row headerRow() {
+		Row r = getRow(1);
+		if (column.isHeaderVertical())
+			r.setHeightInPoints(96);
+		return r;
+	}
+
+	private CellStyle headerStyle() {
+		if (column.isHeaderVertical())
+			return s.verticalHeader();
+		return s.header();
+	}
+
 	private List<?> filterVisibleColumns() {
 		return table.getColumns().stream()//
-				.filter(c -> ((TabularColumn) c).isVisible())//
+				.filter(c -> ((AppTableColumn) c).isVisible())//
 				.collect(Collectors.toList());
 	}
 
@@ -122,11 +148,7 @@ public class ExcelWriter {
 	}
 
 	private void addTitle() {
-		try {
-			sheet.addMergedRegion(new CellRangeAddress(0, 0, colIdx, colIdx + table.getColumnCount() - 1));
-		} catch (Exception e) {
-			System.err.println(e.getMessage());
-		}
+		sheet.addMergedRegion(new CellRangeAddress(0, 0, colIdx, colIdx + table.getColumnCount() - 1));
 		Row row = getRow(0);
 		row.setHeightInPoints(30);
 		setTitleCell(row);
@@ -136,7 +158,7 @@ public class ExcelWriter {
 		for (int i = 0; i < sheetnames.length; i++) {
 			createSheet(sheetnames[i]);
 			colIdx = 0;
-			for (Tabular table : tables.get(i)) {
+			for (AppTable<?> table : tables.get(i)) {
 				this.table = table;
 				getters = new ArrayList<>();
 				addTitle();
@@ -150,16 +172,22 @@ public class ExcelWriter {
 
 	private void createSheet(String id) {
 		sheet = wb.createSheet(id);
-		// sheet.protectSheet("secretPassword");
 		sheet.createFreezePane(0, 2, 0, 2);
+		sheet.setMargin(TopMargin, 0.25);
+		sheet.setMargin(BottomMargin, 0.25);
+		sheet.setMargin(LeftMargin, 0.25);
+		sheet.setMargin(RightMargin, 0.25);
+		sheet.setMargin(TopMargin, 0.25);
+		sheet.setMargin(HeaderMargin, 0.25);
+		sheet.setMargin(FooterMargin, 0.25);
+		sheet.setFitToPage(true);
+		sheet.setPrintGridlines(true);
+		sheet.setRepeatingRows(CellRangeAddress.valueOf("1:2"));
+		sheet.protectSheet("secretPassword");
 	}
 
 	private Cell createSumCell(int i) {
 		return getLastRow().createCell(i + colIdx + table.getColumnIndexOfFirstTotal());
-	}
-
-	private String file() {
-		return getProperty("user.home") + "\\Desktop\\" + filename + ".xls";
 	}
 
 	private Row getLastRow() {
@@ -221,6 +249,12 @@ public class ExcelWriter {
 	private void setDecimal(Cell c, BigDecimal d) {
 		c.setCellValue(d.doubleValue());
 		c.setCellStyle(s.decimal());
+	}
+
+	private void setFraction(Cell c, Fraction f) {
+		int denominator = f.getDenominator();
+		c.setCellValue(f.doubleValue());
+		c.setCellStyle(s.fraction(denominator));
 	}
 
 	private void setId(Cell c, long l) {
@@ -286,6 +320,8 @@ public class ExcelWriter {
 			setDate(c, (LocalDate) o);
 		else if (endsWith(s, "Type"))
 			setCenter(c, o.toString());
+		else if (endsWith(s, "InFractions"))
+			setFraction(c, (Fraction) o);
 		else if (endsWith(s, "Level"))
 			setRight(c, o.toString());
 		else if (endsWith(s, "Valid") || endsWith(s, "Paid"))

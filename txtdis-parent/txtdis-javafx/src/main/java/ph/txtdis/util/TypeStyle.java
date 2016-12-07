@@ -2,9 +2,7 @@ package ph.txtdis.util;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.geometry.Pos.CENTER_RIGHT;
-import static ph.txtdis.util.NumberUtils.toBigDecimal;
-import static ph.txtdis.util.NumberUtils.toInteger;
-import static ph.txtdis.util.NumberUtils.toLong;
+import static org.apache.commons.lang3.StringUtils.trim;
 import static ph.txtdis.util.Styled.for2Place;
 import static ph.txtdis.util.Styled.for4Place;
 import static ph.txtdis.util.Styled.forBoolean;
@@ -12,6 +10,7 @@ import static ph.txtdis.util.Styled.forCode;
 import static ph.txtdis.util.Styled.forCurrency;
 import static ph.txtdis.util.Styled.forDate;
 import static ph.txtdis.util.Styled.forEnum;
+import static ph.txtdis.util.Styled.forFraction;
 import static ph.txtdis.util.Styled.forIdNo;
 import static ph.txtdis.util.Styled.forInteger;
 import static ph.txtdis.util.Styled.forPercent;
@@ -26,9 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
-import static org.apache.commons.lang3.StringUtils.trim;
-
-import static ph.txtdis.util.DateTimeUtils.toTime;
+import org.apache.commons.lang3.math.Fraction;
 
 import ph.txtdis.fx.control.AppField;
 import ph.txtdis.fx.control.StylableTextField;
@@ -46,6 +43,7 @@ public class TypeStyle {
 			case CODE:
 			case CURRENCY:
 			case FOURPLACE:
+			case FRACTION:
 			case ID:
 			case INTEGER:
 			case PERCENT:
@@ -72,13 +70,15 @@ public class TypeStyle {
 			case PERCENT:
 			case QUANTITY:
 			case TWOPLACE:
-				return (T) toBigDecimal(text);
+				return (T) NumberUtils.toBigDecimal(text);
+			case FRACTION:
+				return (T) NumberUtils.toFraction(text);
 			case ID:
-				return (T) toLong(text);
+				return (T) NumberUtils.toLong(text);
 			case INTEGER:
-				return (T) toInteger(text);
+				return (T) NumberUtils.toInteger(text);
 			case TIME:
-				return (T) toTime(text);
+				return (T) DateTimeUtils.toTime(text);
 			default:
 				return null;
 		}
@@ -105,6 +105,9 @@ public class TypeStyle {
 				break;
 			case FOURPLACE:
 				for4Place(field, (BigDecimal) value);
+				break;
+			case FRACTION:
+				forFraction(field, (Fraction) value);
 				break;
 			case ID:
 				forIdNo(field, (Long) value);
@@ -183,6 +186,7 @@ public class TypeStyle {
 			case TWOPLACE:
 				return 90;
 			case DATE:
+			case FRACTION:
 			case QUANTITY:
 				return 110;
 			case PHONE:

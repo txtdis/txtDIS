@@ -10,9 +10,8 @@ import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.service.Excel;
 
-public abstract class AbstractExcelApp<AT extends AppTable<T>, AS extends Excel<?>, T>
-		extends AbstractTableApp<AT, AS, T>
-{
+public abstract class AbstractExcelApp<AT extends AppTable<T>, AS extends Excel<T>, T>
+		extends AbstractTableApp<AT, AS, T> {
 
 	@Autowired
 	private AppButton excelButton;
@@ -21,8 +20,7 @@ public abstract class AbstractExcelApp<AT extends AppTable<T>, AS extends Excel<
 		try {
 			saveAsExcel(table);
 		} catch (Exception e) {
-			e.printStackTrace();
-			dialog.show(e).addParent(this).start();
+			showErrorDialog(e);
 		}
 	}
 
@@ -37,6 +35,7 @@ public abstract class AbstractExcelApp<AT extends AppTable<T>, AS extends Excel<
 		excelButton.icon("excel").tooltip("Save to a spreadsheet").build();
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void saveAsExcel(AT table) throws Exception {
 		service.saveAsExcel(table);
 	}

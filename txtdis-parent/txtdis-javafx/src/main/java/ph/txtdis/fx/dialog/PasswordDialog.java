@@ -15,22 +15,22 @@ import ph.txtdis.fx.control.PasswordInput;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.info.Information;
 import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.service.CredentialService;
 import ph.txtdis.service.UserService;
-import ph.txtdis.util.SpringUtil;
 
-public abstract class PasswordDialog extends InputDialog {
+public abstract class PasswordDialog extends AbstractInputDialog {
 
 	@Autowired
-	protected UserService service;
+	private CredentialService credentialService;
+
+	@Autowired
+	protected UserService userService;
 
 	@Autowired
 	private LabelFactory label;
 
 	@Autowired
-	protected PasswordInput password1;
-
-	@Autowired
-	protected PasswordInput password2;
+	protected PasswordInput password1, password2;
 
 	@Autowired
 	protected AppButton changeButton;
@@ -63,7 +63,7 @@ public abstract class PasswordDialog extends InputDialog {
 	}
 
 	protected String encodedPassword() {
-		return SpringUtil.encode(password2());
+		return credentialService.encode(password2());
 	}
 
 	protected AppGridPane grid() {
@@ -85,9 +85,9 @@ public abstract class PasswordDialog extends InputDialog {
 	}
 
 	protected void saveUser() throws SuccessfulSaveInfo, Exception {
-		User user = SpringUtil.user();
+		User user = credentialService.user();
 		user.setPassword(encodedPassword());
-		service.save(user);
+		userService.save(user);
 	}
 
 	protected void setBindings() {
@@ -111,7 +111,7 @@ public abstract class PasswordDialog extends InputDialog {
 
 	private void save() throws SuccessfulSaveInfo, Exception {
 		saveUser();
-		SpringUtil.setPassword(password2());
+		credentialService.setPassword(password2());
 		close();
 	}
 

@@ -1,11 +1,6 @@
 package ph.txtdis.service;
 
-import static java.util.stream.Collectors.toList;
-
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import ph.txtdis.dto.User;
 import ph.txtdis.exception.FailedAuthenticationException;
@@ -17,60 +12,25 @@ import ph.txtdis.exception.StoppedServerException;
 import ph.txtdis.info.SuccessfulSaveInfo;
 import ph.txtdis.type.UserType;
 
-@Service("userService")
-public class UserService {
+public interface UserService {
 
-	private static final String USER = "user";
+	boolean isOffSite();
 
-	@Autowired
-	private ReadOnlyService<User> readOnlyService;
+	User find(String username) throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException,
+			RestException, InvalidException;
 
-	@Autowired
-	private SavingService<User> savingService;
+	User findByEmail(String email) throws NoServerConnectionException, StoppedServerException,
+			FailedAuthenticationException, RestException, InvalidException;
 
-	@Autowired
-	private ServerService server;
+	List<User> list() throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException,
+			RestException, InvalidException;
 
-	public boolean isOffSite() {
-		return server.isOffSite();
-	}
+	List<User> listByRole(UserType... types) throws NoServerConnectionException, StoppedServerException,
+			FailedAuthenticationException, RestException, InvalidException;
 
-	public User find(String username) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException {
-		return readOnlyService.module(USER).getOne("/" + username);
-	}
+	List<String> listNamesByRole(UserType... types);
 
-	public User findByEmail(String email) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException {
-		return readOnlyService.module(USER).getOne("/email?address=" + email);
-	}
-
-	public List<User> list() throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException,
-			RestException, InvalidException {
-		return readOnlyService.module(USER).getList();
-	}
-
-	public List<User> listByRole(UserType... types) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException {
-		String roles = "/role?";
-		for (int i = 0; i < types.length; i++)
-			roles += (i == 0 ? "" : "&") + "name=" + types[i];
-		return readOnlyService.module(USER).getList(roles);
-	}
-
-	public List<String> listNamesByRole(UserType... types) {
-		try {
-			return listByRole(types).stream().map(u -> u.getUsername()).collect(toList());
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	public User save(User entity) throws SuccessfulSaveInfo, NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, InvalidException, NotAllowedOffSiteTransactionException {
-		if (isOffSite())
-			throw new NotAllowedOffSiteTransactionException();
-		return savingService.module(USER).save(entity);
-	}
+	User save(User entity) throws SuccessfulSaveInfo, NoServerConnectionException, StoppedServerException,
+			FailedAuthenticationException, InvalidException, NotAllowedOffSiteTransactionException;
 
 }

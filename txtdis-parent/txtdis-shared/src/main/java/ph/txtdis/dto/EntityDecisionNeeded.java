@@ -2,16 +2,19 @@ package ph.txtdis.dto;
 
 import java.time.ZonedDateTime;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+public interface EntityDecisionNeeded<PK> extends CreationTracked, Validated, Keyed<PK> {
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public abstract class EntityDecisionNeeded<PK> extends EntityCreationTracked<PK>  implements Validated{
+	String getRemarks();
 
-	private Boolean isValid;
+	void setRemarks(String s);
 
-	private String decidedBy, remarks;
+	void setIsValid(Boolean isValid);
 
-	private ZonedDateTime decidedOn;
+	String getDecidedBy();
+
+	void setDecidedBy(String username);
+
+	ZonedDateTime getDecidedOn();
+
+	void setDecidedOn(ZonedDateTime decidedOn);
 }

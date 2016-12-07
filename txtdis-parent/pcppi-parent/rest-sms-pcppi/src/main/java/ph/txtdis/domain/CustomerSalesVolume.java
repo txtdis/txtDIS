@@ -23,12 +23,12 @@ import lombok.NoArgsConstructor;
 indexes = { //
 		@Index(columnList = "customer_id, item_id") }, //
 		uniqueConstraints = @UniqueConstraint(columnNames = { "customer_id", "item_id" }) )
-public class CustomerSalesVolume extends AbstractId<Long> {
+public class CustomerSalesVolume extends AbstractEntityId<Long> {
 
 	private static final long serialVersionUID = -7474940802227888900L;
 
 	@ManyToOne(optional = false)
-	private Customer customer;
+	private CustomerImpl customer;
 
 	@ManyToOne(optional = false)
 	private Item item;
