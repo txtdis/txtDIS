@@ -301,12 +301,12 @@ public interface BillingRepository extends CrudRepository<BillableEntity, Long> 
 			@Param("exTruck") PartnerType t, @Param("startOfDay") ZonedDateTime s, @Param("endOfDay") ZonedDateTime e);
 
 	// next exTruck
-	BillableEntity findFirstByCustomerTypeAndBookingIdGreaterThanOrderByBookingIdAsc(
-			@Param("exTruck") PartnerType t, @Param("bookingId") Long id);
+	BillableEntity findFirstByCustomerTypeAndBookingIdGreaterThanOrderByBookingIdAsc(@Param("exTruck") PartnerType t,
+			@Param("bookingId") Long id);
 
 	// previous exTruck
-	BillableEntity findFirstByCustomerTypeAndBookingIdLessThanOrderByBookingIdDesc(
-			@Param("exTruck") PartnerType t, @Param("bookingId") Long id);
+	BillableEntity findFirstByCustomerTypeAndBookingIdLessThanOrderByBookingIdDesc(@Param("exTruck") PartnerType t,
+			@Param("bookingId") Long id);
 
 	// first exTruck
 	BillableEntity findFirstByCustomerTypeAndBookingIdNotNullOrderByBookingIdAsc(@Param("exTruck") PartnerType t);
@@ -324,8 +324,8 @@ public interface BillingRepository extends CrudRepository<BillableEntity, Long> 
 	BillableEntity findFirstByCustomerTypeInAndBookingIdAndRmaNullOrderByIdAsc(
 			@Param("exTruckAndOutlet") List<PartnerType> t, @Param("bookingId") Long id);
 
-	List<BillableEntity> findByCustomerTypeAndPickingNotNullAndOrderDateBetween(
-			@Param("exTruck") PartnerType t, @Param("goLive") LocalDate start, @Param("cutOff") LocalDate end);
+	List<BillableEntity> findByCustomerTypeAndPickingNotNullAndOrderDateBetween(@Param("exTruck") PartnerType t,
+			@Param("goLive") LocalDate start, @Param("cutOff") LocalDate end);
 
 	List<BillableEntity> findByOrderDateBetweenAndReceivedOnNotNull(@Param("startDate") LocalDate s,
 			@Param("endDate") LocalDate e);
@@ -427,4 +427,8 @@ public interface BillingRepository extends CrudRepository<BillableEntity, Long> 
 
 	// find load order
 	BillableEntity findByCustomerNameAndOrderDate(@Param("exTruckName") String exTruck, @Param("date") LocalDate d);
+
+	// find load order
+	BillableEntity findByCustomerNameStartingWithAndBookingId(@Param("exTruckName") String exTruck,
+			@Param("loadOrderId") Long id);
 }

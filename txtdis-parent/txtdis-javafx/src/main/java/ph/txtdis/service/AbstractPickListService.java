@@ -32,7 +32,6 @@ import ph.txtdis.exception.RestException;
 import ph.txtdis.exception.StoppedServerException;
 import ph.txtdis.exception.UnauthorizedUserException;
 import ph.txtdis.util.ClientTypeMap;
-import ph.txtdis.util.DateTimeUtils;
 
 public abstract class AbstractPickListService implements PickListService {
 
@@ -242,14 +241,15 @@ public abstract class AbstractPickListService implements PickListService {
 			throw new NotAllowedOffSiteTransactionException();
 		if (!credentialService.isUser(MANAGER) && !credentialService.isUser(STOCK_CHECKER))
 			throw new UnauthorizedUserException("Stock Checkers Only");
-		if (!d.isBefore(goLiveDate()))
-			verifyDateIsTodayOrTheNextWorkDay(d);
+		// TODO
+		//		if (!d.isBefore(goLiveDate()))
+		//			verifyDateIsTodayOrTheNextWorkDay(d);
 		get().setPickDate(d);
 	}
 
-	private LocalDate goLiveDate() {
-		return DateTimeUtils.toDate(goLive);
-	}
+	//	private LocalDate goLiveDate() {
+	//		return DateTimeUtils.toDate(goLive);
+	//	}
 
 	@Override
 	public void setTruckUponValidation(String t) throws NothingToPickException {

@@ -12,6 +12,7 @@ import ph.txtdis.dto.Customer;
 import ph.txtdis.dto.Item;
 import ph.txtdis.dto.Route;
 import ph.txtdis.exception.InvalidException;
+import ph.txtdis.info.Information;
 import ph.txtdis.type.UomType;
 
 @Service("billingService")
@@ -23,7 +24,7 @@ public class BillingServiceImpl extends AbstractBillingService {
 	@Autowired
 	private PricedBillableService priceService;
 
-	private Billable exTruckLoadOrder;
+	private boolean isReferenceAnExTruckLoadOrder;
 
 	private Customer customer;
 
@@ -42,7 +43,7 @@ public class BillingServiceImpl extends AbstractBillingService {
 
 	@Override
 	public boolean isAppendable() {
-		return isNew() && isReferenceAnExTruckLoadOrder(get());
+		return isNew() && isReferenceAnExTruckLoadOrder;
 	}
 
 	@Override
@@ -55,49 +56,68 @@ public class BillingServiceImpl extends AbstractBillingService {
 		super.nullifyAll();
 		customer = null;
 		exTruckDetails = null;
-		exTruckLoadOrder = null;
+		isReferenceAnExTruckLoadOrder = false;
+	}
+
+	@Override
+	public void save() throws Information, Exception {
+		// TODO Auto-generated method stub
+		System.err.println("DueDate = " + getDueDate());
+		super.save();
 	}
 
 	@Override
 	public void setQtyUponValidation(UomType uom, BigDecimal qty) throws Exception {
-		if (exTruckDetails != null) {
-			for (BillableDetail detail : exTruckLoadOrder.getDetails()) {
-				if (detail.getId().equals(item.getId())) {
-					detail.setSoldQty(detail.getSoldQtyInDecimals().add(qty));
-					break;
-				}
-			}
-			exTruckLoadOrder = save(exTruckLoadOrder);
-		}
+		if (isBilledQtyMoreThanRemainingLoaded(qty))
+			throw new InvalidException("Quantity is more than remaining");
 		super.setQtyUponValidation(uom, qty);
+	}
+
+	private boolean isBilledQtyMoreThanRemainingLoaded(BigDecimal qty) {
+		return exTruckDetails.stream().anyMatch(d -> d.getId().equals(item.getId()) && d.getQty().compareTo(qty) < 0);
+	}
+
+	@Override
+	public void updateSummaries(List<BillableDetail> items) {
+		setDetails(items);
+		super.updateSummaries(items);
 	}
 
 	@Override
 	public void updateUponCustomerIdValidation(Long id) throws Exception {
-		customer = customerValidationService.validate(id, getOrderDate());
-		verifyCustomerAndBillableRoutesAreTheSame();
-		verifyDeliveryIsScheduledToday();
-		priceService.setItemDiscountMap(customer, getOrderDate());
+		Customer c = customerValidationService.validate(id, getOrderDate());
+		verifyCustomerAndBillableRoutesAreTheSame(c);
+		verifyDeliveryIsScheduledToday(c);
+		priceService.setItemDiscountMap(c, getOrderDate());
+		setCustomer(c);
 	}
 
-	private void verifyCustomerAndBillableRoutesAreTheSame() throws Exception {
-		if (!areRoutesTheSame())
-			throw new InvalidException(customer + "\nis not in " + getRouteName() + "'s route");
+	private void setCustomer(Customer c) {
+		customer = c;
+		get().setDueDate(getOrderDate().plusDays(c.getCreditTerm()));
+		get().setCustomerId(c.getId());
+		get().setCustomerName(c.getName());
+		get().setCustomerAddress(c.getAddress());
 	}
 
-	private String getRouteName() {
+	private void verifyCustomerAndBillableRoutesAreTheSame(Customer c) throws Exception {
+		if (!areRoutesTheSame(c))
+			throw new InvalidException(c + "\nis not in " + getRouteName(c) + "'s route");
+	}
+
+	private String getRouteName(Customer c) {
 		if (get().getRoute() == null)
-			get().setRoute(getCustomerRouteName());
+			get().setRoute(getCustomerRouteName(c));
 		return get().getRoute();
 	}
 
-	private boolean areRoutesTheSame() {
-		return getRouteName().equalsIgnoreCase(getCustomerRouteName());
+	private boolean areRoutesTheSame(Customer c) {
+		return getRouteName(c).equalsIgnoreCase(getCustomerRouteName(c));
 	}
 
-	private String getCustomerRouteName() {
+	private String getCustomerRouteName(Customer c) {
 		try {
-			Route route = customer.getRoute(getOrderDate());
+			Route route = c.getRoute(getOrderDate());
 			return route.getName();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -105,10 +125,9 @@ public class BillingServiceImpl extends AbstractBillingService {
 		}
 	}
 
-	private void verifyDeliveryIsScheduledToday() throws InvalidException {
-		if (!customer.areDeliveriesPickedUp(getOrderDate())
-				&& !customerService.isDeliveryScheduledOnThisDate(customer, getOrderDate()))
-			throw new InvalidException(customer + "\nis not scheduled for delivery today");
+	private void verifyDeliveryIsScheduledToday(Customer c) throws InvalidException {
+		if (!c.areDeliveriesPickedUp(getOrderDate()) && !customerService.isDeliveryScheduledOnThisDate(c, getOrderDate()))
+			throw new InvalidException(c + "\nis not scheduled for delivery today");
 	}
 
 	@Override
@@ -118,14 +137,14 @@ public class BillingServiceImpl extends AbstractBillingService {
 	}
 
 	private boolean isReferenceAnExTruckLoadOrder(Billable b) {
-		return b.getCustomerName().startsWith("EX-TRUCK");
+		return isReferenceAnExTruckLoadOrder = b == null || b.getCustomerName() == null ? false
+				: b.getCustomerName().startsWith("EX-TRUCK");
 	}
 
 	private Billable updateUponLoadOrderValidation(Billable b) throws Exception {
 		verifyLoadOrderIsStillOpen(b);
 		exTruckDetails = b.getDetails();
-		exTruckLoadOrder = b;
-		return nullifyCustomerIdAndNameAndAddressAndBillableDetails(b);
+		return setOrderDateAndBookingIdAndCreatedByAndOn(b);
 	}
 
 	private void verifyLoadOrderIsStillOpen(Billable b) throws Exception {
@@ -133,12 +152,13 @@ public class BillingServiceImpl extends AbstractBillingService {
 			throw new InvalidException("L/O No. " + b.getBookingId() + " has an R/R\nthus, is closed.");
 	}
 
-	private Billable nullifyCustomerIdAndNameAndAddressAndBillableDetails(Billable b) {
-		b.setCustomerId(null);
-		b.setCustomerName(null);
-		b.setCustomerAddress(null);
-		b.setDetails(null);
-		return b;
+	private Billable setOrderDateAndBookingIdAndCreatedByAndOn(Billable b) {
+		setOrderDate(b.getOrderDate());
+		get().setBookingId(b.getBookingId());
+		get().setCreatedBy(b.getCreatedBy());
+		get().setCreatedOn(b.getCreatedOn());
+		get().setPickListId(b.getPickListId());
+		return get();
 	}
 
 	@Override

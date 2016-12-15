@@ -146,6 +146,7 @@ public class Code {
 	}
 
 	public static String getPaymentTermCode(LocalDate dueDate, LocalDate orderDate) {
+
 		Long l = orderDate.until(dueDate, ChronoUnit.DAYS);
 		if (l == 0)
 			return COD;

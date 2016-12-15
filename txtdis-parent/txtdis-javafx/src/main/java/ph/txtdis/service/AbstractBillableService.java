@@ -496,7 +496,8 @@ public abstract class AbstractBillableService implements BillableService, Custom
 		setItem(verifyItem(id));
 	}
 
-	protected void setOrderDate(LocalDate d) {
+	@Override
+	public void setOrderDate(LocalDate d) {
 		get().setOrderDate(d);
 	}
 

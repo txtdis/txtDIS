@@ -38,6 +38,12 @@ public class NoPurchaseOrderReceiptAppImpl extends
 		return l;
 	}
 
+	// TODO to remove later
+	@Override
+	protected Node orderDateNode() {
+		return orderDateStackPane();
+	}
+
 	@Override
 	protected Node referenceNode() {
 		referenceIdInput.setFieldWidth(180);
@@ -61,6 +67,8 @@ public class NoPurchaseOrderReceiptAppImpl extends
 		super.setListeners();
 		referenceIdInput.setOnAction(e -> updateUponReferenceIdValidation());
 		table.setOnItemChange(e -> service.setDetails(table.getItems()));
+		// TODO -- to remove later
+		orderDatePicker.setOnAction(e -> service.setOrderDate(orderDatePicker.getValue()));
 	}
 
 	@Override

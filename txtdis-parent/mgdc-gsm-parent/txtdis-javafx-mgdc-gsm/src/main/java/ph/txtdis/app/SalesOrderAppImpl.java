@@ -76,6 +76,12 @@ public class SalesOrderAppImpl //
 		return l;
 	}
 
+	// TODO to remove later
+	@Override
+	protected Node orderDateNode() {
+		return orderDateStackPane();
+	}
+
 	@Override
 	public void refresh() {
 		super.refresh();
@@ -100,6 +106,8 @@ public class SalesOrderAppImpl //
 	protected void setListeners() {
 		super.setListeners();
 		exTruckCombo.setOnAction(e -> setExTruckAsCustomerUponValidation());
+		// TODO -- to remove later
+		orderDatePicker.setOnAction(e -> service.setOrderDate(orderDatePicker.getValue()));
 	}
 
 	private void setExTruckAsCustomerUponValidation() {

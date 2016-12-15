@@ -98,6 +98,8 @@ public interface BillableService
 
 	void setItem(Item item);
 
+	void setOrderDate(LocalDate value);
+
 	void setRemarks(String remarks);
 
 	void setUnpaidValue(BigDecimal unpaid);

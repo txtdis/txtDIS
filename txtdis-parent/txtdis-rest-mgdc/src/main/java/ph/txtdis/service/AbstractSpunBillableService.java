@@ -414,7 +414,7 @@ public abstract class AbstractSpunBillableService
 		e = updateTotals(e, b);
 		e = updateDecisionData(e, b);
 		e = updateReceivingInfo(e, b);
-		e.setDetails(details(e, b));
+		e.setDetails(setDetails(e, b));
 		return e;
 	}
 
@@ -519,7 +519,7 @@ public abstract class AbstractSpunBillableService
 		return b == null || b.getBookingId() == null ? 1L : b.getBookingId() + 1;
 	}
 
-	private List<BillableDetailEntity> details(BillableEntity e, Billable b) {
+	protected List<BillableDetailEntity> setDetails(BillableEntity e, Billable b) {
 		return b.getDetails().stream().map(d -> detail(e, b, d)).collect(Collectors.toList());
 	}
 

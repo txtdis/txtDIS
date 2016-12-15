@@ -112,6 +112,7 @@ public abstract class AbstractBillingService extends AbstractBillableService imp
 			throw new NotAllowedOffSiteTransactionException();
 		set(validateBooking(id.toString()));
 		get().setBilledBy(credentialService.username());
+		updateSummaries(getDetails());
 	}
 
 	protected Billable validateBooking(String id) throws Exception {

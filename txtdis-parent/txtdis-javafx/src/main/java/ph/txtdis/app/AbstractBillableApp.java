@@ -255,7 +255,6 @@ public abstract class AbstractBillableApp<AS extends BillableService, AT extends
 	@Override
 	public void refresh() {
 		super.refresh();
-		customerBox.refresh();
 		billedByDisplay.setValue(service.getBilledBy());
 		billedOnDisplay.setValue(service.getBilledOn());
 		customerAddressDisplay.setValue(service.getCustomerAddress());
@@ -270,6 +269,7 @@ public abstract class AbstractBillableApp<AS extends BillableService, AT extends
 		referenceIdInput.setValue(service.getBookingId());
 		remarksDisplay.setValue(service.getRemarks());
 		table.items(service.getDetails());
+		customerBox.refresh();
 	}
 
 	@Override

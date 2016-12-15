@@ -186,6 +186,10 @@ public class BillableServiceImpl implements BillableService {
 	}
 
 	private String getPaymentTermCode(Billable b) {
+		logger.info("\n    OrderDate: " + b.getOrderDate());
+		logger.info("\n    DueDate: " + b.getDueDate());
+		logger.info("\n    Customer: " + b.getCustomerId() + " - " + b.getCustomerName());
+		logger.info("\n    Details: " + b.getDetails());
 		return Code.getPaymentTermCode(b.getDueDate(), b.getOrderDate());
 	}
 
