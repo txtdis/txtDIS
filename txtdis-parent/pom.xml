@@ -15,7 +15,7 @@
 		<version>1.4.2.RELEASE</version>
 	</parent>
 
-	<version>0.9.4.7</version>
+	<version>0.9.4.8</version>
 	<packaging>pom</packaging>
 	<name>txtDIS Parent POM</name>
 

@@ -592,7 +592,8 @@ public class RemittanceServiceImpl implements RemittanceService {
 		LocalDate d = getPaymentDate();
 		if (!isNew() || d == null || credentialService.isUser(MANAGER))
 			return;
-		validateCashPaymentDateIsYesterdayOrToday(d);
+		// TODO -- remove later
+		// validateCashPaymentDateIsYesterdayOrToday(d);
 		validateNoCashPaymentsReceivedFromCollector(d);
 	}
 
@@ -682,6 +683,8 @@ public class RemittanceServiceImpl implements RemittanceService {
 		return h;
 	}
 
+	// TODO -- use later
+	@SuppressWarnings("unused")
 	private void validateCashPaymentDateIsYesterdayOrToday(LocalDate d) throws Exception {
 		LocalDate today = syncService.getServerDate();
 		LocalDate yesterday = today.minusDays(1L);

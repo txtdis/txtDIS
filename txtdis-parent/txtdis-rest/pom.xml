@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>txtdis-parent</artifactId>
-		<version>0.9.4.7</version>
+		<version>0.9.4.8</version>
 	</parent>
 
 	<artifactId>txtdis-rest</artifactId>

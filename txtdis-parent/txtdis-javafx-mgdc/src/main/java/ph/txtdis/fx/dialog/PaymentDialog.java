@@ -35,51 +35,35 @@ public class PaymentDialog extends AbstractFieldDialog<RemittanceDetail> {
 	private LabeledCombo<BillingType> billableCombo;
 
 	@Autowired
-	private LabeledField<String> prefixField;
-
-	@Autowired
-	private LabeledField<Long> idField;
-
-	@Autowired
-	private LabeledField<String> suffixField;
-
-	@Autowired
-	private LabeledField<String> customerDisplay;
+	private LabeledField<BigDecimal> receivableDisplay, paymentDisplay, balanceDisplay, remainingDisplay;
 
 	@Autowired
 	private LabeledField<LocalDate> dateDueDisplay;
 
 	@Autowired
-	private LabeledField<BigDecimal> receivableDisplay;
+	private LabeledField<Long> idField;
 
 	@Autowired
-	private LabeledField<BigDecimal> paymentDisplay;
-
-	@Autowired
-	private LabeledField<BigDecimal> balanceDisplay;
-
-	@Autowired
-	private LabeledField<BigDecimal> remainingDisplay;
+	private LabeledField<String> prefixField, suffixField, customerDisplay;
 
 	@Autowired
 	private RemittanceService remitService;
 
 	private Billable billable;
 
-	private void payFully(BigDecimal payment, BigDecimal remainingAfterPayment) {
-		paymentDisplay.setValue(payment);
-		balanceDisplay.setValue(ZERO);
-		remainingDisplay.setValue(remainingAfterPayment);
-	}
-
-	private void payPartial(BigDecimal unpaidValue, BigDecimal remainingPayment) {
-		paymentDisplay.setValue(remainingPayment);
-		balanceDisplay.setValue(unpaidValue.subtract(remainingPayment));
-		remainingDisplay.setValue(ZERO);
-	}
-
-	private LabeledField<BigDecimal> balanceDisplay() {
-		return balanceDisplay.name("Balance").readOnly().build(CURRENCY);
+	@Override
+	protected List<InputNode<?>> addNodes() {
+		return Arrays.asList(//
+				billableCombo(), //
+				prefixField(), //
+				idField(), //
+				suffixField(), //
+				customerDisplay(), //
+				dateDueDisplay(), //
+				receivableDisplay(), //
+				paymentField(), //
+				balanceDisplay(), //
+				remainingDisplay());
 	}
 
 	private LabeledCombo<BillingType> billableCombo() {
@@ -88,45 +72,22 @@ public class PaymentDialog extends AbstractFieldDialog<RemittanceDetail> {
 		return billableCombo;
 	}
 
-	private LabeledField<String> customerDisplay() {
-		return customerDisplay.name("Customer").readOnly().build(TEXT);
+	private void updateUponDeliveryIdValidation() {
+		try {
+			BillingType b = billableCombo.getValue();
+			if (b != null && b.equals(DELIVERY))
+				updateUponIdValidation(DELIVERY);
+		} catch (Exception e) {
+			resetNodesOnError(e);
+		}
 	}
 
-	private LabeledField<LocalDate> dateDueDisplay() {
-		return dateDueDisplay.name("Date Due").readOnly().build(DATE);
-	}
-
-	private LabeledField<Long> idField() {
-		idField.name("ID No.").build(ID);
-		idField.setOnAction(e -> updateUponDeliveryIdValidation());
-		return idField;
-	}
-
-	private LabeledField<BigDecimal> paymentField() {
-		return paymentDisplay.name("Payment").readOnly().build(CURRENCY);
-	}
-
-	private LabeledField<String> prefixField() {
-		prefixField.name("Code").width(70).build(TEXT);
-		prefixField.disableIf(billableCombo.is(DELIVERY));
-		return prefixField;
-	}
-
-	private LabeledField<BigDecimal> receivableDisplay() {
-		return receivableDisplay.name("Amount Due").readOnly().build(CURRENCY);
-	}
-
-	private LabeledField<BigDecimal> remainingDisplay() {
-		remainingDisplay.name("Remaining Payment").readOnly().build(CURRENCY);
-		remainingDisplay.setValue(remitService.getValue());
-		return remainingDisplay;
-	}
-
-	private LabeledField<String> suffixField() {
-		suffixField.name("Series").width(40).build(TEXT);
-		suffixField.setOnAction(e -> updateUponInvoiceIdValidation());
-		suffixField.disableIf(billableCombo.is(DELIVERY));
-		return suffixField;
+	private void updateUponIdValidation(BillingType b) throws Exception {
+		Billable i = remitService.updateUponIdValidation(b, //
+				prefixField.getValue(), //
+				idField.getValue(), //
+				suffixField.getValue());
+		updateBillableDisplays(billable = i);
 	}
 
 	private void updateBillableDisplays(Billable i) {
@@ -148,22 +109,35 @@ public class PaymentDialog extends AbstractFieldDialog<RemittanceDetail> {
 			payPartial(unpaidValue, remainingPayment);
 	}
 
-	private void updateUponDeliveryIdValidation() {
-		try {
-			BillingType b = billableCombo.getValue();
-			if (b != null && b.equals(DELIVERY))
-				updateUponIdValidation(DELIVERY);
-		} catch (Exception e) {
-			resetNodesOnError(e);
-		}
+	private void payFully(BigDecimal payment, BigDecimal remainingAfterPayment) {
+		paymentDisplay.setValue(payment);
+		balanceDisplay.setValue(ZERO);
+		remainingDisplay.setValue(remainingAfterPayment);
 	}
 
-	private void updateUponIdValidation(BillingType b) throws Exception {
-		Billable i = remitService.updateUponIdValidation(b, //
-				prefixField.getValue(), //
-				idField.getValue(), //
-				suffixField.getValue());
-		updateBillableDisplays(billable = i);
+	private void payPartial(BigDecimal unpaidValue, BigDecimal remainingPayment) {
+		paymentDisplay.setValue(remainingPayment);
+		balanceDisplay.setValue(unpaidValue.subtract(remainingPayment));
+		remainingDisplay.setValue(ZERO);
+	}
+
+	private LabeledField<String> prefixField() {
+		prefixField.name("Code").width(70).build(TEXT);
+		prefixField.disableIf(billableCombo.is(DELIVERY));
+		return prefixField;
+	}
+
+	private LabeledField<Long> idField() {
+		idField.name("ID No.").build(ID);
+		idField.setOnAction(e -> updateUponDeliveryIdValidation());
+		return idField;
+	}
+
+	private LabeledField<String> suffixField() {
+		suffixField.name("Series").width(40).build(TEXT);
+		suffixField.setOnAction(e -> updateUponInvoiceIdValidation());
+		suffixField.disableIf(billableCombo.is(DELIVERY));
+		return suffixField;
 	}
 
 	private void updateUponInvoiceIdValidation() {
@@ -174,19 +148,30 @@ public class PaymentDialog extends AbstractFieldDialog<RemittanceDetail> {
 		}
 	}
 
-	@Override
-	protected List<InputNode<?>> addNodes() {
-		return Arrays.asList(//
-				billableCombo(), //
-				prefixField(), //
-				idField(), //
-				suffixField(), //
-				customerDisplay(), //
-				dateDueDisplay(), //
-				receivableDisplay(), //
-				paymentField(), //
-				balanceDisplay(), //
-				remainingDisplay());
+	private LabeledField<String> customerDisplay() {
+		return customerDisplay.name("Customer").readOnly().build(TEXT);
+	}
+
+	private LabeledField<LocalDate> dateDueDisplay() {
+		return dateDueDisplay.name("Date Due").readOnly().build(DATE);
+	}
+
+	private LabeledField<BigDecimal> receivableDisplay() {
+		return receivableDisplay.name("Amount Due").readOnly().build(CURRENCY);
+	}
+
+	private LabeledField<BigDecimal> paymentField() {
+		return paymentDisplay.name("Payment").readOnly().build(CURRENCY);
+	}
+
+	private LabeledField<BigDecimal> balanceDisplay() {
+		return balanceDisplay.name("Balance").readOnly().build(CURRENCY);
+	}
+
+	private LabeledField<BigDecimal> remainingDisplay() {
+		remainingDisplay.name("Remaining Payment").readOnly().build(CURRENCY);
+		remainingDisplay.setValue(remitService.getValue());
+		return remainingDisplay;
 	}
 
 	@Override
