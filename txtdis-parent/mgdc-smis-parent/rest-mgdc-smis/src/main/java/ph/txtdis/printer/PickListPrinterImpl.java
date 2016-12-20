@@ -32,7 +32,7 @@ public class PickListPrinterImpl extends AbstractPickListPrinter {
 	}
 
 	private String itemQty(BillableDetailEntity d) {
-		return formatQuantity(d.getQty());
+		return formatQuantity(d.getFinalQty());
 	}
 
 	private String uom(BillableDetailEntity d) {

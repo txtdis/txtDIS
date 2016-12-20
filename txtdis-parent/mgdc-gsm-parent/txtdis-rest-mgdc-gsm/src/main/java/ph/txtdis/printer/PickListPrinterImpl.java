@@ -26,7 +26,7 @@ public class PickListPrinterImpl extends AbstractPickListPrinter implements QtyI
 
 	@Override
 	protected String itemQtyAndUom(BillableDetailEntity d) {
-		return qtyInFraction(itemService, d.getItem(), d.getQty().intValue());
+		return qtyInFraction(itemService, d.getItem(), d.getFinalQty().intValue());
 	}
 
 	@Override

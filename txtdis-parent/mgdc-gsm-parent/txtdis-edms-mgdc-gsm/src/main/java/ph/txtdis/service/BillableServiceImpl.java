@@ -225,7 +225,7 @@ public class BillableServiceImpl implements BillableService {
 		d.setPriceValue(bd.getPriceValue());
 		d.setDiscountValue(BigDecimal.ZERO);
 		d.setTotalDiscountValue(computeVolumeDiscountPerLineItem(bd));
-		d.setTotalValue(bd.getSubtotalValue());
+		d.setTotalValue(bd.getFinalSubtotalValue());
 		d.setTransactionCode(getSalesTransactionCode(bd));
 		d.setTdi("");
 		return edmsSalesOrderDetailRepository.save(d);
@@ -233,7 +233,7 @@ public class BillableServiceImpl implements BillableService {
 
 	private BigDecimal getQty(BillableDetail bd) {
 		return NumberUtils.divide( //
-				bd.getQty(), //
+				bd.getFinalQty(), //
 				itemService.getBottlesPerCase(bd));
 	}
 
@@ -436,12 +436,12 @@ public class BillableServiceImpl implements BillableService {
 		d.setItemCode(i.getCode());
 		d.setItemName(i.getName());
 		d.setDeliveredQty(BigDecimal.ZERO);
-		d.setQty(bd.getQty());
+		d.setQty(bd.getFinalQty());
 		d.setUomCode(Code.getUomCode(bd));
 		d.setCostValue(BigDecimal.ZERO);
 		d.setPriceValue(bd.getPriceValue());
 		d.setDiscountValue(BigDecimal.ZERO);
-		d.setTotalValue(bd.getSubtotalValue());
+		d.setTotalValue(bd.getFinalSubtotalValue());
 		d.setTransactionCode(getReturnsTransactionCode(b));
 		edmsCreditMemoDetailRepository.save(d);
 	}
@@ -478,9 +478,8 @@ public class BillableServiceImpl implements BillableService {
 		b.setBookingId(null);
 		b.setCustomerId(null);
 		b.setCustomerName(customerService.getName(i));
-		b.setGrossValue(i.getTotalValue());
 		b.setPickListId(truckService.getId(i));
-		b.setTotalValue(b.getGrossValue());
+		b.setTotalValue(i.getTotalValue());
 		b.setUnpaidValue(remittanceService.getUnpaidAmount(i));
 		b.setFullyPaid(remittanceService.isFullyPaid(b));
 		b.setBilledBy(Code.EDMS);

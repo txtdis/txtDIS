@@ -5,6 +5,7 @@ import static ph.txtdis.type.UserType.STOCK_CHECKER;
 import static ph.txtdis.type.UserType.STORE_KEEPER;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
@@ -25,6 +26,12 @@ public abstract class AbstractReceivingReportService //
 	@Override
 	public String getAlternateName() {
 		return "R/R";
+	}
+
+	@Override
+	public List<BillableDetail> getDetails() {
+		return super.getDetails() == null ? null
+				: super.getDetails().stream().filter(d -> d.getReturnedQty() != null).collect(Collectors.toList());
 	}
 
 	@Override

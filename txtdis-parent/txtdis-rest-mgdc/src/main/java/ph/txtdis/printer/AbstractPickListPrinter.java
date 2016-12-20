@@ -178,7 +178,7 @@ public abstract class AbstractPickListPrinter extends AbstractPrinter<PickListEn
 	}
 
 	protected BigDecimal subtotalValue(BillableDetailEntity d) {
-		return d.getPriceValue().multiply(d.getQty());
+		return d.getPriceValue().multiply(d.getFinalQty());
 	}
 
 	private void printBookingFooter(BillableEntity b) {

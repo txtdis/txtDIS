@@ -4,5 +4,7 @@ import ph.txtdis.dto.Billable;
 
 public interface TotaledBillableService {
 
-	Billable updateTotals(Billable b);
+	Billable updateFinalTotals(Billable b);
+
+	Billable updateInitialTotals(Billable b);
 }

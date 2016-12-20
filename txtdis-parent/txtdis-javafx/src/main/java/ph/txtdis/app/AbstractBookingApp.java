@@ -63,10 +63,6 @@ public abstract class AbstractBookingApp<AS extends BookingService, AT extends B
 
 	private void refreshSummaryPane() {
 		totalDisplay.setValue(service.getTotalValue());
-		refreshVatNodes();
-	}
-
-	private void refreshVatNodes() {
 		vatableDisplay.setValue(service.getVatable());
 		vatDisplay.setValue(service.getVat());
 	}

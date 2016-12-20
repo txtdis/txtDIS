@@ -20,7 +20,7 @@ public class BillableDetail extends AbstractId<Long>
 
 	private UomType uom;
 
-	private BigDecimal initialQty, soldQty, returnedQty, freeQty, priceValue, discountValue;
+	private BigDecimal initialQty, soldQty, returnedQty, freeQty, priceValue;
 
 	private QualityType quality;
 
@@ -32,32 +32,30 @@ public class BillableDetail extends AbstractId<Long>
 		return quality + ":" + itemName;
 	}
 
-	public BigDecimal getDiscountedSubtotalValue() {
-		return (price().subtract(discount())).multiply(qty());
-	}
-
-	private BigDecimal qty() {
-		BigDecimal qty = getQty();
+	private BigDecimal billableQty(BigDecimal unitQty) {
 		if (qtyPerCase != 0)
-			qty = qty.divide(new BigDecimal(qtyPerCase), 4, RoundingMode.HALF_EVEN);
-		return qty;
+			unitQty = unitQty.divide(new BigDecimal(qtyPerCase), 4, RoundingMode.HALF_EVEN);
+		return unitQty;
 	}
 
-	private BigDecimal discount() {
-		BigDecimal d = getDiscountValue();
-		return d != null ? d : ZERO;
+	public BigDecimal getFinalSubtotalValue() {
+		return subtotal(getFinalQty());
 	}
 
-	public BigDecimal getSubtotalValue() {
-		return price().multiply(qty());
+	private BigDecimal subtotal(BigDecimal unitQty) {
+		return price().multiply(billableQty(unitQty));
 	}
 
 	private BigDecimal price() {
 		return priceValue == null ? ZERO : priceValue;
 	}
 
+	public BigDecimal getInitialSubtotalValue() {
+		return subtotal(getInitialQty());
+	}
+
 	@Override
 	public String toString() {
-		return itemName + ": " + NumberUtils.toCurrencyText(getSubtotalValue());
+		return itemName + ": " + NumberUtils.toCurrencyText(getFinalSubtotalValue());
 	}
 }

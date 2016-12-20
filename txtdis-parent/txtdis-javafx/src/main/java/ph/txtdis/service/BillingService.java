@@ -20,6 +20,8 @@ public interface BillingService extends BillableService {
 
 	BigDecimal getVatable();
 
+	boolean isAnInvoice();
+
 	List<Billable> listAged(Customer customer);
 
 	List<Billable> listAging(Customer customer);

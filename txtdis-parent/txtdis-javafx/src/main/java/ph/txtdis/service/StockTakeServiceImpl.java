@@ -27,7 +27,7 @@ import ph.txtdis.type.UomType;
 import ph.txtdis.util.ClientTypeMap;
 
 @Service("stockTakeService")
-public class StockTakeServiceImpl implements BilledAllPickedSalesOrder, ClosedAllPickedLoadOrder, StockTakeService {
+public class StockTakeServiceImpl implements BilledAllPickedSalesOrder, PickedLoadOrderVerified, StockTakeService {
 
 	@Autowired
 	private CredentialService credentialService;

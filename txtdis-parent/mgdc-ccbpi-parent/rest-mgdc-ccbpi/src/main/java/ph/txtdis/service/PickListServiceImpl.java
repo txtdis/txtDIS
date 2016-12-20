@@ -43,7 +43,7 @@ public class PickListServiceImpl extends AbstractPickListService {
 	@Override
 	protected BomEntity toBom(BillableDetailEntity d) {
 		logger.info("\n    BillableDetailEntityBeforeBomCreation = " + d);
-		return createBom(d.getItem(), d.getQty());
+		return createBom(d.getItem(), d.getFinalQty());
 	}
 
 	@Override

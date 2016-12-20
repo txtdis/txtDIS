@@ -36,4 +36,10 @@ public class ExTruckController extends AbstractBillableController<ExTruckService
 		Billable b = service.findOpenLoadOrder(s, d);
 		return new ResponseEntity<>(b, OK);
 	}
+
+	@RequestMapping(path = "/shortLoadOrder", method = GET)
+	public ResponseEntity<?> findShortLoadOrder(@RequestParam("id") Long id) {
+		Billable b = service.findShortLoadOrder(id);
+		return new ResponseEntity<>(b, OK);
+	}
 }

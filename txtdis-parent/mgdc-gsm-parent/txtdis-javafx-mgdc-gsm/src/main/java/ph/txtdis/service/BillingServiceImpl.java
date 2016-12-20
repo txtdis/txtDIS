@@ -16,7 +16,7 @@ import ph.txtdis.info.Information;
 import ph.txtdis.type.UomType;
 
 @Service("billingService")
-public class BillingServiceImpl extends AbstractBillingService {
+public class BillingServiceImpl extends AbstractBillingService implements PickedLoadOrderVerified {
 
 	@Autowired
 	private CustomerValidationService customerValidationService;
@@ -37,6 +37,11 @@ public class BillingServiceImpl extends AbstractBillingService {
 	}
 
 	@Override
+	public ReadOnlyService<Billable> getBillableReadOnlyService() {
+		return billableReadOnlyService;
+	}
+
+	@Override
 	public String getReferencePrompt() {
 		return "Load/Sales Order No.";
 	}
@@ -44,6 +49,14 @@ public class BillingServiceImpl extends AbstractBillingService {
 	@Override
 	public boolean isAppendable() {
 		return isNew() && isReferenceAnExTruckLoadOrder;
+	}
+
+	@Override
+	protected boolean isForDR(Billable b) {
+		// TODO Auto-generated method stub
+		if (isReferenceAnExTruckLoadOrder(b))
+			return true;
+		return super.isForDR(b);
 	}
 
 	@Override
@@ -74,7 +87,8 @@ public class BillingServiceImpl extends AbstractBillingService {
 	}
 
 	private boolean isBilledQtyMoreThanRemainingLoaded(BigDecimal qty) {
-		return exTruckDetails.stream().anyMatch(d -> d.getId().equals(item.getId()) && d.getQty().compareTo(qty) < 0);
+		return exTruckDetails.stream()
+				.anyMatch(d -> d.getId().equals(item.getId()) && d.getFinalQty().compareTo(qty) < 0);
 	}
 
 	@Override
@@ -133,7 +147,7 @@ public class BillingServiceImpl extends AbstractBillingService {
 	@Override
 	protected Billable validateBooking(String id) throws Exception {
 		Billable b = super.validateBooking(id);
-		return !isReferenceAnExTruckLoadOrder(b) ? b : updateUponLoadOrderValidation(b);
+		return !isReferenceAnExTruckLoadOrder ? b : updateUponLoadOrderValidation(b);
 	}
 
 	private boolean isReferenceAnExTruckLoadOrder(Billable b) {
@@ -142,14 +156,16 @@ public class BillingServiceImpl extends AbstractBillingService {
 	}
 
 	private Billable updateUponLoadOrderValidation(Billable b) throws Exception {
-		verifyLoadOrderIsStillOpen(b);
+		verifyLoadOrderIsStillOpenForBilling(b);
 		exTruckDetails = b.getDetails();
 		return setOrderDateAndBookingIdAndCreatedByAndOn(b);
 	}
 
-	private void verifyLoadOrderIsStillOpen(Billable b) throws Exception {
-		if (isAnInvoice() && b.getReceivedOn() != null)
-			throw new InvalidException("L/O No. " + b.getBookingId() + " has an R/R\nthus, is closed.");
+	private void verifyLoadOrderIsStillOpenForBilling(Billable b) throws Exception {
+		if (isAnInvoice())
+			verifyPickedLoadOrderCanBeInvoiced(b);
+		else
+			verifyPickedLoadOrderCanBeDRdBecauseOfItemShortages(b.getBookingId());
 	}
 
 	private Billable setOrderDateAndBookingIdAndCreatedByAndOn(Billable b) {

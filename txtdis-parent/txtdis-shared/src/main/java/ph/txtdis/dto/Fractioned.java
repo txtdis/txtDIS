@@ -35,7 +35,7 @@ public interface Fractioned {
 
 	@JsonIgnore
 	default Fraction getQtyInFractions() {
-		return isNotPerCase() ? null : Fraction.getFraction(getQty().intValue(), getQtyPerCase());
+		return isNotPerCase() ? null : Fraction.getFraction(getFinalQty().intValue(), getQtyPerCase());
 	}
 
 	@JsonIgnore
@@ -64,15 +64,15 @@ public interface Fractioned {
 	}
 
 	@JsonIgnore
-	default BigDecimal getQtyInDecimals() {
+	default BigDecimal getFinalQtyInDecimals() {
 		return getInitialQtyInDecimals() //
 				.subtract(getSoldQtyInDecimals()) //
 				.subtract(getReturnedQtyInDecimals()) //
 				.subtract(getFreeQtyInDecimals());
 	}
 
-	default BigDecimal getQty() {
-		BigDecimal d = getQtyInDecimals();
+	default BigDecimal getFinalQty() {
+		BigDecimal d = getFinalQtyInDecimals();
 		return isNegative(d) ? ZERO : d;
 	}
 

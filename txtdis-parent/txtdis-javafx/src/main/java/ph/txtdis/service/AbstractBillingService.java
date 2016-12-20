@@ -9,6 +9,7 @@ import static ph.txtdis.util.TextUtils.nullIfEmpty;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,6 +27,7 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.exception.RestException;
 import ph.txtdis.exception.StoppedServerException;
 import ph.txtdis.type.BillableType;
+import ph.txtdis.util.NumberUtils;
 
 public abstract class AbstractBillingService extends AbstractBillableService implements BillingService {
 
@@ -44,10 +46,6 @@ public abstract class AbstractBillingService extends AbstractBillableService imp
 		if (isAnInvoice())
 			return "S/I";
 		return "D/R";
-	}
-
-	protected boolean isAnInvoice() {
-		return type == BillableType.INVOICE;
 	}
 
 	@Override
@@ -73,6 +71,13 @@ public abstract class AbstractBillingService extends AbstractBillableService imp
 	}
 
 	@Override
+	public List<BillableDetail> getDetails() {
+		return super.getDetails() == null ? null
+				: super.getDetails().stream().filter(d -> NumberUtils.isPositive(d.getFinalQty()))
+						.collect(Collectors.toList());
+	}
+
+	@Override
 	public String getHeaderText() {
 		if (isAnInvoice())
 			return "Sales Invoice";
@@ -89,6 +94,11 @@ public abstract class AbstractBillingService extends AbstractBillableService imp
 		if (isAnInvoice())
 			return super.getSpunModule();
 		return "deliveryReport";
+	}
+
+	@Override
+	public boolean isAnInvoice() {
+		return type == BillableType.INVOICE;
 	}
 
 	@Override
@@ -171,7 +181,7 @@ public abstract class AbstractBillingService extends AbstractBillableService imp
 
 	@Override
 	public void updateSummaries(List<BillableDetail> items) {
-		set(totalService.updateTotals(get()));
+		set(totalService.updateFinalTotals(get()));
 	}
 
 	@Override

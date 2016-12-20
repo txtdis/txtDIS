@@ -4,31 +4,31 @@ import static java.math.BigDecimal.ZERO;
 import static ph.txtdis.util.NumberUtils.isNegative;
 
 import java.math.BigDecimal;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Service;
 
 import ph.txtdis.dto.Billable;
+import ph.txtdis.dto.BillableDetail;
 
 @Service("totaledBillableService")
 public class TotaledBillableServiceImpl implements TotaledBillableService {
 
 	@Override
-	public Billable updateTotals(Billable b) {
-		if (b.getId() == null)
-			b = updateGrossAndTotal(b);
+	public Billable updateFinalTotals(Billable b) {
+		return computeTotals(b, d -> d.getFinalSubtotalValue());
+	}
+
+	private Billable computeTotals(Billable b, Function<BillableDetail, BigDecimal> subtotal) {
+		b.setGrossValue(computeGross(b, subtotal));
+		b.setTotalValue(b.getGrossValue());
 		b = computeUnpaid(b);
 		return b;
 	}
 
-	private Billable updateGrossAndTotal(Billable b) {
-		b.setGrossValue(computeGross(b));
-		b.setTotalValue(b.getGrossValue());
-		return b;
-	}
-
-	private BigDecimal computeGross(Billable b) {
+	private BigDecimal computeGross(Billable b, Function<BillableDetail, BigDecimal> subtotal) {
 		try {
-			BigDecimal gross = b.getDetails().stream().map(d -> d.getSubtotalValue()).reduce(ZERO, BigDecimal::add);
+			BigDecimal gross = b.getDetails().stream().map(subtotal).reduce(ZERO, BigDecimal::add);
 			return isNegative(gross) ? null : gross;
 		} catch (Exception e) {
 			return null;
@@ -39,5 +39,10 @@ public class TotaledBillableServiceImpl implements TotaledBillableService {
 		if (b.getPayments() == null || b.getPayments().isEmpty())
 			b.setUnpaidValue(b.getTotalValue());
 		return b;
+	}
+
+	@Override
+	public Billable updateInitialTotals(Billable b) {
+		return computeTotals(b, d -> d.getInitialSubtotalValue());
 	}
 }

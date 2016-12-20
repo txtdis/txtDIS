@@ -425,10 +425,13 @@ public interface BillingRepository extends CrudRepository<BillableEntity, Long> 
 	List<BillableEntity> findByNumIdNotNullAndFullyPaidFalseAndCustomerIdAndOrderDateGreaterThanEqualAndDueDateLessThan(
 			@Param("customerId") Long id, @Param("goLive") LocalDate goLive, @Param("now") LocalDate now);
 
-	// find load order
+	// find load order by order date
 	BillableEntity findByCustomerNameAndOrderDate(@Param("exTruckName") String exTruck, @Param("date") LocalDate d);
 
 	// find load order
-	BillableEntity findByCustomerNameStartingWithAndBookingId(@Param("exTruckName") String exTruck,
+	BillableEntity findByCustomerTypeAndBookingId(@Param("exTruck") PartnerType t, @Param("loadOrderId") Long id);
+
+	// find load order w/ an R/R
+	BillableEntity findByCustomerTypeAndBookingIdAndReceivingIdNotNull(@Param("exTruck") PartnerType t,
 			@Param("loadOrderId") Long id);
 }

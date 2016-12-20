@@ -356,7 +356,6 @@ public abstract class AbstractSpunBillableService
 		d.setReturnedQty(e.getReturnedQty());
 		d.setQuality(e.getQuality());
 		d.setPriceValue(e.getPriceValue());
-		d.setDiscountValue(e.getDiscountValue());
 		d.setQtyPerCase(getQtyPerCase(e, item));
 		d = setDaysLevel(d, e);
 		return d;
@@ -454,8 +453,8 @@ public abstract class AbstractSpunBillableService
 
 	private Function<BillableDetail, BigDecimal> getQty(Billable b) {
 		if (b.getCustomerId() == null || !b.getCustomerId().equals(vendorId()))
-			return BillableDetail::getQty;
-		return BillableDetail::getQtyInDecimals;
+			return BillableDetail::getFinalQty;
+		return BillableDetail::getFinalQtyInDecimals;
 	}
 
 	private BillableEntity setCancelledData(BillableEntity e) {
@@ -532,10 +531,9 @@ public abstract class AbstractSpunBillableService
 		ed.setQuality(bd.getQuality());
 		ed.setReturnedQty(bd.getReturnedQty());
 		ed.setPriceValue(bd.getPriceValue());
-		ed.setDiscountValue(bd.getDiscountValue());
 		ed = setDaysLevel(ed, b, bd);
 		logger.info("\n    BillableDetailEntity: " //
-				+ (b.getOrderNo().isEmpty() ? "NEW" : b.getOrderNo()) + ", " + ed.getItem() + ", " + ed.getQty());
+				+ (b.getOrderNo().isEmpty() ? "NEW" : b.getOrderNo()) + ", " + ed.getItem() + ", " + ed.getFinalQty());
 		return ed;
 	}
 

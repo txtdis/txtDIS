@@ -15,7 +15,7 @@
 		<version>1.4.2.RELEASE</version>
 	</parent>
 
-	<version>0.9.4.8</version>
+	<version>0.9.4.9</version>
 	<packaging>pom</packaging>
 	<name>txtDIS Parent POM</name>
 
@@ -270,7 +270,7 @@
 							<id>iscc</id>
 							<phase>install</phase>
 							<configuration>
-								<executable>ISCC.exe</executable>
+								<executable>C:/Users/txtDIS/InnoSetup5/ISCC.exe</executable>
 								<workingDirectory>${setup.config.dir}</workingDirectory>
 								<arguments>
 									<argument>/OC:/Users/txtDIS/Documents/txtdis/inno</argument>

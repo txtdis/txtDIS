@@ -50,7 +50,7 @@ public class DeliveryListServiceImpl extends AbstractBillableService implements 
 
 	@Override
 	public List<BigDecimal> getTotals(List<BillableDetail> l) {
-		BigDecimal total = l.stream().map(BillableDetail::getSubtotalValue).reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal total = l.stream().map(BillableDetail::getFinalSubtotalValue).reduce(BigDecimal.ZERO, BigDecimal::add);
 		return Arrays.asList(total);
 	}
 

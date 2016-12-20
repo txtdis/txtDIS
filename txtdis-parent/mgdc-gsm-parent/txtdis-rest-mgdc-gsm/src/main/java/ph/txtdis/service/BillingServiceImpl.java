@@ -16,6 +16,7 @@ import ph.txtdis.domain.BillableDetailEntity;
 import ph.txtdis.domain.BillableEntity;
 import ph.txtdis.domain.ItemEntity;
 import ph.txtdis.dto.Billable;
+import ph.txtdis.dto.PartnerType;
 import ph.txtdis.exception.FailedAuthenticationException;
 import ph.txtdis.exception.InvalidException;
 import ph.txtdis.exception.NoServerConnectionException;
@@ -86,12 +87,12 @@ public class BillingServiceImpl extends AbstractBillableService implements Impor
 			Map<ItemEntity, BillableDetailEntity> loadOrderDetailMap, //
 			BillableDetailEntity billingDetail, //
 			BillableDetailEntity loadOrderDetail) {
-		loadOrderDetail.setSoldQty(loadOrderDetail.getSoldQtyInDecimals().add(billingDetail.getQtyInDecimals()));
+		loadOrderDetail.setSoldQty(loadOrderDetail.getSoldQtyInDecimals().add(billingDetail.getFinalQtyInDecimals()));
 		loadOrderDetailMap.put(loadOrderDetail.getItem(), loadOrderDetail);
 		return loadOrderDetailMap;
 	}
 
 	private BillableEntity findByLoadOrderId(Long id) {
-		return repository.findByCustomerNameStartingWithAndBookingId("EX-TRUCK", id);
+		return repository.findByCustomerTypeAndBookingId(PartnerType.EX_TRUCK, id);
 	}
 }

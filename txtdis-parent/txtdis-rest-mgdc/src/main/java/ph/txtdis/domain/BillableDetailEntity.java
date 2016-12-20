@@ -76,7 +76,7 @@ public class BillableDetailEntity extends AbstractEntityId<Long> implements Frac
 	}
 
 	public BigDecimal getUnitQty() {
-		return getQty().multiply(qtyPerPiece());
+		return getFinalQty().multiply(qtyPerPiece());
 	}
 
 	@Override

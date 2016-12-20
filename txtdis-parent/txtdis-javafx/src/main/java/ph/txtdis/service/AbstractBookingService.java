@@ -149,7 +149,7 @@ public abstract class AbstractBookingService extends AbstractBillableService imp
 	@Override
 	public void updateSummaries(List<BillableDetail> items) {
 		setDetails(items);
-		set(totalService.updateTotals(get()));
+		set(totalService.updateInitialTotals(get()));
 	}
 
 	@Override

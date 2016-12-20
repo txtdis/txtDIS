@@ -61,7 +61,11 @@ public abstract class AbstractBillableTable<AS extends BillableService, BD exten
 		uom.ofType(ENUM).build("UOM", "uom");
 		quality.ofType(ENUM).build("Quality", "quality");
 		price.ofType(CURRENCY).build("Price", "priceValue");
-		subtotal.ofType(CURRENCY).build("Subtotal", "subtotalValue");
+		subtotal.ofType(CURRENCY).build("Subtotal", subtotal());
+	}
+
+	protected String subtotal() {
+		return "finalSubtotalValue";
 	}
 
 	protected String qty() {

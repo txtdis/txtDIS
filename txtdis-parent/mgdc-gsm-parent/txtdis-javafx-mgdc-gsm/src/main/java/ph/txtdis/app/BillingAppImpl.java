@@ -15,7 +15,10 @@ public class BillingAppImpl //
 	@Override
 	protected void reset() {
 		super.reset();
-		idPrefixInput.requestFocus();
+		if (service.isAnInvoice())
+			idPrefixInput.requestFocus();
+		else
+			referenceIdInput.requestFocus();
 	}
 
 	@Override

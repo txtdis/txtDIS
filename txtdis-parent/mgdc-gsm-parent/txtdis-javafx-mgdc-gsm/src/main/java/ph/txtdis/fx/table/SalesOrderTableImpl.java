@@ -31,7 +31,7 @@ public class SalesOrderTableImpl //
 		if (service.isExTruck())
 			l.addAll(asList(bookedQtyInFractions, soldQtyInFractions, returnedQtyInFractions, qtyColumn()));
 		else
-			l.addAll(asList(price, qtyColumn(), subtotal));
+			l.addAll(asList(price, bookedQtyInFractions, subtotal));
 		return l;
 	}
 
@@ -47,5 +47,10 @@ public class SalesOrderTableImpl //
 		if (service.isExTruck())
 			return "Returned";
 		return netQtyColumnName();
+	}
+
+	@Override
+	protected String subtotal() {
+		return "initialSubtotalValue";
 	}
 }

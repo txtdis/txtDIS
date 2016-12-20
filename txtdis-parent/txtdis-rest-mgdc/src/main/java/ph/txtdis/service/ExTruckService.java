@@ -13,4 +13,6 @@ public interface ExTruckService extends SpunBillableService {
 	Billable findLoadOrder(LocalDate date, String exTruck);
 
 	Billable findOpenLoadOrder(String s, Date d);
+
+	Billable findShortLoadOrder(Long id);
 }

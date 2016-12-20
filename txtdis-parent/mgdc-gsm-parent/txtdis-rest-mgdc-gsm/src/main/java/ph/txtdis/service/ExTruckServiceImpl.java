@@ -14,7 +14,7 @@ import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.PartnerType;
 import ph.txtdis.util.NumberUtils;
 
-@Service("exTruckServiceImpl")
+@Service("exTruckService")
 public class ExTruckServiceImpl extends AbstractSpunBillableService implements ExTruckService {
 
 	@Override
@@ -41,7 +41,7 @@ public class ExTruckServiceImpl extends AbstractSpunBillableService implements E
 		List<BillableEntity> l = repository.findByCustomerTypeAndPickingNotNullAndOrderDateBetween(EX_TRUCK, goLive(),
 				billingCutoff(date, seller));
 		BillableEntity e = l.stream().flatMap(b -> b.getDetails().stream()) //
-				.filter(d -> !NumberUtils.isZero(d.getQtyInDecimals())) //
+				.filter(d -> !NumberUtils.isZero(d.getFinalQtyInDecimals())) //
 				.map(d -> d.getBilling()).distinct() //
 				.filter(b -> filterBySeller(b, seller)) //
 				.findFirst().orElse(null);
@@ -52,6 +52,16 @@ public class ExTruckServiceImpl extends AbstractSpunBillableService implements E
 		if (seller.equalsIgnoreCase("ALL"))
 			return true;
 		return seller.equals(b.getCustomer().getSeller());
+	}
+
+	@Override
+	public Billable findShortLoadOrder(Long id) {
+		BillableEntity e = repository.findByCustomerTypeAndBookingIdAndReceivingIdNotNull(EX_TRUCK, id);
+		return isShort(e) ? toBookingIdOnlyBillable(e) : null;
+	}
+
+	private boolean isShort(BillableEntity e) {
+		return e == null ? false : e.getDetails().stream().anyMatch(d -> NumberUtils.isPositive(d.getFinalQty()));
 	}
 
 	@Override

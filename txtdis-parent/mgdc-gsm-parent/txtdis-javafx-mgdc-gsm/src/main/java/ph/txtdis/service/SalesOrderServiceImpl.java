@@ -186,7 +186,7 @@ public class SalesOrderServiceImpl extends AbstractBookingService implements Sal
 		logger.info("\n    ExTruck = " + truck);
 		if (truck == null || truck.isEmpty() || !isNew())
 			return;
-		setExTruck(truck);
+		setExTruckAsCustomer(truck);
 		verifyAllCashBillablesHaveBeenFullyPaid();
 		verifyAllPickedBillablesHaveBeenClosed();
 	}
@@ -198,7 +198,7 @@ public class SalesOrderServiceImpl extends AbstractBookingService implements Sal
 			verifyAllPickedSalesOrderHaveBeenBilled(getSeller(), getOrderDate());
 	}
 
-	private void setExTruck(String t) {
+	private void setExTruckAsCustomer(String t) {
 		try {
 			customer = customerService.findByName(t);
 			setCustomerRelatedData();
@@ -264,7 +264,8 @@ public class SalesOrderServiceImpl extends AbstractBookingService implements Sal
 	private void setDates() {
 		if (isExTruck())
 			return;
-		setOrderDate();
+		if (getOrderDate() == null)
+			setOrderDate();
 		setDueDate();
 	}
 

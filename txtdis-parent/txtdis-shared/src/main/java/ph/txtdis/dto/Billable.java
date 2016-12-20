@@ -63,10 +63,6 @@ public class Billable extends AbstractDecisionNeeded<Long>
 		return suffix == null ? "" : suffix;
 	}
 
-	public BigDecimal getGrossValue() {
-		return grossValue == null ? BigDecimal.ZERO : grossValue;
-	}
-
 	public BigDecimal getTotalValue() {
 		return totalValue == null ? BigDecimal.ZERO : totalValue;
 	}
