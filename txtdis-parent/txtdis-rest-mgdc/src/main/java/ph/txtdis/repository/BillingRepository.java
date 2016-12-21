@@ -214,6 +214,9 @@ public interface BillingRepository extends CrudRepository<BillableEntity, Long> 
 	// first D/R 
 	BillableEntity findFirstByNumIdLessThanOrderByIdAsc(@Param("zero") Long z);
 
+	// find latest D/R
+	BillableEntity findFirstByNumIdLessThanOrderByNumIdAsc(@Param("zero") Long z);
+
 	// any S/I by Customer & Item
 	BillableEntity findFirstByNumIdNotNullAndRmaNullAndCustomerIdAndOrderDateBetweenAndDetails_Item_Id(
 			@Param("customerId") Long c, @Param("start") LocalDate s, @Param("end") LocalDate e, @Param("itemId") Long i);

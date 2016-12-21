@@ -65,7 +65,8 @@ public class BillingServiceImpl extends AbstractBillableService implements Impor
 
 	private void updateLoadOrderSoldQtys( //
 			BillableEntity loadOrder, //
-			List<BillableDetailEntity> billingDetails) {
+			List<BillableDetailEntity> billingDetails //
+	) {
 		Map<ItemEntity, BillableDetailEntity> loadOrderDetailMap = loadOrder.getDetails().stream()
 				.collect(Collectors.toMap(BillableDetailEntity::getItem, Function.identity()));
 		for (BillableDetailEntity billingDetail : billingDetails)
@@ -76,7 +77,8 @@ public class BillingServiceImpl extends AbstractBillableService implements Impor
 
 	private Map<ItemEntity, BillableDetailEntity> updateLoadOrderSoldQtys( //
 			Map<ItemEntity, BillableDetailEntity> loadOrderDetailMap, //
-			BillableDetailEntity billingDetail) {
+			BillableDetailEntity billingDetail //
+	) {
 		BillableDetailEntity loadOrderDetail = loadOrderDetailMap.get(billingDetail.getItem());
 		if (loadOrderDetail != null)
 			loadOrderDetailMap = updateLoadOrderSoldQty(loadOrderDetailMap, billingDetail, loadOrderDetail);
@@ -86,7 +88,8 @@ public class BillingServiceImpl extends AbstractBillableService implements Impor
 	private Map<ItemEntity, BillableDetailEntity> updateLoadOrderSoldQty(
 			Map<ItemEntity, BillableDetailEntity> loadOrderDetailMap, //
 			BillableDetailEntity billingDetail, //
-			BillableDetailEntity loadOrderDetail) {
+			BillableDetailEntity loadOrderDetail //
+	) {
 		loadOrderDetail.setSoldQty(loadOrderDetail.getSoldQtyInDecimals().add(billingDetail.getFinalQtyInDecimals()));
 		loadOrderDetailMap.put(loadOrderDetail.getItem(), loadOrderDetail);
 		return loadOrderDetailMap;

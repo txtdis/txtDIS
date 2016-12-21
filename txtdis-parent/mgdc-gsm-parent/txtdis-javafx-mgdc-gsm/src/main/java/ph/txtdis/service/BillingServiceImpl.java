@@ -12,7 +12,6 @@ import ph.txtdis.dto.Customer;
 import ph.txtdis.dto.Item;
 import ph.txtdis.dto.Route;
 import ph.txtdis.exception.InvalidException;
-import ph.txtdis.info.Information;
 import ph.txtdis.type.UomType;
 
 @Service("billingService")
@@ -53,7 +52,6 @@ public class BillingServiceImpl extends AbstractBillingService implements Picked
 
 	@Override
 	protected boolean isForDR(Billable b) {
-		// TODO Auto-generated method stub
 		if (isReferenceAnExTruckLoadOrder(b))
 			return true;
 		return super.isForDR(b);
@@ -70,13 +68,6 @@ public class BillingServiceImpl extends AbstractBillingService implements Picked
 		customer = null;
 		exTruckDetails = null;
 		isReferenceAnExTruckLoadOrder = false;
-	}
-
-	@Override
-	public void save() throws Information, Exception {
-		// TODO Auto-generated method stub
-		System.err.println("DueDate = " + getDueDate());
-		super.save();
 	}
 
 	@Override
@@ -147,12 +138,12 @@ public class BillingServiceImpl extends AbstractBillingService implements Picked
 	@Override
 	protected Billable validateBooking(String id) throws Exception {
 		Billable b = super.validateBooking(id);
-		return !isReferenceAnExTruckLoadOrder ? b : updateUponLoadOrderValidation(b);
+		return !isReferenceAnExTruckLoadOrder(b) ? b : updateUponLoadOrderValidation(b);
 	}
 
 	private boolean isReferenceAnExTruckLoadOrder(Billable b) {
-		return isReferenceAnExTruckLoadOrder = b == null || b.getCustomerName() == null ? false
-				: b.getCustomerName().startsWith("EX-TRUCK");
+		return isReferenceAnExTruckLoadOrder = (b == null || b.getCustomerName() == null ? false
+				: b.getCustomerName().startsWith("EX-TRUCK"));
 	}
 
 	private Billable updateUponLoadOrderValidation(Billable b) throws Exception {

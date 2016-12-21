@@ -398,7 +398,7 @@ public abstract class AbstractSpunBillableService
 		BillableEntity e = new BillableEntity();
 		e.setPrefix(b.getPrefix());
 		e.setSuffix(b.getSuffix());
-		e.setNumId(b.getNumId());
+		e.setNumId(getNumId(b));
 		e.setOrderDate(b.getOrderDate());
 		if (cancelled(b))
 			return setCancelledData(e);
@@ -415,6 +415,15 @@ public abstract class AbstractSpunBillableService
 		e = updateReceivingInfo(e, b);
 		e.setDetails(setDetails(e, b));
 		return e;
+	}
+
+	private Long getNumId(Billable b) {
+		return b.getNumId() == null ? getDeliveryId() : b.getNumId();
+	}
+
+	private Long getDeliveryId() {
+		BillableEntity e = repository.findFirstByNumIdLessThanOrderByNumIdAsc(0L);
+		return e.getNumId() - 1;
 	}
 
 	private BillableEntity updateReceivingInfo(BillableEntity e, Billable b) {
@@ -575,7 +584,7 @@ public abstract class AbstractSpunBillableService
 	}
 
 	private Long numId(Billable b) {
-		Long id = b.getNumId();
+		Long id = getNumId(b);
 		return id == null ? generateDeliveryId() : id;
 	}
 

@@ -13,9 +13,9 @@ import ph.txtdis.fx.dialog.BillableDialog;
 import ph.txtdis.service.CokeBillableService;
 
 @Scope("Lazy")
-@Component("orderConfirmationBillableTable")
-public class OrderConfirmationBillableTableImpl
-		extends AbstractBeverageBillableTable<CokeBillableService, BillableDialog> {
+@Component("orderConfirmationTable")
+public class OrderConfirmationTableImpl extends AbstractBeverageBillableTable<CokeBillableService, BillableDialog>
+		implements OrderConfirmationTable {
 
 	@Override
 	protected List<TableColumn<BillableDetail, ?>> columns() {
