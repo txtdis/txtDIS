@@ -1,0 +1,28 @@
+package ph.txtdis.dyvek.service.server;
+
+import java.util.List;
+
+import ph.txtdis.dto.Remittance;
+import ph.txtdis.dto.RemittanceDetail;
+import ph.txtdis.dyvek.domain.RemittanceDetailEntity;
+import ph.txtdis.dyvek.domain.RemittanceEntity;
+import ph.txtdis.dyvek.model.Billable;
+import ph.txtdis.dyvek.repository.RemittanceRepository;
+import ph.txtdis.service.DecisionDataUpdate;
+import ph.txtdis.service.RemittanceService;
+import ph.txtdis.service.SpunSavedKeyedService;
+
+public interface DyvekRemittanceService //
+		extends DecisionDataUpdate<RemittanceEntity, RemittanceRepository>, RemittanceService,
+		SpunSavedKeyedService<RemittanceEntity, Remittance, Long> {
+
+	List<Remittance> findAll(Billable b);
+
+	RemittanceEntity findEntityByBillingId(Long id);
+
+	RemittanceEntity findEntityByCheck(String bank, Long checkId);
+
+	void saveDetails(List<RemittanceDetailEntity> l);
+
+	List<RemittanceDetail> toDetails(List<RemittanceDetailEntity> l);
+}

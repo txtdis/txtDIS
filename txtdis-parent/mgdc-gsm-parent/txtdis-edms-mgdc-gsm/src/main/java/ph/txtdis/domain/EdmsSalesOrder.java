@@ -13,13 +13,15 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "tr_so_header")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsSalesOrder extends EdmsAbstractBookedPaidTransported implements Serializable {
+public class EdmsSalesOrder //
+		extends EdmsAbstractBookedPaidTransported //
+		implements Serializable {
 
 	private static final long serialVersionUID = -7879043349941384153L;
 
 	@Column(name = "modiBy")
-	private String modifiedBy;
+	private String modifiedBy = "";
 
 	@Column(name = "dateModi")
-	private String modifiedOn;
+	private String modifiedOn = "";
 }

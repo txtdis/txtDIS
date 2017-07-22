@@ -12,22 +12,23 @@ import org.springframework.stereotype.Component;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.pane.AppGridPane;
 
 @Scope("prototype")
 @Component("searchDialog")
-public class SearchDialog extends AbstractInputDialog {
+public class SearchDialog //
+		extends AbstractInputDialog {
 
 	@Autowired
 	protected AppGridPane grid;
 
 	@Autowired
-	private AppField<String> textField;
+	private AppFieldImpl<String> textField;
 
 	@Autowired
-	private AppButton findButton;
+	private AppButtonImpl findButton;
 
 	private String searchText, criteria;
 
@@ -41,13 +42,13 @@ public class SearchDialog extends AbstractInputDialog {
 	}
 
 	@Override
-	public void setFocus() {
+	public void goToDefaultFocus() {
 		textField.requestFocus();
 	}
 
 	private Button findButton() {
 		findButton.large("Find").build();
-		findButton.setOnAction(event -> setEnteredText());
+		findButton.onAction(event -> setEnteredText());
 		return findButton;
 	}
 
@@ -84,8 +85,8 @@ public class SearchDialog extends AbstractInputDialog {
 	}
 
 	@Override
-	protected void setOnFiredCloseButton() {
+	protected void nullData() {
+		super.nullData();
 		searchText = null;
-		super.setOnFiredCloseButton();
 	}
 }

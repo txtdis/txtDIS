@@ -5,7 +5,8 @@ import java.time.ZonedDateTime;
 import lombok.Data;
 
 @Data
-public abstract class AbstractCreationTracked<PK> implements CreationTracked, Keyed<PK> {
+public abstract class AbstractCreationTracked<PK> //
+		implements CreationLogged, Keyed<PK> {
 
 	private PK id;
 

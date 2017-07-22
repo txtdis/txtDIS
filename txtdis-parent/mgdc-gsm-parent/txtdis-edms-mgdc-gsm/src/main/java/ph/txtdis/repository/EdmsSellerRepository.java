@@ -6,9 +6,15 @@ import org.springframework.stereotype.Repository;
 import ph.txtdis.domain.EdmsSeller;
 
 @Repository("edmsSellerRepository")
-public interface EdmsSellerRepository extends CodeNameRepository<EdmsSeller> {
+public interface EdmsSellerRepository //
+		extends CodeNameRepository<EdmsSeller> {
 
-	EdmsSeller findByPlateNo(@Param("plateNo") String p);
+	EdmsSeller findByPlateNo( //
+			@Param("plateNo") String p);
 
-	EdmsSeller findByTruckCode(@Param("truckCode") String t);
+	EdmsSeller findByTruckCode( //
+			@Param("truckCode") String t);
+
+	EdmsSeller findFirstByNameEndingWithIgnoreCaseOrderByIdDesc( //
+			@Param("username") String u);
 }

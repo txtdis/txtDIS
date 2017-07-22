@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository;
 import ph.txtdis.domain.EdmsLoadOrder;
 
 @Repository("edmsLoadOrderRepository")
-public interface EdmsLoadOrderRepository extends CrudRepository<EdmsLoadOrder, Long> {
+public interface EdmsLoadOrderRepository //
+		extends CrudRepository<EdmsLoadOrder, Long> {
 
-	EdmsLoadOrder findByReferenceNo(@Param("referenceNo") String referenceNo);
+	EdmsLoadOrder findByReferenceNo( //
+			@Param("referenceNo") String referenceNo);
 }

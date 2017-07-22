@@ -7,7 +7,6 @@ import static org.apache.commons.lang3.StringUtils.capitalize;
 import static ph.txtdis.util.DateTimeUtils.toTimestampFilename;
 import static ph.txtdis.util.DateTimeUtils.toTimestampText;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,12 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ph.txtdis.dto.Inventory;
-import ph.txtdis.excel.ExcelWriter;
-import ph.txtdis.exception.FailedAuthenticationException;
-import ph.txtdis.exception.InvalidException;
-import ph.txtdis.exception.NoServerConnectionException;
-import ph.txtdis.exception.RestException;
-import ph.txtdis.exception.StoppedServerException;
+import ph.txtdis.excel.ExcelReportWriter;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.util.ClientTypeMap;
 
@@ -33,7 +27,7 @@ public class InventoryServiceImpl implements InventoryService {
 	private CredentialService credentialService;
 
 	@Autowired
-	private ExcelWriter excel;
+	private ExcelReportWriter excel;
 
 	@Autowired
 	private ReadOnlyService<Inventory> readOnlyService;
@@ -62,18 +56,17 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public String getHeaderText() {
+	public String getHeaderName() {
 		return "Inventory";
 	}
 
 	@Override
-	public Inventory getInventory(Long itemId) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException {
-		return readOnlyService.module(getModule()).getOne("/item?id=" + itemId);
+	public Inventory getInventory(Long itemId) throws Exception {
+		return readOnlyService.module(getModuleName()).getOne("/item?id=" + itemId);
 	}
 
 	@Override
-	public String getModule() {
+	public String getModuleName() {
 		return "inventory";
 	}
 
@@ -88,8 +81,8 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public String getTitleText() {
-		return credentialService.username() + "@" + modulePrefix + " " + capitalize(getModule());
+	public String getTitleName() {
+		return credentialService.username() + "@" + modulePrefix + " " + capitalize(getModuleName());
 	}
 
 	@Override
@@ -98,9 +91,14 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
+	public void reset() {
+		date = null;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
-	public void saveAsExcel(AppTable<Inventory>... tables) throws IOException {
-		excel.filename(excelName()).sheetname(toTimestampFilename(now())).table(tables).write();
+	public void saveAsExcel(AppTable<Inventory>... tables) throws Exception {
+		excel.table(tables).filename(excelName()).sheetname(toTimestampFilename(now())).write();
 	}
 
 	@Override
@@ -109,12 +107,11 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	private String excelName() {
-		return getTitleText() + "." + toTimestampFilename(now());
+		return getTitleName() + "." + toTimestampFilename(now());
 	}
 
 	private BigDecimal getTotalObsolesenceValue(List<Inventory> l) {
-		return l.stream().filter(v -> v.getObsolesenceValue() != null).map(v -> v.getObsolesenceValue()).reduce(ZERO,
-				BigDecimal::add);
+		return l.stream().filter(v -> v.getObsolesenceValue() != null).map(v -> v.getObsolesenceValue()).reduce(ZERO, BigDecimal::add);
 	}
 
 	private BigDecimal getTotalValue(List<Inventory> l) {

@@ -9,7 +9,9 @@ import ph.txtdis.type.Type;
 
 @AllArgsConstructor
 @SuppressWarnings("unchecked")
-public class FieldCell<S, T> extends TextFieldTableCell<S, T> implements DoubleClickable, StylableTextField {
+public class FieldCell<S, T> //
+		extends TextFieldTableCell<S, T> //
+		implements DoubleClickable, StylableTextField {
 
 	private Type type;
 

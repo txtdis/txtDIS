@@ -14,7 +14,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "master_itemlist")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsItem extends EdmsAbstractMaster implements Serializable {
+public class EdmsItem //
+		extends EdmsAbstractMaster //
+		implements Serializable {
 
 	private static final long serialVersionUID = -3563721761323835200L;
 
@@ -67,7 +69,7 @@ public class EdmsItem extends EdmsAbstractMaster implements Serializable {
 	private BigDecimal maxQty;
 
 	@Column(name = "active")
-	private boolean isActive;
+	private Boolean isActive;
 
 	@Override
 	public String toString() {

@@ -9,12 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ph.txtdis.dto.Truck;
-import ph.txtdis.exception.FailedAuthenticationException;
-import ph.txtdis.exception.InvalidException;
-import ph.txtdis.exception.NoServerConnectionException;
-import ph.txtdis.exception.NotAllowedOffSiteTransactionException;
-import ph.txtdis.exception.StoppedServerException;
-import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.info.Information;
 import ph.txtdis.util.ClientTypeMap;
 
 @Service("truckService")
@@ -27,9 +22,6 @@ public class TruckServiceImpl implements TruckService {
 	private ReadOnlyService<Truck> readOnlyService;
 
 	@Autowired
-	private RestServerService serverService;
-
-	@Autowired
 	private SavingService<Truck> savingService;
 
 	@Autowired
@@ -39,7 +31,7 @@ public class TruckServiceImpl implements TruckService {
 	private String modulePrefix;
 
 	@Override
-	public String getModule() {
+	public String getModuleName() {
 		return "truck";
 	}
 
@@ -49,18 +41,13 @@ public class TruckServiceImpl implements TruckService {
 	}
 
 	@Override
-	public String getTitleText() {
-		return credentialService.username() + "@" + modulePrefix + " " + TruckService.super.getTitleText();
+	public String getTitleName() {
+		return credentialService.username() + "@" + modulePrefix + " " + TruckService.super.getTitleName();
 	}
 
 	@Override
 	public ClientTypeMap getTypeMap() {
 		return typeMap;
-	}
-
-	@Override
-	public boolean isOffSite() {
-		return serverService.isOffSite();
 	}
 
 	@Override
@@ -73,12 +60,13 @@ public class TruckServiceImpl implements TruckService {
 	}
 
 	@Override
-	public Truck save(String name) throws SuccessfulSaveInfo, NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, InvalidException, NotAllowedOffSiteTransactionException {
-		if (isOffSite())
-			throw new NotAllowedOffSiteTransactionException();
+	public void reset() {
+	}
+
+	@Override
+	public Truck save(String name) throws Information, Exception {
 		Truck t = new Truck();
 		t.setName(name);
-		return savingService.module(getModule()).save(t);
+		return savingService.module(getModuleName()).save(t);
 	}
 }

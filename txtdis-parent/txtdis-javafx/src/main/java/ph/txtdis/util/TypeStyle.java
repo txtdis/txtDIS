@@ -3,8 +3,14 @@ package ph.txtdis.util;
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static javafx.geometry.Pos.CENTER_RIGHT;
 import static org.apache.commons.lang3.StringUtils.trim;
+import static ph.txtdis.util.DateTimeUtils.toTime;
+import static ph.txtdis.util.NumberUtils.toBigDecimal;
+import static ph.txtdis.util.NumberUtils.toFraction;
+import static ph.txtdis.util.NumberUtils.toInteger;
+import static ph.txtdis.util.NumberUtils.toLong;
 import static ph.txtdis.util.Styled.for2Place;
 import static ph.txtdis.util.Styled.for4Place;
+import static ph.txtdis.util.Styled.for4PlacePercent;
 import static ph.txtdis.util.Styled.forBoolean;
 import static ph.txtdis.util.Styled.forCode;
 import static ph.txtdis.util.Styled.forCurrency;
@@ -27,7 +33,7 @@ import java.time.ZonedDateTime;
 
 import org.apache.commons.lang3.math.Fraction;
 
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.StylableTextField;
 import ph.txtdis.fx.validator.AlphabetOnlyValidator;
 import ph.txtdis.fx.validator.DecimalInputValidator;
@@ -38,11 +44,12 @@ import ph.txtdis.type.Type;
 
 public class TypeStyle {
 
-	public static <T> void align(Type type, AppField<T> field) {
+	public static <T> void align(Type type, AppFieldImpl<T> field) {
 		switch (type) {
 			case CODE:
 			case CURRENCY:
 			case FOURPLACE:
+			case FOURPLACE_PERCENT:
 			case FRACTION:
 			case ID:
 			case INTEGER:
@@ -64,21 +71,22 @@ public class TypeStyle {
 			case CODE:
 			case TEXT:
 			case PHONE:
-				return text == null ? null : (T) trim(text);
+				return text == null ? (T) "" : (T) trim(text);
 			case CURRENCY:
 			case FOURPLACE:
+			case FOURPLACE_PERCENT:
 			case PERCENT:
 			case QUANTITY:
 			case TWOPLACE:
-				return (T) NumberUtils.toBigDecimal(text);
+				return (T) toBigDecimal(text);
 			case FRACTION:
-				return (T) NumberUtils.toFraction(text);
+				return (T) toFraction(text);
 			case ID:
-				return (T) NumberUtils.toLong(text);
+				return (T) toLong(text);
 			case INTEGER:
-				return (T) NumberUtils.toInteger(text);
+				return (T) toInteger(text);
 			case TIME:
-				return (T) DateTimeUtils.toTime(text);
+				return (T) toTime(text);
 			default:
 				return null;
 		}
@@ -105,6 +113,9 @@ public class TypeStyle {
 				break;
 			case FOURPLACE:
 				for4Place(field, (BigDecimal) value);
+				break;
+			case FOURPLACE_PERCENT:
+				for4PlacePercent(field, (BigDecimal) value);
 				break;
 			case FRACTION:
 				forFraction(field, (Fraction) value);
@@ -140,17 +151,14 @@ public class TypeStyle {
 		}
 	}
 
-	public static <T> void validate(Type type, AppField<T> field) {
+	public static <T> void validate(Type type, AppFieldImpl<T> field) {
 		switch (type) {
 			case ALPHA:
 				field.textProperty().addListener(new AlphabetOnlyValidator(field));
 				break;
-			case CODE:
-			case TEXT:
-				field.textProperty().addListener(new TextValidator(field));
-				break;
 			case CURRENCY:
 			case FOURPLACE:
+			case FOURPLACE_PERCENT:
 			case PERCENT:
 			case QUANTITY:
 			case TWOPLACE:
@@ -168,6 +176,7 @@ public class TypeStyle {
 				field.setPromptText("hh:mm");
 				break;
 			default:
+				field.textProperty().addListener(new TextValidator(field));
 		}
 	}
 
@@ -179,6 +188,7 @@ public class TypeStyle {
 				return 60;
 			case ENUM:
 			case FOURPLACE:
+			case FOURPLACE_PERCENT:
 			case INTEGER:
 			case TIME:
 			case ID:

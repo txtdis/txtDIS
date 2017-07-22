@@ -1,6 +1,5 @@
 package ph.txtdis.service;
 
-import static java.util.Arrays.asList;
 import static org.apache.log4j.Logger.getLogger;
 
 import java.util.List;
@@ -15,7 +14,8 @@ import lombok.Getter;
 
 @Getter
 @Service("restServerService")
-public class RestServerServiceImpl implements RestServerService {
+public class RestServerServiceImpl //
+		implements RestServerService {
 
 	private static Logger logger = getLogger(RestServerServiceImpl.class);
 
@@ -45,17 +45,10 @@ public class RestServerServiceImpl implements RestServerService {
 	}
 
 	@Override
-	public boolean isOffSite() {
-		if (asList(env.getActiveProfiles()).contains("dev"))
-			return false;
-		return getLocation().equals("this.pc");
-	}
-
-	@Override
 	public String getKeystore() {
-		logger.info("Keystore = " + keystores.get(index()) + ".p12");
-		logger.info("Address = " + address());
-		logger.info("Port = " + port);
+		logger.info("\n    Keystore = " + keystores.get(index()) + ".p12");
+		logger.info("\n    Address = " + address());
+		logger.info("\n    Port = " + port);
 		return keystores.get(index()) + ".p12";
 	}
 

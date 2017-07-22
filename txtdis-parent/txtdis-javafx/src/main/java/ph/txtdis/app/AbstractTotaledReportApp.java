@@ -10,7 +10,7 @@ import javafx.scene.Node;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.service.ReportService;
 
-public abstract class AbstractTotaledReportApp<AT extends AppTable<T>, AS extends ReportService<T>, T>
+public abstract class AbstractTotaledReportApp<AT extends AppTable<T>, AS extends ReportService<T>, T> //
 		extends AbstractReportApp<AT, AS, T> {
 
 	@Autowired
@@ -23,14 +23,9 @@ public abstract class AbstractTotaledReportApp<AT extends AppTable<T>, AS extend
 
 	@Override
 	public void refresh() {
-		try {
-			table.items(service.list());
-			totaledTableApp.refresh(service);
-			super.refresh();
-		} catch (Exception e) {
-			e.printStackTrace();
-			dialog.show(e).addParent(this).start();
-		}
+		table.items(service.list());
+		totaledTableApp.refresh(service);
+		super.refresh();
 	}
 
 	@Override

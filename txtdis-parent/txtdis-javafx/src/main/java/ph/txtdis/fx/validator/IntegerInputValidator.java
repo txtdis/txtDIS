@@ -2,17 +2,18 @@ package ph.txtdis.fx.validator;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppFieldImpl;
 
-public class IntegerInputValidator implements ChangeListener<String> {
+public class IntegerInputValidator //
+		implements ChangeListener<String> {
 
 	private boolean ignore;
 
-	private AppField<?> input;
+	private AppFieldImpl<?> input;
 
 	private String restrict;
 
-	public IntegerInputValidator(AppField<?> input) {
+	public IntegerInputValidator(AppFieldImpl<?> input) {
 		this.input = input;
 		this.restrict = "[0-9-()]";
 	}

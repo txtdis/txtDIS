@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CreditNotePayment extends AbstractId<Long> implements Keyed<Long> {
+public class CreditNotePayment extends AbstractKeyed<Long> implements Keyed<Long> {
 
 	private BigDecimal paymentValue;
 

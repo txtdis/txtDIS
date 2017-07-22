@@ -6,15 +6,18 @@ import static java.math.RoundingMode.HALF_EVEN;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.Fraction;
 
 public class NumberUtils {
 
 	public final static DecimalFormat NO_COMMA_DECIMAL = new DecimalFormat("0.00;(0.00)");
+
 	public final static DecimalFormat TWO_PLACE_DECIMAL = new DecimalFormat("#,##0.00;(#,##0.00)");
+
 	public final static DecimalFormat FOUR_PLACE_DECIMAL = new DecimalFormat("#,##0.0000;(#,##0.0000)");
+
 	public final static DecimalFormat INTEGER = new DecimalFormat("#,##0;(#,##0)");
+
 	public final static DecimalFormat NO_COMMA_INTEGER = new DecimalFormat("0;(0)");
 
 	public final static BigDecimal HUNDRED = new BigDecimal("100");
@@ -22,85 +25,109 @@ public class NumberUtils {
 	public static BigDecimal divide(BigDecimal dividend, BigDecimal divisor) {
 		if (dividend == null || isZero(divisor))
 			return ZERO;
-		return dividend.divide(divisor, 4, HALF_EVEN);
+		return dividend.divide(divisor, 8, HALF_EVEN);
 	}
 
-	public static String format2Place(BigDecimal number) {
-		return isZero(number) ? "" : TWO_PLACE_DECIMAL.format(number);
+	public static BigDecimal divide(int dividend, int divisor) {
+		return divide(toDecimal(dividend), toDecimal(divisor));
 	}
 
-	public static String format4Place(BigDecimal number) {
-		return isZero(number) ? "" : FOUR_PLACE_DECIMAL.format(number);
+	public static boolean isNegative(BigDecimal no) {
+		return no == null ? false : no.compareTo(ZERO) < 0;
 	}
 
-	public static String toCurrencyText(BigDecimal number) {
-		return isZero(number) ? "" : "₱" + format2Place(number);
+	public static boolean isNegative(Integer no) {
+		return no == null ? false : no < 0;
 	}
 
-	public static String formatDecimal(BigDecimal number) {
-		return isZero(number) ? ""
-				: isZero(number.remainder(BigDecimal.ONE)) ? INTEGER.format(number) : format2Place(number);
+	public static boolean isNegative(Long no) {
+		return no == null ? false : no < 0;
 	}
 
-	public static String formatId(Long number) {
-		return isZero(number) ? "" : NO_COMMA_INTEGER.format(number);
+	public static boolean isNegative(String text) {
+		return text.startsWith("-") || (text.startsWith("(") && text.endsWith(")"));
 	}
 
-	public static String formatInt(Integer number) {
-		return isZero(number) ? "" : INTEGER.format(number);
+	public static boolean isPositive(BigDecimal no) {
+		return no == null ? false : no.compareTo(ZERO) > 0;
 	}
 
-	public static String formatPercent(BigDecimal number) {
-		return isZero(number) ? "" : format2Place(number) + "%";
+	public static boolean isZero(BigDecimal no) {
+		return no == null ? true : no.compareTo(ZERO) == 0;
 	}
 
-	public static String formatWhole(BigDecimal number) {
-		return isZero(number) ? "" : NO_COMMA_INTEGER.format(number);
+	public static boolean isZero(Integer no) {
+		return no == null ? true : no == 0;
 	}
 
-	public static boolean isNegative(BigDecimal number) {
-		return number == null ? false : number.compareTo(ZERO) < 0;
+	public static boolean isZero(Long no) {
+		return no == null ? true : no == 0;
 	}
 
-	public static boolean isNegative(Integer number) {
-		return number == null ? false : number < 0;
+	public static BigDecimal nullIfZero(BigDecimal no) {
+		return isZero(no) ? null : no;
 	}
 
-	public static boolean isNegative(Long number) {
-		return number == null ? false : number < 0;
+	public static Long nullIfZero(Long id) {
+		return id == 0L ? null : id;
 	}
 
-	public static boolean isNegative(String string) {
-		return string.startsWith("-") || (string.startsWith("(") && string.endsWith(")"));
+	public static String printDecimal(BigDecimal no) {
+		return NO_COMMA_DECIMAL.format(no);
 	}
 
-	public static boolean isPositive(BigDecimal number) {
-		return number == null ? false : number.compareTo(ZERO) > 0;
+	public static String printInteger(BigDecimal no) {
+		return NO_COMMA_INTEGER.format(no);
 	}
 
-	public static boolean isZero(BigDecimal number) {
-		return number == null ? true : number.compareTo(ZERO) == 0;
+	public static BigDecimal remainder(BigDecimal dividend, BigDecimal divisor) {
+		if (dividend == null || isZero(divisor))
+			return ZERO;
+		int remainder = dividend.intValue() % divisor.intValue();
+		return toDecimal(remainder);
 	}
 
-	public static boolean isZero(Integer number) {
-		return number == null ? true : number == 0;
+	public static String to2PlaceDecimalText(BigDecimal no) {
+		return isZero(no) ? "" : TWO_PLACE_DECIMAL.format(no);
 	}
 
-	public static boolean isZero(Long number) {
-		return number == null ? true : number == 0;
+	public static String to4PlaceDecimalText(BigDecimal no) {
+		return isZero(no) ? "" : FOUR_PLACE_DECIMAL.format(no);
 	}
 
-	public static double parseDouble(String text) {
-		return toBigDecimal(text).doubleValue();
+	public static String to4PlacePercentText(BigDecimal no) {
+		return isZero(no) ? "" : to4PlaceDecimalText(no) + "%";
+	}
+
+	public static String toAsNeededNoOfPlaceDecimalText(BigDecimal no) {
+		return isZero(no) ? "" : isZero(no.remainder(BigDecimal.ONE)) ? INTEGER.format(no) : to2PlaceDecimalText(no);
 	}
 
 	public static BigDecimal toBigDecimal(String text) {
 		if (text == null)
 			return ZERO;
-		text = text.trim().replace(",", "").replace("(", "-").replace(")", "").replace("₱", "");
+		text = text.trim() //
+				.replace(" ", "") //
+				.replace(",", "") //
+				.replace("(", "-") //
+				.replace(")", "") //
+				.replace("%", "") //
+				.replace("₱", "");
 		if (text.equals("-") || text.isEmpty())
 			return ZERO;
 		return new BigDecimal(text);
+	}
+
+	public static String toCurrencyText(BigDecimal no) {
+		return isZero(no) ? "" : "₱" + to2PlaceDecimalText(no);
+	}
+
+	public static BigDecimal toDecimal(int integer) {
+		return toBigDecimal(String.valueOf(integer));
+	}
+
+	public static double toDouble(String text) {
+		return toBigDecimal(text).doubleValue();
 	}
 
 	public static Fraction toFraction(String text) {
@@ -111,48 +138,43 @@ public class NumberUtils {
 		}
 	}
 
+	public static String toIdText(BigDecimal no) {
+		return isZero(no) ? "" : NO_COMMA_INTEGER.format(no);
+	}
+
+	public static String toIdText(Long no) {
+		return isZero(no) ? "" : NO_COMMA_INTEGER.format(no);
+	}
+
 	public static Integer toInteger(String text) {
 		return toBigDecimal(text).intValue();
+	}
+
+	public static String toIntegerWithComma(Integer no) {
+		return isZero(no) ? "" : INTEGER.format(no);
 	}
 
 	public static Long toLong(String text) {
 		return toBigDecimal(text).longValue();
 	}
 
-	public static String formatQuantity(BigDecimal number) {
-		return isZero(number) ? "" : INTEGER.format(number);
-	}
-
-	public static BigDecimal parseBigDecimal(String text) {
-		if (text == null)
-			return ZERO;
-		text = text.replace(" ", "")//
-				.replace(",", "")//
-				.replace("(", "-")//
-				.replace(")", "")//
-				.replace("₱", "");
-		if (text.equals("-") || text.isEmpty() || StringUtils.isNumeric(text.replaceFirst("-", "")))
-			return ZERO;
-		return new BigDecimal(text);
-	}
-
-	public static Integer parseInteger(String text) {
-		return parseBigDecimal(text).intValue();
-	}
-
-	public static Long parseLong(String text) {
-		return parseBigDecimal(text).longValue();
-	}
-
-	public static String printDecimal(BigDecimal number) {
-		return NO_COMMA_DECIMAL.format(number);
-	}
-
-	public static String printInteger(BigDecimal number) {
-		return NO_COMMA_INTEGER.format(number);
-	}
-
 	public static BigDecimal toPercentRate(BigDecimal percent) {
 		return percent == null ? ZERO : divide(percent, HUNDRED);
+	}
+
+	public static String toPercentText(BigDecimal no) {
+		return isZero(no) ? "" : to2PlaceDecimalText(no) + "%";
+	}
+
+	public static String toQuantityText(BigDecimal no) {
+		return isZero(no) ? "" : INTEGER.format(no);
+	}
+
+	public static BigDecimal toWholeNo(BigDecimal no) {
+		return no == null ? ZERO : toDecimal(no.intValue());
+	}
+
+	public static BigDecimal zeroIfNull(BigDecimal no) {
+		return no == null ? ZERO : no;
 	}
 }

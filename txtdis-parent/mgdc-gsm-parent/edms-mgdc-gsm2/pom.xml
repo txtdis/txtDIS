@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>mgdc-gsm-parent</artifactId>
-		<version>0.9.5.1</version>
+		<version>1.0.1.5</version>
 	</parent>
 
 	<artifactId>edms-mgdc-gsm2</artifactId>
@@ -15,6 +15,7 @@
 		<header.type>console</header.type>
 		<host.type>${project.artifactId}</host.type>
 		<icon.name>txtdis-edms2</icon.name>
+		<key.store>pc</key.store>
 		<start-class>ph.txtdis.ServerApp</start-class>
 	</properties>
 
@@ -27,13 +28,6 @@
 	</dependencies>
 
 	<profiles>
-		<profile>
-			<id>onsite</id>
-			<properties>
-				<key.store>pc</key.store>
-				<server.site></server.site>
-			</properties>
-		</profile>
 		<profile>
 			<id>mgdc-gsm</id>
 			<build>

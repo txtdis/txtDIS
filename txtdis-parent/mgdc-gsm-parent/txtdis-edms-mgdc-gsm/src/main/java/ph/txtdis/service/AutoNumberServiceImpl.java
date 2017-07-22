@@ -10,7 +10,8 @@ import ph.txtdis.repository.EdmsMasterAutoNumberRepository;
 import ph.txtdis.util.Code;
 
 @Service("autoNumberService")
-public class AutoNumberServiceImpl implements AutoNumberService {
+public class AutoNumberServiceImpl //
+		implements AutoNumberService {
 
 	private static final String LATEST_UPDATE = "01";
 
@@ -19,12 +20,6 @@ public class AutoNumberServiceImpl implements AutoNumberService {
 
 	@Autowired
 	private EdmsMasterAutoNumberRepository edmsMasterAutoNumberRepository;
-
-	private String getAutoNoName(String prefix) {
-		if (prefix.equals(Code.CUSTOMER_PREFIX))
-			return Code.CUSTOMER_AUTO_NO;
-		return prefix;
-	}
 
 	@Override
 	public void saveAutoNo(String prefix, String autoNo) {
@@ -42,6 +37,12 @@ public class AutoNumberServiceImpl implements AutoNumberService {
 		EdmsMasterAutoNumber e = edmsMasterAutoNumberRepository.findByName(getAutoNoName(prefix));
 		e.setLastNo(autoNo);
 		edmsMasterAutoNumberRepository.save(e);
+	}
+
+	private String getAutoNoName(String prefix) {
+		if (prefix.equals(Code.CUSTOMER_PREFIX))
+			return Code.CUSTOMER_AUTO_NO;
+		return prefix;
 	}
 
 	private void saveTransactionAutoNo(String prefix, String autoNo) {

@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ph.txtdis.dto.User;
-import ph.txtdis.service.UserService;
+import ph.txtdis.service.EdmsUserService;
 
 @RequestMapping("/users")
 @RestController("userController")
 public class UserController {
 
 	@Autowired
-	private UserService service;
+	private EdmsUserService service;
 
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> list() {

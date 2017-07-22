@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 import ph.txtdis.domain.EdmsPurchaseReceipt;
 
 @Repository("edmsPurchaseReceiptRepository")
-public interface EdmsPurchaseReceiptRepository extends CrudRepository<EdmsPurchaseReceipt, Long> {
+public interface EdmsPurchaseReceiptRepository //
+		extends CrudRepository<EdmsPurchaseReceipt, Long> {
 }

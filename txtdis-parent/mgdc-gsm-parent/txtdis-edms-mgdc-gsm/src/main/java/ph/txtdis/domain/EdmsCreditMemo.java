@@ -14,7 +14,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "tr_cm_header")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsCreditMemo extends EdmsAbstractPaidTransported implements Serializable {
+public class EdmsCreditMemo //
+		extends EdmsAbstractPaidTransported //
+		implements Serializable {
 
 	private static final long serialVersionUID = 586806393911673808L;
 
@@ -22,10 +24,10 @@ public class EdmsCreditMemo extends EdmsAbstractPaidTransported implements Seria
 	private LocalDate billedDate;
 
 	@Column(name = "modiBy")
-	private String modifiedBy;
+	private String modifiedBy = "";
 
 	@Column(name = "dateModi")
-	private String modifiedOn;
+	private String modifiedOn = "";
 
 	@Column(name = "rsrPosted")
 	private String postedRemittanceVariance;

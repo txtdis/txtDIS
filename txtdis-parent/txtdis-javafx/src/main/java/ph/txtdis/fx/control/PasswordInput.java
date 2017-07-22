@@ -8,12 +8,14 @@ import com.sun.javafx.scene.control.skin.TextFieldSkin;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
+import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+@Scope("prototype")
 @Component
-@Scope(value = "prototype")
 @SuppressWarnings("restriction")
 public class PasswordInput extends PasswordField {
 
@@ -21,19 +23,22 @@ public class PasswordInput extends PasswordField {
 		addEventFilter(KeyEvent.KEY_PRESSED, event -> {
 			if (event.getCode() == KeyCode.ENTER) {
 				TextFieldSkin skin = (TextFieldSkin) getSkin();
-				PasswordFieldBehavior behavior = (PasswordFieldBehavior) skin
-		                .getBehavior();
+				PasswordFieldBehavior behavior = (PasswordFieldBehavior) skin.getBehavior();
 				behavior.traverseNext();
 				event.consume();
 			}
 		});
 	}
 
+	public void disableIf(ObservableValue<Boolean> observable) {
+		disableProperty().bind(observable);
+	}
+
 	public BooleanBinding isEmpty() {
 		return textProperty().isEmpty();
 	}
 
-	public void disableIf(ObservableValue<Boolean> observable) {
-		disableProperty().bind(observable);
+	public void onAction(EventHandler<InputMethodEvent> e) {
+		setOnInputMethodTextChanged(e);
 	}
 }

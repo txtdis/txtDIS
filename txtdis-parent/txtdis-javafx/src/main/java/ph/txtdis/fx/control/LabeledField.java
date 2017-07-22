@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -20,10 +21,10 @@ import ph.txtdis.type.Type;
 public class LabeledField<T> implements InputControl<T>, InputNode<T> {
 
 	@Autowired
-	private AppButton searchButton;
+	private AppButtonImpl searchButton;
 
 	@Autowired
-	private AppField<T> textField;
+	private AppFieldImpl<T> textField;
 
 	@Autowired
 	private LabelFactory label;
@@ -44,7 +45,7 @@ public class LabeledField<T> implements InputControl<T>, InputNode<T> {
 		textField.clear();
 	}
 
-	public void disableIf(BooleanBinding b) {
+	public void disableIf(ObservableBooleanValue b) {
 		textField.disableIf(b);
 	}
 
@@ -88,12 +89,12 @@ public class LabeledField<T> implements InputControl<T>, InputNode<T> {
 		clear();
 	}
 
-	public void setOnAction(EventHandler<ActionEvent> action) {
-		textField.setOnAction(action);
+	public void onAction(EventHandler<ActionEvent> e) {
+		textField.setOnAction(e);
 	}
 
-	public void setOnSearch(EventHandler<ActionEvent> action) {
-		searchButton.setOnAction(action);
+	public void setOnSearch(EventHandler<ActionEvent> e) {
+		searchButton.onAction(e);
 	}
 
 	@Override
@@ -110,13 +111,13 @@ public class LabeledField<T> implements InputControl<T>, InputNode<T> {
 		return new HBox(textField(type), searchButton());
 	}
 
-	private AppButton searchButton() {
+	private AppButtonImpl searchButton() {
 		searchButton.fontSize(16).icon("search").build();
 		searchButton.focusTraversableProperty().set(false);
 		return searchButton;
 	}
 
-	private AppField<T> textField(Type type) {
+	private AppFieldImpl<T> textField(Type type) {
 		return textField.build(type);
 	}
 }

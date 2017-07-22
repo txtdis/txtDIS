@@ -6,12 +6,13 @@ import ph.txtdis.type.UserType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Authority extends AbstractId<Long> {
+public class Authority //
+		extends AbstractKeyed<Long> {
 
 	private UserType authority;
 
 	@Override
 	public String toString() {
-		return authority.toString();
+		return getAuthority().toString();
 	}
 }

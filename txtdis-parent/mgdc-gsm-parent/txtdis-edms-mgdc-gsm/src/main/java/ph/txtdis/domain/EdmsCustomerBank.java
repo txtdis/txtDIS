@@ -13,7 +13,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "master_customerlist_bank")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsCustomerBank extends EdmsAbstractId implements Serializable {
+public class EdmsCustomerBank //
+		extends EdmsAbstractId //
+		implements Serializable {
 
 	private static final long serialVersionUID = -7925283571731892086L;
 
@@ -21,11 +23,11 @@ public class EdmsCustomerBank extends EdmsAbstractId implements Serializable {
 	private String customerCode;
 
 	@Column(name = "bank")
-	private String bankName;
+	private String bankName = "";
 
 	@Column(name = "accNo")
-	private String accountNo;
+	private String accountNo = "";
 
 	@Column(name = "accName")
-	private String accountName;
+	private String accountName = "";
 }

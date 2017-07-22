@@ -13,23 +13,23 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import ph.txtdis.dto.StockTakeVariance;
-import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.dialog.AuditDialog;
+import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.dialog.AuditDialogImpl;
 import ph.txtdis.fx.dialog.OpenByDateDialog;
 import ph.txtdis.fx.table.StockTakeVarianceTable;
-import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.info.Information;
 import ph.txtdis.service.StockTakeVarianceService;
 import ph.txtdis.util.TextUtils;
 
-public class AbstractStockTakeVarianceApp
-		extends AbstractReportApp<StockTakeVarianceTable, StockTakeVarianceService, StockTakeVariance>
+public abstract class AbstractStockTakeVarianceApp //
+		extends AbstractReportApp<StockTakeVarianceTable, StockTakeVarianceService, StockTakeVariance> //
 		implements StockTakeVarianceApp {
 
 	@Autowired
-	private AppButton decisionButton, saveButton;
+	private AppButtonImpl decisionButton, saveButton;
 
 	@Autowired
-	private AuditDialog decisionDialog;
+	private AuditDialogImpl decisionDialog;
 
 	@Autowired
 	private OpenByDateDialog openDialog;
@@ -39,8 +39,8 @@ public class AbstractStockTakeVarianceApp
 	private BooleanProperty canBeRejected = new SimpleBooleanProperty(false);
 
 	@Override
-	protected List<AppButton> addButtons() {
-		List<AppButton> b = new ArrayList<>(super.addButtons());
+	protected List<AppButtonImpl> addButtons() {
+		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
 		b.addAll(Arrays.asList( //
 				saveButton.icon("save").tooltip("Save...").build(), //
 				decisionButton.icon("decision").tooltip("Decide...").build()));
@@ -67,14 +67,14 @@ public class AbstractStockTakeVarianceApp
 	@Override
 	protected void setListeners() {
 		super.setListeners();
-		saveButton.setOnAction(e -> save());
-		decisionButton.setOnAction(e -> decide());
+		saveButton.onAction(e -> save());
+		decisionButton.onAction(e -> decide());
 	}
 
 	private void save() {
 		try {
 			service.saveUponValidation(table.getItems());
-		} catch (SuccessfulSaveInfo i) {
+		} catch (Information i) {
 			dialog.show(i).addParent(this).start();
 		} catch (Exception e) {
 			showErrorDialog(e);

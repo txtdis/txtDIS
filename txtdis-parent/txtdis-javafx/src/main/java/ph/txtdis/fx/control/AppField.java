@@ -1,137 +1,41 @@
 package ph.txtdis.fx.control;
 
-import static javafx.scene.input.KeyCode.ENTER;
-import static javafx.scene.input.KeyEvent.KEY_PRESSED;
-import static ph.txtdis.type.Type.TEXT;
-import static ph.txtdis.util.TypeStyle.align;
-import static ph.txtdis.util.TypeStyle.parse;
-import static ph.txtdis.util.TypeStyle.style;
-
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import com.sun.javafx.scene.control.skin.TextFieldSkin;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
-import javafx.scene.control.TextField;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import ph.txtdis.type.Type;
-import ph.txtdis.util.TypeStyle;
 
-@Component
-@Scope("prototype")
-@SuppressWarnings("restriction")
-public class AppField<T> extends TextField implements ErrorHandling, InputControl<T>, StylableTextField {
+public interface AppField<T> //
+		extends ErrorHandling, FocusRequested, InputControl<T>, StylableTextField {
 
-	private int length, width;
+	AppFieldImpl<T> build(Type type);
 
-	private String prompt;
+	void disable();
 
-	private Type type;
+	void disableIf(ObservableBooleanValue b);
 
-	public AppField() {
-		setStyle("-fx-opacity: 1; ");
-		traverseOnPressedEnterKey();
-		cancelEditOnLostFocus();
-	}
+	void enable();
 
-	public AppField<T> prompt(String prompt) {
-		this.prompt = prompt;
-		return this;
-	}
+	BooleanBinding isEmpty();
 
-	public AppField<T> build(Type type) {
-		this.type = type;
-		setAlignment();
-		setFieldWidth(width());
-		setProperties();
-		setPromptText(prompt);
-		return this;
-	}
+	BooleanBinding isNot(String text);
 
-	public void disableIf(ObservableBooleanValue b) {
-		disableProperty().bind(b);
-	}
+	BooleanBinding isNotEmpty();
 
-	@Override
-	public T getValue() {
-		return parse(type, getText());
-	}
+	int length();
 
-	@Override
-	public void handleError() {
-		clear();
-		requestFocus();
-	}
+	AppField<T> length(int length);
 
-	public BooleanBinding isEmpty() {
-		return textProperty().isEmpty();
-	}
+	void onAction(EventHandler<ActionEvent> e);
 
-	public BooleanBinding isNot(String text) {
-		return textProperty().isNotEqualTo(text);
-	}
+	AppField<T> prompt(String prompt);
 
-	public BooleanBinding isNotEmpty() {
-		return isEmpty().not();
-	}
+	AppField<T> readOnly();
 
-	public int length() {
-		return length;
-	}
+	void setFieldWidth(int width);
 
-	public AppField<T> length(int length) {
-		this.length = length;
-		return this;
-	}
+	void showIf(ObservableBooleanValue b);
 
-	public AppField<T> readOnly() {
-		disableProperty().unbind();
-		disableProperty().set(true);
-		return this;
-	}
-
-	@Override
-	public void setValue(T value) {
-		style(type, this, value);
-	}
-
-	public AppField<T> width(int width) {
-		this.width = width;
-		return this;
-	}
-
-	private void cancelEditOnLostFocus() {
-		focusedProperty().addListener((focus, outOfFocus, inFocus) -> {
-			if (!inFocus)
-				cancelEdit();
-		});
-	}
-
-	private void setAlignment() {
-		align(type, this);
-	}
-
-	public void setFieldWidth(int width) {
-		setMinWidth(width);
-		setPrefWidth(width);
-		if (type != TEXT)
-			setMaxWidth(width);
-	}
-
-	private void setProperties() {
-		if (!isDisabled())
-			TypeStyle.validate(type, this);
-	}
-
-	private void traverseOnPressedEnterKey() {
-		addEventFilter(KEY_PRESSED, event -> {
-			if (event.getCode() == ENTER)
-				((TextFieldSkin) getSkin()).getBehavior().traverseNext();
-		});
-	}
-
-	private int width() {
-		return width != 0 ? width : TypeStyle.width(type);
-	}
+	AppField<T> width(int width);
 }

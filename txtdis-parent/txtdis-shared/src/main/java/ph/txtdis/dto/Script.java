@@ -8,7 +8,8 @@ import ph.txtdis.type.ScriptType;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Script extends AbstractId<Long> {
+public class Script //
+		extends AbstractKeyed<Long> {
 
 	private ScriptType type;
 

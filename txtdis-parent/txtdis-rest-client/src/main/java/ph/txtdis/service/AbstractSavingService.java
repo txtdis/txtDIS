@@ -12,12 +12,11 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
 import ph.txtdis.exception.FailedAuthenticationException;
-import ph.txtdis.exception.InvalidException;
 import ph.txtdis.exception.NoServerConnectionException;
 import ph.txtdis.exception.StoppedServerException;
 import ph.txtdis.util.HttpHeader;
 
-public class AbstractSavingService<T, H extends HttpHeader, RS extends RestService, RSS extends RestServerService>
+public class AbstractSavingService<T, H extends HttpHeader, RS extends RestService, RSS extends RestServerService> //
 		implements SavingService<T> {
 
 	@Autowired
@@ -33,22 +32,23 @@ public class AbstractSavingService<T, H extends HttpHeader, RS extends RestServi
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public T save(T entity)
-			throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException, InvalidException {
+	public T save(T entity) throws Exception {
 		try {
 			return entity == null ? null
-					: (T) restService.init().postForObject(url(entity), httpEntity(entity), entity.getClass());
+					: (T) restService.init().postForObject( //
+							url(entity), //
+							httpEntity(entity), //
+							entity.getClass());
 		} catch (ResourceAccessException e) {
-			e.printStackTrace();
 			throw new NoServerConnectionException(serverService.getLocation());
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			e.printStackTrace();
-			if (e.getStatusCode() == UNAUTHORIZED)
+			if (e.getStatusCode() == UNAUTHORIZED) {
 				if (e.getResponseBodyAsString().contains("This connection has been closed"))
 					throw new StoppedServerException();
 				else
 					throw new FailedAuthenticationException();
-			throw new InvalidException(e.getStatusText());
+			}
+			throw new Exception(e);
 		}
 	}
 

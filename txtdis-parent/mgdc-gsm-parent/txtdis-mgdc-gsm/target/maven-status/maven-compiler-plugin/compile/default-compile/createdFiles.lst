@@ -1,0 +1,8 @@
+ph\txtdis\mgdc\gsm\dto\Item.class
+ph\txtdis\mgdc\gsm\dto\Channel.class
+ph\txtdis\mgdc\gsm\dto\Purchase.class
+ph\txtdis\mgdc\gsm\dto\StockTakeAdjustment.class
+ph\txtdis\mgdc\gsm\dto\Vat.class
+ph\txtdis\mgdc\gsm\dto\ItemStartDate.class
+ph\txtdis\mgdc\gsm\dto\Customer.class
+ph\txtdis\mgdc\gsm\dto\CustomerDiscount.class

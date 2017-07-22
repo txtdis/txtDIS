@@ -15,9 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javafx.scene.control.TableView;
 import ph.txtdis.dto.Keyed;
-import ph.txtdis.fx.dialog.Inputted;
+import ph.txtdis.fx.dialog.InputtedDialog;
 
 @Scope("prototype")
 @Component("decisionNeededTable")
@@ -48,16 +47,13 @@ public class DecisionNeededTableControls<S extends Keyed<?>> {
 	private Column<S, String> remarks;
 
 	public List<Column<S, ?>> addColumns() {
-		return asList(startDate.ofType(DATE).build("Start\nDate", "startDate"),
-				givenBy.ofType(TEXT).width(100).build("Given\nby", "createdBy"),
-				givenOn.ofType(TIMESTAMP).build("Given\non", "createdOn"),
-				approved.ofType(BOOLEAN).build("OK'd", "isValid"),
+		return asList(startDate.ofType(DATE).build("Start\nDate", "startDate"), givenBy.ofType(TEXT).width(100).build("Given\nby", "createdBy"),
+				givenOn.ofType(TIMESTAMP).build("Given\non", "createdOn"), approved.ofType(BOOLEAN).build("OK'd", "isValid"),
 				decidedBy.ofType(TEXT).width(120).build("Dis/approved\nby", "decidedBy"),
-				decidedOn.ofType(TIMESTAMP).build("Dis/approved\non", "decidedOn"),
-				remarks.ofType(TEXT).width(320).build("Remarks", "remarks"));
+				decidedOn.ofType(TIMESTAMP).build("Dis/approved\non", "decidedOn"), remarks.ofType(TEXT).width(320).build("Remarks", "remarks"));
 	}
 
-	public AppendContextMenu<S> addContextMenu(TableView<S> t, Inputted<S> dialog) {
+	public AppendContextMenu<S> addContextMenu(AppTable<S> t, InputtedDialog<S> dialog) {
 		return append.addMenu(t, dialog);
 	}
 

@@ -8,7 +8,8 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class StockTake extends AbstractCreationTracked<Long> implements Keyed<Long> {
+public class StockTake //
+		extends AbstractCreationTracked<Long> {
 
 	private String warehouse, checker, taker, remarks;
 

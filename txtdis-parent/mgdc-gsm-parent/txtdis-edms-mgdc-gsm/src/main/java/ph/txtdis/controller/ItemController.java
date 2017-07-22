@@ -9,12 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ph.txtdis.dto.Item;
-import ph.txtdis.service.ItemService;
+import ph.txtdis.mgdc.gsm.dto.Item;
+import ph.txtdis.service.EdmsItemService;
 
 @RequestMapping("/items")
 @RestController("itemController")
-public class ItemController extends AbstractIdController<ItemService, Item, Long> {
+public class ItemController //
+		extends AbstractSavedController<EdmsItemService, Item, Long> {
 
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> list() {

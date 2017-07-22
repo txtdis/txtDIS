@@ -67,7 +67,7 @@ public class LabeledCheckBox implements InputNode<Boolean> {
 		checkBox.selectedProperty().set(false);
 	}
 
-	public void setOnAction(EventHandler<ActionEvent> e) {
-		checkBox.setOnAction(e);
+	public void onAction(EventHandler<ActionEvent> e) {
+		checkBox.onAction(e);
 	}
 }

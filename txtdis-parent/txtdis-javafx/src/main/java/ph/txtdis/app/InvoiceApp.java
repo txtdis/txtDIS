@@ -1,4 +1,5 @@
 package ph.txtdis.app;
 
-public interface InvoiceApp extends Launchable {
+public interface InvoiceApp //
+		extends LaunchableApp {
 }

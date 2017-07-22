@@ -8,10 +8,22 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TextUtils {
 
-	private static final String NULL = "null";
+	public static final String HAS_OVERDUES = "overdues";
+
+	public static final String NULL = "null";
+
+	public static String blankIfNull(Object o) {
+		return o == null ? "" : o.toString();
+	}
 
 	public static String blankIfNull(String s) {
 		return s == null ? "" : s;
+	}
+
+	public static String blankIfNullElseAddCarriageReturn(String s) {
+		if (s != null && !s.trim().isEmpty())
+			return s.trim() + "\n";
+		return blankIfNull(s);
 	}
 
 	public static String capitalize(String uncapped) {
@@ -32,7 +44,7 @@ public class TextUtils {
 	}
 
 	public static String toBoolSign(Boolean b) {
-		return b == null ? "" : b ? "√" : "x";
+		return b == null || !b ? "" : "√";
 	}
 
 	public static String toIdDisplay(String c) {

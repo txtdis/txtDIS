@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Stock extends AbstractId<Long> {
+public class Stock extends AbstractKeyed<Long> {
 
 	private String item;
 

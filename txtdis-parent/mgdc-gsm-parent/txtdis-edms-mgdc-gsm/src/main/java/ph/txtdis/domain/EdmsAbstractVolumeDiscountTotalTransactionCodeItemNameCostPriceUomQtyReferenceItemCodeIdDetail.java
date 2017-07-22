@@ -1,5 +1,7 @@
 package ph.txtdis.domain;
 
+import static java.math.BigDecimal.ZERO;
+
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
@@ -11,9 +13,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class EdmsAbstractVolumeDiscountTotalTransactionCodeItemNameCostPriceUomQtyReferenceItemCodeIdDetail
+public abstract class EdmsAbstractVolumeDiscountTotalTransactionCodeItemNameCostPriceUomQtyReferenceItemCodeIdDetail //
 		extends EdmsAbstractDiscountTotalTransactionCodeItemNameCostPriceUomQtyReferenceItemCodeIdDetail {
 
 	@Column(name = "otherDisc")
-	private BigDecimal totalDiscountValue;
+	private BigDecimal totalDiscountValue = ZERO;
 }

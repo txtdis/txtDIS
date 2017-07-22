@@ -1,17 +1,12 @@
 package ph.txtdis.service;
 
-import ph.txtdis.exception.FailedAuthenticationException;
-import ph.txtdis.exception.InvalidException;
-import ph.txtdis.exception.NoServerConnectionException;
-import ph.txtdis.exception.StoppedServerException;
-import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.info.Information;
 
-public interface SavedByEntity<T> extends Moduled {
+public interface SavedByEntity<T> extends ModuleNamedService {
 
 	SavingService<T> getSavingService();
 
-	default T save(T entity) throws SuccessfulSaveInfo, NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, InvalidException {
-		return getSavingService().module(getModule()).save(entity);
+	default T save(T entity) throws Information, Exception {
+		return getSavingService().module(getModuleName()).save(entity);
 	}
 }

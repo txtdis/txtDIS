@@ -7,11 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import lombok.Getter;
-import ph.txtdis.exception.FailedAuthenticationException;
 import ph.txtdis.exception.InvalidException;
-import ph.txtdis.exception.NoServerConnectionException;
-import ph.txtdis.exception.RestException;
-import ph.txtdis.exception.StoppedServerException;
 import ph.txtdis.util.DateTimeUtils;
 
 @Getter
@@ -35,8 +31,7 @@ public class SyncServiceImpl implements SyncService {
 	}
 
 	@Override
-	public void validateVersionIsLatest() throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException {
+	public void validateVersionIsLatest() throws Exception {
 		String serverVersion = readOnlyService.module("sync").getOne("/serverVersion");
 		String latestVersion = readOnlyService.module("sync").getOne("/latestVersion");
 		if (latestVersion.compareTo(serverVersion) > 0)

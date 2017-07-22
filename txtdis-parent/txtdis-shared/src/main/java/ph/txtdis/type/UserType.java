@@ -9,12 +9,14 @@ public enum UserType {
 	STORE_KEEPER, // 5
 	SELLER, // 6
 	GUEST, // 7
-	ADMIN, // 8
+	BUYER, // 8
 	AUDITOR, // 9
 	DRIVER, // 10
 	HELPER, // 11
 	HEAD_CASHIER, // 12
 	COLLECTOR, // 13
 	STOCK_CHECKER, // 14
-	STOCK_TAKER; // 15
+	STOCK_TAKER, // 15
+	SYSGEN, // 16
+	OWNER; //17
 }

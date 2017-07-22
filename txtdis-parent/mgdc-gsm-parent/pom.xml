@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>txtdis-parent</artifactId>
-		<version>0.9.5.1</version>
+		<version>1.0.1.5</version>
 	</parent>
 
 	<artifactId>mgdc-gsm-parent</artifactId>
@@ -15,12 +15,13 @@
 	<modules>
 		<module>edms-mgdc-gsm2</module>
 		<module>edms-mgdc-gsm3</module>
-		<module>rest-mgdc-gsm2</module>
-		<module>rest-mgdc-gsm3</module>
 		<module>javafx-mgdc-gsm2</module>
 		<module>javafx-mgdc-gsm3</module>
+		<module>rest-mgdc-gsm2</module>
+		<module>rest-mgdc-gsm3</module>
 		<module>txtdis-edms-mgdc-gsm</module>
 		<module>txtdis-javafx-mgdc-gsm</module>
+		<module>txtdis-mgdc-gsm</module>
 		<module>txtdis-rest-mgdc-gsm</module>
 	</modules>
 </project>

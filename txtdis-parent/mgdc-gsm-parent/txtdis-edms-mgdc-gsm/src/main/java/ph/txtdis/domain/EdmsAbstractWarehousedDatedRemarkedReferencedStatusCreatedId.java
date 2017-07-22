@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class EdmsAbstractWarehousedDatedRemarkedReferencedStatusCreatedId
+public abstract class EdmsAbstractWarehousedDatedRemarkedReferencedStatusCreatedId //
 		extends EdmsAbstractDatedRemarkedReferencedStatusCreatedId {
 
 	@Column(name = "warehouse")

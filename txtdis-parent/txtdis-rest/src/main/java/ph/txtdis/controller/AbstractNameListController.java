@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import ph.txtdis.dto.Named;
-import ph.txtdis.service.NameListCreateService;
+import ph.txtdis.service.SavedNameListService;
 
-public abstract class AbstractNameListController<S extends NameListCreateService<T>, T extends Named>
-		extends AbstractCreateController<S, T, Long> {
+public abstract class AbstractNameListController<S extends SavedNameListService<T>, T extends Named> //
+		extends AbstractSavedController<S, T, Long> {
 
 	@RequestMapping(path = "/{name}", method = GET)
-	public ResponseEntity<?> find(@PathVariable String name) {
+	public ResponseEntity<?> name(@PathVariable String name) {
 		T body = service.findByName(name);
 		return new ResponseEntity<>(body, HttpStatus.OK);
 	}

@@ -1,19 +1,11 @@
 package ph.txtdis.service;
 
-import ph.txtdis.dto.CreationTracked;
+import ph.txtdis.dto.CreationLogged;
 import ph.txtdis.dto.Keyed;
 
-public interface SpunById<PK> extends CreationTracked, GetSet<PK>, Keyed<PK>, Moduled, Spun {
+public interface SpunById<PK> extends CreationLogged, GetterAndSetterService<PK>, Keyed<PK>, ModuleNamedService, SpunService {
 
-	default PK getSpunId() {
-		return isNew() ? null : getId();
-	}
-
-	default String getSpunModule() {
-		return getModule();
-	}
-
-	SpunService<? extends Keyed<PK>, PK> getSpunService();
+	SpunKeyedService<? extends Keyed<PK>, PK> getSpunService();
 
 	default boolean isNew() {
 		return getCreatedOn() == null;
@@ -21,11 +13,11 @@ public interface SpunById<PK> extends CreationTracked, GetSet<PK>, Keyed<PK>, Mo
 
 	@Override
 	default void next() throws Exception {
-		set(getSpunService().module(getSpunModule()).next(getSpunId()));
+		set(getSpunService().module(getModuleName()).next(getId()));
 	}
 
 	@Override
 	default void previous() throws Exception {
-		set(getSpunService().module(getSpunModule()).previous(getSpunId()));
+		set(getSpunService().module(getModuleName()).previous(getId()));
 	}
 }

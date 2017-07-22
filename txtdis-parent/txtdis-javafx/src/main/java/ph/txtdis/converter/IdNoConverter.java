@@ -7,7 +7,7 @@ public class IdNoConverter extends StringConverter<Long> {
 
     @Override
     public String toString(Long number) {
-        return NumberUtils.formatId(number);
+        return NumberUtils.toIdText(number);
     }
 
     @Override

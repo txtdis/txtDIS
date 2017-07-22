@@ -1,4 +1,5 @@
 package ph.txtdis.app;
 
-public interface ItemApp extends Launchable {
+public interface ItemApp //
+		extends StartableApp {
 }

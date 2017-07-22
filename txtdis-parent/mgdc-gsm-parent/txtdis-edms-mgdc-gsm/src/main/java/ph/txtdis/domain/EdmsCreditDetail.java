@@ -1,5 +1,7 @@
 package ph.txtdis.domain;
 
+import static java.math.BigDecimal.ZERO;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -31,22 +33,22 @@ public class EdmsCreditDetail extends EdmsAbstractId implements Serializable {
 	private BigDecimal creditLimit;
 
 	@Column(name = "disc")
-	private Byte discountGiven;
+	private Byte discountGiven = 1;
 
 	@Column(name = "discPHP")
-	private BigDecimal discountValue;
+	private BigDecimal discountValue = ZERO;
 
 	@Column(name = "discPer")
-	private BigDecimal percentDiscount;
+	private BigDecimal percentDiscount = ZERO;
 
 	@Column(name = "discCash")
-	private BigDecimal cashDiscount;
+	private BigDecimal cashDiscount = ZERO;
 
 	@Column(name = "discBase")
-	private BigDecimal baseDiscount;
+	private BigDecimal baseDiscount = ZERO;
 
 	@Column(name = "discOthers")
-	private BigDecimal otherDiscount;
+	private BigDecimal otherDiscount = ZERO;
 
 	@Column(name = "chk")
 	private Byte chequeAllowed;

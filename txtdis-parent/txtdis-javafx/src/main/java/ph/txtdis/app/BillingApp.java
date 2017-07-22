@@ -1,4 +1,5 @@
 package ph.txtdis.app;
 
-public interface BillingApp extends Launchable, MultiTyped {
+public interface BillingApp //
+		extends LaunchableApp {
 }

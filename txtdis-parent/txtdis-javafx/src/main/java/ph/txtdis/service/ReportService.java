@@ -1,4 +1,5 @@
 package ph.txtdis.service;
 
-public interface ReportService<T> extends Moduled, Spreadsheet<T>, StartEndService, Spun {
+public interface ReportService<T> //
+		extends HeaderNameService, IconAndModuleNamedAndTypeMappedService, ResettableService, Spreadsheet<T>, StartEndService, SpunService {
 }

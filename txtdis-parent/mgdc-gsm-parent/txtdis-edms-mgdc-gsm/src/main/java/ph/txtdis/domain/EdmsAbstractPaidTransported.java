@@ -11,7 +11,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class EdmsAbstractPaidTransported extends EdmsAbstractTransported {
+public abstract class EdmsAbstractPaidTransported //
+		extends EdmsAbstractTransported {
 
 	@Column(name = "paymentType")
 	private String paymentMode;

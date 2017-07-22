@@ -1,17 +1,18 @@
 package ph.txtdis.dto;
 
-import static ph.txtdis.type.BillableType.DELIVERY_REPORT;
-import static ph.txtdis.type.BillableType.INVOICE;
+import static ph.txtdis.type.ModuleType.DELIVERY_REPORT;
+import static ph.txtdis.type.ModuleType.INVOICE;
 import static ph.txtdis.util.NumberUtils.isNegative;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import lombok.Data;
-import ph.txtdis.type.BillableType;
+import ph.txtdis.type.ModuleType;
 
 @Data
-public class CustomerReceivable implements Keyed<Long>, Typed {
+public class CustomerReceivable //
+		implements Keyed<Long>, Typed {
 
 	private Long id;
 
@@ -24,7 +25,7 @@ public class CustomerReceivable implements Keyed<Long>, Typed {
 	private int daysOverCount;
 
 	@Override
-	public BillableType type() {
+	public ModuleType type() {
 		return isNegative(orderNo) ? DELIVERY_REPORT : INVOICE;
 	}
 }

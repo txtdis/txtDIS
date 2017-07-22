@@ -1,50 +1,39 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-    <groupId>ph.txtdis</groupId>
-    <artifactId>mgdc-ccbpi-parent</artifactId>
-    <version>0.9.5.1</version>
-  </parent>
-  
-  <artifactId>javafx-mgdc-ccbpi</artifactId>
-	<name>txtDIS SMIS ${server.site}Client</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>ph.txtdis</groupId>
+		<artifactId>mgdc-ccbpi-parent</artifactId>
+		<version>1.0.1.5</version>
+	</parent>
+
+	<artifactId>javafx-mgdc-ccbpi</artifactId>
+	<name>txtDIS CCBPI Client</name>
 
 	<properties>
-		<start-class>ph.txtdis.App</start-class>
-		<icon.name>txtdis-ccbpi</icon.name>
+		<default.server>local.network</default.server>
 		<header.type>gui</header.type>
+		<host.type>${project.artifactId}</host.type>
+		<icon.name>txtdis-ccbpi</icon.name>
+		<key.store>mgdc-ccbpi</key.store>
+		<start-class>ph.txtdis.App</start-class>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-javafx-beverage</artifactId>
+			<artifactId>shared-mgdc-ccbpi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-mgdc</artifactId>
+			<artifactId>txtdis-javafx-mgdc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+
 	<profiles>
-		<profile>
-			<id>offsite</id>
-			<properties>
-				<default.server>this.pc</default.server>
-				<key.store>pc</key.store>
-				<server.site>OffSite</server.site>
-			</properties>
-		</profile>
-		<profile>
-			<id>onsite</id>
-			<properties>
-				<default.server>local.network</default.server>
-				<key.store>mgdc-ccbpi</key.store>
-				<server.site></server.site>
-			</properties>
-		</profile>
 		<profile>
 			<id>mgdc-ccbpi</id>
 			<build>

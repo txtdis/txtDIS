@@ -9,6 +9,7 @@ public enum Type {
 	DATE, //
 	ENUM, //
 	FOURPLACE, //
+	FOURPLACE_PERCENT, //
 	FRACTION, //
 	ID, //
 	INTEGER, //

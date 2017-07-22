@@ -6,15 +6,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.control.AppButtonImpl;
 import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.Excel;
+import ph.txtdis.service.SavableAsExcelService;
 
-public abstract class AbstractExcelApp<AT extends AppTable<T>, AS extends Excel<T>, T>
+public abstract class AbstractExcelApp<AT extends AppTable<T>, AS extends SavableAsExcelService<T>, T> //
 		extends AbstractTableApp<AT, AS, T> {
 
 	@Autowired
-	private AppButton excelButton;
+	protected AppButtonImpl excelButton;
 
 	private void saveAsExcel() {
 		try {
@@ -25,7 +25,7 @@ public abstract class AbstractExcelApp<AT extends AppTable<T>, AS extends Excel<
 	}
 
 	@Override
-	protected List<AppButton> addButtons() {
+	protected List<AppButtonImpl> addButtons() {
 		createButtons();
 		setOnButtonClick();
 		return asList(excelButton);
@@ -41,6 +41,6 @@ public abstract class AbstractExcelApp<AT extends AppTable<T>, AS extends Excel<
 	}
 
 	protected void setOnButtonClick() {
-		excelButton.setOnAction(e -> saveAsExcel());
+		excelButton.onAction(e -> saveAsExcel());
 	}
 }

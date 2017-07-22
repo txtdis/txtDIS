@@ -4,5 +4,5 @@ public interface Remarked {
 
 	String getRemarks();
 
-	void setRemarks(String s);
+	void setRemarks(String text);
 }

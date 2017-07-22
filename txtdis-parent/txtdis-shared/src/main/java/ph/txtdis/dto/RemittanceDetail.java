@@ -1,7 +1,7 @@
 package ph.txtdis.dto;
 
-import static ph.txtdis.type.BillableType.DELIVERY_REPORT;
-import static ph.txtdis.type.BillableType.INVOICE;
+import static ph.txtdis.type.ModuleType.DELIVERY_REPORT;
+import static ph.txtdis.type.ModuleType.INVOICE;
 import static ph.txtdis.util.NumberUtils.isNegative;
 
 import java.math.BigDecimal;
@@ -9,20 +9,24 @@ import java.time.LocalDate;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ph.txtdis.type.BillableType;
+import ph.txtdis.type.ModuleType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RemittanceDetail extends AbstractId<Long> implements Keyed<Long>, Typed {
+public class RemittanceDetail //
+		extends AbstractKeyed<Long> //
+		implements Keyed<Long>, Typed {
 
-	private String orderNo, customerName;
+	private boolean isSelected;
+
+	private String orderNo, referenceNo, customer;
 
 	private LocalDate dueDate;
 
 	private BigDecimal totalDueValue, paymentValue;
 
 	@Override
-	public BillableType type() {
+	public ModuleType type() {
 		return isNegative(orderNo) ? DELIVERY_REPORT : INVOICE;
 	}
 }

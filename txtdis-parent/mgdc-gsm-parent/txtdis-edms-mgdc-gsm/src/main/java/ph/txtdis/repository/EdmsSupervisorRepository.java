@@ -5,5 +5,6 @@ import org.springframework.stereotype.Repository;
 import ph.txtdis.domain.EdmsSupervisor;
 
 @Repository("edmsSupervisorRepository")
-public interface EdmsSupervisorRepository extends CodeNameRepository<EdmsSupervisor> {
+public interface EdmsSupervisorRepository //
+		extends CodeNameRepository<EdmsSupervisor> {
 }

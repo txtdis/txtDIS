@@ -7,7 +7,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 
-public class DateInputValidator implements ChangeListener<String> {
+public class DateInputValidator //
+		implements ChangeListener<String> {
 
 	private boolean ignore;
 	private TextField input;
@@ -110,8 +111,7 @@ public class DateInputValidator implements ChangeListener<String> {
 	}
 
 	private void validate() {
-		if (disallowedCharacter() || misplacedDateSeparator() || invalidMonth() || improperDay()
-				|| exceededAllowedCharacterLength())
+		if (disallowedCharacter() || misplacedDateSeparator() || invalidMonth() || improperDay() || exceededAllowedCharacterLength())
 			ignoreLastCharacter();
 	}
 

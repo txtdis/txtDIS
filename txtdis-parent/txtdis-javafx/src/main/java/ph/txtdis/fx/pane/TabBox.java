@@ -7,16 +7,17 @@ import org.springframework.stereotype.Component;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-@Component
-public class TabBox extends TabPane {
+@Component("tabBox")
+public class TabBox //
+		extends TabPane {
 
-    public TabBox() {
-        setStyle("-fx-tab-min-width: 80;");
-        setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-    }
+	public TabBox() {
+		setStyle("-fx-tab-min-width: 80;");
+		setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+	}
 
-    public TabBox addTabs(List<Tab> tabs) {
-        getTabs().addAll(tabs);
-        return this;
-    }
+	public TabBox addTabs(List<Tab> tabs) {
+		getTabs().addAll(tabs);
+		return this;
+	}
 }

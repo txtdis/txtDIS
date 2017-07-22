@@ -38,6 +38,7 @@ public abstract class AbstractTab extends Tab implements InputTab {
 		return this;
 	}
 
+	@Override
 	public InputTab build() {
 		setContent(mainVerticalPane());
 		setListeners();
@@ -45,10 +46,12 @@ public abstract class AbstractTab extends Tab implements InputTab {
 		return this;
 	}
 
+	@Override
 	public void disableIf(ObservableBooleanValue b) {
 		disableProperty().bind(b);
 	}
 
+	@Override
 	public void select() {
 		getTabPane().getSelectionModel().select(this);
 	}

@@ -16,7 +16,9 @@ import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-public class AbstractRestService<RSS extends RestServerService> extends RestTemplate implements RestService {
+public class AbstractRestService<RSS extends RestServerService> //
+		extends RestTemplate //
+		implements RestService {
 
 	@Autowired
 	private RSS serverService;
@@ -58,8 +60,8 @@ public class AbstractRestService<RSS extends RestServerService> extends RestTemp
 
 	private SSLConnectionSocketFactory socketFactory() {
 		try {
-			return new SSLConnectionSocketFactory(new SSLContextBuilder()
-					.loadTrustMaterial(null, new TrustSelfSignedStrategy()).loadKeyMaterial(keyStore(), txtDIS()).build());
+			return new SSLConnectionSocketFactory(
+					new SSLContextBuilder().loadTrustMaterial(null, new TrustSelfSignedStrategy()).loadKeyMaterial(keyStore(), txtDIS()).build());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

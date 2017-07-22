@@ -1,6 +1,10 @@
 package ph.txtdis;
 
 import static java.util.Arrays.asList;
+import static ph.txtdis.type.PriceType.DEALER;
+import static ph.txtdis.type.PriceType.PURCHASE;
+import static ph.txtdis.type.SyncType.BACKUP;
+import static ph.txtdis.type.SyncType.VERSION;
 import static ph.txtdis.type.UserType.CASHIER;
 import static ph.txtdis.type.UserType.COLLECTOR;
 import static ph.txtdis.type.UserType.DRIVER;
@@ -12,45 +16,59 @@ import static ph.txtdis.type.UserType.SELLER;
 import static ph.txtdis.type.UserType.STOCK_CHECKER;
 import static ph.txtdis.type.UserType.STOCK_TAKER;
 import static ph.txtdis.type.UserType.STORE_KEEPER;
+import static ph.txtdis.type.UserType.SYSGEN;
+import static ph.txtdis.util.DateTimeUtils.epochDate;
+import static ph.txtdis.util.DateTimeUtils.toDate;
+import static ph.txtdis.util.DateTimeUtils.toUtilDate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
 
-import ph.txtdis.domain.AccountEntity;
 import ph.txtdis.domain.AuthorityEntity;
-import ph.txtdis.domain.CustomerEntity;
-import ph.txtdis.domain.HolidayEntity;
-import ph.txtdis.domain.ItemEntity;
-import ph.txtdis.domain.PriceEntity;
-import ph.txtdis.domain.PricingTypeEntity;
-import ph.txtdis.domain.QtyPerUomEntity;
-import ph.txtdis.domain.RouteEntity;
-import ph.txtdis.domain.RoutingEntity;
 import ph.txtdis.domain.SyncEntity;
 import ph.txtdis.domain.TruckEntity;
 import ph.txtdis.domain.UserEntity;
-import ph.txtdis.domain.WarehouseEntity;
-import ph.txtdis.dto.PartnerType;
-import ph.txtdis.repository.CustomerRepository;
-import ph.txtdis.repository.HolidayRepository;
-import ph.txtdis.repository.ItemRepository;
-import ph.txtdis.repository.PricingTypeRepository;
-import ph.txtdis.repository.RouteRepository;
+import ph.txtdis.mgdc.ccbpi.domain.CustomerEntity;
+import ph.txtdis.mgdc.ccbpi.domain.ItemEntity;
+import ph.txtdis.mgdc.ccbpi.domain.PickListDetailEntity;
+import ph.txtdis.mgdc.ccbpi.domain.PickListEntity;
+import ph.txtdis.mgdc.ccbpi.domain.QtyPerUomEntity;
+import ph.txtdis.mgdc.ccbpi.domain.RoutingEntity;
+import ph.txtdis.mgdc.ccbpi.repository.CustomerRepository;
+import ph.txtdis.mgdc.ccbpi.repository.ItemRepository;
+import ph.txtdis.mgdc.ccbpi.repository.PickListDetailRepository;
+import ph.txtdis.mgdc.ccbpi.repository.PickListRepository;
+import ph.txtdis.mgdc.domain.AccountEntity;
+import ph.txtdis.mgdc.domain.HolidayEntity;
+import ph.txtdis.mgdc.domain.PriceEntity;
+import ph.txtdis.mgdc.domain.PricingTypeEntity;
+import ph.txtdis.mgdc.domain.RouteEntity;
+import ph.txtdis.mgdc.domain.WarehouseEntity;
+import ph.txtdis.mgdc.repository.HolidayRepository;
+import ph.txtdis.mgdc.repository.PricingTypeRepository;
+import ph.txtdis.mgdc.repository.RouteRepository;
+import ph.txtdis.mgdc.repository.WarehouseRepository;
 import ph.txtdis.repository.SyncRepository;
 import ph.txtdis.repository.TruckRepository;
 import ph.txtdis.repository.UserRepository;
-import ph.txtdis.repository.WarehouseRepository;
 import ph.txtdis.service.CredentialService;
 import ph.txtdis.type.ItemType;
+import ph.txtdis.type.PartnerType;
 import ph.txtdis.type.SyncType;
 import ph.txtdis.type.UomType;
 import ph.txtdis.type.UserType;
@@ -58,8 +76,6 @@ import ph.txtdis.util.DateTimeUtils;
 
 @Configuration("persistenceConfiguration")
 public class PersistenceConfiguration {
-
-	private static final String SYSGEN = "SYSGEN";
 
 	@Autowired
 	private CustomerRepository customerRepository;
@@ -69,6 +85,12 @@ public class PersistenceConfiguration {
 
 	@Autowired
 	private ItemRepository itemRepository;
+
+	@Autowired
+	private PickListDetailRepository pickListDetailRepository;
+
+	@Autowired
+	private PickListRepository pickListRepository;
 
 	@Autowired
 	private PricingTypeRepository pricingTypeRepository;
@@ -91,23 +113,26 @@ public class PersistenceConfiguration {
 	@Autowired
 	private CredentialService credentialService;
 
+	@Autowired
+	private Revision3 revision3;
+
 	@Value("${go.live}")
 	private String goLive;
-
-	private AuthorityEntity manager, //
-			driver, helper, seller, salesEncoder, //
-			collector, cashier, headCashier, //
-			storekeeper, stockChecker, stockTaker;
 
 	private PricingTypeEntity purchase, dealer;
 
 	private RouteEntity e3cg, e3ch, e3ci, e3cj, e3ck;
 
 	@PostConstruct
+	@Transactional
 	private void start() {
+		initialSetup();
+		revision3.givePickUpDiscountsToSelectedCustomers();
+	}
+
+	private void initialSetup() {
 		if (syncRepository.count() == 0)
 			try {
-				setRoles();
 				userRepository.save(users());
 				truckRepository.save(trucks());
 				holidayRepository.save(philippineHolidays2017());
@@ -116,53 +141,66 @@ public class PersistenceConfiguration {
 				itemRepository.save(empties());
 				itemRepository.save(items());
 				setRoutes();
+				customerRepository.save(banks());
 				customerRepository.save(customers());
-				syncRepository.save(sync());
+				syncRepository.save(newSync(VERSION, toUtilDate("2009-09-07")));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 	}
 
-	private void setRoles() {
-		manager = newRole(MANAGER);
-		driver = newRole(DRIVER);
-		helper = newRole(HELPER);
-		seller = newRole(SELLER);
-		salesEncoder = newRole(SALES_ENCODER);
-		collector = newRole(COLLECTOR);
-		cashier = newRole(CASHIER);
-		headCashier = newRole(HEAD_CASHIER);
-		storekeeper = newRole(STORE_KEEPER);
-		stockChecker = newRole(STOCK_CHECKER);
-		stockTaker = newRole(STOCK_TAKER);
-	}
-
-	private AuthorityEntity newRole(UserType role) {
-		AuthorityEntity r = new AuthorityEntity();
-		r.setAuthority(role);
-		return r;
-	}
-
 	private List<UserEntity> users() {
 		return Arrays.asList(//
-				newUser("SO", "JACKIE", "robbie", "917 568 2168", "manila12@gmail.com", manager), //
-				newUser("SO", "RONALD", "alphacowboy", "917 895 8268", "ronaldallanso@yahoo.com", manager), //
-
-				newUser(null, "SYSGEN", "Vierski@1", "949 859 2927", "txtdis.erp@gmail.com", manager) //
+				newUser("LAYCO", "GERALD", "password", null, null, DRIVER, COLLECTOR), //
+				newUser("CERNA", "ROMMEL", "password", null, null, DRIVER, COLLECTOR), //
+				newUser("LAYCO", "JEROME", "password", null, null, DRIVER, COLLECTOR), //
+				newUser("GURION", "VANS", "password", null, null, DRIVER, COLLECTOR), //
+				newUser("DANCEL", "MARVIN", "password", null, null, DRIVER), //
+				newUser("UBIÑA", "MARCIAL", "password", null, null, DRIVER), //
+				newUser("CLAVE", "RYAN", "password", null, null, DRIVER), //
+				newUser("VILLALINO", "ALJON", "password", null, null, COLLECTOR), //
+				newUser("CORDA", "AISON", "password", null, null, HELPER), //
+				newUser("TORIO", "JERRY", "password", null, null, HELPER), //
+				newUser("UBIÑA", "MARNEL", "password", null, null, HELPER), //
+				newUser("GUMABAY", "JAYJAY", "password", null, null, HELPER), //
+				newUser("REPUELA", "FRANK", "password", null, null, STORE_KEEPER), //
+				newUser("GUAÑIZO", "RONNAVIE", "password", null, null, STOCK_CHECKER), //
+				newUser("GUILLERMO", "MARIBEL", "password", null, null, SALES_ENCODER), //
+				newUser("TISADO", "KENNETH", "password", null, null, STOCK_TAKER), //
+				newUser("ABASCAN", "GELYN", "password", null, null, CASHIER), //
+				newUser("FAURA", "EDISON", "password", null, null, SELLER), //
+				newUser("SAN DIEGO", "KATRINA", "password", null, null, SELLER), //
+				newUser("BASILIO", "RAYMOND", "password", null, null, SELLER), //
+				newUser("CALAYAN", "BERCIE", "password", null, null, SELLER), //
+				newUser("DE LEON", "JOHN", "password", null, null, SELLER), //
+				newUser("DOPAN", "MARIVIC", "marvic", null, null, HEAD_CASHIER), //
+				newUser("SO", "JACKIE", "robbie", "917 568 2168", "manila12@gmail.com", MANAGER), //
+				newUser("SO", "RONALD", "alphacowboy", "917 895 8268", "ronaldallanso@yahoo.com", MANAGER), //
+				newUser(null, "SYSGEN", "Vierski@1", "949 859 2927", "txtdis.erp@gmail.com", MANAGER) //
 		);
 	}
 
-	private UserEntity newUser(String surname, String username, String password, String phone, String email,
-			AuthorityEntity... roles) {
+	private UserEntity newUser(String surname, String username, String password, String phone, String email, UserType... roles) {
 		UserEntity u = new UserEntity();
-		u.setUsername(username);
+		u.setName(username);
 		u.setSurname(surname);
 		u.setEnabled(true);
 		u.setPassword(encodePassword(password));
 		u.setMobile(formatPhoneNumber(phone));
 		u.setEmail(email);
-		u.setRoles(asList(roles));
+		u.setRoles(roles(u, roles));
 		return u;
+	}
+
+	private List<AuthorityEntity> roles(UserEntity u, UserType[] roles) {
+		return Arrays.asList(roles).stream().map(r -> newRole(u, r)).collect(Collectors.toList());
+	}
+
+	private AuthorityEntity newRole(UserEntity u, UserType role) {
+		AuthorityEntity r = new AuthorityEntity();
+		r.setUser(u);
+		r.setRole(role);
+		return r;
 	}
 
 	private String encodePassword(String password) {
@@ -177,7 +215,12 @@ public class PersistenceConfiguration {
 
 	private List<TruckEntity> trucks() {
 		return Arrays.asList( //
-				newTruck("") //
+				newTruck("RCJ419"), //
+				newTruck("RAK213"), //
+				newTruck("XPC508"), //
+				newTruck("RGH556"), //
+				newTruck("SQ1377"), //
+				newTruck("NC79034") //
 		);
 	}
 
@@ -212,8 +255,8 @@ public class PersistenceConfiguration {
 	}
 
 	private void setPricingTypes() {
-		purchase = newPricingType("PURCHASE");
-		dealer = newPricingType("DEALER");
+		purchase = newPricingType(PURCHASE.toString());
+		dealer = newPricingType(DEALER.toString());
 	}
 
 	private PricingTypeEntity newPricingType(String name) {
@@ -224,7 +267,7 @@ public class PersistenceConfiguration {
 
 	private List<ItemEntity> empties() {
 		return Arrays.asList( //
-				newItem(147, "CASE237", "237 CASE FULL", 24, 90.00, 90.00, null),
+				newItem(147, "CASE237", "237 CASE FULL", 24, 90.00, 90.00, null), //
 				newItem(156, "CASE355", "355 CASE FULL", 24, 90.00, 90.00, null),
 				newItem(290, "CASE237RTOUG", "237 CASE FULL ULTRAGLS RTO", 24, 90.00, 90.00, null),
 				newItem(291, "CASE237SPRUG", "237 CASE FULL ULTRAGLS SPRITE", 24, 90.00, 90.00, null),
@@ -242,7 +285,8 @@ public class PersistenceConfiguration {
 				newItem(180, "CASE240POPUG", "240 CASE FULL ULTRAGLS POP", 1, 90.00, 90.00, null),
 				newItem(82, "CASESHELL1.0", "1.0 SHELL PLASTIC", 1, 52.00, 52.00, null),
 				newItem(353, "CASE240SARUG", "240 CASE FULL SARSI ULTRAGLASS", 1, 90.00, 90.00, null),
-				newItem(78, "CASESHELL355", "355 SHELL PLASTIC", 1, 42.00, 42.00, null) //
+				newItem(78, "CASESHELL355", "355 SHELL PLASTIC", 1, 42.00, 42.00, null), //
+				newItem(176, "CASE1.0COKE", "1.0 CASE FULL ULTRA GLASS COKE", 1, 172.00, 172.00, null) //
 		);
 	}
 
@@ -291,7 +335,7 @@ public class PersistenceConfiguration {
 				newItem(106117, "WILLWT500X24", "500MLPLBTN1X24 WILKINSPURE LTWT", 24, 250.00, 238.00, null),
 				newItem(104201, "WILPUR1X12", "1LPLBTN1X12 WILKINS PURE", 12, 240.00, 228.00, null),
 				newItem(104474, "RGBS/R237X24", "237ML RGB X SPRITE12 RT012", 24, 144.00, 132.00, 147),
-				newItem(104475, "RGBCRS750X12", "750ML RGB X COKE6 RT03 SPRITE3", 12, 168.00, 156.00, 156),
+				newItem(104475, "RGBCRS750X12", "750ML RGB X COKE6 RT03 SPRITE3", 12, 168.00, 156.00, 677),
 				newItem(104600, "COKPRO355X24", "355MLGLBTR1X24 COKE PROM", 24, 192.00, 180.00, 156),
 				newItem(104608, "RTOPRO355X24", "355MLGLBTR1X24 ROYAL TRU ORG PROM", 24, 192.00, 180.00, 156),
 				newItem(104609, "SPRPRO355X24", "355MLGLBTR1X24 SPRITE PROM", 24, 192.00, 180.00, 156),
@@ -304,20 +348,20 @@ public class PersistenceConfiguration {
 				newItem(104956, "SPR250X12", "250MLPLBTN1X12 SPRITE", 12, 108.00, 103.00, null),
 				newItem(105147, "RGBS/R355X24", "355ML RGB X SPRITE12 ROYAL 12 ULTRA", 24, 192.00, 180.00, 156),
 				newItem(105311, "SAR250X12", "250MLPLBTN1X12 SARSI ROOT BEER", 12, 108.00, 103.00, null),
-				newItem(105329, "COKTPR237X24", "237MLGLBTR1X24 COKE TLPR", 24, 112.00, 100.00, 147),
+				newItem(105329, "COKTPR237X24", "237MLGLBTR1X24 COKE TLPR", 24, 112.00, 100.00, null),
 				newItem(105331, "COKTAL237X24", "237MLGLBTR1X24 COKE TALL", 24, 112.00, 100.00, 147),
 				newItem(105343, "MMFORG800X12", "800MLPLBTN1X12 MM FRSH ORG (NC) PRIM", 12, 252.00, 242.00, null),
 				newItem(105346, "MMFORG250X12", "250MLPLBTN1X12 MM FRSH ORG (NC) PRIM", 12, 108.00, 103.00, null),
 				newItem(105909, "SPRLBR250X12", "250MLPLBTN1X12 SPRITE LBRNS MX", 12, 108.00, 103.00, null),
 				newItem(105953, "RLFSWT250X12", "250MLPLBTN1X12 REAL LEAF FRTCY SWT TEA", 12, 96.00, 91.00, null),
 				newItem(105947, "POW250X12", "250MLPLBTN1X12 PADE MT BRY", 12, 96.00, 91.00, null),
-				newItem(105330, "COKTPL237X24", "237MLGLBTR1X24 COKE TLPL", 24, 112.00, 100.00, 147),
+				newItem(105330, "COKTPL237X24", "237MLGLBTR1X24 COKE TLPL", 24, 112.00, 100.00, 78),
 				newItem(103958, "RLFH/L480X24", "480MLPLBTN1X24 REAL LEAF HONLYCH G PRIM", 24, 430.00, 418.00, null),
 				newItem(104798, "RGBSRL237X24", "237 RET X 24 ROYAL RAINBOW CASE", 24, 144.00, 132.00, 147),
 				newItem(105314, "RGBCRS355X24", "355 RGBX COKE12 SPRITE6 ROYAL6", 24, 192.00, 180.00, 156),
 				newItem(105394, "MMFORG800X6", "800MLPLBTN1X6MM FRSH ORG (NC) PRIM", 6, 126.00, 121.00, null),
-				newItem(104611, "SPRPLC355X24", "355MLGLBTR1X24 SPRITE PLCR", 24, 192.00, 180.00, 156),
-				newItem(104603, "COKPLC355X24", "355MLGLBTR1X24 COKE PLCR", 24, 192.00, 180.00, 156),
+				newItem(104611, "SPRPLC355X24", "355MLGLBTR1X24 SPRITE PLCR", 24, 192.00, 180.00, 78),
+				newItem(104603, "COKPLC355X24", "355MLGLBTR1X24 COKE PLCR", 24, 192.00, 180.00, 78),
 				newItem(105892, "EOCMGO30X12", "30GMSACHN1X12 EIGHT OCLCKLMNACTMANG PROM", 12, 101.80, 100.60, null),
 				newItem(105895, "EOCPIN30X12", "30GMSACHN1X12 EIGHT OCLCKLMNACTPINE PROM", 12, 101.80, 100.60, null),
 				newItem(105672, "EOCORG30X12", "30GMSACHN1X12 EIGHT OCLCKIMMACTORG PROM", 12, 101.80, 100.60, null),
@@ -328,22 +372,33 @@ public class PersistenceConfiguration {
 				newItem(101630, "POPULT240X24", "240MLGLBTR1X24 POP COLA ULTR", 24, 108.00, 96.00, 180),
 				newItem(104599, "POPULP240X24", "240MLGLBTR1X24 POP COLA PROM", 24, 108.00, 96.00, 180),
 				newItem(101319, "WILDIS18.9X1", "18.9LPLJGR1X1 WILKINS DISTILLED WTR", 1, 150.00, 138.00, null),
-				newItem(104529, "COKPLC750X12", "750MLGLBTR1X12 COKE PLCR", 12, 168.00, 156.00, 304),
-				newItem(104528, "SPRPLC750X12", "750MLGLBTR1X12 SPRITE PLCR", 12, 168.00, 156.00, 678),
+				newItem(104529, "COKPLC750X12", "750MLGLBTR1X12 COKE PLCR", 12, 168.00, 156.00, 82),
+				newItem(104528, "SPRPLC750X12", "750MLGLBTR1X12 SPRITE PLCR", 12, 168.00, 156.00, 82),
 				newItem(102003, "WILPRO1X12", "1LPLBTN1X12 WILKINS DISTILLED WTR PROM", 12, 280.00, 268.00, null),
-				newItem(106125, "WILLTW1X12", "1LPLBTN1X12 WILKINS DISTILLED WTR LTWT", 12, 280.00, 268.00, null),
+				newItem(106125, "WILDLT1X12", "1LPLBTN1X12 WILKINS DISTILLED WTR LTWT", 12, 280.00, 268.00, null),
 				newItem(102648, "SARULT240X24", "240MLGLBTR1X24 SARSI ROOT BEER ULTR", 24, 155.00, 143.00, 180),
 				newItem(105506, "SPALMN300X12", "300MLPLBTN1X12 SPARKLE LMN", 12, 108.00, 103.00, null),
 				newItem(106148, "COKFRU250X24", "250NRPX36 COKE24 FRUITCY12", 24, 312.00, 297.00, null),
 				newItem(106149, "COKMTB250X24", "250NRPX36 COKE24 MTBERRY12", 24, 312.00, 297.00, null),
 				newItem(104895, "COKPRO1X12", "1LGLBTR1X12 COKE PROM", 12, 222.00, 210.00, null),
-				newItem(104897, "COKPLC1X12", "1LGLBTR1X12 COKE PLCR", 12, 222.00, 210.00, null),
 				newItem(106272, "COKK/L175X24", "750 RET COKE12 1.0 RET COKE12 250 COKE12", 24, 390.00, 361.00, null),
-				newItem(106268, "COKM/W250X48", "250 COKE48 330WLKNSPUREOLD330", 48, 432.00, 400.00, null));
+				newItem(106268, "COKM/W250X48", "250 COKE48 330WLKNSPUREOLD330", 48, 432.00, 400.00, null),
+				newItem(101710, "SCHSOD330X24", "330MLALCNN1X24 SCHW SODA WTR-KO", 24, 580.00, 568.00, null),
+				newItem(106118, "WILPLT1X12", "1LPLBTN1X12 WILKINS PURE LTWT", 12, 240.00, 228.00, null),
+				newItem(106127, "WILPLT330X30", "330MLPLBTN1X30 WILKINS PURE LTWT", 30, 210.00, 200.00, null),
+				newItem(102003, "WILDIS1X12", "1LPLBTN1X12 WILKINS DISTILLED WTR PROM", 12, 280.00, 268.00, null),
+				newItem(104895, "COKPROM1X12", "1LGLBTR1X12 COKE PROM	", 12, 222.00, 210.00, null),
+				newItem(104897, "COKPLC1X12", "1LGLBTR1X12 COKE PLCR", 12, 222.00, 210.00, 82),
+				newItem(106272, "COKKL1.75X24", "750 RET COKE12 1.0 RET COKE12 250 COKE12", 24, 390.00, 361.00, 304),
+				newItem(106268, "COKMW250X48", "250 COKE48 330WLKNSPUREOLD330	", 48, 432.00, 400.00, null),
+				newItem(106337, "COKREI1X12", "750MLGLBTR1X12COKE REIN", 12, 118.00, 106.00, 304),
+				newItem(106335, "RTOREI1X12", "750MLGLBTR1X12RTO REIN", 12, 118.00, 106.00, 304),
+				newItem(106336, "SPRREI1X12", "750MLGLBTR1X12SPRITE REIN", 12, 118.00, 106.00, 304),
+				newItem(101609, "COKULT1X12", "1LGLBTNR1X12 COKE ULTR", 12, 222.00, 210.00, 176));
 	}
 
-	private ItemEntity newItem(Integer id, String name, String description, int qtyPerCase, double sellingPrice,
-			double purchasePrice, Integer emptiesId) {
+	private ItemEntity newItem(Integer id, String name, String description, int qtyPerCase, double sellingPrice, double purchasePrice,
+			Integer emptiesId) {
 		ItemEntity i = new ItemEntity();
 		i.setVendorId(id.toString());
 		i.setName(name);
@@ -385,8 +440,9 @@ public class PersistenceConfiguration {
 		p.setType(type);
 		p.setPriceValue(new BigDecimal(price));
 		p.setStartDate(goLiveDate());
-		p.setDecidedBy(SYSGEN);
+		p.setDecidedBy(SYSGEN.toString());
 		p.setDecidedOn(goLiveTimestamp());
+		p.setIsValid(true);
 		return p;
 	}
 
@@ -395,7 +451,7 @@ public class PersistenceConfiguration {
 	}
 
 	private LocalDate goLiveDate() {
-		return DateTimeUtils.toDate(goLive);
+		return toDate(goLive);
 	}
 
 	private ItemEntity getEmpties(Integer id) {
@@ -403,11 +459,12 @@ public class PersistenceConfiguration {
 	}
 
 	private void setRoutes() {
-		e3cg = newRoute("E3CG", "PS1");
-		e3ch = newRoute("E3CH", "PS2");
-		e3ci = newRoute("E3CI", "PS3");
-		e3cj = newRoute("E3CJ", "PS4");
-		e3ck = newRoute("E3CK", "PS5");
+		newRoute("EWHS", "MARIBEL");
+		e3cg = newRoute("E3CG", "EDISON");
+		e3ch = newRoute("E3CH", "KATRINA");
+		e3ci = newRoute("E3CI", "JOHN");
+		e3cj = newRoute("E3CJ", "RAYMOND");
+		e3ck = newRoute("E3CK", "BERCIE");
 	}
 
 	private RouteEntity newRoute(String name, String seller) {
@@ -424,8 +481,33 @@ public class PersistenceConfiguration {
 		return Arrays.asList(a);
 	}
 
-	private List<CustomerEntity> customers() {
+	private List<CustomerEntity> banks() {
 		return Arrays.asList( //
+				newBank("EWT"), //
+				newBank("CREDIT MEMO"), //
+				newBank("ASIA UNITED BANK"), //
+				newBank("BANK OF COMMERCE"), //
+				newBank("BANK ONE"), //
+				newBank("BDO"), //
+				newBank("BPI"), //
+				newBank("CHINABANK"), //
+				newBank("CITYSTATE BANK"), //
+				newBank("EASTWEST BANK"), //
+				newBank("MALAYAN BANK"), //
+				newBank("METROBANK"), //
+				newBank("PNB"), //
+				newBank("PSB"), //
+				newBank("RCBC"), //
+				newBank("SECURITY BANK"), //
+				newBank("UCPB"), //
+				newBank("UNIONBANK"), //
+				newBank("ALLIED BANK"), //
+				newBank("BANK OF JACKIE"), //
+				newBank("BANK OF RONALD"));
+	}
+
+	private List<CustomerEntity> customers() {
+		return asList( //
 				newOutlet(503746808, "2544 STORE", e3cg), //
 				newOutlet(503746953, "3K STORE", e3ck), //
 				newOutlet(503747162, "888 STORE", e3cj), //
@@ -720,6 +802,13 @@ public class PersistenceConfiguration {
 		);
 	}
 
+	private CustomerEntity newBank(String name) {
+		CustomerEntity c = new CustomerEntity();
+		c.setName(name);
+		c.setType(PartnerType.FINANCIAL);
+		return c;
+	}
+
 	private CustomerEntity newOutlet(long id, String name, RouteEntity route) {
 		CustomerEntity c = new CustomerEntity();
 		c.setVendorId(id);
@@ -737,10 +826,66 @@ public class PersistenceConfiguration {
 		return Arrays.asList(r);
 	}
 
-	private SyncEntity sync() {
-		SyncEntity s = new SyncEntity();
-		s.setLastSync(DateTimeUtils.toUtilDate("2009-04-09"));
-		s.setType(SyncType.VERSION);
-		return s;
+	private SyncEntity newSync(SyncType script, Date date) {
+		SyncEntity e = new SyncEntity();
+		e.setId(script);
+		e.setLastSync(epochDate());
+		return e;
+	}
+
+	@SuppressWarnings("unused")
+	private void addEmptiestoPickListDetail() {
+		if (!syncRepository.exists(BACKUP)) {
+			Iterable<PickListDetailEntity> i = pickListDetailRepository.findAll();
+			StreamSupport.stream(i.spliterator(), false) //
+					.collect(Collectors.groupingBy(PickListDetailEntity::getPicking, Collectors.toList())) //
+					.entrySet().forEach(p -> addEmptiesToPickListDetails(p));
+			syncRepository.save(newSync(BACKUP, toUtilDate(LocalDate.now())));
+		}
+	}
+
+	private void addEmptiesToPickListDetails(Entry<PickListEntity, List<PickListDetailEntity>> entry) {
+		List<ItemEntity> empties = empties(entry.getValue());
+		if (empties.isEmpty())
+			return;
+		savePickList(entry.getKey(), entry.getValue(), empties);
+	}
+
+	private List<ItemEntity> empties(List<PickListDetailEntity> list) {
+		return list.stream().map(d -> d.getItem().getEmpties()).filter(i -> i != null).distinct().collect(Collectors.toList());
+	}
+
+	private void savePickList(PickListEntity pickList, List<PickListDetailEntity> details, List<ItemEntity> empties) {
+		empties = empties(empties, bottles(empties));
+		pickList = addEmpties(pickList, details, empties);
+		pickListRepository.save(pickList);
+	}
+
+	private List<ItemEntity> empties(List<ItemEntity> empties, List<ItemEntity> bottles) {
+		empties = new ArrayList<>(empties);
+		empties.addAll(bottles);
+		empties.addAll(shells(bottles));
+		return empties;
+	}
+
+	private List<ItemEntity> bottles(List<ItemEntity> empties) {
+		return empties.stream().map(d -> d.getEmpties()).filter(i -> i != null).distinct().collect(Collectors.toList());
+	}
+
+	private List<ItemEntity> shells(List<ItemEntity> bottles) {
+		return bottles(bottles);
+	}
+
+	private PickListEntity addEmpties(PickListEntity pickList, List<PickListDetailEntity> details, List<ItemEntity> empties) {
+		details.addAll(empties.stream().map(item -> toPickListDetail(pickList, item)).collect(Collectors.toList()));
+		pickList.setDetails(details);
+		return pickList;
+	}
+
+	private PickListDetailEntity toPickListDetail(PickListEntity p, ItemEntity i) {
+		PickListDetailEntity d = new PickListDetailEntity();
+		d.setPicking(p);
+		d.setItem(i);
+		return d;
 	}
 }

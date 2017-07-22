@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -25,6 +26,10 @@ public class LabeledDatePicker implements InputNode<LocalDate> {
 	private LocalDatePicker datePicker;
 
 	private List<Node> nodes;
+
+	public void disableIf(ObservableBooleanValue b) {
+		datePicker.disableIf(b);
+	}
 
 	@Override
 	public List<Node> getNodes() {
@@ -56,7 +61,7 @@ public class LabeledDatePicker implements InputNode<LocalDate> {
 		datePicker.setValue(null);
 	}
 
-	public void setOnAction(EventHandler<ActionEvent> value) {
-		datePicker.setOnAction(value);
+	public void onAction(EventHandler<ActionEvent> e) {
+		datePicker.onAction(e);
 	}
 }

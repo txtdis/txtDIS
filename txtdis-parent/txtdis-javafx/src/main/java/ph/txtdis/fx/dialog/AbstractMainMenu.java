@@ -1,9 +1,12 @@
 package ph.txtdis.fx.dialog;
 
+import javafx.application.Platform;
 import javafx.stage.WindowEvent;
 import ph.txtdis.util.FontIcon;
 
-public abstract class AbstractMainMenu extends AbstractMenu implements MainMenu {
+public abstract class AbstractMainMenu //
+		extends AbstractMenu //
+		implements MainMenu {
 
 	@Override
 	public void display() {
@@ -15,5 +18,7 @@ public abstract class AbstractMainMenu extends AbstractMenu implements MainMenu 
 		show();
 	}
 
-	protected abstract void onCloseRequestAction(WindowEvent e);
+	protected void onCloseRequestAction(WindowEvent e) {
+		Platform.exit();
+	}
 }

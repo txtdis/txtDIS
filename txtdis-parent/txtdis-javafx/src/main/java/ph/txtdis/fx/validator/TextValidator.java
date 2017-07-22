@@ -2,19 +2,20 @@ package ph.txtdis.fx.validator;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppFieldImpl;
 
-public class TextValidator implements ChangeListener<String> {
+public class TextValidator //
+		implements ChangeListener<String> {
 
 	private boolean ignore;
 
-	private AppField<?> input;
+	private AppFieldImpl<?> input;
 
 	private String restrict;
 
-	public TextValidator(AppField<?> input) {
+	public TextValidator(AppFieldImpl<?> input) {
 		this.input = input;
-		this.restrict = "[a-zA-Z0-9-\\[\\]*:,.&'+/!%()Ñ ]";
+		this.restrict = "[a-zA-Z0-9-\\[\\]*:,.&'+/!%()ÑX ]";
 	}
 
 	@Override

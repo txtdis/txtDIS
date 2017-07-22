@@ -13,7 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import ph.txtdis.dto.Style;
 import ph.txtdis.dto.User;
-import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.control.AppButtonImpl;
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.fx.control.BaseColorPicker;
 import ph.txtdis.fx.control.LabelFactory;
@@ -32,7 +32,7 @@ public class StyleApp extends AbstractInputDialog {
 	protected AppGridPane grid;
 
 	@Autowired
-	private AppButton changeButton;
+	private AppButtonImpl changeButton;
 
 	@Autowired
 	private AppCombo<String> fontCombo;
@@ -60,17 +60,17 @@ public class StyleApp extends AbstractInputDialog {
 	public void refresh() {
 		colorPicker.reset();
 		fontCombo.select(systemFont());
-		setFocus();
+		goToDefaultFocus();
 	}
 
 	@Override
-	public void setFocus() {
+	public void goToDefaultFocus() {
 		colorPicker.requestFocus();
 	}
 
 	private Button changeButton() {
 		changeButton.large("Change").build();
-		changeButton.setOnAction(event -> trySavingChanges());
+		changeButton.onAction(event -> trySavingChanges());
 		return changeButton;
 	}
 
@@ -95,8 +95,8 @@ public class StyleApp extends AbstractInputDialog {
 
 	private String rgb() {
 		Color color = colorPicker.getValue();
-		return String.format("rgba(%d, %d, %d, %f)", (int) Math.round(color.getRed() * 255),
-				(int) Math.round(color.getGreen() * 255), (int) Math.round(color.getBlue() * 255), color.getOpacity());
+		return String.format("rgba(%d, %d, %d, %f)", (int) Math.round(color.getRed() * 255), (int) Math.round(color.getGreen() * 255),
+				(int) Math.round(color.getBlue() * 255), color.getOpacity());
 	}
 
 	private void saveChanges() throws SuccessfulSaveInfo, Exception {

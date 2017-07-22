@@ -8,7 +8,8 @@ import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 @Component("dialogMessageBox")
-public class DialogMessageBox extends VBox {
+public class DialogMessageBox //
+		extends VBox {
 
 	public DialogMessageBox() {
 		setAlignment(Pos.CENTER);

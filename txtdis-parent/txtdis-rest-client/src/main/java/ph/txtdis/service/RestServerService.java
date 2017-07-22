@@ -14,7 +14,5 @@ public interface RestServerService {
 
 	String getPort();
 
-	boolean isOffSite();
-
 	void setLocation(String text);
 }

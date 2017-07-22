@@ -2,8 +2,8 @@ package ph.txtdis.dto;
 
 import java.math.BigDecimal;
 
-public interface CustomerCredit
-		extends EntityDecisionNeeded<Long>, Comparable<CustomerCredit>, Keyed<Long>, StartDated {
+public interface CustomerCredit //
+		extends ForApproval, Comparable<CustomerCredit>, Keyed<Long>, StartDated {
 
 	int getTermInDays();
 

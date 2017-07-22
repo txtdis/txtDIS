@@ -1,4 +1,5 @@
 package ph.txtdis.app;
 
-public interface DeliveryReportApp extends Launchable {
+public interface DeliveryReportApp //
+		extends LaunchableApp {
 }

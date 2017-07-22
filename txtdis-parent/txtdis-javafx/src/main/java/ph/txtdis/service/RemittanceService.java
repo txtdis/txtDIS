@@ -5,44 +5,37 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.CreationTracked;
-import ph.txtdis.dto.Customer;
-import ph.txtdis.dto.PaymentHistory;
+import ph.txtdis.dto.CreationLogged;
 import ph.txtdis.dto.Remittance;
-import ph.txtdis.dto.RemittanceDetail;
 import ph.txtdis.info.Information;
-import ph.txtdis.type.BillingType;
 import ph.txtdis.type.PaymentType;
 
-public interface RemittanceService
-		extends Detailed, DecisionNeeded, Reset, Serviced<Long>, Spreadsheet<PaymentHistory>, CreationTracked {
+public interface RemittanceService //
+		extends BankDrawnCheckService<Remittance>, DecisionNeededService, OpenDialogHeaderTextService, ResettableService,
+		RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long>, Spreadsheet<Remittance>,
+		CreationLogged {
 
-	RemittanceDetail createDetail(Billable billable, BigDecimal payment, BigDecimal remaining);
+	boolean canDepositCash();
 
-	boolean isBillableOnThisPaymentList(Billable i);
+	boolean canDepositCheck();
 
-	List<String> getBankNames();
+	boolean canPostPaymentData();
 
-	List<Customer> getBanks();
+	boolean canReceiveTransferredPayments();
 
 	Long getCheckId();
-
-	List<String> getCollectorNames();
 
 	List<String> getCollectors();
 
 	ZonedDateTime getDepositedOn();
 
-	String getDepositor();
+	String getDepositedTo();
 
-	String getDepositorBank();
+	String getDepositEncodedBy();
 
-	ZonedDateTime getDepositorOn();
+	ZonedDateTime getDepositEncodedOn();
 
-	List<RemittanceDetail> getDetails();
-
-	List<Customer> getDraweeBanks();
+	List<String> getDraweeBanks();
 
 	LocalDate getPaymentDate();
 
@@ -50,9 +43,9 @@ public interface RemittanceService
 
 	String getReceivedBy();
 
-	ZonedDateTime getReceivedOn();
+	List<String> getReceivedFromList();
 
-	BigDecimal getRemaining();
+	ZonedDateTime getReceivedOn();
 
 	Remittance getUndepositedPayment(PaymentType t, String seller, LocalDate d) throws Exception;
 
@@ -60,26 +53,11 @@ public interface RemittanceService
 
 	boolean isCashPayment();
 
-	boolean isOffSite();
+	List<Remittance> list(String bank);
 
-	boolean isUserAllowedToMakeCashDeposits();
-
-	boolean isUserAllowedToMakeCheckDeposits();
-
-	boolean isUserAllowedToPostRemittanceData();
-
-	boolean isUserAllowedToReceiveFundTransfer();
-
-	void nullifyPaymentData(Billable billable) throws Information, Exception;
-
-	void open(Customer bank, Long checkId) throws Exception;
+	void open(String bank, Long checkId) throws Exception;
 
 	void resetInputDataRelatedToPayment();
-
-	@Override
-	default void save() throws Information, Exception {
-		Serviced.super.save();
-	}
 
 	void save(List<Remittance> l) throws Information, Exception;
 
@@ -87,7 +65,7 @@ public interface RemittanceService
 
 	void setCollector(String s);
 
-	void setDepositData(Customer bank, ZonedDateTime depositedOn);
+	void setDepositData(String bank, ZonedDateTime depositedOn);
 
 	void setDraweeBank(String c);
 
@@ -95,11 +73,9 @@ public interface RemittanceService
 
 	void setPayment(BigDecimal p);
 
-	void setRemarks(String text);
+	void setPaymentDate(LocalDate d);
 
-	Billable updateUponIdValidation(BillingType b, String prefix, Long id, String suffix) throws Exception;
-
-	void validateBankCheckBeforeSetting(Customer bank) throws Exception;
+	void validateBankCheckBeforeSetting(String bank) throws Exception;
 
 	void validateCashCollection() throws Exception;
 

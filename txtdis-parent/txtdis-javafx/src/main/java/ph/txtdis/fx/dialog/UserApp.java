@@ -3,115 +3,162 @@ package ph.txtdis.fx.dialog;
 import static ph.txtdis.type.Type.TEXT;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javafx.scene.Node;
 import javafx.scene.control.Button;
-import ph.txtdis.app.Startable;
-import ph.txtdis.dto.Authority;
-import ph.txtdis.dto.User;
-import ph.txtdis.exception.DuplicateException;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.app.StartableApp;
+import ph.txtdis.exception.NotFoundException;
+import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppCheckBox;
+import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LabelFactory;
+import ph.txtdis.fx.pane.AppBoxPaneFactory;
 import ph.txtdis.fx.pane.AppGridPane;
-import ph.txtdis.info.SuccessfulSaveInfo;
-import ph.txtdis.type.UserType;
+import ph.txtdis.fx.table.RoleTable;
+import ph.txtdis.info.Information;
+import ph.txtdis.service.UserService;
 
 @Scope("prototype")
 @Component("userApp")
-public class UserApp extends PasswordDialog implements Startable {
+public class UserApp extends AbstractInputDialog implements StartableApp {
 
 	@Autowired
 	private LabelFactory label;
 
 	@Autowired
-	private AppField<String> userField;
+	private AppBoxPaneFactory box;
+
+	@Autowired
+	private AppFieldImpl<String> userField, surnameField;
+
+	@Autowired
+	private AppButtonImpl saveButton;
+
+	@Autowired
+	private AppGridPane grid;
+
+	@Autowired
+	private AppCheckBox enabledCheckbox;
+
+	@Autowired
+	private RoleTable roleTable;
+
+	@Autowired
+	private UserService service;
 
 	@Override
-	public void refresh() {
-		clearPasswordFields();
-		userField.clear();
-		super.refresh();
+	protected Button[] buttons() {
+		return new Button[] { saveButton(), closeButton() };
 	}
 
-	@Override
-	public void setFocus() {
-		userField.requestFocus();
+	private Button saveButton() {
+		saveButton.large("Save").build();
+		saveButton.onAction(e -> save());
+		return saveButton;
 	}
 
-	private void clearPasswordFields() {
-		password1.clear();
-		password2.clear();
-	}
-
-	private Authority managerRole() {
-		Authority a = new Authority();
-		a.setAuthority(UserType.MANAGER);
-		return a;
-	}
-
-	private User newUser() {
-		User user = new User();
-		user.setUsername(username());
-		user.setPassword(encodedPassword());
-		user.setEnabled(true);
-		user.setRoles(Arrays.asList(managerRole()));
-		return user;
-	}
-
-	private AppField<String> userField() {
-		userField.build(TEXT);
-		userField.setOnAction(event -> validate());
-		return userField;
-	}
-
-	private String username() {
-		return userField.getText();
-	}
-
-	private void validate() {
+	private void save() {
 		try {
-			validateUserName(userField.getText());
+			service.save(roleTable.getItems());
+		} catch (Information i) {
+			dialog.show(i).addParent(this).start();
 		} catch (Exception e) {
-			dialog.show(e).addParent(this).start();
+			showErrorDialog(e);
+		} finally {
 			refresh();
 		}
 	}
 
-	private void validateUserName(String username) throws Exception {
-		if (userService.find(username) != null)
-			throw new DuplicateException(username);
-	}
-
-	@Override
-	protected Button changeButton() {
-		changeButton.setText("Save");
-		return super.changeButton();
-	}
-
-	@Override
-	protected AppGridPane grid() {
-		grid.getChildren().clear();
-		grid.add(label.field("Input Username"), 0, 0);
-		grid.add(userField(), 1, 0);
-		return super.grid();
-	}
-
 	@Override
 	protected String headerText() {
-		return "Add New User";
+		return "Input User Details";
 	}
 
 	@Override
-	protected void saveUser() throws SuccessfulSaveInfo, Exception {
-		userService.save(newUser());
+	protected List<Node> nodes() {
+		saveButton.disableIf(roleTable.isEmpty());
+		return Arrays.asList(header(), grid(), tablePane(), buttonBox());
+	}
+
+	private AppGridPane grid() {
+		grid.getChildren().clear();
+		grid.add(label.field("Username"), 0, 0);
+		grid.add(userField(), 1, 0);
+		grid.add(label.field("Surname"), 0, 1);
+		grid.add(surnameField(), 1, 1);
+		grid.add(label.field("Enabled"), 0, 2);
+		grid.add(enabledCheckbox(), 1, 2);
+		return grid;
+	}
+
+	private AppFieldImpl<String> userField() {
+		userField.build(TEXT);
+		userField.onAction(e -> validate());
+		return userField;
+	}
+
+	private void validate() {
+		if (userField.isNotEmpty().get())
+			try {
+				service.validateUsername(userField.getText());
+				refresh();
+			} catch (NotFoundException e) {
+				surnameField.requestFocus();
+			} catch (Exception e) {
+				showErrorDialog(e);
+				userField.clear();
+				userField.requestFocus();
+			}
+		else
+			userField.requestFocus();
+	}
+
+	private void showErrorDialog(Exception e) {
+		e.printStackTrace();
+		dialog.show(e).addParent(this).start();
+	}
+
+	private AppFieldImpl<String> surnameField() {
+		surnameField.build(TEXT);
+		surnameField.disableIf(userField.isEmpty());
+		surnameField.onAction(e -> service.setSurname(surnameField.getText()));
+		return surnameField;
+	}
+
+	private AppCheckBox enabledCheckbox() {
+		enabledCheckbox.disableIf(surnameField.isEmpty());
+		enabledCheckbox.onAction(e -> service.setEnabled(enabledCheckbox.getValue()));
+		return enabledCheckbox;
+	}
+
+	private Node tablePane() {
+		roleTable.build();
+		roleTable.disableIf(enabledCheckbox.disableProperty());
+		return box.forHorizontalPane(roleTable);
 	}
 
 	@Override
-	protected void setBindings() {
-		password1.disableIf(userField.isEmpty());
-		super.setBindings();
+	public void refresh() {
+		userField.setValue(service.getUsername());
+		surnameField.setValue(service.getSurname());
+		enabledCheckbox.setValue(service.isEnabled());
+		roleTable.items(service.getRolesThatCanBeAssigned());
+		super.refresh();
+	}
+
+	@Override
+	protected void setOnClickedCloseButton() {
+		service.reset();
+		close();
+	}
+
+	@Override
+	public void goToDefaultFocus() {
+		userField.requestFocus();
 	}
 }

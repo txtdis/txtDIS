@@ -1,5 +1,6 @@
 package ph.txtdis.service;
 
+import static org.apache.commons.lang3.StringUtils.substringBetween;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -11,17 +12,16 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 
 import ph.txtdis.exception.FailedAuthenticationException;
-import ph.txtdis.exception.InvalidException;
 import ph.txtdis.exception.NoServerConnectionException;
-import ph.txtdis.exception.RestException;
 import ph.txtdis.exception.StoppedServerException;
 import ph.txtdis.util.HttpHeader;
 import ph.txtdis.util.TypeMap;
 
-public abstract class AbstractReadOnlyService<T, H extends HttpHeader, RS extends RestService, RSS extends RestServerService>
+public abstract class AbstractReadOnlyService<T, H extends HttpHeader, RS extends RestService, RSS extends RestServerService> //
 		implements ReadOnlyService<T> {
 
 	@Autowired
@@ -39,15 +39,13 @@ public abstract class AbstractReadOnlyService<T, H extends HttpHeader, RS extend
 	private String module;
 
 	@Override
-	public List<T> getList() throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException,
-			RestException, InvalidException {
+	public List<T> getList() throws Exception {
 		return getList("");
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public T getOne(String endpoint) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException {
+	public T getOne(String endpoint) throws Exception {
 		return (T) responseEntity(endpoint, single()).getBody();
 	}
 
@@ -65,25 +63,20 @@ public abstract class AbstractReadOnlyService<T, H extends HttpHeader, RS extend
 		return English.plural(single());
 	}
 
-	private ResponseEntity<?> responseEntity(String endpoint, String path) throws NoServerConnectionException,
-			StoppedServerException, FailedAuthenticationException, RestException, InvalidException {
+	private ResponseEntity<?> responseEntity(String endpoint, String path) throws Exception {
 		try {
 			return restService.init().exchange(url() + endpoint, GET, httpEntity(null), response.type(path));
 		} catch (ResourceAccessException e) {
 			e.printStackTrace();
 			throw new NoServerConnectionException(serverService.getLocation());
 		} catch (HttpClientErrorException | HttpServerErrorException e) {
-			e.printStackTrace();
 			if (e.getStatusCode() == UNAUTHORIZED) {
-				if (e.getResponseBodyAsString().contains("This connection has been closed"))
+				if (errorMsg(e).contains("This connection has been closed"))
 					throw new StoppedServerException();
-				else
-					throw new FailedAuthenticationException();
-			} else
-				throw new RestException(e);
-		} catch (Exception e) {
+				throw new FailedAuthenticationException();
+			}
 			e.printStackTrace();
-			throw new InvalidException(e.getMessage());
+			throw new Exception(errorMsg(e));
 		}
 	}
 
@@ -91,10 +84,14 @@ public abstract class AbstractReadOnlyService<T, H extends HttpHeader, RS extend
 		return "https://" + serverService.address() + ":" + serverService.getPort() + "/" + plural();
 	}
 
+	private String errorMsg(HttpStatusCodeException e) {
+		String msg = e.getResponseBodyAsString();
+		return substringBetween(msg, "message\":\"", "\",\"path");
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<T> getList(String endpoint) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException {
+	public List<T> getList(String endpoint) throws Exception {
 		return (List<T>) responseEntity(endpoint, plural()).getBody();
 	}
 

@@ -16,15 +16,18 @@ import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.ComboBox;
 
-@Component
 @Scope("prototype")
+@Component("appCombo")
 @SuppressWarnings("restriction")
-public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
+public class AppCombo<T> //
+		extends ComboBox<T> //
+		implements ErrorHandling, InputControl<T> {
 
 	private boolean singleItemIsNotAutoSelected;
 
@@ -46,7 +49,7 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 	}
 
 	public BooleanBinding are(List<T> items) {
-		BooleanBinding b = Bindings.not(new SimpleBooleanProperty(true));
+		BooleanBinding b = Bindings.not(new SimpleBooleanProperty(false));
 		if (items == null || items.isEmpty())
 			return b;
 		b = is(items.get(0));
@@ -72,11 +75,13 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 		setValue(null);
 	}
 
-	public void disableIf(BooleanBinding b) {
-		disableProperty().bind(b);
+	public void disable() {
+		disableProperty().unbind();
+		disableProperty().set(true);
 	}
 
-	public void disableIf(ReadOnlyBooleanProperty b) {
+	public void disableIf(ObservableBooleanValue b) {
+		disableProperty().unbind();
 		disableProperty().bind(b);
 	}
 
@@ -84,15 +89,30 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 		getItems().clear();
 	}
 
+	public void enable() {
+		disableProperty().unbind();
+		disableProperty().set(false);
+	}
+
+	@Override
+	public void handleError() {
+		clear();
+		requestFocus();
+	}
+
 	public boolean hasItems() {
 		return getItems() != null && getItems().size() > 1;
+	}
+
+	public boolean hasSelectedItem() {
+		return isEmpty().not().get();
 	}
 
 	public BooleanBinding is(T item) {
 		return getSelectionModel().selectedItemProperty().isEqualTo(item);
 	}
 
-	public ObservableBooleanValue isDisabledNow() {
+	public ObservableBooleanValue isCurrentlyDisabled() {
 		return disabledProperty();
 	}
 
@@ -117,6 +137,7 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 	}
 
 	public AppCombo<T> items(List<T> items) {
+		clear();
 		setItems(items == null ? emptyObservableList() : observableArrayList(items));
 		selectSingleItemIfAutoSelectedAndDisableFocusTranversing();
 		return this;
@@ -149,6 +170,10 @@ public class AppCombo<T> extends ComboBox<T> implements InputControl<T> {
 	public AppCombo<T> noAutoSelectSingleItem() {
 		singleItemIsNotAutoSelected = true;
 		return this;
+	}
+
+	public void onAction(EventHandler<ActionEvent> e) {
+		setOnAction(e);
 	}
 
 	public AppCombo<T> readOnlyOfWidth(int width) {

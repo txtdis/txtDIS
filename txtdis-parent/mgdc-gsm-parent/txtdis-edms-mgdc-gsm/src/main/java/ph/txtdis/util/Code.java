@@ -1,8 +1,5 @@
 package ph.txtdis.util;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -57,6 +54,10 @@ public class Code {
 
 	public static final String COD = "COD";
 
+	public static final String CASH_ONLY = "1";
+
+	public static final String CASH_AND_CREDIT = "0";
+
 	public static final String CLOSED = "Closed";
 
 	public static final String TRUE = "True";
@@ -97,8 +98,6 @@ public class Code {
 
 	public static final String VODKA = "VODKA";
 
-	public static final String DEALER = "DEALER";
-
 	public static final String RETAIL = "RETAIL";
 
 	public static final String PDC = "PDC";
@@ -127,7 +126,9 @@ public class Code {
 
 	public static final String REWARD = "Reward";
 
-	public static final byte YES = 1;
+	public static final Byte YES = 1;
+
+	public static final Byte NO = 0;
 
 	public static final short VALID = 2;
 
@@ -141,17 +142,9 @@ public class Code {
 
 	public static final String PULL_OUT = "Pull Out";
 
-	public static String getPaymentModeCode(LocalDate due, LocalDate date) {
-		return due.isEqual(date) ? Code.CASH : Code.CREDIT;
-	}
+	public static final byte STILL_ACTIVE = -1;
 
-	public static String getPaymentTermCode(LocalDate dueDate, LocalDate orderDate) {
-
-		Long l = orderDate.until(dueDate, ChronoUnit.DAYS);
-		if (l == 0)
-			return COD;
-		return StringUtils.leftPad(l.toString(), 2, "0") + " DAYS";
-	}
+	public static final byte DEACTIVATED = 0;
 
 	public static String increment(String code) {
 		String[] codes = StringUtils.split(code, "-");
@@ -174,8 +167,12 @@ public class Code {
 		return index == 0 ? "" : codes[0] + "-";
 	}
 
-	public static String addZeroes(String l) {
-		return StringUtils.leftPad(l, 8, "0");
+	public static String addZeroes(String no) {
+		return addZeroes(8, no);
+	}
+
+	public static String addZeroes(int count, String no) {
+		return StringUtils.leftPad(no, count, "0");
 	}
 
 	public static String getUomCode(UnitMeasured u) {

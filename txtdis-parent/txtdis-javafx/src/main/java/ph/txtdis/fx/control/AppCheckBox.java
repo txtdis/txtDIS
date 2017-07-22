@@ -10,12 +10,16 @@ import com.sun.javafx.scene.control.behavior.ButtonBehavior;
 import com.sun.javafx.scene.control.skin.CheckBoxSkin;
 
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.CheckBox;
 
 @Scope("prototype")
 @Component("appCheckBox")
 @SuppressWarnings("restriction")
-public class AppCheckBox extends CheckBox implements InputControl<Boolean> {
+public class AppCheckBox //
+		extends CheckBox //
+		implements InputControl<Boolean> {
 
 	public AppCheckBox() {
 		traverseOnPressedEnterKey();
@@ -37,6 +41,16 @@ public class AppCheckBox extends CheckBox implements InputControl<Boolean> {
 
 	public AppCheckBox label(String n) {
 		setText(n);
+		return this;
+	}
+
+	public void onAction(EventHandler<ActionEvent> e) {
+		setOnAction(e);
+	}
+
+	public AppCheckBox readOnly() {
+		disableProperty().unbind();
+		disableProperty().set(true);
 		return this;
 	}
 

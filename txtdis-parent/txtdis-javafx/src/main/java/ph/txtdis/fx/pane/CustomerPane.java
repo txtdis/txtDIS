@@ -8,9 +8,13 @@ import javafx.scene.Node;
 
 public interface CustomerPane {
 
+	void clear();
+
 	void disableNameFieldIf(ObservableBooleanValue b);
 
 	BooleanBinding hasIncompleteData();
+
+	List<Node> mainVerticalPaneNodes();
 
 	void refresh();
 
@@ -18,11 +22,11 @@ public interface CustomerPane {
 
 	void select();
 
-	BooleanBinding showsPartnerAsACustomer();
-
-	List<Node> mainVerticalPaneNodes();
-
 	void setBindings();
 
+	void setFocus();
+
 	void setListeners();
+
+	BooleanBinding showsPartnerAsACustomer();
 }

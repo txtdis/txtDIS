@@ -1,16 +1,18 @@
 package ph.txtdis.service;
 
 import ph.txtdis.domain.EdmsInvoice;
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.PickList;
+import ph.txtdis.domain.EdmsTruck;
+import ph.txtdis.dto.Keyed;
+import ph.txtdis.dto.Truck;
 
-public interface EdmsTruckService extends TruckService {
+public interface EdmsTruckService //
+		extends SavedNameListService<Truck> {
 
-	String getCode(Billable i);
+	EdmsTruck findEntityByPlateNo(String plate);
 
-	String getCode(PickList p);
+	String getCode(Keyed<Long> r);
 
-	String getPlateNo(Billable i);
+	String getDescription();
 
 	Long getId(EdmsInvoice i);
 }

@@ -31,13 +31,13 @@ public class OpenByDateDialog extends AbstractInputDialog {
 	}
 
 	@Override
-	public void setFocus() {
+	public void goToDefaultFocus() {
 		datePicker.requestFocus();
 	}
 
 	private LocalDatePicker datePicker() {
 		datePicker.setValue(null);
-		datePicker.setOnAction(e -> onPick());
+		datePicker.onAction(e -> onPick());
 		return datePicker;
 	}
 
@@ -60,9 +60,14 @@ public class OpenByDateDialog extends AbstractInputDialog {
 	}
 
 	@Override
-	protected void setOnFiredCloseButton() {
+	protected void nullData() {
+		super.nullData();
 		date = null;
+	}
+
+	@Override
+	public void refresh() {
+		super.refresh();
 		datePicker.setValue(date);
-		super.setOnFiredCloseButton();
 	}
 }

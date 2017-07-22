@@ -5,7 +5,8 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
-public class Inventory implements Keyed<Long> {
+public class Inventory //
+		implements Keyed<Long> {
 
 	private Long id;
 

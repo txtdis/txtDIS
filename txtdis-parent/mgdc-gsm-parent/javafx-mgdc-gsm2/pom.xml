@@ -5,16 +5,18 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>mgdc-gsm-parent</artifactId>
-		<version>0.9.5.1</version>
+		<version>1.0.1.5</version>
 	</parent>
 
 	<artifactId>javafx-mgdc-gsm2</artifactId>
-	<name>txtDIS GSM2 ${server.site}Client</name>
+	<name>txtDIS GSM2 Client</name>
 
 	<properties>
+		<default.server>local.network</default.server>
 		<header.type>gui</header.type>
 		<host.type>${project.artifactId}</host.type>
 		<icon.name>txtdis-gsm2</icon.name>
+		<key.store>mgdc-gsm</key.store>
 		<start-class>ph.txtdis.App</start-class>
 	</properties>
 
@@ -25,24 +27,8 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	
+
 	<profiles>
-		<profile>
-			<id>offsite</id>
-			<properties>
-				<default.server>this.pc</default.server>
-				<key.store>pc</key.store>
-				<server.site>OffSite</server.site>
-			</properties>
-		</profile>
-		<profile>
-			<id>onsite</id>
-			<properties>
-				<default.server>local.network</default.server>
-				<key.store>mgdc-gsm</key.store>
-				<server.site></server.site>
-			</properties>
-		</profile>
 		<profile>
 			<id>mgdc-gsm</id>
 			<build>

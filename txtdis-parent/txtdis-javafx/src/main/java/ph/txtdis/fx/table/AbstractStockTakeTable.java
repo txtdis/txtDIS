@@ -1,17 +1,21 @@
 package ph.txtdis.fx.table;
 
+import static java.util.Arrays.asList;
 import static ph.txtdis.type.Type.ENUM;
 import static ph.txtdis.type.Type.ID;
 import static ph.txtdis.type.Type.TEXT;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.StockTakeDetail;
 import ph.txtdis.fx.dialog.StockTakeDialog;
 import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;
 
-public abstract class AbstractStockTakeTable extends AbstractTableView<StockTakeDetail> {
+public abstract class AbstractStockTakeTable extends AbstractTable<StockTakeDetail> {
 
 	@Autowired
 	private AppendContextMenu<StockTakeDetail> append;
@@ -35,9 +39,8 @@ public abstract class AbstractStockTakeTable extends AbstractTableView<StockTake
 	private StockTakeDialog dialog;
 
 	@Override
-	@SuppressWarnings("unchecked")
-	protected void addColumns() {
-		getColumns().setAll(//
+	protected List<TableColumn<StockTakeDetail, ?>> addColumns() {
+		return asList( //
 				id.ofType(ID).build("ID No.", "id"), //
 				name.ofType(TEXT).width(180).build("Name", "name"), //
 				uom.ofType(ENUM).build("UOM", "uom"), //

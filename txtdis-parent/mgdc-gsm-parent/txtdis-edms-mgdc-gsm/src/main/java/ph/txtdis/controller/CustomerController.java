@@ -9,12 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ph.txtdis.dto.Customer;
-import ph.txtdis.service.CustomerService;
+import ph.txtdis.mgdc.gsm.dto.Customer;
+import ph.txtdis.service.EdmsCustomerService;
 
 @RequestMapping("/customers")
 @RestController("customerController")
-public class CustomerController extends AbstractIdController<CustomerService, Customer, Long> {
+public class CustomerController //
+		extends AbstractSavedController<EdmsCustomerService, Customer, Long> {
 
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> list() {
@@ -22,9 +23,9 @@ public class CustomerController extends AbstractIdController<CustomerService, Cu
 		return new ResponseEntity<>(l, OK);
 	}
 
-	@RequestMapping(path = "/exTrucks")
-	public ResponseEntity<?> listExTrucks() {
-		List<Customer> l = service.listExTrucks();
+	@RequestMapping(path = "/onAction")
+	public ResponseEntity<?> listonAction() {
+		List<Customer> l = service.listonAction();
 		return new ResponseEntity<>(l, OK);
 	}
 }

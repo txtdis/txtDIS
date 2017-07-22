@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class StockTakeReconciliation extends AbstractId<LocalDate> {
+public class StockTakeReconciliation extends AbstractKeyed<LocalDate> {
 
 	private User cutoffBy;
 

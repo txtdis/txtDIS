@@ -2,9 +2,10 @@ package ph.txtdis.fx.validator;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppFieldImpl;
 
-public class AlphabetOnlyValidator implements ChangeListener<String> {
+public class AlphabetOnlyValidator //
+		implements ChangeListener<String> {
 
 	private boolean ignore;
 
@@ -12,11 +13,11 @@ public class AlphabetOnlyValidator implements ChangeListener<String> {
 
 	private String restrict;
 
-	private AppField<?> input;
+	private AppFieldImpl<?> input;
 
-	public AlphabetOnlyValidator(AppField<?> input) {
+	public AlphabetOnlyValidator(AppFieldImpl<?> input) {
 		this.input = input;
-		this.restrict = "[a-zA-Z]";
+		this.restrict = "[a-zA-ZX]";
 		maxLength = (int) input.getMinWidth() / 30;
 	}
 

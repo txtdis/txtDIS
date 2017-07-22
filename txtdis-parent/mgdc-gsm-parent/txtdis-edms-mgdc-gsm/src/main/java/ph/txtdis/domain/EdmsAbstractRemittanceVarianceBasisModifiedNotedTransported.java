@@ -12,10 +12,10 @@ import lombok.EqualsAndHashCode;
 public abstract class EdmsAbstractRemittanceVarianceBasisModifiedNotedTransported extends EdmsAbstractTransported {
 
 	@Column(name = "modiBy")
-	private String modifiedBy;
+	private String modifiedBy = "";
 
 	@Column(name = "dateModi")
-	private String modifiedOn;
+	private String modifiedOn = "";
 
 	@Column(name = "rsrPosted")
 	private String postedRemittanceVariance;

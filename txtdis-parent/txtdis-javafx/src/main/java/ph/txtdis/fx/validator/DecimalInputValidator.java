@@ -2,17 +2,18 @@ package ph.txtdis.fx.validator;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppFieldImpl;
 
-public class DecimalInputValidator implements ChangeListener<String> {
+public class DecimalInputValidator //
+		implements ChangeListener<String> {
 
 	private boolean ignore;
-	private AppField<?> input;
+	private AppFieldImpl<?> input;
 	private String restrict;
 
-	public DecimalInputValidator(AppField<?> input) {
+	public DecimalInputValidator(AppFieldImpl<?> input) {
 		this.input = input;
-		this.restrict = "[0-9-.,()₱]";
+		this.restrict = "[0-9-.,()₱%]";
 	}
 
 	@Override

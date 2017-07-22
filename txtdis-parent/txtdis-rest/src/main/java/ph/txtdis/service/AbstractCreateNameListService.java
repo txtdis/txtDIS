@@ -11,21 +11,25 @@ public abstract class AbstractCreateNameListService<//
 		R extends NameListRepository<E>, //
 		E extends Keyed<Long>, //
 		T extends Keyed<Long>> //
-		extends AbstractCreateService<R, E, T, Long> //
-		implements NameListCreateService<T> {
+		extends AbstractSavedKeyedService<R, E, T, Long> //
+		implements SavedNameListService<T> {
 
 	@Autowired
 	protected R repository;
 
 	@Override
 	public T findByName(String name) {
-		E e = repository.findByNameIgnoreCase(name);
-		return toDTO(e);
+		E e = findEntityByName(name);
+		return toModel(e);
+	}
+
+	protected E findEntityByName(String name) {
+		return repository.findByNameIgnoreCase(name);
 	}
 
 	@Override
 	public List<T> findByOrderByNameAsc() {
 		List<E> e = repository.findByOrderByNameAsc();
-		return toList(e);
+		return toModels(e);
 	}
 }

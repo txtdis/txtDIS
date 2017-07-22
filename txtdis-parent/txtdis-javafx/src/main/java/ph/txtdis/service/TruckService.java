@@ -4,9 +4,7 @@ import java.util.List;
 
 import ph.txtdis.dto.Truck;
 
-public interface TruckService extends Listed<Truck>, SavedByName<Truck>, Titled, UniquelyNamed<Truck> {
-
-	boolean isOffSite();
+public interface TruckService extends ListedAndResetableService<Truck>, SavedByName<Truck>, TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService, UniqueNamedService<Truck> {
 
 	List<String> listNames();
 }

@@ -36,5 +36,4 @@ public interface CredentialService {
 	User user();
 
 	String username();
-
 }

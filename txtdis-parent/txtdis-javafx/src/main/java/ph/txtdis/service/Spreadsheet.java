@@ -1,4 +1,5 @@
 package ph.txtdis.service;
 
-public interface Spreadsheet<T> extends TotaledTableService<T>, Excel<T>, Titled {
+public interface Spreadsheet<T> //
+		extends SubheadedTotaledService<T>, SavableAsExcelService<T>, TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService {
 }

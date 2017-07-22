@@ -8,9 +8,12 @@ import org.springframework.stereotype.Repository;
 import ph.txtdis.domain.EdmsCustomer;
 
 @Repository("edmsCustomerRepository")
-public interface EdmsCustomerRepository extends CodeNameRepository<EdmsCustomer> {
+public interface EdmsCustomerRepository //
+		extends CodeNameRepository<EdmsCustomer> {
 
-	List<EdmsCustomer> findByProvinceContainingIgnoreCase(@Param("province") String p);
+	List<EdmsCustomer> findByProvinceContainingIgnoreCase( //
+			@Param("province") String p);
 
-	List<EdmsCustomer> findByCityContainingIgnoreCase(@Param("city") String c);
+	List<EdmsCustomer> findByCityContainingIgnoreCase( //
+			@Param("city") String c);
 }

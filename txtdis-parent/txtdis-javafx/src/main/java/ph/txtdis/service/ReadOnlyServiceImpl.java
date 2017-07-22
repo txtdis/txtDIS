@@ -7,5 +7,6 @@ import ph.txtdis.util.HttpHeader;
 
 @Scope("prototype")
 @Service("readOnlyService")
-public class ReadOnlyServiceImpl<T> extends AbstractReadOnlyService<T, HttpHeader, RestService, RestServerService> {
+public class ReadOnlyServiceImpl<T> //
+		extends AbstractReadOnlyService<T, HttpHeader, RestService, RestServerService> {
 }

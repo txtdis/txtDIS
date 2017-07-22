@@ -2,15 +2,16 @@ package ph.txtdis.fx.validator;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppFieldImpl;
 
-public class PhoneInputValidator implements ChangeListener<String> {
+public class PhoneInputValidator //
+		implements ChangeListener<String> {
 
 	private boolean ignore;
-	private AppField<?> input;
+	private AppFieldImpl<?> input;
 	private String restrict;
 
-	public PhoneInputValidator(AppField<?> input) {
+	public PhoneInputValidator(AppFieldImpl<?> input) {
 		this.input = input;
 		this.restrict = "[0-9 ]";
 	}

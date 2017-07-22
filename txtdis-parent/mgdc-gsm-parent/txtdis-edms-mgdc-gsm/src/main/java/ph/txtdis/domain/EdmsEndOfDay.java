@@ -10,11 +10,13 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.Data;
+import ph.txtdis.dto.Keyed;
 
 @Data
 @Entity
 @Table(name = "sys_eod")
-public class EdmsEndOfDay {
+public class EdmsEndOfDay //
+		implements Keyed<Integer> {
 
 	@Id
 	@Column(name = "id")

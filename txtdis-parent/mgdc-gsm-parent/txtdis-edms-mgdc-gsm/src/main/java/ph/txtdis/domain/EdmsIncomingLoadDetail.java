@@ -1,5 +1,7 @@
 package ph.txtdis.domain;
 
+import static java.math.BigDecimal.ZERO;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -23,48 +25,31 @@ public class EdmsIncomingLoadDetail extends EdmsAbstractReferencedItemCodeIdDeta
 	private String itemName;
 
 	@Column(name = "fullCase")
-	private BigDecimal fullCaseQty;
+	private BigDecimal fullCaseQty = ZERO;
 
 	@Column(name = "fullBottle")
-	private BigDecimal fullBottleQty;
+	private BigDecimal fullBottleQty = ZERO;
 
 	@Column(name = "returnCase")
-	private BigDecimal returnedCaseQty;
+	private BigDecimal returnedCaseQty = ZERO;
 
 	@Column(name = "returnBottle")
-	private BigDecimal returnedBottleQty;
+	private BigDecimal returnedBottleQty = ZERO;
 
 	@Column(name = "empCase")
-	private BigDecimal emptyCaseQty;
+	private BigDecimal emptyCaseQty = ZERO;
 
 	@Column(name = "empBottle")
-	private BigDecimal emptyBottleQty;
+	private BigDecimal emptyBottleQty = ZERO;
 
 	@Column(name = "psCase")
-	private BigDecimal promoCaseQty;
+	private BigDecimal promoCaseQty = ZERO;
 
 	@Column(name = "psBtottle")
-	private BigDecimal promoBottleQty;
-
-	public BigDecimal getFullCaseQty() {
-		return fullCaseQty == null ? BigDecimal.ZERO : fullCaseQty;
-	}
-
-	public BigDecimal getFullBottleQty() {
-		return fullBottleQty == null ? BigDecimal.ZERO : fullBottleQty;
-	}
-
-	public BigDecimal getReturnedCaseQty() {
-		return returnedCaseQty == null ? BigDecimal.ZERO : returnedCaseQty;
-	}
-
-	public BigDecimal getReturnedBottleQty() {
-		return returnedBottleQty == null ? BigDecimal.ZERO : returnedBottleQty;
-	}
+	private BigDecimal promoBottleQty = ZERO;
 
 	@Override
 	public String toString() {
-		return getReferenceNo() + ": " + itemName + " - " + NumberUtils.formatWhole(fullCaseQty) + "CS"
-				+ NumberUtils.formatWhole(fullBottleQty);
+		return getReferenceNo() + ": " + itemName + " - " + NumberUtils.toIdText(fullCaseQty) + "CS" + NumberUtils.toIdText(fullBottleQty);
 	}
 }

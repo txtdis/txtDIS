@@ -13,7 +13,8 @@ import ph.txtdis.type.UomType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class StockTakeDetail extends AbstractId<Long> implements Keyed<Long> {
+public class StockTakeDetail //
+		extends AbstractKeyed<Long> {
 
 	private String name;
 

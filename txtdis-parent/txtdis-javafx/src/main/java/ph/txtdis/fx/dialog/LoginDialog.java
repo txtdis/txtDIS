@@ -3,7 +3,7 @@ package ph.txtdis.fx.dialog;
 import static ph.txtdis.type.Type.TEXT;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javafx.application.Platform;
@@ -17,16 +17,18 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.control.PasswordInput;
+import ph.txtdis.fx.pane.AppBoxPaneFactory;
 import ph.txtdis.fx.pane.AppGridPane;
+import ph.txtdis.service.LoginService;
 import ph.txtdis.service.RestServerService;
 import ph.txtdis.service.SyncService;
 import ph.txtdis.util.FontIcon;
 
-@Lazy
+@Scope("prototype")
 @Component("loginDialog")
 public class LoginDialog extends Stage {
 
@@ -34,31 +36,22 @@ public class LoginDialog extends Stage {
 			+ " -fx-focus-color: white; -fx-faint-focus-color: #ffffff22; ";
 
 	@Autowired
-	private ph.txtdis.service.LoginService login;
+	private AppBoxPaneFactory box;
 
 	@Autowired
-	private RestServerService serverService;
+	private AppGridPane grid;
 
 	@Autowired
-	private SyncService syncService;
+	private AppButtonImpl loginButton, passwordButton, serverButton;
+
+	@Autowired
+	private AppFieldImpl<String> userField;
 
 	@Autowired
 	private LabelFactory label;
 
 	@Autowired
-	private AppField<String> userField;
-
-	@Autowired
 	private PasswordInput passwordField;
-
-	@Autowired
-	private AppButton serverButton;
-
-	@Autowired
-	private AppButton passwordButton;
-
-	@Autowired
-	private AppButton loginButton;
 
 	@Autowired
 	private ServerSelectionDialog serverDialog;
@@ -73,7 +66,13 @@ public class LoginDialog extends Stage {
 	private MessageDialog dialog;
 
 	@Autowired
-	private AppGridPane grid;
+	private LoginService login;
+
+	@Autowired
+	private RestServerService serverService;
+
+	@Autowired
+	private SyncService syncService;
 
 	private BooleanProperty ready = new SimpleBooleanProperty(false);
 
@@ -87,7 +86,7 @@ public class LoginDialog extends Stage {
 	}
 
 	private Node buttons() {
-		HBox hb = new HBox(loginButton(), passwordButton(), serverButton());
+		HBox hb = box.forHorizontals(loginButton(), passwordButton(), serverButton());
 		hb.setAlignment(Pos.CENTER);
 		return hb;
 	}
@@ -115,7 +114,6 @@ public class LoginDialog extends Stage {
 	}
 
 	private void closeOnError(Exception e) {
-		e.printStackTrace();
 		dialog.show(e).updateStyle(STYLE).addParent(this).start();
 		Platform.exit();
 	}
@@ -132,7 +130,7 @@ public class LoginDialog extends Stage {
 	private Node loginButton() {
 		loginButton.text("Log-in").build();
 		loginButton.disableIf(passwordField.isEmpty());
-		loginButton.setOnAction(event -> tryLoggingInUponVerification());
+		loginButton.onAction(event -> tryLoggingInUponVerification());
 		return loginButton;
 	}
 
@@ -144,7 +142,7 @@ public class LoginDialog extends Stage {
 	private Node passwordButton() {
 		passwordButton.text("Alter Password").build();
 		passwordButton.disableIf(passwordField.isEmpty());
-		passwordButton.setOnAction(event -> tryChangingPasswordUponVerification());
+		passwordButton.onAction(event -> tryChangingPasswordUponVerification());
 		return passwordButton;
 	}
 
@@ -154,7 +152,7 @@ public class LoginDialog extends Stage {
 	}
 
 	private Scene scene() {
-		VBox vb = new VBox(gridPane(), buttons());
+		VBox vb = box.forVerticals(gridPane(), buttons());
 		vb.setAlignment(Pos.CENTER);
 		vb.setPadding(new Insets(20));
 		vb.setStyle(STYLE);
@@ -163,7 +161,7 @@ public class LoginDialog extends Stage {
 
 	private Node serverButton() {
 		serverButton.text("Change Server").build();
-		serverButton.setOnAction(event -> changeServer());
+		serverButton.onAction(event -> changeServer());
 		return serverButton;
 	}
 

@@ -9,11 +9,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class EdmsAbstractCreatedId extends EdmsAbstractId {
+public abstract class EdmsAbstractCreatedId //
+		extends EdmsAbstractId {
 
 	@Column(name = "createBy")
-	private String createdBy;
+	private String createdBy = "";
 
 	@Column(name = "dateCreate")
-	private String createdOn;
+	private String createdOn = "";
 }

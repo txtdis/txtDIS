@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import ph.txtdis.dto.Bom;
 import ph.txtdis.dto.StockTakeVariance;
+import ph.txtdis.mgdc.gsm.service.server.AbstractStockTakeVarianceService;
+import ph.txtdis.mgdc.gsm.service.server.InventoryReadOnlyService;
 
 @Service("stockTakeVarianceService")
 public class StockTakeVarianceServiceImpl extends AbstractStockTakeVarianceService {

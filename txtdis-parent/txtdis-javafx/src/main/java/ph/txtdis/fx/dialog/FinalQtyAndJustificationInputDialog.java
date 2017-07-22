@@ -14,15 +14,16 @@ import org.springframework.stereotype.Component;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import ph.txtdis.dto.StockTakeVariance;
-import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.TextAreaDisplay;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.type.Type;
 
 @Scope("prototype")
 @Component("finalQtyAndJustificationInputDialog")
-public class FinalQtyAndJustificationInputDialog extends AbstractInputDialog {
+public class FinalQtyAndJustificationInputDialog //
+		extends AbstractInputDialog {
 
 	private static Logger logger = getLogger(FinalQtyAndJustificationInputDialog.class);
 
@@ -30,10 +31,10 @@ public class FinalQtyAndJustificationInputDialog extends AbstractInputDialog {
 	private AppGridPane grid;
 
 	@Autowired
-	private AppButton actionButton;
+	private AppButtonImpl actionButton;
 
 	@Autowired
-	private AppField<Integer> caseField, pieceField;
+	private AppFieldImpl<Integer> caseField, pieceField;
 
 	@Autowired
 	private TextAreaDisplay justificationArea;
@@ -55,7 +56,7 @@ public class FinalQtyAndJustificationInputDialog extends AbstractInputDialog {
 	}
 
 	@Override
-	public void setFocus() {
+	public void goToDefaultFocus() {
 		caseField.requestFocus();
 	}
 
@@ -95,7 +96,7 @@ public class FinalQtyAndJustificationInputDialog extends AbstractInputDialog {
 
 	private Button actionButton() {
 		actionButton.large("Input").build();
-		actionButton.setOnAction(event -> setFinalQtyAndJustification());
+		actionButton.onAction(event -> setFinalQtyAndJustification());
 		actionButton.disableIf(caseField.isEmpty() //
 				.or(pieceField.isEmpty()) //
 				.or(justificationArea.isEmpty()));
@@ -116,13 +117,12 @@ public class FinalQtyAndJustificationInputDialog extends AbstractInputDialog {
 		grid.add(pieceField.build(Type.INTEGER), 3, 0);
 		grid.add(label.field("Justification"), 0, 1);
 		grid.add(justificationArea.width(360).build(), 0, 2, 4, 1);
-		justificationArea.editable();
+		justificationArea.makeEditable();
 		return asList(header(), grid, buttonBox());
 	}
 
 	@Override
-	protected void setOnFiredCloseButton() {
-		refresh();
-		super.setOnFiredCloseButton();
+	protected void nullData() {
+		super.nullData();
 	}
 }

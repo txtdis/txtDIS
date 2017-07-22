@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ph.txtdis.dto.Remittance;
-import ph.txtdis.service.RemittanceService;
+import ph.txtdis.service.EdmsRemittanceService;
 
 @RequestMapping("/remittances")
 @RestController("remittanceController")
 public class RemittanceController {
 
 	@Autowired
-	private RemittanceService service;
+	private EdmsRemittanceService service;
 
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> list() {

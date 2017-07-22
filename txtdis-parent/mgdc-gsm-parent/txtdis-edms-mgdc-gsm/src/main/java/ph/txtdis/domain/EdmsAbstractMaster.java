@@ -5,11 +5,14 @@ import javax.persistence.MappedSuperclass;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import ph.txtdis.dto.Named;
 
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class EdmsAbstractMaster extends EdmsAbstractModifiedCreatedId {
+public abstract class EdmsAbstractMaster //
+		extends EdmsAbstractModifiedCreatedId //
+		implements Named {
 
 	@Column(name = "xCode")
 	private String code;

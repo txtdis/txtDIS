@@ -16,8 +16,8 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 
+@Scope("prototype")
 @Component
-@Scope(value = "prototype")
 public class LabeledCombo<T> implements InputNode<T> {
 
 	@Autowired
@@ -87,7 +87,7 @@ public class LabeledCombo<T> implements InputNode<T> {
 		comboBox.select(item);
 	}
 
-	public void setOnAction(EventHandler<ActionEvent> event) {
-		comboBox.setOnAction(event);
+	public void onAction(EventHandler<ActionEvent> e) {
+		comboBox.onAction(e);
 	}
 }

@@ -3,7 +3,7 @@ package ph.txtdis.app;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.TotaledTableService;
+import ph.txtdis.service.TotaledService;
 
 public interface TotaledTableApp<T> {
 
@@ -13,5 +13,5 @@ public interface TotaledTableApp<T> {
 
 	HBox addTotalDisplays(int count);
 
-	void refresh(TotaledTableService<T> s);
+	void refresh(TotaledService<T> s);
 }

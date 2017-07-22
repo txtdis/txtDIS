@@ -1,9 +1,9 @@
 package ph.txtdis.app;
 
 import ph.txtdis.dto.Typed;
-import ph.txtdis.type.BillableType;
+import ph.txtdis.type.ModuleType;
 
 public interface MultiTyped extends Typed {
 
-	Startable type(BillableType type);
+	StartableApp type(ModuleType type);
 }

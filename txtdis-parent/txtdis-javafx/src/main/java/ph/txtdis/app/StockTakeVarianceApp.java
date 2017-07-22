@@ -1,4 +1,4 @@
 package ph.txtdis.app;
 
-public interface StockTakeVarianceApp extends Startable {
+public interface StockTakeVarianceApp extends StartableApp {
 }

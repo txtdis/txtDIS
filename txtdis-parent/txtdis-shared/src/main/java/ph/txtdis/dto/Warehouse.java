@@ -5,14 +5,14 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Warehouse extends AbstractCreationTracked<Long> implements Named {
-
-	private ItemFamily family;
+public class Warehouse //
+		extends AbstractCreationTracked<Long> //
+		implements Named {
 
 	private String name;
 
 	@Override
 	public String toString() {
-		return name;
+		return getName();
 	}
 }

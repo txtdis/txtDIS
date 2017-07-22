@@ -6,8 +6,10 @@ import org.springframework.stereotype.Repository;
 import ph.txtdis.domain.EdmsItem;
 
 @Repository("edmsItemRepository")
-public interface EdmsItemRepository extends CodeNameRepository<EdmsItem> {
+public interface EdmsItemRepository //
+		extends CodeNameRepository<EdmsItem> {
 
 	@Override
-	EdmsItem findByCode(@Param("code") String c);
+	EdmsItem findByCodeIgnoreCase( //
+			@Param("code") String c);
 }

@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import ph.txtdis.util.DateTimeUtils;
 
 @Service("edmsService")
-public class EdmsServiceImpl implements EdmsService {
+public class EdmsServiceImpl //
+		implements EdmsService {
 
 	@Value("${go.live}")
 	private String goLive;

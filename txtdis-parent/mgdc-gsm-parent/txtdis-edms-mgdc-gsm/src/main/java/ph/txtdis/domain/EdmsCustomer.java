@@ -13,7 +13,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "master_customerlist")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsCustomer extends EdmsAbstractMaster implements Serializable {
+public class EdmsCustomer //
+		extends EdmsAbstractMaster //
+		implements Serializable {
 
 	private static final long serialVersionUID = -6671533661614579186L;
 
@@ -24,10 +26,10 @@ public class EdmsCustomer extends EdmsAbstractMaster implements Serializable {
 	private String businessName;
 
 	@Column(name = "ci_tin")
-	private String tin;
+	private String tin = "";
 
 	@Column(name = "ci_yrOwned")
-	private String yearsOwned;
+	private String yearsOwned = "0";
 
 	@Column(name = "ci_outletType")
 	private String channel;
@@ -36,13 +38,13 @@ public class EdmsCustomer extends EdmsAbstractMaster implements Serializable {
 	private String status;
 
 	@Column(name = "oi_homeAddress")
-	private String homeAddress;
+	private String homeAddress = "";
 
 	@Column(name = "oi_contactNo")
 	private String phoneNo;
 
 	@Column(name = "oi_bDate")
-	private String birthDate;
+	private String birthDate = "";
 
 	@Column(name = "oi_status")
 	private String exclusivity;
@@ -69,16 +71,16 @@ public class EdmsCustomer extends EdmsAbstractMaster implements Serializable {
 	private String barangay;
 
 	@Column(name = "ba_no")
-	private String streetNo;
+	private String streetNo = "";
 
 	@Column(name = "ba_street")
-	private String street;
+	private String street = "";
 
 	@Column(name = "ba_bldg")
-	private String bldg;
+	private String bldg = "";
 
 	@Column(name = "ri_salesman")
-	private String seller;
+	private String seller = "";
 
 	@Column(name = "ri_foc")
 	private String visitFrequency;

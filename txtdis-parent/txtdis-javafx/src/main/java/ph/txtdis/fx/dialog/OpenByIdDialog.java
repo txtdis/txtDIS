@@ -12,60 +12,61 @@ import org.springframework.stereotype.Component;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.type.Type;
 
 @Scope("prototype")
 @Component("openByIdDialog")
-public class OpenByIdDialog<PK> extends AbstractInputDialog {
+public class OpenByIdDialog<PK> //
+		extends AbstractInputDialog {
 
 	@Autowired
 	private AppGridPane grid;
 
 	@Autowired
-	private AppButton openButton;
+	private AppButtonImpl openButton;
 
 	@Autowired
 	private LabelFactory label;
 
 	@Autowired
-	private AppField<PK> idField;
+	private AppFieldImpl<PK> keyField;
 
 	private String labelName = "ID No";
 
-	private PK id;
+	private PK key;
 
 	public OpenByIdDialog<PK> idPrompt(String labelName) {
 		this.labelName = labelName;
 		return this;
 	}
 
-	public String getId() {
-		return id == null ? null : id.toString();
+	public String getKey() {
+		return key == null ? null : key.toString();
 	}
 
 	@Override
-	public void setFocus() {
-		idField.requestFocus();
+	public void goToDefaultFocus() {
+		keyField.requestFocus();
 	}
 
 	private Type getType() {
-		return id instanceof Long ? ID : TEXT;
+		return key instanceof Long ? ID : TEXT;
 	}
 
 	private Button openButton() {
 		openButton.large("Open").build();
-		openButton.setOnAction(event -> setEnteredId());
-		openButton.disableIf(idField.isEmpty());
+		openButton.onAction(event -> setEnteredId());
+		openButton.disableIf(keyField.isEmpty());
 		return openButton;
 	}
 
 	private void setEnteredId() {
-		id = idField.getValue();
-		idField.setValue(null);
+		key = keyField.getValue();
+		keyField.setValue(null);
 		close();
 	}
 
@@ -79,13 +80,13 @@ public class OpenByIdDialog<PK> extends AbstractInputDialog {
 		grid.getChildren().clear();
 		grid.add(label.help(prompt), 0, 0, 2, 1);
 		grid.add(label.field(labelName), 0, 1);
-		grid.add(idField.build(getType()), 1, 1);
+		grid.add(keyField.build(getType()), 1, 1);
 		return Arrays.asList(header(), grid, buttonBox());
 	}
 
 	@Override
-	protected void setOnFiredCloseButton() {
-		id = null;
-		super.setOnFiredCloseButton();
+	protected void nullData() {
+		super.nullData();
+		key = null;
 	}
 }

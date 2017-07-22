@@ -3,14 +3,15 @@ package ph.txtdis.util;
 import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
 import static ph.txtdis.util.DateTimeUtils.toTimeDisplay;
 import static ph.txtdis.util.DateTimeUtils.toTimestampText;
-import static ph.txtdis.util.NumberUtils.format2Place;
-import static ph.txtdis.util.NumberUtils.format4Place;
-import static ph.txtdis.util.NumberUtils.formatDecimal;
-import static ph.txtdis.util.NumberUtils.formatId;
-import static ph.txtdis.util.NumberUtils.formatInt;
-import static ph.txtdis.util.NumberUtils.formatPercent;
 import static ph.txtdis.util.NumberUtils.isNegative;
+import static ph.txtdis.util.NumberUtils.to2PlaceDecimalText;
+import static ph.txtdis.util.NumberUtils.to4PlaceDecimalText;
+import static ph.txtdis.util.NumberUtils.to4PlacePercentText;
+import static ph.txtdis.util.NumberUtils.toAsNeededNoOfPlaceDecimalText;
 import static ph.txtdis.util.NumberUtils.toCurrencyText;
+import static ph.txtdis.util.NumberUtils.toIdText;
+import static ph.txtdis.util.NumberUtils.toIntegerWithComma;
+import static ph.txtdis.util.NumberUtils.toPercentText;
 import static ph.txtdis.util.TextUtils.toBoolSign;
 import static ph.txtdis.util.TextUtils.toIdDisplay;
 
@@ -40,12 +41,17 @@ public class Styled {
 	private static final String RED = COLOR + " red; ";
 
 	public static void for2Place(StylableTextField f, BigDecimal d) {
-		f.setText(format2Place(d));
+		f.setText(to2PlaceDecimalText(d));
 		setNumberStyle(f, d);
 	}
 
 	public static void for4Place(StylableTextField f, BigDecimal d) {
-		f.setText(format4Place(d));
+		f.setText(to4PlaceDecimalText(d));
+		setNumberStyle(f, d);
+	}
+
+	public static void for4PlacePercent(StylableTextField f, BigDecimal d) {
+		f.setText(to4PlacePercentText(d));
 		setNumberStyle(f, d);
 	}
 
@@ -84,17 +90,17 @@ public class Styled {
 	}
 
 	public static void forIdNo(StylableTextField f, Long l) {
-		f.setText(formatId(l));
+		f.setText(toIdText(l));
 		setNumberStyle(f, l);
 	}
 
 	public static void forInteger(StylableTextField f, Integer i) {
-		f.setText(formatInt(i));
+		f.setText(toIntegerWithComma(i));
 		setNumberStyle(f, i);
 	}
 
 	public static void forPercent(StylableTextField f, BigDecimal d) {
-		f.setText(formatPercent(d));
+		f.setText(toPercentText(d));
 		setNumberStyle(f, d);
 	}
 
@@ -104,7 +110,7 @@ public class Styled {
 	}
 
 	public static void forQuantity(StylableTextField f, BigDecimal d) {
-		f.setText(formatDecimal(d));
+		f.setText(toAsNeededNoOfPlaceDecimalText(d));
 		setNumberStyle(f, d);
 	}
 

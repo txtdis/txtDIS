@@ -9,7 +9,8 @@ import javafx.scene.layout.GridPane;
 
 @Scope("prototype")
 @Component("appGridPane")
-public class AppGridPane extends GridPane {
+public class AppGridPane //
+		extends GridPane {
 
 	public AppGridPane() {
 		setPadding(new Insets(10));

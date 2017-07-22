@@ -2,35 +2,42 @@ package ph.txtdis.service;
 
 import java.util.List;
 
+import ph.txtdis.dto.Role;
 import ph.txtdis.dto.User;
-import ph.txtdis.exception.FailedAuthenticationException;
-import ph.txtdis.exception.InvalidException;
-import ph.txtdis.exception.NoServerConnectionException;
-import ph.txtdis.exception.NotAllowedOffSiteTransactionException;
-import ph.txtdis.exception.RestException;
-import ph.txtdis.exception.StoppedServerException;
-import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.info.Information;
 import ph.txtdis.type.UserType;
 
 public interface UserService {
 
-	boolean isOffSite();
+	User find(String username) throws Exception;
 
-	User find(String username) throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException,
-			RestException, InvalidException;
+	User findByEmail(String email) throws Exception;
 
-	User findByEmail(String email) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException;
+	List<Role> getRolesThatCanBeAssigned();
 
-	List<User> list() throws NoServerConnectionException, StoppedServerException, FailedAuthenticationException,
-			RestException, InvalidException;
+	String getSurname();
 
-	List<User> listByRole(UserType... types) throws NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, RestException, InvalidException;
+	String getUsername();
+
+	boolean isEnabled();
+
+	List<User> list() throws Exception;
+
+	List<User> listByRole(UserType... types) throws Exception;
 
 	List<String> listNamesByRole(UserType... types);
 
-	User save(User entity) throws SuccessfulSaveInfo, NoServerConnectionException, StoppedServerException,
-			FailedAuthenticationException, InvalidException, NotAllowedOffSiteTransactionException;
+	void reset();
 
+	void save(List<Role> roles) throws Information, Exception;
+
+	User save(User entity) throws Exception;
+
+	void setEnabled(boolean b);
+
+	void setRoles(List<Role> items);
+
+	void setSurname(String surname);
+
+	void validateUsername(String username) throws Exception;
 }

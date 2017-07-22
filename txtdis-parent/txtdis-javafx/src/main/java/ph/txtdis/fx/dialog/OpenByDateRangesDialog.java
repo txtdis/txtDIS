@@ -11,13 +11,14 @@ import org.springframework.stereotype.Component;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.control.AppButtonImpl;
 import ph.txtdis.fx.control.LocalDatePicker;
 import ph.txtdis.fx.pane.AppGridPane;
 
 @Scope("prototype")
 @Component("openByDateRangesDialog")
-public class OpenByDateRangesDialog extends AbstractInputDialog {
+public class OpenByDateRangesDialog //
+		extends AbstractInputDialog {
 
 	private class EndDateBeforeStartException extends Exception {
 
@@ -41,7 +42,7 @@ public class OpenByDateRangesDialog extends AbstractInputDialog {
 	protected AppGridPane grid;
 
 	@Autowired
-	protected AppButton actionButton;
+	protected AppButtonImpl actionButton;
 
 	@Autowired
 	private LocalDatePicker startDatePicker, endDatePicker;
@@ -71,12 +72,12 @@ public class OpenByDateRangesDialog extends AbstractInputDialog {
 	}
 
 	@Override
-	public void setFocus() {
+	public void goToDefaultFocus() {
 		startDatePicker.requestFocus();
 	}
 
 	private Node endDatePicker() {
-		endDatePicker.setOnAction(e -> validateDates());
+		endDatePicker.onAction(e -> validateDates());
 		return endDatePicker;
 	}
 
@@ -86,12 +87,6 @@ public class OpenByDateRangesDialog extends AbstractInputDialog {
 			throw new NoStartDateException();
 		if (endDatePicker.getValue().isBefore(start))
 			throw new EndDateBeforeStartException();
-	}
-
-	private void resetNodesOnError(Exception e) {
-		e.printStackTrace();
-		dialog.show(e).addParent(this).start();
-		refresh();
 	}
 
 	private void setDates() {
@@ -112,7 +107,7 @@ public class OpenByDateRangesDialog extends AbstractInputDialog {
 
 	protected Button actionButton() {
 		actionButton.large(actionButtonText).build();
-		actionButton.setOnAction(event -> setDates());
+		actionButton.onAction(event -> setDates());
 		actionButton.disableIf(startDatePicker.isEmpty().or(endDatePicker.isEmpty()));
 		return actionButton;
 	}
@@ -133,10 +128,9 @@ public class OpenByDateRangesDialog extends AbstractInputDialog {
 	}
 
 	@Override
-	protected void setOnFiredCloseButton() {
+	protected void nullData() {
+		super.nullData();
 		startDate = null;
 		endDate = null;
-		refresh();
-		super.setOnFiredCloseButton();
 	}
 }

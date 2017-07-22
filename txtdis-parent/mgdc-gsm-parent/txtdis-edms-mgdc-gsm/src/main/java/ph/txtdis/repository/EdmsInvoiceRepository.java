@@ -10,12 +10,22 @@ import org.springframework.stereotype.Repository;
 import ph.txtdis.domain.EdmsInvoice;
 
 @Repository("edmsInvoiceRepository")
-public interface EdmsInvoiceRepository extends CrudRepository<EdmsInvoice, Long> {
+public interface EdmsInvoiceRepository //
+		extends CrudRepository<EdmsInvoice, Long> {
 
-	List<EdmsInvoice> findByReferenceNo(@Param("referenceNo") String no);
-
-	EdmsInvoice findByReferenceNoAndStatus(@Param("referenceNo") String no, @Param("status") String closedOrVoid);
-
-	List<EdmsInvoice> findByOrderDateAndTruckCodeAndStatus(@Param("orderDate") LocalDate d, @Param("truckCode") String t,
+	EdmsInvoice findByBookingNoAndStatus( //
+			@Param("bookingNo") String no, //
 			@Param("status") String closed);
+
+	List<EdmsInvoice> findByOrderDateAndTruckCodeAndStatus( //
+			@Param("orderDate") LocalDate d, //
+			@Param("truckCode") String t, //
+			@Param("status") String closed);
+
+	EdmsInvoice findByReferenceNo( //
+			@Param("referenceNo") String no);
+
+	EdmsInvoice findByReferenceNoAndStatus( //
+			@Param("referenceNo") String no, //
+			@Param("closedOrVoid") String s);
 }

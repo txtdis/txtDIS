@@ -1,12 +1,10 @@
 package ph.txtdis.service;
 
-import static org.apache.log4j.Logger.getLogger;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,11 +19,8 @@ import ph.txtdis.type.UserType;
 @Service("credentialService")
 public class CredentialServiceImpl implements CredentialService {
 
-	private static Logger logger = getLogger(CredentialServiceImpl.class);
-
 	@Override
 	public Authentication authentication() {
-		logger.info("\n    Authentication = " + getContext().getAuthentication());
 		return getContext().getAuthentication();
 	}
 
@@ -82,8 +77,7 @@ public class CredentialServiceImpl implements CredentialService {
 	}
 
 	private List<GrantedAuthority> toGranted(List<Authority> roles) {
-		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getAuthority().toString()))
-				.collect(Collectors.toList());
+		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getAuthority().toString())).collect(Collectors.toList());
 	}
 
 	@Override

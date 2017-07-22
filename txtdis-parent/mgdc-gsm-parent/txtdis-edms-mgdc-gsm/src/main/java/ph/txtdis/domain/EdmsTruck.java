@@ -13,7 +13,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "ref_truck")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsTruck extends EdmsAbstractMaster implements Serializable {
+public class EdmsTruck //
+		extends EdmsAbstractMaster //
+		implements Serializable {
 
 	private static final long serialVersionUID = -2645700673137405555L;
 

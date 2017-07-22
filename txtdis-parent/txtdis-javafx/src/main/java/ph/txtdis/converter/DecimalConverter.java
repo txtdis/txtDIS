@@ -9,7 +9,7 @@ public class DecimalConverter extends StringConverter<BigDecimal> {
 
     @Override
     public String toString(BigDecimal number) {
-        return NumberUtils.formatDecimal(number);
+        return NumberUtils.toAsNeededNoOfPlaceDecimalText(number);
     }
 
     @Override

@@ -5,12 +5,14 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Truck extends AbstractCreationTracked<Long> implements Named {
+public class Truck //
+		extends AbstractCreationTracked<Long> //
+		implements Named {
 
-	private String name;
+	private String name, route;
 
 	@Override
 	public String toString() {
-		return name;
+		return getName();
 	}
 }

@@ -11,7 +11,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class EdmsAbstractBookedPaidTransported extends EdmsAbstractPaidTransported {
+public abstract class EdmsAbstractBookedPaidTransported //
+		extends EdmsAbstractPaidTransported {
 
 	@Column(name = "deliveryDate")
 	private LocalDate deliveryDate;

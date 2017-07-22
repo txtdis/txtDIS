@@ -15,8 +15,8 @@ public class ReflectionUtils {
 		try {
 			Constructor<?> constructor = cls.getConstructor(parameterTypes);
 			return (T) constructor.newInstance(parameters);
-		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException
-				| IllegalArgumentException | InvocationTargetException e) {
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
+				| InvocationTargetException e) {
 			e.printStackTrace();
 			return null;
 		}

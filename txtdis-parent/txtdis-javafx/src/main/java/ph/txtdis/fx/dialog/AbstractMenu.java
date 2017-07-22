@@ -10,13 +10,14 @@ import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import ph.txtdis.app.Startable;
-import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.app.StartableApp;
+import ph.txtdis.fx.control.AppButtonImpl;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.service.CredentialService;
 import ph.txtdis.util.StyleSheet;
 
-public abstract class AbstractMenu extends Stage {
+public abstract class AbstractMenu //
+		extends Stage {
 
 	@Autowired
 	protected CredentialService credentialService;
@@ -53,9 +54,9 @@ public abstract class AbstractMenu extends Stage {
 
 	protected abstract GridPane addGridPaneNodes(GridPane gp);
 
-	protected AppButton button(Startable app, AppButton button, String icon) {
+	protected AppButtonImpl button(StartableApp app, AppButtonImpl button, String icon) {
 		button.fontSize(44).icon(icon).build();
-		button.setOnAction(e -> app.start());
+		button.onAction(e -> app.start());
 		return button;
 	}
 }

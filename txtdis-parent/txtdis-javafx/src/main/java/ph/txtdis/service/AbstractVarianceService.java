@@ -10,41 +10,43 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import ph.txtdis.excel.ExcelWriter;
+import ph.txtdis.dto.Keyed;
+import ph.txtdis.excel.ExcelReportWriter;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.util.ClientTypeMap;
 
-public abstract class AbstractVarianceService<T> implements VarianceService<T> {
+public abstract class AbstractVarianceService<T extends Keyed<Long>> //
+		implements VarianceService<T> {
+
+	@Autowired
+	private CredentialService credentialService;
+
+	@Autowired
+	private ReadOnlyService<T> readOnlyService;
+
+	@Autowired
+	private SyncService syncService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
 
 	@Autowired
-	private ExcelWriter excel;
-
-	@Autowired
-	protected CredentialService credentialService;
-
-	@Autowired
-	protected ReadOnlyService<T> readOnlyService;
-
-	@Autowired
-	protected SyncService syncService;
+	private ExcelReportWriter excel;
 
 	@Value("${prefix.module}")
 	private String modulePrefix;
 
-	protected LocalDate end, start;
+	private LocalDate end, start;
+
+	public AbstractVarianceService() {
+		reset();
+	}
 
 	@Override
 	public LocalDate getEndDate() {
 		if (end == null)
-			end = yesterday();
+			end = today();
 		return end;
-	}
-
-	private LocalDate yesterday() {
-		return today().minusDays(1L);
 	}
 
 	protected LocalDate today() {
@@ -52,8 +54,8 @@ public abstract class AbstractVarianceService<T> implements VarianceService<T> {
 	}
 
 	@Override
-	public String getHeaderText() {
-		return getActualHeader() + " Variance";
+	public String getHeaderName() {
+		return getActualColumnName() + " Variance";
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public abstract class AbstractVarianceService<T> implements VarianceService<T> {
 	@Override
 	public LocalDate getStartDate() {
 		if (start == null)
-			start = yesterday();
+			start = today();
 		return start;
 	}
 
@@ -77,8 +79,8 @@ public abstract class AbstractVarianceService<T> implements VarianceService<T> {
 	}
 
 	@Override
-	public String getTitleText() {
-		return credentialService.username() + "@" + modulePrefix + " " + getHeaderText() + " : " + getSubhead();
+	public String getTitleName() {
+		return credentialService.username() + "@" + modulePrefix + " " + getHeaderName() + " : " + getSubhead();
 	}
 
 	@Override
@@ -89,7 +91,7 @@ public abstract class AbstractVarianceService<T> implements VarianceService<T> {
 	@Override
 	public List<T> list() {
 		try {
-			return readOnlyService.module(getModule()).getList("/list?start=" + getStartDate() + "&end=" + getEndDate());
+			return readOnlyService.module(getModuleName()).getList("/list?start=" + getStartDate() + "&end=" + getEndDate());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return emptyList();
@@ -98,7 +100,7 @@ public abstract class AbstractVarianceService<T> implements VarianceService<T> {
 
 	@Override
 	public void next() {
-		if (getEndDate().isBefore(yesterday()))
+		if (getEndDate().isBefore(today()))
 			start = end = getEndDate().plusDays(1L);
 	}
 
@@ -108,13 +110,19 @@ public abstract class AbstractVarianceService<T> implements VarianceService<T> {
 	}
 
 	@Override
+	public void reset() {
+		end = null;
+		start = null;
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public void saveAsExcel(AppTable<T>... tables) throws IOException {
-		excel.filename(excelName()).sheetname(getHeaderText()).table(tables).write();
+		excel.table(tables).filename(excelName()).sheetname(getHeaderName()).write();
 	}
 
 	private String excelName() {
-		return getHeaderText().replace(" ", ".") + "." + getSubhead().replace("-", ".to.").replace("/", "-");
+		return getHeaderName().replace(" ", ".") + "." + getSubhead().replace(" ", "").replace(":", ".").replace(" - ", ".to.").replace("/", "-");
 	}
 
 	@Override

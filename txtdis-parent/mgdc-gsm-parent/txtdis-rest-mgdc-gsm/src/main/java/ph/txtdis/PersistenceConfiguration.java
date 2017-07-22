@@ -1,5 +1,9 @@
 package ph.txtdis;
 
+import static ph.txtdis.type.PriceType.DEALER;
+import static ph.txtdis.type.PriceType.PURCHASE;
+import static ph.txtdis.type.PriceType.RETAIL;
+
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -11,34 +15,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import ph.txtdis.domain.HolidayEntity;
-import ph.txtdis.domain.PricingTypeEntity;
 import ph.txtdis.domain.SyncEntity;
-import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.dto.PickList;
 import ph.txtdis.dto.Warehouse;
-import ph.txtdis.exception.FailedAuthenticationException;
-import ph.txtdis.exception.InvalidException;
-import ph.txtdis.exception.NoServerConnectionException;
-import ph.txtdis.exception.RestException;
-import ph.txtdis.exception.StoppedServerException;
-import ph.txtdis.repository.HolidayRepository;
-import ph.txtdis.repository.PricingTypeRepository;
+import ph.txtdis.mgdc.domain.HolidayEntity;
+import ph.txtdis.mgdc.domain.PricingTypeEntity;
+import ph.txtdis.mgdc.gsm.service.server.CreditedAndDiscountedCustomerService;
+import ph.txtdis.mgdc.gsm.service.server.GsmRemittanceService;
+import ph.txtdis.mgdc.gsm.service.server.GsmRouteService;
+import ph.txtdis.mgdc.gsm.service.server.ImportedBillingService;
+import ph.txtdis.mgdc.gsm.service.server.ImportedChannelService;
+import ph.txtdis.mgdc.gsm.service.server.ImportedItemService;
+import ph.txtdis.mgdc.gsm.service.server.ImportedLeveledItemFamilyService;
+import ph.txtdis.mgdc.gsm.service.server.ImportedLocationService;
+import ph.txtdis.mgdc.gsm.service.server.ImportedTruckService;
+import ph.txtdis.mgdc.gsm.service.server.PickListService;
+import ph.txtdis.mgdc.gsm.service.server.UserService;
+import ph.txtdis.mgdc.repository.HolidayRepository;
+import ph.txtdis.mgdc.repository.PricingTypeRepository;
+import ph.txtdis.mgdc.service.server.WarehouseService;
 import ph.txtdis.repository.SyncRepository;
-import ph.txtdis.service.ImportedBillingService;
-import ph.txtdis.service.ImportedChannelService;
-import ph.txtdis.service.ImportedCustomerService;
-import ph.txtdis.service.ImportedItemFamilyService;
-import ph.txtdis.service.ImportedItemService;
-import ph.txtdis.service.ImportedLocationService;
-import ph.txtdis.service.ImportedRemittanceService;
-import ph.txtdis.service.ImportedRouteService;
-import ph.txtdis.service.ImportedTruckService;
-import ph.txtdis.service.ImportedUserService;
-import ph.txtdis.service.PickListService;
-import ph.txtdis.service.WarehouseService;
 import ph.txtdis.type.SyncType;
-import ph.txtdis.util.Code;
 import ph.txtdis.util.DateTimeUtils;
 
 @Configuration("persistenceConfiguration")
@@ -58,37 +55,37 @@ public class PersistenceConfiguration {
 	private PricingTypeRepository pricingRepository;
 
 	@Autowired
+	private CreditedAndDiscountedCustomerService customerService;
+
+	@Autowired
 	private ImportedBillingService billableService;
 
 	@Autowired
 	private ImportedChannelService channelService;
 
 	@Autowired
-	private ImportedCustomerService customerService;
-
-	@Autowired
 	private ImportedItemService itemService;
 
 	@Autowired
-	private ImportedItemFamilyService familyService;
+	private ImportedLeveledItemFamilyService familyService;
 
 	@Autowired
 	private ImportedLocationService locationService;
 
 	@Autowired
-	private ImportedRouteService routeService;
+	private GsmRouteService routeService;
 
 	@Autowired
 	private PickListService pickListService;
 
 	@Autowired
-	private ImportedRemittanceService remittanceService;
+	private GsmRemittanceService remittanceService;
 
 	@Autowired
 	private ImportedTruckService truckService;
 
 	@Autowired
-	private ImportedUserService userService;
+	private UserService userService;
 
 	@Autowired
 	private WarehouseService warehouseService;
@@ -115,8 +112,7 @@ public class PersistenceConfiguration {
 				billableService.importAll();
 				remittanceService.importAll();
 				syncRepository.save(sync());
-			} catch (NoServerConnectionException | StoppedServerException | FailedAuthenticationException | RestException
-					| InvalidException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 	}
@@ -139,24 +135,21 @@ public class PersistenceConfiguration {
 
 	private List<PricingTypeEntity> pricings() {
 		return Arrays.asList(//
-				newPricing("PURCHASE"), //
-				newPricing(Code.DEALER), //
-				newPricing(Code.RETAIL));
+				newPricing(PURCHASE.toString()), //
+				newPricing(DEALER.toString()), //
+				newPricing(RETAIL.toString()));
 	}
 
 	private PricingTypeEntity newPricing(String name) {
-		return new PricingTypeEntity(name);
+		PricingTypeEntity e = new PricingTypeEntity();
+		e.setName(name);
+		return e;
 	}
 
 	private Warehouse warehouse() {
 		Warehouse w = new Warehouse();
 		w.setName(WAREHOUSE);
-		w.setFamily(liquorFamily());
 		return w;
-	}
-
-	private ItemFamily liquorFamily() {
-		return familyService.findByName("LIQUOR");
 	}
 
 	private PickList dummyPickList() {

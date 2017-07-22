@@ -1,4 +1,4 @@
 package ph.txtdis.app;
 
-public interface RemittanceApp extends Startable {
+public interface RemittanceApp extends StartableApp {
 }

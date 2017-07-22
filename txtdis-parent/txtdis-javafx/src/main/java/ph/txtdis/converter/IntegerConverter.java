@@ -12,6 +12,6 @@ public class IntegerConverter extends StringConverter<Integer> {
 
 	@Override
 	public String toString(Integer number) {
-		return NumberUtils.formatInt(number);
+		return NumberUtils.toIntegerWithComma(number);
 	}
 }

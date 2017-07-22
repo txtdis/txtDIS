@@ -13,8 +13,8 @@ public abstract class EdmsAbstractModifiedNotedWarehousedDatedRemarkedReferenced
 		extends EdmsAbstractNotedWarehousedDatedRemarkedReferencedStatusCreatedId {
 
 	@Column(name = "modiBy")
-	private String modifiedBy;
+	private String modifiedBy = "";
 
 	@Column(name = "dateModi")
-	private String modifiedOn;
+	private String modifiedOn = "";
 }

@@ -28,7 +28,7 @@ public class ServerSelectionDialog extends AbstractInputDialog {
 	private ToggleGroup group;
 
 	@Override
-	public void setFocus() {
+	public void goToDefaultFocus() {
 		closeButton.requestFocus();
 	}
 
@@ -68,9 +68,9 @@ public class ServerSelectionDialog extends AbstractInputDialog {
 	}
 
 	@Override
-	protected void setOnFiredCloseButton() {
+	protected void setOnClickedCloseButton() {
 		RadioButton rb = (RadioButton) group.getSelectedToggle();
 		serverService.setLocation(rb.getText());
-		super.setOnFiredCloseButton();
+		super.setOnClickedCloseButton();
 	}
 }

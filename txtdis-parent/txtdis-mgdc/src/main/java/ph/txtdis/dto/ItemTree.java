@@ -5,7 +5,8 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ItemTree extends AbstractCreationTracked<Long> implements Keyed<Long> {
+public class ItemTree //
+		extends AbstractCreationTracked<Long> {
 
 	private ItemFamily family, parent;
 }

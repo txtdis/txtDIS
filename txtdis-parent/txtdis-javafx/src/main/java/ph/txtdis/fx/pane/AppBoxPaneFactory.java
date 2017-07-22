@@ -66,8 +66,18 @@ public class AppBoxPaneFactory {
 		return b;
 	}
 
+	public VBox forVerticalPane(List<? extends Node> n) {
+		return forVerticalPane(toArray(n));
+	}
+
+	public VBox forVerticalPane(Node... n) {
+		VBox b = forVerticals(n);
+		b.setAlignment(Pos.TOP_CENTER);
+		return b;
+	}
+
 	public VBox forVerticals(List<Node> n) {
-		return new VBox(toArray(n));
+		return forVerticals(toArray(n));
 	}
 
 	public VBox forVerticals(Node... n) {

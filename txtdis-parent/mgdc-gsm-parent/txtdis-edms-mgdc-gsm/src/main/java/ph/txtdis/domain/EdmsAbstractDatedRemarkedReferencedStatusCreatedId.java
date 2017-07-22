@@ -11,11 +11,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class EdmsAbstractDatedRemarkedReferencedStatusCreatedId extends EdmsAbstractReferencedStatusCreatedId {
+public abstract class EdmsAbstractDatedRemarkedReferencedStatusCreatedId //
+		extends EdmsAbstractReferencedStatusCreatedId {
 
 	@Column(name = "dateTrans")
 	private LocalDate orderDate;
 
 	@Column(name = "remarks")
-	private String remarks;
+	private String remarks = "";
 }

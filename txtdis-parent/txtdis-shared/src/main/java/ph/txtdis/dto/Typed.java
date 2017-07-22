@@ -1,8 +1,8 @@
 package ph.txtdis.dto;
 
-import ph.txtdis.type.BillableType;
+import ph.txtdis.type.ModuleType;
 
 public interface Typed {
 
-	BillableType type();
+	ModuleType type();
 }

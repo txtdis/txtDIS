@@ -7,7 +7,8 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public abstract class AbstractDecisionNeeded<PK> extends AbstractCreationTracked<PK> {
+public abstract class AbstractDecisionNeeded<PK> //
+		extends AbstractCreationTracked<PK> {
 
 	private Boolean isValid;
 

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>ph.txtdis</groupId>
 		<artifactId>mgdc-gsm-parent</artifactId>
-		<version>0.9.5.1</version>
+		<version>1.0.1.5</version>
 	</parent>
 
 	<artifactId>txtdis-edms-mgdc-gsm</artifactId>
@@ -16,6 +16,11 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>ph.txtdis</groupId>
+			<artifactId>txtdis-mgdc-gsm</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ph.txtdis</groupId>

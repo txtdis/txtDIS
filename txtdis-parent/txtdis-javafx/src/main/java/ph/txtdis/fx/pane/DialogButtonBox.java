@@ -10,7 +10,8 @@ import javafx.scene.layout.HBox;
 
 @Scope("prototype")
 @Component("dialogButtonBox")
-public class DialogButtonBox extends HBox {
+public class DialogButtonBox //
+		extends HBox {
 
 	public DialogButtonBox() {
 		setAlignment(Pos.CENTER_RIGHT);

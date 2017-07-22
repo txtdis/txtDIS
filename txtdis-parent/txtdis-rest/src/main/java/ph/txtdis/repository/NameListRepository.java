@@ -7,11 +7,14 @@ import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
-public interface NameListRepository<T> extends CrudRepository<T, Long> {
+public interface NameListRepository<T> //
+		extends CrudRepository<T, Long> {
 
-	T findByNameIgnoreCase(@Param("name") String name);
+	T findByNameIgnoreCase( //
+			@Param("name") String n);
 
-	T findByNameStartingWithIgnoreCase(@Param("name") String name);
+	T findFirstByNameStartingWithIgnoreCase( //
+			@Param("name") String n);
 
 	List<T> findByOrderByNameAsc();
 }

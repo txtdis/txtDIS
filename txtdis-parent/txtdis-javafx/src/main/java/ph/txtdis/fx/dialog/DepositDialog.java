@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javafx.scene.control.Button;
-import ph.txtdis.dto.Customer;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCombo;
 import ph.txtdis.fx.control.LabeledDatePicker;
@@ -24,10 +23,11 @@ import ph.txtdis.service.RemittanceService;
 
 @Scope("prototype")
 @Component("depositDialog")
-public class DepositDialog extends AbstractFieldDialog<Customer> {
+public class DepositDialog //
+		extends AbstractFieldDialog<String> {
 
 	@Autowired
-	private LabeledCombo<Customer> bankCombo;
+	private LabeledCombo<String> bankCombo;
 
 	@Autowired
 	private LabeledDatePicker datePicker;
@@ -40,8 +40,9 @@ public class DepositDialog extends AbstractFieldDialog<Customer> {
 
 	private ZonedDateTime timestamp;
 
-	public Customer getBank() {
-		return getAddedItem();
+	public String getBank() {
+		List<String> customers = getAddedItems();
+		return customers == null || customers.isEmpty() ? null : customers.get(0);
 	}
 
 	public ZonedDateTime getTimestamp() {
@@ -72,14 +73,14 @@ public class DepositDialog extends AbstractFieldDialog<Customer> {
 
 	@Override
 	protected List<InputNode<?>> addNodes() {
-		bankCombo.name("Bank").items(service.getBanks()).build();
+		bankCombo.name("Bank").items(service.listBanks()).build();
 		datePicker.name("Date");
 		timeInput.name("Time").build(TIME);
 		return Arrays.asList(bankCombo, datePicker, timeInput);
 	}
 
 	@Override
-	protected Customer createEntity() {
+	protected String createEntity() {
 		return bankCombo.getValue();
 	}
 

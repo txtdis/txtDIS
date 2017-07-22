@@ -1,5 +1,7 @@
 package ph.txtdis.util;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -13,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import ph.txtdis.exception.DateBeforeGoLiveException;
 import ph.txtdis.exception.EndDateBeforeStartException;
+import ph.txtdis.exception.InvalidException;
 
 public class DateTimeUtils {
 
@@ -69,15 +72,15 @@ public class DateTimeUtils {
 	}
 
 	public static DateTimeFormatter timestampFormat() {
-		return DateTimeFormatter.ofPattern("M/d/yyyy h:mma");
+		return ofPattern("M/d/yyyy h:mma");
 	}
 
 	public static DateTimeFormatter timestampOf24HourFormat() {
-		return DateTimeFormatter.ofPattern("M/d/yyyy HH:mm");
+		return ofPattern("M/d/yyyy HH:mm");
 	}
 
 	public static DateTimeFormatter timestampWithSecondFormat() {
-		return DateTimeFormatter.ofPattern("M/d/yyyy h:mm:ss a");
+		return ofPattern("M/d/yyyy h:mm:ss a");
 	}
 
 	public static LocalDate toDate(String date) {
@@ -89,23 +92,31 @@ public class DateTimeUtils {
 	}
 
 	public static String toDottedYearMonth(LocalDate d) {
-		return d == null ? "" : d.format(DateTimeFormatter.ofPattern("yyyy.MM"));
+		return d == null ? "" : d.format(ofPattern("yyyy.MM"));
 	}
 
 	public static String toFullMonthYear(LocalDate d) {
-		return d == null ? "" : d.format(DateTimeFormatter.ofPattern("MMMM yyyy"));
+		return d == null ? null : d.format(ofPattern("MMMM yyyy"));
 	}
 
 	public static String toHypenatedYearMonthDay(LocalDate d) {
-		return d == null ? "" : d.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		return d == null ? "" : d.format(ofPattern("yyyy-MM-dd"));
 	}
 
-	private static LocalDate toLocalDate(Date d) {
+	public static LocalDate toLocalDate(Date d) {
 		return d.toInstant().atZone(MANILA_TIME).toLocalDate();
 	}
 
+	public static LocalDate toLocalDateFromOrderConfirmationFormat(String ocsDate) {
+		try {
+			return LocalDate.parse(ocsDate, orderConfirmationFormat());
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	public static String toLongMonthYear(LocalDate d) {
-		return d == null ? "" : d.format(DateTimeFormatter.ofPattern("MMM-yyyy"));
+		return d == null ? "" : d.format(ofPattern("MMM-yyyy"));
 	}
 
 	public static String toOrderConfirmationDate(LocalDate d) {
@@ -113,16 +124,15 @@ public class DateTimeUtils {
 	}
 
 	public static LocalTime toTime(String s) {
-		return s == null ? null : LocalTime.parse(s, DateTimeFormatter.ofPattern("Hmm"));
+		return s == null ? null : LocalTime.parse(s, ofPattern("Hmm"));
 	}
 
 	public static String toTimeDisplay(LocalTime t) {
-		return t == null ? null : t.format(DateTimeFormatter.ofPattern("hh:mma"));
+		return t == null ? null : t.format(ofPattern("hh:mma"));
 	}
 
 	public static String toTimestampFilename(ZonedDateTime zdt) {
-		return zdt == null ? ""
-				: zdt.withZoneSameInstant(MANILA_TIME).format(DateTimeFormatter.ofPattern("yyyy-MM-dd@hh.mma"));
+		return zdt == null ? "" : zdt.withZoneSameInstant(MANILA_TIME).format(ofPattern("yyyy-MM-dd@hh.mma"));
 	}
 
 	public static String toTimestampText(Date d) {
@@ -191,8 +201,7 @@ public class DateTimeUtils {
 		return endDate;
 	}
 
-	public static LocalDate verifyDateIsOnOrAfterGoLive(LocalDate date, LocalDate goLive)
-			throws DateBeforeGoLiveException {
+	public static LocalDate verifyDateIsOnOrAfterGoLive(LocalDate date, LocalDate goLive) throws DateBeforeGoLiveException {
 		if (date.isBefore(goLive))
 			throw new DateBeforeGoLiveException();
 		return date;
@@ -205,5 +214,10 @@ public class DateTimeUtils {
 		Calendar cal = Calendar.getInstance();
 		cal.set(year, month, day);
 		return cal.get(Calendar.WEEK_OF_MONTH);
+	}
+
+	public static void validateEndDate(LocalDate start, LocalDate end) throws Exception {
+		if (end.isBefore(start))
+			throw new InvalidException("End date cannot be before start");
 	}
 }

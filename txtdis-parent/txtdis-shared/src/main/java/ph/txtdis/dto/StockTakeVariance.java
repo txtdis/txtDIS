@@ -2,7 +2,6 @@ package ph.txtdis.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Comparator;
 
 import org.apache.commons.lang3.math.Fraction;
 
@@ -15,7 +14,8 @@ import ph.txtdis.type.UomType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class StockTakeVariance extends AbstractId<Long> implements Comparator<StockTakeVariance>, Keyed<Long> {
+public class StockTakeVariance //
+		extends AbstractKeyed<Long> {
 
 	private LocalDate countDate;
 
@@ -96,13 +96,13 @@ public class StockTakeVariance extends AbstractId<Long> implements Comparator<St
 
 	@Override
 	public String toString() {
-		return getCountDate() + ": " + getItem() + ", " + getQuality() //
-				+ ", start= " + getStartQty() + ", in= " + getInQty() + ", out= " + getOutQty() //
-				+ ", actual= " + getActualQty() + ", final= " + getFinalQty();
-	}
-
-	@Override
-	public int compare(StockTakeVariance a, StockTakeVariance b) {
-		return a.getId().compareTo(b.getId());
+		return getCountDate() //
+				+ ": " + getItem() //
+				+ ", " + getQuality() //
+				+ ", start= " + getStartQty() //
+				+ ", in= " + getInQty() //
+				+ ", out= " + getOutQty() //
+				+ ", actual= " + getActualQty() //
+				+ ", final= " + getFinalQty();
 	}
 }

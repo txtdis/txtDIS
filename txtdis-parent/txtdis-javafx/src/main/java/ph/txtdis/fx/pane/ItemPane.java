@@ -17,5 +17,7 @@ public interface ItemPane {
 
 	void setBindings();
 
+	void setFocus();
+
 	void setListeners();
 }

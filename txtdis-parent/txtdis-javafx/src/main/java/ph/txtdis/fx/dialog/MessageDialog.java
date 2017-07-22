@@ -16,7 +16,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
-import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.control.AppButtonImpl;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.pane.DialogMessageBox;
 import ph.txtdis.fx.pane.MessageDialogButtonBox;
@@ -24,12 +24,13 @@ import ph.txtdis.info.Information;
 
 @Scope("prototype")
 @Component("messageDialog")
-public class MessageDialog extends AbstractDialog {
+public class MessageDialog //
+		extends AbstractDialog {
 
 	private static Logger logger = getLogger(MessageDialog.class);
 
 	@Autowired
-	private AppButton closeButton, optionButton;
+	private AppButtonImpl closeButton, optionButton;
 
 	@Autowired
 	private LabelFactory label;
@@ -54,14 +55,14 @@ public class MessageDialog extends AbstractDialog {
 
 	@Override
 	public void refresh() {
-		setFocus();
+		goToDefaultFocus();
 	}
 
 	public void setErrorStyle() {
 	}
 
 	@Override
-	public void setFocus() {
+	public void goToDefaultFocus() {
 		if (withOption)
 			optionButton.requestFocus();
 		else
@@ -69,11 +70,11 @@ public class MessageDialog extends AbstractDialog {
 	}
 
 	public void setOnDefaultSelection(EventHandler<ActionEvent> e) {
-		closeButton.setOnAction(e);
+		closeButton.onAction(e);
 	}
 
 	public void setOnOptionSelection(EventHandler<ActionEvent> e) {
-		optionButton.setOnAction(e);
+		optionButton.onAction(e);
 	}
 
 	public MessageDialog show(Exception e) {
@@ -122,7 +123,7 @@ public class MessageDialog extends AbstractDialog {
 	private Button closeButton() {
 		closeButton.large(closeText).build();
 		if (!withOption)
-			closeButton.setOnAction(e -> close());
+			closeButton.onAction(e -> close());
 		return closeButton;
 	}
 

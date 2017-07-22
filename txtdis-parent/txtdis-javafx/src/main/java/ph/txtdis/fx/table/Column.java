@@ -13,7 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextAlignment;
-import ph.txtdis.app.Launchable;
+import ph.txtdis.app.LaunchableApp;
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.type.Type;
 import ph.txtdis.util.TypeStyle;
@@ -25,7 +25,7 @@ public class Column<S extends Keyed<?>, T> extends TableColumn<S, T> implements 
 	@Autowired
 	private TabularCell<S, T> cell;
 
-	private Launchable app;
+	private LaunchableApp app;
 
 	private String data;
 
@@ -54,7 +54,7 @@ public class Column<S extends Keyed<?>, T> extends TableColumn<S, T> implements 
 		return this;
 	}
 
-	public Column<S, T> launches(Launchable app) {
+	public Column<S, T> launches(LaunchableApp app) {
 		this.app = app;
 		return this;
 	}
@@ -92,11 +92,15 @@ public class Column<S extends Keyed<?>, T> extends TableColumn<S, T> implements 
 		label.setWrapText(true);
 		label.setAlignment(Pos.CENTER);
 		label.setTextAlignment(TextAlignment.CENTER);
+		setGraphic(labelStack(label));
+	}
+
+	private StackPane labelStack(Label label) {
 		StackPane stack = new StackPane();
 		stack.getChildren().add(label);
 		stack.prefWidthProperty().bind(widthProperty().subtract(5));
 		label.prefWidthProperty().bind(stack.prefWidthProperty());
-		setGraphic(stack);
+		return stack;
 	}
 
 	private void setColumnWidth(int width) {

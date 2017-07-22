@@ -13,23 +13,23 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import ph.txtdis.app.Launchable;
+import ph.txtdis.app.LaunchableApp;
 import ph.txtdis.app.MultiTyped;
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.dto.Typed;
 import ph.txtdis.fx.dialog.AbstractFieldDialog;
-import ph.txtdis.type.BillableType;
+import ph.txtdis.type.ModuleType;
 import ph.txtdis.type.Type;
 
 @Scope("prototype")
 @Component("tabularCell")
 public class TabularCell<S extends Keyed<?>, T> {
 
-	private boolean doubleClickable;
+	private AbstractTable<S> table;
 
-	private AbstractTableView<S> table;
+	private Boolean isDoubleClickEnabled;
 
-	private Launchable app;
+	private LaunchableApp app;
 
 	private String[] selectionIds;
 
@@ -41,25 +41,26 @@ public class TabularCell<S extends Keyed<?>, T> {
 
 	private TableColumn<S, T> tableColumn;
 
-	public TableCell<S, T> get(Launchable app, Type type) {
+	public TableCell<S, T> get(LaunchableApp app, Type type) {
 		this.app = app;
-		this.doubleClickable = true;
+		isDoubleClickEnabled = app != null;
 		return textFieldCell(type);
 	}
 
+	private TableCell<S, T> textFieldCell(Type type) {
+		FieldCell<S, T> cell = new FieldCell<>(type);
+		if (isDoubleClickEnabled != false)
+			cell.setOnMouseClick(e -> onMouseClick(e));
+		return cell;
+	}
+
 	@SuppressWarnings("unchecked")
-	public TableCell<S, T> get(String field) {
-		doubleClickable = false;
-		return (TableCell<S, T>) new CheckboxCell<S>(field);
-	}
-
-	private String getAppType() {
-		return (String) tableColumn.getUserData();
-	}
-
-	private String getColumnIndex() {
-		List<TableColumn<S, ?>> columns = table.getColumns();
-		return String.valueOf(columns.indexOf(tableColumn));
+	private void onMouseClick(MouseEvent e) {
+		if (e.getClickCount() < 2)
+			return;
+		tableCell = (TableCell<S, T>) e.getSource();
+		if (itemExists())
+			onDoubleMouseClicks();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -69,8 +70,32 @@ public class TabularCell<S extends Keyed<?>, T> {
 		return tableItem != null;
 	}
 
+	private void onDoubleMouseClicks() {
+		tableColumn = tableCell.getTableColumn();
+		table = (AbstractTable<S>) tableColumn.getTableView();
+		selectionIds = new String[] { itemId(), columnIdx(), appData() };
+		stage = (Stage) tableCell.getScene().getWindow();
+		launchAppIfAble();
+	}
+
 	private String itemId() {
 		return tableItem.getId().toString();
+	}
+
+	private String columnIdx() {
+		List<TableColumn<S, ?>> columns = table.getColumns();
+		return String.valueOf(columns.indexOf(tableColumn));
+	}
+
+	private String appData() {
+		return (String) tableColumn.getUserData();
+	}
+
+	private void launchAppIfAble() {
+		if (app != null && !app.isDialogCloserOnly())
+			launch();
+		else if (isDoubleClickEnabled == true)
+			setSelectedItem();
 	}
 
 	private void launch() {
@@ -81,6 +106,24 @@ public class TabularCell<S extends Keyed<?>, T> {
 			launchApp();
 	}
 
+	private void launchDialog() {
+		app.actOn(selectionIds);
+		app.start();
+		refreshTable();
+	}
+
+	private void refreshTable() {
+		ObservableList<S> l = observableArrayList(table.getItems());
+		l.set(Integer.valueOf(selectionIds[0]) - 1, addedItem());
+		table.setItems(l);
+	}
+
+	@SuppressWarnings("unchecked")
+	private S addedItem() {
+		List<S> l = ((AbstractFieldDialog<S>) app).getAddedItems();
+		return l == null || l.isEmpty() ? null : l.get(0);
+	}
+
 	private void launchApp() {
 		if (app instanceof MultiTyped)
 			((MultiTyped) app).type(type());
@@ -88,41 +131,8 @@ public class TabularCell<S extends Keyed<?>, T> {
 		app.actOn(selectionIds);
 	}
 
-	private void launchAppIfAble() {
-		if (app != null)
-			launch();
-		else
-			setSelectedItem();
-	}
-
-	private void launchDialog() {
-		app.actOn(selectionIds);
-		app.start();
-		refreshTable();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void onMouseClick(MouseEvent e) {
-		if (e.getClickCount() < 2)
-			return;
-		tableCell = (TableCell<S, T>) e.getSource();
-		if (itemExists())
-			setOnDoubleMouseClicks();
-	}
-
-	@SuppressWarnings("unchecked")
-	private void refreshTable() {
-		ObservableList<S> l = observableArrayList(table.getItems());
-		l.set(Integer.valueOf(selectionIds[0]) - 1, ((AbstractFieldDialog<S>) app).getAddedItem());
-		table.setItems(l);
-	}
-
-	private void setOnDoubleMouseClicks() {
-		tableColumn = tableCell.getTableColumn();
-		table = (AbstractTableView<S>) tableColumn.getTableView();
-		selectionIds = new String[] { itemId(), getColumnIndex(), getAppType() };
-		stage = (Stage) tableCell.getScene().getWindow();
-		launchAppIfAble();
+	private ModuleType type() {
+		return ((Typed) tableItem).type();
 	}
 
 	private void setSelectedItem() {
@@ -130,14 +140,9 @@ public class TabularCell<S extends Keyed<?>, T> {
 		stage.close();
 	}
 
-	private TableCell<S, T> textFieldCell(Type type) {
-		FieldCell<S, T> cell = new FieldCell<>(type);
-		if (doubleClickable)
-			cell.setOnMouseClick(e -> onMouseClick(e));
-		return cell;
-	}
-
-	private BillableType type() {
-		return ((Typed) tableItem).type();
+	@SuppressWarnings("unchecked")
+	public TableCell<S, T> get(String field) {
+		isDoubleClickEnabled = false;
+		return (TableCell<S, T>) new CheckboxCell<S>(field);
 	}
 }

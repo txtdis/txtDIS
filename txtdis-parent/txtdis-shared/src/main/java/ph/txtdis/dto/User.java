@@ -5,11 +5,12 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class User implements Keyed<String> {
+public class User //
+		implements Keyed<String> {
 
 	private String username, password, surname, email;
 
-	private Boolean enabled;
+	private boolean enabled;
 
 	private List<Authority> roles;
 
@@ -27,6 +28,6 @@ public class User implements Keyed<String> {
 
 	@Override
 	public String toString() {
-		return username;
+		return getUsername();
 	}
 }

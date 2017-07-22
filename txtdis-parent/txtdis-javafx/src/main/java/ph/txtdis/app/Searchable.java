@@ -3,13 +3,13 @@ package ph.txtdis.app;
 import javafx.stage.Stage;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.fx.dialog.SearchDialog;
-import ph.txtdis.service.ByNameSearchable;
+import ph.txtdis.service.SearchedByNameService;
 
 public interface Searchable<T> {
 
-	AppSelectable<T> getListApp();
+	SelectableListApp<T> getListApp();
 
-	ByNameSearchable<T> getSearchableByNameService();
+	SearchedByNameService<T> getSearchableByNameService();
 
 	default T getSelectionFromSearchResults(Stage s) {
 		getListApp().addParent(s).start();

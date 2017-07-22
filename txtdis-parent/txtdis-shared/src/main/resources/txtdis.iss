@@ -1,5 +1,5 @@
 [Setup]
-AppId={{{#MyAppName}}
+AppId={#MyAppName}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppVersionName}
@@ -14,7 +14,6 @@ DisableReadyPage=Yes
 DisableFinishedPage=Yes
 DisableWelcomePage=Yes
 DefaultGroupName={#MyApp}
-VersionInfoVersion={#MyAppVersion}
 
 MinVersion=0,5.1 
 OutputBaseFilename={#MyAppVersionName}

@@ -30,7 +30,8 @@ import ph.txtdis.util.FontIcon;
 @SpringBootApplication
 @PropertySource("server.properties")
 @PropertySource("application.properties")
-public class App extends Application {
+public class App //
+		extends Application {
 
 	private HBox splash;
 
