@@ -1,15 +1,15 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.repository.GoodRmaRepository;
 
 @Service("goodRmaService")
-public class GoodRmaServiceImpl extends AbstractRmaService<GoodRmaRepository> //
-		implements GoodRmaService {
+public class GoodRmaServiceImpl
+	extends AbstractRmaService<GoodRmaRepository> //
+	implements GoodRmaService {
 
 	@Override
 	public Billable findByReferenceId(Long id) throws NotFoundException {

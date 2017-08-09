@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class NotTodayOrYesterdayCashPaymentException extends Exception {
+public class NotTodayOrYesterdayCashPaymentException
+	extends Exception {
 
 	private static final long serialVersionUID = -4430663872809922339L;
 

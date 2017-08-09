@@ -1,40 +1,28 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.util.StringUtils.capitalize;
-import static ph.txtdis.type.UserType.MANAGER;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.dto.Keyed;
+import ph.txtdis.exception.DeactivatedException;
+import ph.txtdis.mgdc.gsm.dto.Customer;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.type.PartnerType;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import ph.txtdis.dto.Keyed;
-import ph.txtdis.exception.DeactivatedException;
-import ph.txtdis.mgdc.gsm.dto.Customer;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SpunKeyedService;
-import ph.txtdis.type.PartnerType;
-import ph.txtdis.type.UserType;
-import ph.txtdis.util.ClientTypeMap;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.util.StringUtils.capitalize;
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.UserUtils.isUser;
+import static ph.txtdis.util.UserUtils.username;
 
 public abstract class AbstractCustomerService //
-		implements CustomerService {
+	implements CustomerService {
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<Customer> readOnlyCustomerService;
-
-	@Autowired
-	private SavingService<Customer> savingService;
-
-	@Autowired
-	private SpunKeyedService<Customer, Long> spunService;
+	private RestClientService<Customer> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -48,12 +36,14 @@ public abstract class AbstractCustomerService //
 	}
 
 	@Override
-	public boolean canApprove() {
-		return isUser(MANAGER);
+	public void reset() {
+		customer = null;
+		customers = null;
 	}
 
-	protected boolean isUser(UserType t) {
-		return credentialService.isUser(t);
+	@Override
+	public boolean canApprove() {
+		return isUser(MANAGER);
 	}
 
 	@Override
@@ -65,21 +55,26 @@ public abstract class AbstractCustomerService //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Customer get() {
-		if (customer == null)
-			customer = new Customer();
-		return customer;
-	}
-
-	@Override
 	public String getAlternateName() {
 		return capitalize(getModuleName());
 	}
 
 	@Override
+	public String getModuleName() {
+		return "customer";
+	}
+
+	@Override
 	public String getCreatedBy() {
 		return get().getCreatedBy();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Customer get() {
+		if (customer == null)
+			customer = new Customer();
+		return customer;
 	}
 
 	@Override
@@ -89,7 +84,7 @@ public abstract class AbstractCustomerService //
 
 	@Override
 	public String getDecidedBy() {
-		return credentialService.username();
+		return username();
 	}
 
 	@Override
@@ -100,6 +95,11 @@ public abstract class AbstractCustomerService //
 	@Override
 	public Long getId() {
 		return get().getId();
+	}
+
+	@Override
+	public void setId(Long id) {
+		get().setId(id);
 	}
 
 	@Override
@@ -118,35 +118,20 @@ public abstract class AbstractCustomerService //
 	}
 
 	@Override
-	public ReadOnlyService<Customer> getListedReadOnlyService() {
-		return getReadOnlyService();
-	}
-
-	@Override
-	public String getModuleName() {
-		return "customer";
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public ReadOnlyService<Customer> getReadOnlyService() {
-		return readOnlyCustomerService;
-	}
-
-	@Override
 	public String getRemarks() {
 		return "";
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public SavingService<Customer> getSavingService() {
-		return savingService;
+	public RestClientService<Customer> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
-	public SpunKeyedService<Customer, Long> getSpunService() {
-		return spunService;
+	@SuppressWarnings("unchecked")
+	public RestClientService<Customer> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -156,7 +141,7 @@ public abstract class AbstractCustomerService //
 
 	@Override
 	public String getUsername() {
-		return credentialService.username();
+		return username();
 	}
 
 	@Override
@@ -173,10 +158,8 @@ public abstract class AbstractCustomerService //
 		}
 	}
 
-	@Override
-	public void reset() {
-		customer = null;
-		customers = null;
+	protected List<Customer> getList(String endpoint) throws Exception {
+		return restClientService.module(getModuleName()).getList(endpoint);
 	}
 
 	@Override
@@ -184,18 +167,9 @@ public abstract class AbstractCustomerService //
 		return customers = getList(text.isEmpty() ? "" : "/search?name=" + text);
 	}
 
-	protected List<Customer> getList(String endpoint) throws Exception {
-		return getListedReadOnlyService().module(getModuleName()).getList(endpoint);
-	}
-
 	@Override
 	public <T extends Keyed<Long>> void set(T t) {
 		customer = (Customer) t;
-	}
-
-	@Override
-	public void setId(Long id) {
-		get().setId(id);
 	}
 
 	@Override

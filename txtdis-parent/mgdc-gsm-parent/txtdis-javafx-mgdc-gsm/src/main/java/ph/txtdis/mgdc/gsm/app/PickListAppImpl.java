@@ -1,10 +1,9 @@
 package ph.txtdis.mgdc.gsm.app;
 
+import javafx.beans.binding.BooleanBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.beans.binding.BooleanBinding;
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.mgdc.app.AbstractPickListApp;
 import ph.txtdis.mgdc.gsm.service.ExTruckInclusivePickListService;
@@ -13,7 +12,7 @@ import ph.txtdis.mgdc.service.PickListService;
 @Scope("prototype")
 @Component("pickListApp")
 public class PickListAppImpl //
-		extends AbstractPickListApp<PickListService> {
+	extends AbstractPickListApp<PickListService> {
 
 	@Autowired
 	private AppCombo<String> collectorCombo;
@@ -47,7 +46,7 @@ public class PickListAppImpl //
 		super.setBindings();
 		collectorCombo.disableIf(truckCombo.isEmpty());
 		driverCombo.disableIf(collectorCombo.isEmpty() //
-				.or(isPickup()));
+			.or(isPickup()));
 		table.disableIf(collectorCombo.isEmpty());
 	}
 

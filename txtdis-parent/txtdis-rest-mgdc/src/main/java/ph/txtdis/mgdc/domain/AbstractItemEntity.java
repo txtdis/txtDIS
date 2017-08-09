@@ -1,26 +1,21 @@
 package ph.txtdis.mgdc.domain;
 
-import static javax.persistence.CascadeType.ALL;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractDeactivatableModifiableNamedCreatedKeyedEntity;
 import ph.txtdis.type.ItemType;
 
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
+
+import static javax.persistence.CascadeType.ALL;
+
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractItemEntity //
-		extends AbstractDeactivatableModifiableNamedCreatedKeyedEntity<Long> {
+	extends AbstractDeactivatableModifiableNamedCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -1161314009708169352L;
 

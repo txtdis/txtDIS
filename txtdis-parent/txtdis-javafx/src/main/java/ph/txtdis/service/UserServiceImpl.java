@@ -1,28 +1,9 @@
 package ph.txtdis.service;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.type.UserType.CASHIER;
-import static ph.txtdis.type.UserType.COLLECTOR;
-import static ph.txtdis.type.UserType.DRIVER;
-import static ph.txtdis.type.UserType.HELPER;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.SALES_ENCODER;
-import static ph.txtdis.type.UserType.SELLER;
-import static ph.txtdis.type.UserType.STOCK_CHECKER;
-import static ph.txtdis.type.UserType.STORE_KEEPER;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Authority;
 import ph.txtdis.dto.Role;
 import ph.txtdis.dto.User;
@@ -30,48 +11,43 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.info.Information;
 import ph.txtdis.info.SuccessfulSaveInfo;
 import ph.txtdis.type.UserType;
+import ph.txtdis.util.UserUtils;
 
-@Service("userService")
-public class UserServiceImpl implements UserService {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
-	private static Logger logger = getLogger(UserServiceImpl.class);
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.type.UserType.*;
+
+@Service("UserUtils")
+public class UserServiceImpl
+	implements UserService {
 
 	private static final String USER = "user";
 
-	@Autowired
-	private CredentialService userService;
+	private static Logger logger = getLogger(UserServiceImpl.class);
 
 	@Autowired
-	private ReadOnlyService<User> readOnlyService;
-
-	@Autowired
-	private SavingService<User> savingService;
+	private RestClientService<User> restClientService;
 
 	private User user;
 
 	@Override
-	public User find(String username) throws Exception {
-		return readOnlyService.module(USER).getOne("/" + username);
-	}
-
-	private User set(User u) {
-		return user = u;
-	}
-
-	@Override
 	public User findByEmail(String email) throws Exception {
-		return readOnlyService.module(USER).getOne("/email?address=" + email);
+		return userService().getOne("/email?getAddress=" + email);
 	}
 
-	private User get() {
-		if (user == null)
-			user = new User();
-		return user;
+	private RestClientService<User> userService() {
+		return restClientService.module(USER);
 	}
 
 	@Override
 	public List<Role> getRolesThatCanBeAssigned() {
-		List<GrantedAuthority> l = userService.getRoles();
+		List<GrantedAuthority> l = UserUtils.getRoles();
 		if (isOneOfUsersRoleA(CASHIER, l))
 			return getRolesThatACashierCanAssign();
 		if (isOneOfUsersRoleA(MANAGER, l))
@@ -85,12 +61,6 @@ public class UserServiceImpl implements UserService {
 
 	private boolean isOneOfUsersRoleA(UserType user, List<GrantedAuthority> l) {
 		return l.stream().anyMatch(a -> a.getAuthority().equalsIgnoreCase(user.toString()));
-	}
-
-	private List<Authority> getRoles() {
-		if (get().getRoles() == null)
-			get().setRoles(Collections.emptyList());
-		return get().getRoles();
 	}
 
 	private List<Role> getRolesThatACashierCanAssign() {
@@ -129,9 +99,15 @@ public class UserServiceImpl implements UserService {
 		return get().getSurname();
 	}
 
+	private User get() {
+		if (user == null)
+			user = new User();
+		return user;
+	}
+
 	@Override
-	public String getUsername() {
-		return get().getUsername();
+	public void setSurname(String surname) {
+		get().setSurname(surname);
 	}
 
 	@Override
@@ -140,16 +116,13 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> list() throws Exception {
-		return readOnlyService.module(USER).getList();
+	public void setEnabled(boolean b) {
+		get().setEnabled(b);
 	}
 
 	@Override
-	public List<User> listByRole(UserType... types) throws Exception {
-		String roles = "/role?";
-		for (int i = 0; i < types.length; i++)
-			roles += (i == 0 ? "" : "&") + "name=" + types[i];
-		return readOnlyService.module(USER).getList(roles);
+	public List<User> list() throws Exception {
+		return userService().getList();
 	}
 
 	@Override
@@ -162,8 +135,20 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<User> listByRole(UserType... types) throws Exception {
+		String roles = "/role?";
+		for (int i = 0; i < types.length; i++)
+			roles += (i == 0 ? "" : "&") + "name=" + types[i];
+		return userService().getList(roles);
+	}
+
+	@Override
 	public void reset() {
 		set(null);
+	}
+
+	private User set(User u) {
+		return user = u;
 	}
 
 	@Override
@@ -176,17 +161,23 @@ public class UserServiceImpl implements UserService {
 
 	private void setPasswordIfNone() {
 		if (get().getPassword() == null)
-			get().setPassword(userService.encode("password"));
+			get().setPassword(UserUtils.encode("password"));
 	}
 
 	@Override
 	public User save(User entity) throws Exception {
-		return set(savingService.module(USER).save(entity));
+		return set(userService().save(entity));
 	}
 
 	@Override
-	public void setEnabled(boolean b) {
-		get().setEnabled(b);
+	public String getUsername() {
+		return get().getUsername();
+	}
+
+	private List<Authority> getRoles() {
+		if (get().getRoles() == null)
+			get().setRoles(Collections.emptyList());
+		return get().getRoles();
 	}
 
 	@Override
@@ -201,9 +192,9 @@ public class UserServiceImpl implements UserService {
 
 	private List<Authority> removeRoles(List<Authority> authorities, List<Role> roles) {
 		List<UserType> disabledRoles = roles.stream() //
-				.filter(r -> r.getEnabled() == false) //
-				.map(r -> r.getAuthority()) //
-				.collect(Collectors.toList());
+			.filter(r -> r.getEnabled() == false) //
+			.map(r -> r.getAuthority()) //
+			.collect(Collectors.toList());
 		logger.info("\n    DisabledRoles = " + disabledRoles);
 		authorities.removeIf(a -> disabledRoles.contains(a.getAuthority()));
 		logger.info("\n    RemainingRoles = " + authorities);
@@ -212,10 +203,10 @@ public class UserServiceImpl implements UserService {
 
 	private List<Authority> addRoles(List<Authority> authorities, List<Role> roles) {
 		List<Authority> l = roles.stream() //
-				.filter(r -> r.getEnabled() == true) //
-				.map(r -> toAuthority(r)) //
-				.filter(a -> isNotIn(a, authorities)) //
-				.collect(Collectors.toList());
+			.filter(r -> r.getEnabled() == true) //
+			.map(r -> toAuthority(r)) //
+			.filter(a -> isNotIn(a, authorities)) //
+			.collect(Collectors.toList());
 		logger.info("\n    NewRoles = " + l);
 		if (!l.isEmpty())
 			authorities.addAll(l);
@@ -234,11 +225,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void setSurname(String surname) {
-		get().setSurname(surname);
-	}
-
-	@Override
 	public void validateUsername(String username) throws Exception {
 		User user = find(username);
 		if (user == null) {
@@ -246,5 +232,10 @@ public class UserServiceImpl implements UserService {
 			throw new NotFoundException("");
 		}
 		set(user);
+	}
+
+	@Override
+	public User find(String username) throws Exception {
+		return userService().getOne("/" + username);
 	}
 }

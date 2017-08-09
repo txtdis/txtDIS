@@ -8,13 +8,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javafx.scene.control.Button;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCombo;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.service.FinancialService;
 
 public abstract class AbstractCheckDialog<T, FS extends FinancialService> //
-		extends AbstractFieldDialog<T> {
+	extends AbstractFieldDialog<T> {
 
 	@Autowired
 	protected LabeledField<Long> checkIdInput;
@@ -30,8 +31,8 @@ public abstract class AbstractCheckDialog<T, FS extends FinancialService> //
 	private String bank;
 
 	@Override
-	protected Button addButton() {
-		Button b = super.addButton();
+	protected AppButton addButton() {
+		AppButton b = super.addButton();
 		b.setText(addButtonLabelName());
 		return b;
 	}

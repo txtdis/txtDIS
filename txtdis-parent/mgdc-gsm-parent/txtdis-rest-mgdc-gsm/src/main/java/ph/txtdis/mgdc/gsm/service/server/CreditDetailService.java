@@ -1,7 +1,5 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dto.CreditDetail;
 import ph.txtdis.mgdc.gsm.domain.CreditDetailEntity;
 import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
@@ -9,7 +7,10 @@ import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.repository.CreditDetailRepository;
 import ph.txtdis.service.DecisionDataUpdate;
 
-public interface CreditDetailService extends DecisionDataUpdate<CreditDetailEntity, CreditDetailRepository> {
+import java.util.List;
+
+public interface CreditDetailService
+	extends DecisionDataUpdate<CreditDetailEntity, CreditDetailRepository> {
 
 	List<CreditDetailEntity> getNewAndOldCreditDetails(CustomerEntity e, Customer c);
 

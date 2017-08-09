@@ -4,5 +4,5 @@ import org.springframework.stereotype.Service;
 
 @Service("routeService")
 public class RouteServiceImpl //
-		extends AbstractRouteService {
+	extends AbstractRouteService {
 }

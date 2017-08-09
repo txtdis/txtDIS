@@ -1,21 +1,20 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Booking;
 import ph.txtdis.exception.AlreadyAssignedPersonException;
 import ph.txtdis.mgdc.service.AbstractPickListService;
 import ph.txtdis.type.UserType;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Service("pickListService")
 public class PickListServiceImpl //
-		extends AbstractPickListService //
-		implements ExTruckInclusivePickListService {
+	extends AbstractPickListService //
+	implements ExTruckInclusivePickListService {
 
 	@Autowired
 	private GsmBookingService bookingService;

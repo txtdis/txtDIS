@@ -14,8 +14,10 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "tr_cm_details")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsCreditMemoDetail extends
-		EdmsAbstractDiscountTotalTransactionCodeItemNameCostPriceUomQtyReferenceItemCodeIdDetail implements Serializable {
+public class EdmsCreditMemoDetail
+	extends
+	EdmsAbstractDiscountTotalTransactionCodeItemNameCostPriceUomQtyReferenceItemCodeIdDetail
+	implements Serializable {
 
 	private static final long serialVersionUID = 6256044418218982063L;
 

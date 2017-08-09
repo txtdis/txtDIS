@@ -1,17 +1,16 @@
 package ph.txtdis.app;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.scene.Node;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.service.ReportService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 public abstract class AbstractTotaledReportApp<AT extends AppTable<T>, AS extends ReportService<T>, T> //
-		extends AbstractReportApp<AT, AS, T> {
+	extends AbstractReportApp<AT, AS, T> {
 
 	@Autowired
 	protected TotaledTableApp<T> totaledTableApp;

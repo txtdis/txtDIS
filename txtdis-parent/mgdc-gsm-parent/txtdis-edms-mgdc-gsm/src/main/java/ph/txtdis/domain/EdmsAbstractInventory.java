@@ -11,7 +11,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public class EdmsAbstractInventory extends EdmsAbstractId {
+public class EdmsAbstractInventory
+	extends EdmsAbstractId {
 
 	@Column(name = "itemCode")
 	private String itemCode;

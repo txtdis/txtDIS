@@ -7,6 +7,7 @@ import static java.util.stream.Collectors.toList;
 import static ph.txtdis.type.OrderReturnType.INVALID;
 import static ph.txtdis.type.OrderReturnType.OWN_FAULT;
 import static ph.txtdis.util.NumberUtils.isPositive;
+import static ph.txtdis.util.UserUtils.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,11 +26,12 @@ import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.service.PickListService;
 import ph.txtdis.type.OrderConfirmationType;
 import ph.txtdis.type.OrderReturnType;
+import ph.txtdis.util.UserUtils;
 
 @Service("orderReturnService")
 public class OrderReturnServiceImpl //
-		extends AbstractOrderConfirmationService //
-		implements OrderReturnService {
+	extends AbstractOrderConfirmationService //
+	implements OrderReturnService {
 
 	@Autowired
 	private OrderConfirmationService ocsService;
@@ -42,7 +44,8 @@ public class OrderReturnServiceImpl //
 	private List<BillableDetail> bookedDetails;
 
 	@Override
-	protected Billable findByOrderDateAndOutletIdAndSequenceId(LocalDate orderDate, Long outletId, Long sequenceId) throws Exception {
+	protected Billable findByOrderDateAndOutletIdAndSequenceId(LocalDate orderDate, Long outletId, Long sequenceId)
+		throws Exception {
 		return orderService().getOne("/rr?date=" + orderDate + "&outletId=" + outletId + "&count=" + sequenceId);
 	}
 
@@ -70,9 +73,9 @@ public class OrderReturnServiceImpl //
 	public List<BillableDetail> getDetails() {
 		List<BillableDetail> l = super.getDetails();
 		return l == null ? null
-				: l.stream() //
-						.filter(d -> d != null && isPositive(d.getReturnedQty())) //
-						.collect(toList());
+			: l.stream() //
+			.filter(d -> d != null && isPositive(d.getReturnedQty())) //
+			.collect(toList());
 	}
 
 	@Override
@@ -92,6 +95,11 @@ public class OrderReturnServiceImpl //
 	}
 
 	@Override
+	public void setReceivingDetail(ReceivingDetail detail) {
+		receivingDetail = (BillableDetail) detail;
+	}
+
+	@Override
 	public String getRemarks() {
 		String remarks = get().getRemarks();
 		return remarks == null ? "" : remarks;
@@ -104,29 +112,24 @@ public class OrderReturnServiceImpl //
 
 	private BigDecimal totalQty(List<BillableDetail> l) {
 		return l.stream() //
-				.filter(d -> d != null) //
-				.map(BillableDetail::getReturnedQtyInCases) //
-				.reduce(ZERO, BigDecimal::add);
+			.filter(d -> d != null) //
+			.map(BillableDetail::getReturnedQtyInCases) //
+			.reduce(ZERO, BigDecimal::add);
 	}
 
 	private BigDecimal totalValue(List<BillableDetail> l) {
 		return l.stream() //
-				.filter(d -> d != null) //
-				.map(BillableDetail::getReturnedSubtotalValue) //
-				.reduce(ZERO, BigDecimal::add);
-	}
-
-	@Override
-	public boolean isNew() {
-		return getReceivedOn() == null;
+			.filter(d -> d != null) //
+			.map(BillableDetail::getReturnedSubtotalValue) //
+			.reduce(ZERO, BigDecimal::add);
 	}
 
 	@Override
 	public List<OrderReturnType> listReasons() {
 		String reason = get().getReceivingModifiedBy();
 		return reason != null //
-				? asList(OrderReturnType.valueOf(reason.replace(" ", "_"))) //
-				: asList(OrderReturnType.values());
+			? asList(OrderReturnType.valueOf(reason.replace(" ", "_"))) //
+			: asList(OrderReturnType.values());
 	}
 
 	@Override
@@ -143,7 +146,7 @@ public class OrderReturnServiceImpl //
 
 	@Override
 	public void save() throws Information, Exception {
-		get().setReceivedBy(credentialService.username());
+		get().setReceivedBy(username());
 		super.save();
 	}
 
@@ -156,15 +159,10 @@ public class OrderReturnServiceImpl //
 	}
 
 	@Override
-	public void setReceivingDetail(ReceivingDetail detail) {
-		receivingDetail = (BillableDetail) detail;
-	}
-
-	@Override
 	protected Billable throwNotFoundExceptionIfNull(Billable b, String id) throws Exception {
 		if (b == null)
 			throw new InvalidException(getAbbreviatedModuleNoPrompt() + id + " not found;\n" //
-					+ "Ensure ID's " + getOpenDialogPrompt().replaceFirst("F", "f"));
+				+ "Ensure ID's " + getOpenDialogPrompt().replaceFirst("F", "f"));
 		return b;
 	}
 
@@ -178,6 +176,11 @@ public class OrderReturnServiceImpl //
 		setReason(reason);
 	}
 
+	@Override
+	public boolean isNew() {
+		return getReceivedOn() == null;
+	}
+
 	private boolean isUndelivered() {
 		return OrderConfirmationType.valueOf(getOrderType()) == OrderConfirmationType.UNDELIVERED;
 	}
@@ -186,12 +189,12 @@ public class OrderReturnServiceImpl //
 		setDetails(bookedDetails.stream().map(d -> returnItems(d)).collect(Collectors.toList()));
 	}
 
+	private void setReason(OrderReturnType reason) {
+		get().setReceivingModifiedBy(reason.toString());
+	}
+
 	private BillableDetail returnItems(BillableDetail d) {
 		d.setReturnedQty(d.getInitialQty());
 		return d;
-	}
-
-	private void setReason(OrderReturnType reason) {
-		get().setReceivingModifiedBy(reason.toString());
 	}
 }

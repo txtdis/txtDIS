@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class ItemReturningCustomerIncompleteContactDetailsException extends Exception {
+public class ItemReturningCustomerIncompleteContactDetailsException
+	extends Exception {
 
 	private static final long serialVersionUID = 2874806720155756184L;
 

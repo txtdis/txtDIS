@@ -3,7 +3,8 @@ package ph.txtdis.converter;
 import javafx.util.StringConverter;
 import ph.txtdis.util.NumberUtils;
 
-public class IntegerConverter extends StringConverter<Integer> {
+public class IntegerConverter
+	extends StringConverter<Integer> {
 
 	@Override
 	public Integer fromString(String text) {

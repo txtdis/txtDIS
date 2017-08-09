@@ -10,8 +10,8 @@ import ph.txtdis.dto.SalesItemVariance;
 
 @Service("blanketBalanceService")
 public class BlanketBalanceServiceImpl //
-		extends AbstractSalesItemVarianceService //
-		implements BlanketBalanceService {
+	extends AbstractSalesItemVarianceService //
+	implements BlanketBalanceService {
 
 	@Override
 	public String getActualColumnName() {
@@ -29,11 +29,6 @@ public class BlanketBalanceServiceImpl //
 	}
 
 	@Override
-	public String getModuleName() {
-		return "blanketBalance";
-	}
-
-	@Override
 	public String getReturnedColumnName() {
 		return "Returned";
 	}
@@ -46,10 +41,15 @@ public class BlanketBalanceServiceImpl //
 	@Override
 	public List<SalesItemVariance> list() {
 		try {
-			return getListedReadOnlyService().module(getModuleName()).getList();
+			return getRestClientServiceForLists().module(getModuleName()).getList();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return emptyList();
 		}
+	}
+
+	@Override
+	public String getModuleName() {
+		return "blanketBalance";
 	}
 }

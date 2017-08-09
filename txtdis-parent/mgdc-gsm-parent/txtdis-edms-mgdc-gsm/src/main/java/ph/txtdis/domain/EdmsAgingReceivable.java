@@ -18,7 +18,7 @@ import lombok.Data;
 @Entity
 @Table(name = "master_customerlist_ar")
 public class EdmsAgingReceivable //
-		implements Serializable {
+	implements Serializable {
 
 	private static final long serialVersionUID = -3969533960824154885L;
 

@@ -1,14 +1,6 @@
 package ph.txtdis.mgdc.service.server;
 
-import static ph.txtdis.type.LocationType.BARANGAY;
-import static ph.txtdis.type.LocationType.CITY;
-import static ph.txtdis.type.LocationType.PROVINCE;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Location;
 import ph.txtdis.mgdc.domain.LocationEntity;
 import ph.txtdis.mgdc.domain.LocationTreeEntity;
@@ -16,8 +8,13 @@ import ph.txtdis.mgdc.repository.LocationRepository;
 import ph.txtdis.mgdc.repository.LocationTreeRepository;
 import ph.txtdis.type.LocationType;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static ph.txtdis.type.LocationType.*;
+
 public abstract class AbstractLocationService //
-		implements LocationService {
+	implements LocationService {
 
 	@Autowired
 	protected LocationRepository repository;
@@ -28,6 +25,27 @@ public abstract class AbstractLocationService //
 	@Override
 	public List<Location> listBarangays(String city) {
 		return getLocations(BARANGAY, city);
+	}
+
+	private List<Location> getLocations(LocationType type, String parent) {
+		List<LocationTreeEntity> trees =
+			treeRepository.findByLocationTypeAndParentNameOrderByLocationNameAsc(type, parent);
+		return trees.stream().map(t -> toModel(t.getLocation())).collect(Collectors.toList());
+	}
+
+	@Override
+	public Location toModel(LocationEntity e) {
+		return e == null ? null : newLocation(e);
+	}
+
+	private Location newLocation(LocationEntity e) {
+		Location l = new Location();
+		l.setId(e.getId());
+		l.setName(e.getName());
+		l.setType(e.getType());
+		l.setCreatedBy(e.getCreatedBy());
+		l.setCreatedOn(e.getCreatedOn());
+		return l;
 	}
 
 	@Override
@@ -56,25 +74,5 @@ public abstract class AbstractLocationService //
 		e.setName(t.getName());
 		e.setType(t.getType());
 		return e;
-	}
-
-	private List<Location> getLocations(LocationType type, String parent) {
-		List<LocationTreeEntity> trees = treeRepository.findByLocationTypeAndParentNameOrderByLocationNameAsc(type, parent);
-		return trees.stream().map(t -> toModel(t.getLocation())).collect(Collectors.toList());
-	}
-
-	@Override
-	public Location toModel(LocationEntity e) {
-		return e == null ? null : newLocation(e);
-	}
-
-	private Location newLocation(LocationEntity e) {
-		Location l = new Location();
-		l.setId(e.getId());
-		l.setName(e.getName());
-		l.setType(e.getType());
-		l.setCreatedBy(e.getCreatedBy());
-		l.setCreatedOn(e.getCreatedOn());
-		return l;
 	}
 }

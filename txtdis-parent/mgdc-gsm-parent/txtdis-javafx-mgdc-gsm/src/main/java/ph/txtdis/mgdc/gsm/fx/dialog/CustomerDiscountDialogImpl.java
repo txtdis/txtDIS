@@ -1,22 +1,22 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.mgdc.gsm.dto.CustomerDiscount;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.gsm.service.ValueBasedCustomerDiscountService;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Scope("prototype")
 @Component("customerDiscountDialog")
-public class CustomerDiscountDialogImpl extends AbstractCustomerDiscountDialog {
+public class CustomerDiscountDialogImpl
+	extends AbstractCustomerDiscountDialog {
 
 	@Autowired
 	private ValueBasedCustomerDiscountService valueBasedDiscountedCustomerService;
@@ -51,8 +51,8 @@ public class CustomerDiscountDialogImpl extends AbstractCustomerDiscountDialog {
 	@Override
 	protected CustomerDiscount validateThenCreateDiscount() throws Exception {
 		return valueBasedDiscountedCustomerService.createDiscountUponValidation(//
-				item, //
-				discountField.getValue(), //
-				startDatePicker.getValue());
+			item, //
+			discountField.getValue(), //
+			startDatePicker.getValue());
 	}
 }

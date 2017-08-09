@@ -12,48 +12,55 @@ import ph.txtdis.repository.SpunRepository;
 
 @Repository("remittanceRepository")
 public interface RemittanceRepository //
-		extends SpunRepository<RemittanceEntity, Long> {
+	extends SpunRepository<RemittanceEntity, Long> {
 
 	List<RemittanceEntity> findByCollectorContainingAndPaymentDateBetween( //
-			@Param("collector") String c, //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e);
+	                                                                       @Param("receivedFrom") String c, //
+	                                                                       @Param("start") LocalDate s, //
+	                                                                       @Param("end") LocalDate e);
 
-	RemittanceEntity findByDecidedOnNullAndCheckIdNotNullAndReceivedOnNotNullAndDepositedOnNullAndPaymentDateLessThan( //
-			@Param("paymentDate") LocalDate d);
+	RemittanceEntity findByDecidedOnNullAndCheckIdNotNullAndReceivedOnNotNullAndDepositedOnNullAndPaymentDateLessThan
+		( //
+		  @Param(
+		                                                                                                                   "paymentDate")
+		                                                                                                                   LocalDate d);
 
 	List<RemittanceEntity> findByDecidedOnNullAndCheckIdNotNullAndReceivedOnNull();
 
 	List<RemittanceEntity> findByDecidedOnNullAndDraweeBankId( //
-			@Param("bankId") Long b);
+	                                                           @Param("bankId") Long b);
 
 	List<RemittanceEntity> findByDraweeBankName(//
-			@Param("bank") String b);
+	                                            @Param("bank") String b);
 
 	List<RemittanceEntity> findByDraweeBankNameAndCheckId( //
-			@Param("bank") String bank, //
-			@Param("checkId") Long c);
+	                                                       @Param("bank") String bank, //
+	                                                       @Param("checkId") Long c);
 
 	List<RemittanceEntity> findByIsValidNullAndPaymentDateLessThanAndCreatedOnLessThan( //
-			@Param("paymentDate") LocalDate p, //
-			@Param("createdOn") ZonedDateTime c);
+	                                                                                    @Param("paymentDate")
+		                                                                                    LocalDate p, //
+	                                                                                    @Param("createdOn")
+		                                                                                    ZonedDateTime c);
 
 	List<RemittanceEntity> findByPaymentDateBetweenOrderByPaymentDateAsc( //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e);
+	                                                                      @Param("start") LocalDate s, //
+	                                                                      @Param("end") LocalDate e);
 
 	List<RemittanceEntity> findByPaymentDateGreaterThanAndDecidedOnNullOrderByIdDesc( //
-			@Param("goLive") LocalDate d);
+	                                                                                  @Param("goLive") LocalDate d);
 
 	RemittanceEntity findFirstByCollectorAndPaymentDateAndCheckIdNull( //
-			@Param("collector") String n, //
-			@Param("date") LocalDate d);
+	                                                                   @Param("receivedFrom") String n, //
+	                                                                   @Param("date") LocalDate d);
 
 	RemittanceEntity findFirstByDecidedOnNullAndCheckIdNullAndDepositedOnNullAndPaymentDateLessThan( //
-			@Param("paymentDate") LocalDate d);
+	                                                                                                 @Param(
+		                                                                                                 "paymentDate")
+		                                                                                                 LocalDate d);
 
 	RemittanceEntity findFirstByDecidedOnNullAndDepositedOnNotNull();
 
 	RemittanceEntity findFirstByPaymentDateOrderByIdAsc( //
-			@Param("paymentDate") LocalDate d);
+	                                                     @Param("paymentDate") LocalDate d);
 }

@@ -1,17 +1,30 @@
 package ph.txtdis.mgdc.printer;
 
-import static org.apache.commons.lang3.StringUtils.leftPad;
+import javafx.scene.image.Image;
 
 import java.io.IOException;
 
-import javafx.scene.image.Image;
+import static org.apache.commons.lang3.StringUtils.leftPad;
 
 public abstract class AbstractPrinter<T> //
-		extends AbstractCDRKingPrinter<T> {
+	extends AbstractCDRKingPrinter<T> {
 
 	protected static final int LARGE_FONT_PAPER_WIDTH = PAPER_WIDTH / 2;
 
 	protected static final int HALF_PAPER_WIDTH = LARGE_FONT_PAPER_WIDTH - 2;
+
+	@Override
+	protected void print() throws Exception {
+		try {
+			printLogo(getLogo());
+			printSubheader();
+			printDetails();
+			printFooter();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new NotPrintedException();
+		}
+	}
 
 	private int[][] getLogo() {
 		String string;
@@ -36,24 +49,15 @@ public abstract class AbstractPrinter<T> //
 		return value;
 	}
 
-	@Override
-	protected void print() throws Exception {
-		try {
-			printLogo(getLogo());
-			printSubheader();
-			printDetails();
-			printFooter();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new NotPrintedException();
-		}
-	}
+	protected abstract void printSubheader() throws IOException;
+
+	protected abstract void printDetails() throws Exception;
+
+	protected abstract void printFooter() throws IOException;
 
 	protected void printDashes() {
 		printer.println(leftPad("", PAPER_WIDTH, "-"));
 	}
-
-	protected abstract void printDetails() throws Exception;
 
 	protected void printEndOfPage() {
 		printer.println(leftPad("", PAPER_WIDTH, "_"));
@@ -64,9 +68,5 @@ public abstract class AbstractPrinter<T> //
 		for (int i = 0; i < 4; i++)
 			printer.println();
 	}
-
-	protected abstract void printFooter() throws IOException;
-
-	protected abstract void printSubheader() throws IOException;
 
 }

@@ -1,13 +1,15 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.time.LocalDate;
-
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.service.BillingBasedService;
 import ph.txtdis.service.VatableService;
 
+import java.time.LocalDate;
+
 public interface RefundedRmaService //
-		extends RmaService, BillingBasedService, VatableService {
+	extends RmaService,
+	BillingBasedService,
+	VatableService {
 
 	void clearInputtedReturnPaymentData();
 

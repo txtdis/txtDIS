@@ -8,5 +8,6 @@ import ph.txtdis.fx.dialog.TruckDialog;
 
 @Scope("prototype")
 @Component("truckTable")
-public class TruckTable extends AbstractNameListTable<Truck, TruckDialog> {
+public class TruckTable
+	extends AbstractNameListTable<Truck, TruckDialog> {
 }

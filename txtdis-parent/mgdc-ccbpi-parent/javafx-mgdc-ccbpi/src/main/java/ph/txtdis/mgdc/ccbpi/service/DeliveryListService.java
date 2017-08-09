@@ -5,7 +5,7 @@ import java.util.List;
 import ph.txtdis.info.Information;
 
 public interface DeliveryListService //
-		extends ShippedBillableService {
+	extends ShippedBillableService {
 
 	void confirmNoDeliveryListOfSameDateExists() throws Exception;
 

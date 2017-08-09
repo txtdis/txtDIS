@@ -1,21 +1,20 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.repository.BadRmaRepository;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.math.BigDecimal.ZERO;
+
 @Service("badRmaService")
 public class BadRmaServiceImpl //
-		extends AbstractRmaService<BadRmaRepository> //
-		implements BadRmaService {
+	extends AbstractRmaService<BadRmaRepository> //
+	implements BadRmaService {
 
 	@Override
 	public Billable findByReferenceId(Long id) throws NotFoundException {

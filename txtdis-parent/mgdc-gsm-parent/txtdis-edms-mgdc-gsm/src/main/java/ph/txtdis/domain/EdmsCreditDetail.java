@@ -16,7 +16,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "master_customerlist_payment")
-public class EdmsCreditDetail extends EdmsAbstractId implements Serializable {
+public class EdmsCreditDetail
+	extends EdmsAbstractId
+	implements Serializable {
 
 	private static final long serialVersionUID = -3969533960824154885L;
 

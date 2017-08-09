@@ -1,12 +1,12 @@
 package ph.txtdis.dto;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class User //
-		implements Keyed<String> {
+	implements Keyed<String> {
 
 	private String username, password, surname, email;
 

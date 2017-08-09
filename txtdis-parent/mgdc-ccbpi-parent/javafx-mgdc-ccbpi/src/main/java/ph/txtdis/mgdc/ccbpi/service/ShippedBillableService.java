@@ -4,7 +4,8 @@ import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.service.TotaledService;
 
 public interface ShippedBillableService //
-		extends BillableService, TotaledService<BillableDetail> {
+	extends BillableService,
+	TotaledService<BillableDetail> {
 
 	String getRoute();
 

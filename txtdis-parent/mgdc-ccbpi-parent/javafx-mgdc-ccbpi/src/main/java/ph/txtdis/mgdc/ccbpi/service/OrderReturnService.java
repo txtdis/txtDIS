@@ -7,7 +7,9 @@ import ph.txtdis.service.TotaledService;
 import ph.txtdis.type.OrderReturnType;
 
 public interface OrderReturnService //
-		extends BillableService, UpToReturnableQtyReceivingService, TotaledService<BillableDetail> {
+	extends BillableService,
+	UpToReturnableQtyReceivingService,
+	TotaledService<BillableDetail> {
 
 	String getCollectorName();
 

@@ -11,7 +11,7 @@ import ph.txtdis.service.RemittanceService;
 @Scope("prototype")
 @Component("remittanceApp")
 public class RemittanceAppImpl //
-		extends AbstractRemittanceApp<RemittanceService> {
+	extends AbstractRemittanceApp<RemittanceService> {
 
 	@Override
 	protected AppGridPane addGridPane() {
@@ -23,6 +23,6 @@ public class RemittanceAppImpl //
 	@Override
 	protected BooleanBinding saveButtonDisableBindings() {
 		return isPosted() //
-				.or(canPostPaymentData.not());
+			.or(canPostPaymentData.not());
 	}
 }

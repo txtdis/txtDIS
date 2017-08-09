@@ -3,6 +3,7 @@ package ph.txtdis.mgdc.ccbpi.service;
 import static java.math.BigDecimal.ZERO;
 import static org.apache.log4j.Logger.getLogger;
 import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.UserUtils.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -18,23 +19,23 @@ import org.springframework.beans.factory.annotation.Value;
 import ph.txtdis.dto.SalesItemVariance;
 import ph.txtdis.excel.ExcelReportWriter;
 import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.util.ClientTypeMap;
 
 public abstract class AbstractListService //
-		implements ListService {
+	implements ListService {
 
 	private static Logger logger = getLogger(AbstractListService.class);
 
-	@Autowired
-	private CredentialService credentialService;
+	protected List<SalesItemVariance> list;
+
+	protected String item;
 
 	@Autowired
 	private BommedDiscountedPricedValidatedItemService itemService;
 
 	@Autowired
-	private ReadOnlyService<SalesItemVariance> readOnlyService;
+	private RestClientService<SalesItemVariance> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -49,26 +50,36 @@ public abstract class AbstractListService //
 
 	private String route;
 
-	protected List<SalesItemVariance> list;
-
-	protected String item;
-
 	public AbstractListService() {
 		reset();
 	}
 
+	@Override
+	public void reset() {
+		list = null;
+		start = null;
+		end = null;
+		item = null;
+		route = null;
+	}
+
 	protected List<SalesItemVariance> getList(String endPt) throws Exception {
-		return getListedReadOnlyService().module(getModuleName()).getList(endPt);
+		return getRestClientServiceForLists().module(getModuleName()).getList(endPt);
 	}
 
 	@Override
-	public ReadOnlyService<SalesItemVariance> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<SalesItemVariance> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public String getModuleName() {
 		return "bookingVariance";
+	}
+
+	@Override
+	public String getTitleName() {
+		return username() + "@" + modulePrefix + " " + getHeaderName() + " : " + getSubhead();
 	}
 
 	@Override
@@ -85,11 +96,6 @@ public abstract class AbstractListService //
 		if (!start.isEqual(end))
 			d = d + " - " + toDateDisplay(end);
 		return d;
-	}
-
-	@Override
-	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + getHeaderName() + " : " + getSubhead();
 	}
 
 	@Override
@@ -153,21 +159,13 @@ public abstract class AbstractListService //
 	}
 
 	@Override
-	public void reset() {
-		list = null;
-		start = null;
-		end = null;
-		item = null;
-		route = null;
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
 	public void saveAsExcel(AppTable<SalesItemVariance>... tables) throws IOException {
 		excel.table(tables).filename(excelName()).sheetname(getHeaderName()).write();
 	}
 
 	private String excelName() {
-		return getHeaderName().replace(" ", ".") + "." + getSubhead().replace(" ", "").replace(":", ".").replace("-", ".to.").replace("/", "-");
+		return getHeaderName().replace(" ", ".") + "." +
+			getSubhead().replace(" ", "").replace(":", ".").replace("-", ".to.").replace("/", "-");
 	}
 }

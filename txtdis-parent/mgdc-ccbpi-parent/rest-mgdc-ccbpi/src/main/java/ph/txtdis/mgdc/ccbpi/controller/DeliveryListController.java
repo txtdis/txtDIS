@@ -19,7 +19,7 @@ import ph.txtdis.mgdc.controller.AbstractSpunSavedReferencedKeyedController;
 @RequestMapping("/deliveryLists")
 @RestController("deliveryListController")
 public class DeliveryListController //
-		extends AbstractSpunSavedReferencedKeyedController<DeliveryListService, BillableEntity, Billable> {
+	extends AbstractSpunSavedReferencedKeyedController<DeliveryListService, BillableEntity, Billable> {
 
 	@RequestMapping(path = "/deliveryList", method = GET)
 	public ResponseEntity<?> deliveryList(@RequestParam("id") Long id) throws NotFoundException {

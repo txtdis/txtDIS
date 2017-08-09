@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class ToBeReturnedItemNotPurchasedWithinTheLastSixMonthException extends Exception {
+public class ToBeReturnedItemNotPurchasedWithinTheLastSixMonthException
+	extends Exception {
 
 	private static final long serialVersionUID = 1145267869617171227L;
 

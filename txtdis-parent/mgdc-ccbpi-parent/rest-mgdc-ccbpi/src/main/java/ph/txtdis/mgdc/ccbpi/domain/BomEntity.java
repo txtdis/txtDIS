@@ -18,7 +18,7 @@ import ph.txtdis.domain.AbstractCreatedKeyedEntity;
 @Table(name = "bom")
 @EqualsAndHashCode(callSuper = true)
 public class BomEntity //
-		extends AbstractCreatedKeyedEntity<Long> {
+	extends AbstractCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -86213987350272414L;
 

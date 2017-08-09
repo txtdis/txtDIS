@@ -1,11 +1,6 @@
 package ph.txtdis.mgdc.fx.dialog;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Route;
 import ph.txtdis.dto.Routing;
 import ph.txtdis.fx.control.InputNode;
@@ -15,9 +10,13 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.service.RouteAssignedCustomerService;
 import ph.txtdis.mgdc.service.RouteService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 public abstract class AbstractRoutingDialog<CS extends RouteAssignedCustomerService> //
-		extends AbstractFieldDialog<Routing> //
-		implements RoutingDialog {
+	extends AbstractFieldDialog<Routing> //
+	implements RoutingDialog {
 
 	@Autowired
 	protected CS customerService;
@@ -57,7 +56,8 @@ public abstract class AbstractRoutingDialog<CS extends RouteAssignedCustomerServ
 	private void createRouteAssignmentUponValidation() {
 		try {
 			if (startDatePicker.getValue() != null)
-				routing = customerService.createRouteAssignmentUponValidation(routeCombo.getValue(), startDatePicker.getValue());
+				routing =
+					customerService.createRouteAssignmentUponValidation(routeCombo.getValue(), startDatePicker.getValue());
 		} catch (Exception e) {
 			resetNodesOnError(e);
 		}

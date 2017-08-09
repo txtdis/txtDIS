@@ -7,12 +7,13 @@ import ph.txtdis.mgdc.gsm.app.AbstractStockTakeApp;
 
 @Scope("prototype")
 @Component("stockTakeApp")
-public class StockTakeAppImpl extends AbstractStockTakeApp {
+public class StockTakeAppImpl
+	extends AbstractStockTakeApp {
 
 	@Override
 	public void start() {
 		super.start();
 		close();
-		dialog.showInfo("Please use GSM2 App").addParent(this).start();
+		messageDialog.showInfo("Please use GSM2 App").addParent(this).start();
 	}
 }

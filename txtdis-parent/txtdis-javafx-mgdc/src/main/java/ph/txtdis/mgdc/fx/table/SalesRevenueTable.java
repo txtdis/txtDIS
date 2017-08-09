@@ -1,26 +1,25 @@
 package ph.txtdis.mgdc.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.math.BigDecimal;
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.SalesRevenue;
 import ph.txtdis.fx.table.AbstractTable;
 import ph.txtdis.fx.table.Column;
 import ph.txtdis.mgdc.service.SalesRevenueService;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.CURRENCY;
+import static ph.txtdis.type.Type.TEXT;
+
 @Scope("prototype")
 @Component("salesRevenueTable")
 public class SalesRevenueTable //
-		extends AbstractTable<SalesRevenue> {
+	extends AbstractTable<SalesRevenue> {
 
 	@Autowired
 	private Column<SalesRevenue, String> seller;
@@ -40,8 +39,9 @@ public class SalesRevenueTable //
 	@Override
 	protected List<TableColumn<SalesRevenue, ?>> addColumns() {
 		return asList( //
-				seller.ofType(TEXT).width(120).build("Seller", "seller"), customer.ofType(TEXT).width(360).build("Customer", "customer"), //
-				value.ofType(CURRENCY).build("Revenue", "value") //
+			seller.ofType(TEXT).width(120).build("Seller", "seller"),
+			customer.ofType(TEXT).width(360).build("Customer", "customer"), //
+			value.ofType(CURRENCY).build("Revenue", "value") //
 		);
 	}
 

@@ -1,35 +1,31 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.PartnerType.OUTLET;
-import static ph.txtdis.type.PartnerType.VENDOR;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.repository.BillingDetailRepository;
 import ph.txtdis.mgdc.gsm.repository.SalesOrderRepository;
-import ph.txtdis.service.CredentialService;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.PartnerType.OUTLET;
+import static ph.txtdis.type.PartnerType.VENDOR;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("salesOrderService")
 public class SalesOrderServiceImpl //
-		extends AbstractBookingService<SalesOrderRepository> //
-		implements SalesOrderService {
+	extends AbstractBookingService<SalesOrderRepository> //
+	implements SalesOrderService {
 
 	private static final String CREATED_NEW_ITEM_DETAILS = "CREATED NEW ITEM DETAILS";
 
 	@Autowired
 	private BillingDetailRepository detailRepository;
-
-	@Autowired
-	private CredentialService credentialService;
 
 	@Override
 	public List<BillableEntity> findAllPicked() {
@@ -44,13 +40,14 @@ public class SalesOrderServiceImpl //
 	@Override
 	public BillableEntity findEntityByBookingNo(String key) {
 		return bookingRepository.findFirstByCustomerTypeInAndBookingIdAndRmaNullOrderById( //
-				asList(OUTLET), //
-				Long.valueOf(key));
+			asList(OUTLET), //
+			Long.valueOf(key));
 	}
 
 	@Override
 	public Billable findUnbilledPickedBooking(LocalDate d) {
-		BillableEntity e = bookingRepository.findFirstByNumIdNullAndRmaNullAndCustomerTypeAndPickingNotNullAndOrderDateBetween( //
+		BillableEntity e =
+			bookingRepository.findFirstByNumIdNullAndRmaNullAndCustomerTypeAndPickingNotNullAndOrderDateBetween( //
 				OUTLET, //
 				goLive(), //
 				billingCutoff(d));
@@ -59,7 +56,8 @@ public class SalesOrderServiceImpl //
 
 	@Override
 	public Billable findUnpicked(LocalDate d) {
-		BillableEntity e = bookingRepository.findFirstByNumIdNullAndRmaNullAndCustomerTypeNotAndPickingNullAndOrderDateBetween( //
+		BillableEntity e =
+			bookingRepository.findFirstByNumIdNullAndRmaNullAndCustomerTypeNotAndPickingNullAndOrderDateBetween( //
 				VENDOR, //
 				goLive(), //
 				billingCutoff(d));
@@ -78,12 +76,14 @@ public class SalesOrderServiceImpl //
 
 	@Override
 	protected BillableEntity nextEntity(Long id) {
-		return bookingRepository.findFirstByCustomerTypeAndRmaNullAndIdGreaterThanAndBookingIdGreaterThanOrderByIdAsc(OUTLET, id, 0L);
+		return bookingRepository
+			.findFirstByCustomerTypeAndRmaNullAndIdGreaterThanAndBookingIdGreaterThanOrderByIdAsc(OUTLET, id, 0L);
 	}
 
 	@Override
 	protected BillableEntity previousEntity(Long id) {
-		return bookingRepository.findFirstByCustomerTypeAndRmaNullAndIdLessThanAndBookingIdGreaterThanOrderByIdDesc(OUTLET, id, 0L);
+		return bookingRepository
+			.findFirstByCustomerTypeAndRmaNullAndIdLessThanAndBookingIdGreaterThanOrderByIdDesc(OUTLET, id, 0L);
 	}
 
 	@Override
@@ -128,9 +128,9 @@ public class SalesOrderServiceImpl //
 
 	private String newDetailRemarks(Billable b) {
 		return CREATED_NEW_ITEM_DETAILS + ": " //
-				+ credentialService.username() + " - " //
-				+ toDateDisplay(LocalDate.now()) //
-				+ remarks(b);
+			+ username() + " - " //
+			+ toDateDisplay(LocalDate.now()) //
+			+ remarks(b);
 	}
 
 	private String remarks(Billable b) {

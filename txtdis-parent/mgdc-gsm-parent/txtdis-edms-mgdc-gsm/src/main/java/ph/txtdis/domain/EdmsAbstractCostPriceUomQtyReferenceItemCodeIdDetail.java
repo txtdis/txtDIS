@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class EdmsAbstractCostPriceUomQtyReferenceItemCodeIdDetail //
-		extends EdmsAbstractUomQtyReferencedItemCodeIdDetail {
+	extends EdmsAbstractUomQtyReferencedItemCodeIdDetail {
 
 	@Column(name = "cost")
 	private BigDecimal costValue = ZERO;

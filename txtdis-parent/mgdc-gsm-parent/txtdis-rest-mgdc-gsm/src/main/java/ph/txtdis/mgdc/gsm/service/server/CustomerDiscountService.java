@@ -1,8 +1,5 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.domain.CustomerDiscountEntity;
 import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
@@ -11,9 +8,15 @@ import ph.txtdis.mgdc.gsm.dto.CustomerDiscount;
 import ph.txtdis.mgdc.gsm.repository.CustomerDiscountRepository;
 import ph.txtdis.service.DecisionDataUpdate;
 
-public interface CustomerDiscountService extends DecisionDataUpdate<CustomerDiscountEntity, CustomerDiscountRepository> {
+import java.math.BigDecimal;
+import java.util.List;
 
-	void cancelDiscountsOfOutletsWithAverageMonthlySalesBelowRequiredQty(BigDecimal noOfmonths, BigDecimal requiredQty, List<BillableEntity> billings);
+public interface CustomerDiscountService
+	extends DecisionDataUpdate<CustomerDiscountEntity, CustomerDiscountRepository> {
+
+	void cancelDiscountsOfOutletsWithAverageMonthlySalesBelowRequiredQty(BigDecimal noOfmonths,
+	                                                                     BigDecimal requiredQty,
+	                                                                     List<BillableEntity> billings);
 
 	List<CustomerDiscountEntity> getNewAndOldCustomerDiscounts(CustomerEntity e, Customer c);
 

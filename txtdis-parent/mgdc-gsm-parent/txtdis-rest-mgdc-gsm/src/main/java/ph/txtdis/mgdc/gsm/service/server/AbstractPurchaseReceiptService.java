@@ -1,14 +1,14 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static ph.txtdis.type.PartnerType.VENDOR;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.repository.PurchaseReceiptRepository;
 
-public abstract class AbstractPurchaseReceiptService extends AbstractReceivingService //
-		implements GsmPurchaseReceiptService {
+import static ph.txtdis.type.PartnerType.VENDOR;
+
+public abstract class AbstractPurchaseReceiptService
+	extends AbstractReceivingService //
+	implements GsmPurchaseReceiptService {
 
 	@Autowired
 	private PurchaseReceiptRepository purchaseReceiptRepository;
@@ -20,7 +20,8 @@ public abstract class AbstractPurchaseReceiptService extends AbstractReceivingSe
 
 	@Override
 	protected BillableEntity nextEntity(Long id) {
-		return purchaseReceiptRepository.findFirstByCustomerTypeAndReceivingIdNotNullAndIdGreaterThanOrderByIdAsc(VENDOR, id);
+		return purchaseReceiptRepository
+			.findFirstByCustomerTypeAndReceivingIdNotNullAndIdGreaterThanOrderByIdAsc(VENDOR, id);
 	}
 
 	@Override
@@ -30,6 +31,7 @@ public abstract class AbstractPurchaseReceiptService extends AbstractReceivingSe
 
 	@Override
 	protected BillableEntity previousEntity(Long id) {
-		return purchaseReceiptRepository.findFirstByCustomerTypeAndReceivingIdNotNullAndIdLessThanOrderByIdDesc(VENDOR, id);
+		return purchaseReceiptRepository
+			.findFirstByCustomerTypeAndReceivingIdNotNullAndIdLessThanOrderByIdDesc(VENDOR, id);
 	}
 }

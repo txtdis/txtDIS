@@ -9,7 +9,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
-public abstract class EdmsAbstractRemittanceVarianceBasisModifiedNotedTransported extends EdmsAbstractTransported {
+public abstract class EdmsAbstractRemittanceVarianceBasisModifiedNotedTransported
+	extends EdmsAbstractTransported {
 
 	@Column(name = "modiBy")
 	private String modifiedBy = "";

@@ -1,50 +1,39 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static ph.txtdis.util.DateTimeUtils.endOfMonth;
-import static ph.txtdis.util.DateTimeUtils.startOfMonth;
-import static ph.txtdis.util.DateTimeUtils.toDottedYearMonth;
-import static ph.txtdis.util.DateTimeUtils.toFullMonthYear;
-import static ph.txtdis.util.DateTimeUtils.toLongMonthYear;
-import static ph.txtdis.util.NumberUtils.divide;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.excel.ExcelReportWriter;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.mgdc.gsm.dto.Vat;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.excel.ExcelReportWriter;
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.mgdc.gsm.dto.Vat;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SyncService;
-import ph.txtdis.util.ClientTypeMap;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static ph.txtdis.util.DateTimeUtils.*;
+import static ph.txtdis.util.NumberUtils.divide;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("vatService")
-public class VatServiceImpl implements VatService {
-
-	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<Vat> readOnlyService;
-
-	@Autowired
-	protected SyncService syncService;
-
-	@Autowired
-	private ExcelReportWriter excel;
+public class VatServiceImpl
+	implements VatService {
 
 	@Autowired
 	public ClientTypeMap typeMap;
+
+	@Autowired
+	private RestClientService<Vat> restClientService;
+
+	@Autowired
+	private ExcelReportWriter excel;
 
 	@Value("${prefix.module}")
 	private String modulePrefix;
@@ -61,25 +50,18 @@ public class VatServiceImpl implements VatService {
 	}
 
 	@Override
+	public void setEndDate(LocalDate d) {
+		end = endOfMonth(d);
+	}
+
+	@Override
 	public String getHeaderName() {
 		return "Value-Added Tax";
 	}
 
 	@Override
-	public String getModuleName() {
-		return "vat";
-	}
-
-	@Override
-	public ReadOnlyService<Vat> getListedReadOnlyService() {
-		return readOnlyService;
-	}
-
-	@Override
-	public LocalDate getStartDate() {
-		if (start == null)
-			setStartDate(syncService.getServerDate());
-		return start;
+	public RestClientService<Vat> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -88,12 +70,30 @@ public class VatServiceImpl implements VatService {
 	}
 
 	@Override
+	public LocalDate getStartDate() {
+		if (start == null)
+			setStartDate(getServerDate());
+		return start;
+	}
+
+	@Override
+	public void setStartDate(LocalDate d) {
+		start = startOfMonth(d);
+		setEndDate(d);
+	}
+
+	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + getAllCapModule() + " " + toLongMonthYear(getStartDate());
+		return username() + "@" + modulePrefix + " " + getAllCapModule() + " " + toLongMonthYear(getStartDate());
 	}
 
 	private String getAllCapModule() {
 		return getModuleName().toUpperCase();
+	}
+
+	@Override
+	public String getModuleName() {
+		return "vat";
 	}
 
 	@Override
@@ -124,15 +124,6 @@ public class VatServiceImpl implements VatService {
 	}
 
 	@Override
-	public BigDecimal getVatable(BigDecimal total) {
-		return divide(total, getVatDivisor());
-	}
-
-	private BigDecimal getVatDivisor() {
-		return ONE.add(getVatRate());
-	}
-
-	@Override
 	public BigDecimal getVatRate() {
 		return vatRate == null ? computeVat() : vatRate;
 	}
@@ -152,8 +143,17 @@ public class VatServiceImpl implements VatService {
 		}
 	}
 
-	private ReadOnlyService<Vat> findVat() {
-		return readOnlyService.module(getModuleName());
+	private RestClientService<Vat> findVat() {
+		return restClientService.module(getModuleName());
+	}
+
+	@Override
+	public BigDecimal getVatable(BigDecimal total) {
+		return divide(total, getVatDivisor());
+	}
+
+	private BigDecimal getVatDivisor() {
+		return ONE.add(getVatRate());
 	}
 
 	@Override
@@ -197,16 +197,5 @@ public class VatServiceImpl implements VatService {
 
 	private String getExcelSheetName() {
 		return toLongMonthYear(getStartDate());
-	}
-
-	@Override
-	public void setEndDate(LocalDate d) {
-		end = endOfMonth(d);
-	}
-
-	@Override
-	public void setStartDate(LocalDate d) {
-		start = startOfMonth(d);
-		setEndDate(d);
 	}
 }

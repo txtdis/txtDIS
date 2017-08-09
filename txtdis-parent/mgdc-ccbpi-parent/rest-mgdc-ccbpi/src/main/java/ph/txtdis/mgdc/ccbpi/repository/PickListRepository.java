@@ -11,36 +11,42 @@ import ph.txtdis.repository.SpunRepository;
 
 @Repository("pickListRepository")
 public interface PickListRepository //
-		extends SpunRepository<PickListEntity, Long> {
+	extends SpunRepository<PickListEntity, Long> {
 
 	List<PickListEntity> findByPickDate( //
-			@Param("date") LocalDate d);
+	                                     @Param("date") LocalDate d);
 
 	PickListEntity findByPrintedOnIsNotNullAndBillingsBookingId( //
-			@Param("bookingId") Long id);
+	                                                             @Param("bookingId") Long id);
 
 	PickListEntity findByReceivedOnNotNullAndId( //
-			@Param("id") Long id);
+	                                             @Param("id") Long id);
 
 	List<PickListEntity> findDistinctByPickDateBetweenAndLeadAssistantNameContainingAndBillingsNotNull( //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e, //
-			@Param("collector") String collector);
+	                                                                                                    @Param("start")
+		                                                                                                    LocalDate s,
+	                                                                                                    //
+	                                                                                                    @Param("end")
+		                                                                                                    LocalDate e,
+	                                                                                                    //
+	                                                                                                    @Param(
+		                                                                                                    "receivedFrom")
+		                                                                                                    String collector);
 
 	PickListEntity findFirstByBillingsBilledOnNullAndPickDate( //
-			@Param("date") LocalDate d);
+	                                                           @Param("date") LocalDate d);
 
 	PickListEntity findFirstByPickDateAndTruckId( //
-			@Param("date") LocalDate d, //
-			@Param("truckId") Long id);
+	                                              @Param("date") LocalDate d, //
+	                                              @Param("truckId") Long id);
 
 	// next Load Return
 	PickListEntity findFirstByReceivedOnNotNullAndIdGreaterThanOrderByIdAsc( //
-			@Param("id") Long id);
+	                                                                         @Param("id") Long id);
 
 	// previous Load Return
 	PickListEntity findFirstByReceivedOnNotNullAndIdLessThanOrderByIdDesc( //
-			@Param("id") Long id);
+	                                                                       @Param("id") Long id);
 
 	// first Load Return
 	PickListEntity findFirstByReceivedOnNotNullOrderByIdAsc();

@@ -16,7 +16,7 @@ import ph.txtdis.dto.Role;
 @Scope("prototype")
 @Component("roleTable")
 public class RoleTable //
-		extends AbstractTable<Role> {
+	extends AbstractTable<Role> {
 
 	@Autowired
 	private Column<Role, Boolean> enabled;
@@ -27,7 +27,7 @@ public class RoleTable //
 	@Override
 	protected List<TableColumn<Role, ?>> addColumns() {
 		return asList( //
-				enabled.ofType(CHECKBOX).build("Role", "enabled"), //
-				role.ofType(TEXT).build("Authorization", "role"));
+			enabled.ofType(CHECKBOX).build("Role", "enabled"), //
+			role.ofType(TEXT).build("Authorization", "role"));
 	}
 }

@@ -9,7 +9,7 @@ import javafx.scene.control.TabPane;
 
 @Component("tabBox")
 public class TabBox //
-		extends TabPane {
+	extends TabPane {
 
 	public TabBox() {
 		setStyle("-fx-tab-min-width: 80;");

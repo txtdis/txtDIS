@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 @Service("commissionService")
 public class CommissionServiceImpl //
-		implements CommissionService {
+	implements CommissionService {
 
 	@Override
 	public void reset() {

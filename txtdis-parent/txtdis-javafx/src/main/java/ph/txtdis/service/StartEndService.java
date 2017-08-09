@@ -6,9 +6,9 @@ public interface StartEndService {
 
 	LocalDate getEndDate();
 
-	LocalDate getStartDate();
-
 	void setEndDate(LocalDate d);
+
+	LocalDate getStartDate();
 
 	void setStartDate(LocalDate d);
 }

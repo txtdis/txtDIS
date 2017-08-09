@@ -16,8 +16,8 @@ import ph.txtdis.mgdc.ccbpi.service.DeliveryListService;
 @Scope("prototype")
 @Component("deliveryListApp")
 public class DeliveryListAppImpl //
-		extends AbstractShippedBillableApp<DeliveryListService, DeliveryListTable> //
-		implements DeliveryListApp {
+	extends AbstractShippedBillableApp<DeliveryListService, DeliveryListTable> //
+	implements DeliveryListApp {
 
 	@Autowired
 	private AppCombo<String> routeCombo;
@@ -27,12 +27,6 @@ public class DeliveryListAppImpl //
 
 	@Autowired
 	private OCPReader ocpReader;
-
-	@Override
-	public void refresh() {
-		super.refresh();
-		routeCombo.items(service.listRouteNames());
-	}
 
 	@Override
 	protected void renew() {
@@ -59,7 +53,7 @@ public class DeliveryListAppImpl //
 			try {
 				updateBasedOnRouteSelection(route);
 			} catch (Information i) {
-				dialog.show(i).addParent(this).start();
+				messageDialog.show(i).addParent(this).start();
 				refresh();
 			} catch (Exception e) {
 				showErrorDialog(e);
@@ -71,6 +65,12 @@ public class DeliveryListAppImpl //
 			importOCPUponOrderDateValidation();
 		else
 			service.updateUponRouteValidation(route);
+	}
+
+	@Override
+	public void refresh() {
+		super.refresh();
+		routeCombo.items(service.listRouteNames());
 	}
 
 	private void importOCPUponOrderDateValidation() throws Information, Exception {

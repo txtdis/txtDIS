@@ -18,15 +18,15 @@ import ph.txtdis.domain.AbstractRemittanceEntity;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "remittance", //
-		indexes = { //
-				@Index(columnList = "created_on, id"), //
-				@Index(columnList = "deposited_on, check_id, payment_date"), //
-				@Index(columnList = "drawee_bank_id, check_id"), //
-				@Index(columnList = "payment_date"), //
-				@Index(columnList = "received_on, check_id, payment_date") }, //
-		uniqueConstraints = @UniqueConstraint(columnNames = { "id", "check_id", "drawee_bank_id" }))
+	indexes = { //
+		@Index(columnList = "created_on, id"), //
+		@Index(columnList = "deposited_on, check_id, payment_date"), //
+		@Index(columnList = "drawee_bank_id, check_id"), //
+		@Index(columnList = "payment_date"), //
+		@Index(columnList = "received_on, check_id, payment_date")}, //
+	uniqueConstraints = @UniqueConstraint(columnNames = {"id", "check_id", "drawee_bank_id"}))
 public class RemittanceEntity //
-		extends AbstractRemittanceEntity {
+	extends AbstractRemittanceEntity {
 
 	private static final long serialVersionUID = -5860334462169889589L;
 

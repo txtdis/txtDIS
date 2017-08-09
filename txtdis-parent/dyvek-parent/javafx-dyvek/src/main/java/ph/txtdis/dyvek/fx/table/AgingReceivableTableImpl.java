@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 @Component("agingReceivableTable")
 public class AgingReceivableTableImpl //
-		extends AbstractAgingTable //
-		implements AgingReceivableTable {
+	extends AbstractAgingTable //
+	implements AgingReceivableTable {
 
 	@Override
 	protected String customerColumnName() {

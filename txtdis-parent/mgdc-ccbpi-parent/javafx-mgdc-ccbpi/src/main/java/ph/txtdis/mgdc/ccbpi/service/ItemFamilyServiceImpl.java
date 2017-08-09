@@ -4,14 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ph.txtdis.dto.ItemFamily;
-import ph.txtdis.service.ReadOnlyService;
+import ph.txtdis.service.RestClientService;
 
 @Service("itemFamilyService")
 public class ItemFamilyServiceImpl //
-		implements ItemFamilyService {
+	implements ItemFamilyService {
 
 	@Autowired
-	private ReadOnlyService<ItemFamily> readOnlyService;
+	private RestClientService<ItemFamily> restClientService;
 
 	@Override
 	public String getModuleName() {
@@ -19,7 +19,7 @@ public class ItemFamilyServiceImpl //
 	}
 
 	@Override
-	public ReadOnlyService<ItemFamily> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<ItemFamily> getRestClientService() {
+		return restClientService;
 	}
 }

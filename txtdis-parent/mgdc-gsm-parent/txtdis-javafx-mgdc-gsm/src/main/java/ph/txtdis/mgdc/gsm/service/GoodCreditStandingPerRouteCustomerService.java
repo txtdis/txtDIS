@@ -1,9 +1,9 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.Route;
 import ph.txtdis.mgdc.gsm.dto.Customer;
+
+import java.util.List;
 
 public interface GoodCreditStandingPerRouteCustomerService {
 

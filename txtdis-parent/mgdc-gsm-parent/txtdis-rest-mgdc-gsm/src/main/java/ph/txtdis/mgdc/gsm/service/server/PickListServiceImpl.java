@@ -1,13 +1,11 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.Booking;
+import ph.txtdis.dto.PickList;
+import ph.txtdis.mgdc.gsm.domain.*;
+import ph.txtdis.service.RestClientService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,29 +15,22 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.Booking;
-import ph.txtdis.dto.PickList;
-import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableEntity;
-import ph.txtdis.mgdc.gsm.domain.BomEntity;
-import ph.txtdis.mgdc.gsm.domain.ItemEntity;
-import ph.txtdis.mgdc.gsm.domain.PickListDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.PickListEntity;
-import ph.txtdis.service.SavingService;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.*;
 
 @Service("pickListService")
 public class PickListServiceImpl //
-		extends AbstractPickListService<LoadOrderService> //
-		implements PickListService {
+	extends AbstractPickListService<LoadOrderService> //
+	implements PickListService {
 
 	@Autowired
 	private SalesOrderService bookingService;
 
 	@Autowired
-	private SavingService<PickList> savingService;
+	private RestClientService<PickList> restClientService;
 
 	@Override
 	public List<PickList> findAll() {
@@ -47,30 +38,37 @@ public class PickListServiceImpl //
 		return toModels(toPickings(l, PickListDetailEntity::getInitialQty));
 	}
 
-	private List<PickListEntity> toPickings(List<BillableEntity> l, Function<PickListDetailEntity, BigDecimal> qtyToSum) {
+	private List<PickListEntity> toPickings(List<BillableEntity> l,
+	                                        Function<PickListDetailEntity, BigDecimal> qtyToSum) {
 		return l.stream() //
-				.flatMap(b -> b.getDetails().stream()) //
-				.flatMap(d -> toPickingDetails(d).stream()) //
-				.collect(groupingBy( //
-						PickListDetailEntity::getPicking, //
-						groupingBy( //
-								PickListDetailEntity::getItem, //
-								mapping( //
-										qtyToSum, //
-										reducing( //
-												ZERO, //
-												BigDecimal::add))))) //
-				.entrySet().stream() //
-				.map(s -> toPicklist(s)) //
-				.sorted(comparing(PickListEntity::getId)) //
-				.collect(toList());
+			.flatMap(b -> b.getDetails().stream()) //
+			.flatMap(d -> toPickingDetails(d).stream()) //
+			.collect(groupingBy( //
+				PickListDetailEntity::getPicking, //
+				groupingBy( //
+					PickListDetailEntity::getItem, //
+					mapping( //
+						qtyToSum, //
+						reducing( //
+							ZERO, //
+							BigDecimal::add))))) //
+			.entrySet().stream() //
+			.map(s -> toPicklist(s)) //
+			.sorted(comparing(PickListEntity::getId)) //
+			.collect(toList());
 	}
 
 	private List<PickListDetailEntity> toPickingDetails(BillableDetailEntity d) {
 		List<BomEntity> boms = bomService.extractAll(d.getItem(), ONE);
 		return boms.stream() //
-				.map(bom -> toPickingDetail(d, bom)) //
-				.collect(toList());
+			.map(bom -> toPickingDetail(d, bom)) //
+			.collect(toList());
+	}
+
+	private PickListEntity toPicklist(Entry<PickListEntity, Map<ItemEntity, BigDecimal>> s) {
+		PickListEntity p = s.getKey();
+		p.setDetails(toPicklistDetails(p, s));
+		return p;
 	}
 
 	private PickListDetailEntity toPickingDetail(BillableDetailEntity b, BomEntity bom) {
@@ -82,6 +80,15 @@ public class PickListServiceImpl //
 		return d;
 	}
 
+	private List<PickListDetailEntity> toPicklistDetails(PickListEntity p,
+	                                                     Entry<PickListEntity, Map<ItemEntity, BigDecimal>> s) {
+		return s.getValue() //
+			.entrySet().stream() //
+			.map(m -> toPicklistDetail(p, m)) //
+			.filter(d -> d.getPickedCount() > 0) //
+			.collect(toList());
+	}
+
 	private int pickedCount(BillableDetailEntity b, BomEntity bom) {
 		BigDecimal qty = b.getInitialQty().multiply(bom.getQty());
 		return qty.intValue();
@@ -90,20 +97,6 @@ public class PickListServiceImpl //
 	private int returnedCount(BillableDetailEntity b, BomEntity bom) {
 		BigDecimal qty = b.getReturnedQty().multiply(bom.getQty());
 		return qty.intValue();
-	}
-
-	private PickListEntity toPicklist(Entry<PickListEntity, Map<ItemEntity, BigDecimal>> s) {
-		PickListEntity p = s.getKey();
-		p.setDetails(toPicklistDetails(p, s));
-		return p;
-	}
-
-	private List<PickListDetailEntity> toPicklistDetails(PickListEntity p, Entry<PickListEntity, Map<ItemEntity, BigDecimal>> s) {
-		return s.getValue() //
-				.entrySet().stream() //
-				.map(m -> toPicklistDetail(p, m)) //
-				.filter(d -> d.getPickedCount() > 0) //
-				.collect(toList());
 	}
 
 	private PickListDetailEntity toPicklistDetail(PickListEntity p, Entry<ItemEntity, BigDecimal> m) {
@@ -138,6 +131,12 @@ public class PickListServiceImpl //
 	}
 
 	@Override
+	public PickList saveToEdms(PickList p) throws Exception {
+		restClientService.module("pickList").save(p);
+		return p;
+	}
+
+	@Override
 	public PickList save(PickList p) {
 		try {
 			p = super.save(p);
@@ -145,12 +144,6 @@ public class PickListServiceImpl //
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	@Override
-	public PickList saveToEdms(PickList p) throws Exception {
-		savingService.module("pickList").save(p);
-		return p;
 	}
 
 	@Override

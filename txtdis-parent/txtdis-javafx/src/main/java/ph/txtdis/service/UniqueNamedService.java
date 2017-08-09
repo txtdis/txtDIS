@@ -11,10 +11,10 @@ public interface UniqueNamedService<T extends Keyed<Long>> {
 	}
 
 	default T findByName(String name) throws Exception {
-		return getListedReadOnlyService().module(getModuleName()).getOne("/" + name);
+		return getRestClientService().module(getModuleName()).getOne("/" + name);
 	}
 
-	String getModuleName();
+	RestClientService<T> getRestClientService();
 
-	ReadOnlyService<T> getListedReadOnlyService();
+	String getModuleName();
 }

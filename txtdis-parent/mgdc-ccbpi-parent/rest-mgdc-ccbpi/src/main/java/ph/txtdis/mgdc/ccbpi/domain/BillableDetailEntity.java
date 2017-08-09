@@ -20,11 +20,11 @@ import ph.txtdis.util.NumberUtils;
 @Data
 @Entity
 @Table(name = "billing_detail", //
-		uniqueConstraints = @UniqueConstraint(columnNames = { "billing_id", "item_id", "uom", "price" }))
+	uniqueConstraints = @UniqueConstraint(columnNames = {"billing_id", "item_id", "uom", "price"}))
 @EqualsAndHashCode(callSuper = true)
 public class BillableDetailEntity //
-		extends AbstractKeyedEntity<Long> //
-		implements ItemQuantifiedEntityDetail {
+	extends AbstractKeyedEntity<Long> //
+	implements ItemQuantifiedEntityDetail {
 
 	private static final long serialVersionUID = 257754573072417395L;
 
@@ -52,12 +52,17 @@ public class BillableDetailEntity //
 	@Override
 	public BigDecimal getFinalQty() {
 		return getInitialQty() //
-				.subtract(getReturnedQty());
+			.subtract(getReturnedQty());
 	}
 
 	@Override
 	public BigDecimal getInitialQty() {
 		return initialQty == null ? ZERO : initialQty;
+	}
+
+	@Override
+	public BigDecimal getReturnedQty() {
+		return returnedQty == null ? ZERO : returnedQty;
 	}
 
 	public Long getItemId() {
@@ -69,15 +74,10 @@ public class BillableDetailEntity //
 	}
 
 	@Override
-	public BigDecimal getReturnedQty() {
-		return returnedQty == null ? ZERO : returnedQty;
-	}
-
-	@Override
 	public String toString() {
 		return "\n" + billing.getOrderNo() + ": " + item //
-				+ " -i=" + getInitialQty() //
-				+ " -r=" + returnedQty //
-				+ NumberUtils.toCurrencyText(priceValue);
+			+ " -i=" + getInitialQty() //
+			+ " -r=" + returnedQty //
+			+ NumberUtils.toCurrencyText(priceValue);
 	}
 }

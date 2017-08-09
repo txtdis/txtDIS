@@ -1,10 +1,10 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dto.Routing;
 import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
 import ph.txtdis.mgdc.gsm.domain.RoutingEntity;
+
+import java.util.List;
 
 public interface RoutingService {
 

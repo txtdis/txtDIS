@@ -1,18 +1,19 @@
 package ph.txtdis.mgdc.gsm.dto;
 
-import static ph.txtdis.type.ModuleType.INVOICE;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import lombok.Data;
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.dto.Typed;
 import ph.txtdis.type.ModuleType;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static ph.txtdis.type.ModuleType.INVOICE;
+
 @Data
 public class Vat //
-		implements Keyed<Long>, Typed {
+	implements Keyed<Long>,
+	Typed {
 
 	private Long id, nbrId;
 

@@ -1,22 +1,22 @@
 package ph.txtdis.mgdc.gsm.fx.table;
 
-import static ph.txtdis.type.Type.CODE;
-import static ph.txtdis.type.Type.FRACTION;
-
+import javafx.scene.control.TableColumn;
 import org.apache.commons.lang3.math.Fraction;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.fx.table.Column;
 import ph.txtdis.mgdc.fx.dialog.BillableDialog;
 import ph.txtdis.mgdc.gsm.service.BillableService;
 
+import static ph.txtdis.type.Type.CODE;
+import static ph.txtdis.type.Type.FRACTION;
+
 public class AbstractBeverageBillableTable<AS extends BillableService, BD extends BillableDialog> //
-		extends AbstractBillableTable<AS, BD> {
+	extends AbstractBillableTable<AS, BD> {
 
 	@Autowired
-	protected Column<BillableDetail, Fraction> bookedQtyInFractions, soldQtyInFractions, returnedQtyInFractions, netQtyInFractions;
+	protected Column<BillableDetail, Fraction> bookedQtyInFractions, soldQtyInFractions, returnedQtyInFractions,
+		netQtyInFractions;
 
 	@Autowired
 	protected Column<BillableDetail, String> itemVendorId;
@@ -35,25 +35,25 @@ public class AbstractBeverageBillableTable<AS extends BillableService, BD extend
 		return netQtyColumnName();
 	}
 
-	protected String returnedQtyColumnName() {
-		return netQtyColumnName();
+	protected String qtyInFractions(String type) {
+		return inFractions(type + "Qty");
 	}
 
 	protected String netQtyColumnName() {
 		return "Quantity";
 	}
 
-	protected String qtyInFractions(String type) {
-		return inFractions(type + "Qty");
+	@Override
+	public String netQty() {
+		return inFractions(super.netQty());
+	}
+
+	protected String returnedQtyColumnName() {
+		return netQtyColumnName();
 	}
 
 	private String inFractions(String qtyType) {
 		return qtyType + "InFractions";
-	}
-
-	@Override
-	public String netQty() {
-		return inFractions(super.netQty());
 	}
 
 	@Override

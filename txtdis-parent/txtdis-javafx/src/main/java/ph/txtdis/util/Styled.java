@@ -1,28 +1,17 @@
 package ph.txtdis.util;
 
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.DateTimeUtils.toTimeDisplay;
-import static ph.txtdis.util.DateTimeUtils.toTimestampText;
-import static ph.txtdis.util.NumberUtils.isNegative;
-import static ph.txtdis.util.NumberUtils.to2PlaceDecimalText;
-import static ph.txtdis.util.NumberUtils.to4PlaceDecimalText;
-import static ph.txtdis.util.NumberUtils.to4PlacePercentText;
-import static ph.txtdis.util.NumberUtils.toAsNeededNoOfPlaceDecimalText;
-import static ph.txtdis.util.NumberUtils.toCurrencyText;
-import static ph.txtdis.util.NumberUtils.toIdText;
-import static ph.txtdis.util.NumberUtils.toIntegerWithComma;
-import static ph.txtdis.util.NumberUtils.toPercentText;
-import static ph.txtdis.util.TextUtils.toBoolSign;
-import static ph.txtdis.util.TextUtils.toIdDisplay;
+import org.apache.commons.lang3.math.Fraction;
+import ph.txtdis.fx.control.StylableTextField;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
-import org.apache.commons.lang3.math.Fraction;
-
-import ph.txtdis.fx.control.StylableTextField;
+import static ph.txtdis.util.DateTimeUtils.*;
+import static ph.txtdis.util.NumberUtils.*;
+import static ph.txtdis.util.TextUtils.toBoolSign;
+import static ph.txtdis.util.TextUtils.toIdDisplay;
 
 public class Styled {
 
@@ -32,9 +21,9 @@ public class Styled {
 
 	private static final String UNDIMMED = " -fx-opacity: 1; ";
 
-	private static final String CENTER = UNDIMMED + ALIGN + " center; ";
-
 	protected static final String RIGHT_ALIGN = UNDIMMED + ALIGN + " center-right; ";
+
+	private static final String CENTER = UNDIMMED + ALIGN + " center; ";
 
 	private static final String GREEN = COLOR + " green; ";
 
@@ -43,6 +32,10 @@ public class Styled {
 	public static void for2Place(StylableTextField f, BigDecimal d) {
 		f.setText(to2PlaceDecimalText(d));
 		setNumberStyle(f, d);
+	}
+
+	private static void setNumberStyle(StylableTextField f, BigDecimal d) {
+		f.setStyle(RIGHT_ALIGN + (isNegative(d) ? RED : ""));
 	}
 
 	public static void for4Place(StylableTextField f, BigDecimal d) {
@@ -75,6 +68,10 @@ public class Styled {
 		center(f);
 	}
 
+	private static void center(StylableTextField f) {
+		f.setStyle(CENTER);
+	}
+
 	public static <T> void forEnum(StylableTextField f, T t) {
 		f.setText(t.toString());
 		center(f);
@@ -94,9 +91,17 @@ public class Styled {
 		setNumberStyle(f, l);
 	}
 
+	private static void setNumberStyle(StylableTextField f, Long l) {
+		f.setStyle(RIGHT_ALIGN + (isNegative(l) ? RED : ""));
+	}
+
 	public static void forInteger(StylableTextField f, Integer i) {
 		f.setText(toIntegerWithComma(i));
 		setNumberStyle(f, i);
+	}
+
+	private static void setNumberStyle(StylableTextField f, Integer i) {
+		f.setStyle(RIGHT_ALIGN + (isNegative(i) ? RED : ""));
 	}
 
 	public static void forPercent(StylableTextField f, BigDecimal d) {
@@ -127,21 +132,5 @@ public class Styled {
 	public static void forTimestamp(StylableTextField f, ZonedDateTime t) {
 		f.setText(toTimestampText(t));
 		center(f);
-	}
-
-	private static void center(StylableTextField f) {
-		f.setStyle(CENTER);
-	}
-
-	private static void setNumberStyle(StylableTextField f, BigDecimal d) {
-		f.setStyle(RIGHT_ALIGN + (isNegative(d) ? RED : ""));
-	}
-
-	private static void setNumberStyle(StylableTextField f, Integer i) {
-		f.setStyle(RIGHT_ALIGN + (isNegative(i) ? RED : ""));
-	}
-
-	private static void setNumberStyle(StylableTextField f, Long l) {
-		f.setStyle(RIGHT_ALIGN + (isNegative(l) ? RED : ""));
 	}
 }

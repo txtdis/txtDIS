@@ -1,8 +1,5 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
@@ -12,9 +9,12 @@ import ph.txtdis.mgdc.app.ReceivingReportApp;
 import ph.txtdis.mgdc.fx.table.BillableTable;
 import ph.txtdis.mgdc.gsm.service.ReceivingReportService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractReceivingReportApp<AT extends BillableTable> //
-		extends AbstractBillableApp<ReceivingReportService, AT, Long> //
-		implements ReceivingReportApp {
+	extends AbstractBillableApp<ReceivingReportService, AT, Long> //
+	implements ReceivingReportApp {
 
 	private BooleanProperty receivingReportCanBeCreated, receivingReportCanBeModified;
 
@@ -23,6 +23,13 @@ public abstract class AbstractReceivingReportApp<AT extends BillableTable> //
 		List<Node> l = new ArrayList<>(super.mainVerticalPaneNodes());
 		l.add(trackedPane());
 		return l;
+	}
+
+	@Override
+	protected HBox trackedPane() {
+		List<Node> l = new ArrayList<>(receivingNodes());
+		l.addAll(actionAfterReceivingNodes("Modified"));
+		return pane.centeredHorizontal(l);
 	}
 
 	@Override
@@ -44,19 +51,8 @@ public abstract class AbstractReceivingReportApp<AT extends BillableTable> //
 	}
 
 	@Override
-	protected HBox trackedPane() {
-		List<Node> l = new ArrayList<>(receivingNodes());
-		l.addAll(actionAfterReceivingNodes("Modified"));
-		return box.forHorizontalPane(l);
-	}
-
-	@Override
 	protected void secondGridLine() {
 		customerWithoutDueDateGridLine(1, 6);
-	}
-
-	private Label customerLabel() {
-		return label.field("Customer");
 	}
 
 	@Override
@@ -72,6 +68,10 @@ public abstract class AbstractReceivingReportApp<AT extends BillableTable> //
 		return dueDateDisplay;
 	}
 
+	private Label customerLabel() {
+		return label.field("Customer");
+	}
+
 	@Override
 	protected void addressAndOrRemarksGridLine() {
 		remarksGridLineAtRowSpanning(2, 6);
@@ -79,16 +79,7 @@ public abstract class AbstractReceivingReportApp<AT extends BillableTable> //
 
 	@Override
 	protected HBox tablePane() {
-		return box.forHorizontalPane(table.build());
-	}
-
-	@Override
-	public void refresh() {
-		super.refresh();
-		afterReceivingActionByDisplay.setValue(service.getReceivingModifiedBy());
-		afterReceivingActionOnDisplay.setValue(service.getReceivingModifiedOn());
-		receivingReportCanBeCreated.set(service.isSalesOrderReturnable());
-		receivingReportCanBeModified.set(service.isReceivingReportModifiable());
+		return pane.centeredHorizontal(table.build());
 	}
 
 	@Override
@@ -121,6 +112,15 @@ public abstract class AbstractReceivingReportApp<AT extends BillableTable> //
 				refresh();
 				setFocusAfterReferenceIdValidation();
 			}
+	}
+
+	@Override
+	public void refresh() {
+		super.refresh();
+		afterReceivingActionByDisplay.setValue(service.getReceivingModifiedBy());
+		afterReceivingActionOnDisplay.setValue(service.getReceivingModifiedOn());
+		receivingReportCanBeCreated.set(service.isSalesOrderReturnable());
+		receivingReportCanBeModified.set(service.isReceivingReportModifiable());
 	}
 
 	private void setFocusAfterReferenceIdValidation() {

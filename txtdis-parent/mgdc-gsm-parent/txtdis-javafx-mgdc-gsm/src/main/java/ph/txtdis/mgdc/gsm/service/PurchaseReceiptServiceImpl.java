@@ -1,25 +1,23 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.STOCK_CHECKER;
-import static ph.txtdis.type.UserType.STORE_KEEPER;
-import static ph.txtdis.util.NumberUtils.toIdText;
-
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.UnauthorizedUserException;
 import ph.txtdis.info.Information;
 
+import java.time.LocalDate;
+
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.NumberUtils.toIdText;
+import static ph.txtdis.util.UserUtils.isUser;
+
 @Service("purchaseReceiptService")
 public class PurchaseReceiptServiceImpl //
-		extends AbstractBillableService //
-		implements NoPurchaseOrderReceiptService {
+	extends AbstractBillableService //
+	implements NoPurchaseOrderReceiptService {
 
 	@Value("${vendor.id}")
 	private String vendorId;
@@ -27,11 +25,6 @@ public class PurchaseReceiptServiceImpl //
 	@Override
 	public String getAlternateName() {
 		return "SIV";
-	}
-
-	@Override
-	public Long getBookingId() {
-		return get().getNumId();
 	}
 
 	@Override
@@ -57,8 +50,8 @@ public class PurchaseReceiptServiceImpl //
 	}
 
 	@Override
-	public String getReferencePrompt() {
-		return "B/L No.";
+	public Long getBookingId() {
+		return get().getNumId();
 	}
 
 	@Override
@@ -98,5 +91,10 @@ public class PurchaseReceiptServiceImpl //
 			return;
 		if (!isUser(STOCK_CHECKER) && !isUser(STORE_KEEPER))
 			throw new UnauthorizedUserException("Stock checkers or keepers only");
+	}
+
+	@Override
+	public String getReferencePrompt() {
+		return "B/L No.";
 	}
 }

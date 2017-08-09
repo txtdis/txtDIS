@@ -1,16 +1,15 @@
 package ph.txtdis.dyvek.service;
 
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dyvek.model.Aging;
-import ph.txtdis.service.ReadOnlyService;
+import ph.txtdis.service.RestClientService;
 
 @Service("agingReceivableService")
 public class AgingReceivableServiceImpl //
-		implements AgingReceivableService {
+	implements AgingReceivableService {
 
 	@Override
-	public ReadOnlyService<Aging> getListedReadOnlyService() {
+	public RestClientService<Aging> getRestClientServiceForLists() {
 		// TODO Auto-generated method stub
 		return null;
 	}

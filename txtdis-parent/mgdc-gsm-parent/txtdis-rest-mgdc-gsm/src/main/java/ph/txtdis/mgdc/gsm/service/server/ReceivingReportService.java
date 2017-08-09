@@ -6,7 +6,7 @@ import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.service.server.SpunSavedReferencedKeyedService;
 
 public interface ReceivingReportService //
-		extends SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
+	extends SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
 
 	Billable findByBookingId(Long id) throws NotFoundException;
 }

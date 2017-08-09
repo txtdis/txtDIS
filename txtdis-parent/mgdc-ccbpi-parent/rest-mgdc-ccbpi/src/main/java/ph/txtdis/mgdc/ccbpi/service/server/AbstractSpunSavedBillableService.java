@@ -31,8 +31,9 @@ import ph.txtdis.type.UomType;
 import ph.txtdis.util.DateTimeUtils;
 
 public abstract class AbstractSpunSavedBillableService //
-		extends AbstractServerSpunSavedSearchedEntityService<BillableRepository, BillableEntity, Billable, Long> //
-		implements BillingDataService, SpunSavedBillableService {
+	extends AbstractServerSpunSavedSearchedEntityService<BillableRepository, BillableEntity, Billable, Long> //
+	implements BillingDataService,
+	SpunSavedBillableService {
 
 	protected static final String CANCELLED = "CANCELLED";
 
@@ -87,6 +88,11 @@ public abstract class AbstractSpunSavedBillableService //
 		return setPickingData(b, e.getPicking());
 	}
 
+	@Override
+	public Billable toOrderNoOnlyBillable(BillableEntity e) {
+		return e == null ? null : setOrderNo(new Billable(), e);
+	}
+
 	protected Billable customerOnlyBillable(Billable b, BillableEntity e) {
 		if (b == null)
 			b = new Billable();
@@ -100,19 +106,6 @@ public abstract class AbstractSpunSavedBillableService //
 		return b;
 	}
 
-	private String routeName(BillableEntity e, CustomerEntity c) {
-		RouteEntity route = c.getRoute(e.getOrderDate());
-		return route == null ? null : route.getName();
-	}
-
-	private String seller(BillableEntity e, CustomerEntity c) {
-		String seller = c.getSeller(e.getOrderDate());
-		if (seller == null)
-			return null;
-		UserEntity u = userService.findEntityByPrimaryKey(seller);
-		return u.getSurname() + ", " + u.getName();
-	}
-
 	private Long bookingId(BillableEntity e) {
 		Long id = e.getBookingId();
 		return id == null && e.getCreatedOn() != null ? e.getId() : id;
@@ -121,31 +114,6 @@ public abstract class AbstractSpunSavedBillableService //
 	private List<BillableDetail> details(BillableEntity e) {
 		List<BillableDetailEntity> details = e.getDetails();
 		return details.stream().map(d -> toBillableDetail(d)).collect(Collectors.toList());
-	}
-
-	private BillableDetail toBillableDetail(BillableDetailEntity e) {
-		ItemEntity item = e.getItem();
-		BillableDetail d = new BillableDetail();
-		d.setId(item.getId());
-		d.setItemName(item.getName());
-		d.setItemVendorNo(item.getVendorId());
-		d.setUom(e.getUom());
-		d.setInitialQty(e.getInitialQty());
-		d.setReturnedQty(e.getReturnedQty());
-		d.setQuality(e.getQuality());
-		d.setPriceValue(e.getPriceValue());
-		d.setQtyPerCase(getQtyPerCase(e, item));
-		return d;
-	}
-
-	private int getQtyPerCase(BillableDetailEntity e, ItemEntity item) {
-		if (pricingUom != UomType.CS)
-			return 0;
-		return itemService.getCountPerCase(item);
-	}
-
-	protected String getTotalInText(BigDecimal t) {
-		return "[TOTAL] " + toCurrencyText(t);
 	}
 
 	private Billable setReceivingData(Billable b, BillableEntity e) {
@@ -171,6 +139,40 @@ public abstract class AbstractSpunSavedBillableService //
 		return b;
 	}
 
+	protected Billable setOrderNo(Billable b, BillableEntity e) {
+		b.setPrefix(e.getPrefix());
+		b.setSuffix(e.getSuffix());
+		return b;
+	}
+
+	private String routeName(BillableEntity e, CustomerEntity c) {
+		RouteEntity route = c.getRoute(e.getOrderDate());
+		return route == null ? null : route.getName();
+	}
+
+	private String seller(BillableEntity e, CustomerEntity c) {
+		String seller = c.getSeller(e.getOrderDate());
+		if (seller == null)
+			return null;
+		UserEntity u = userService.findEntityByPrimaryKey(seller);
+		return u.getSurname() + ", " + u.getName();
+	}
+
+	private BillableDetail toBillableDetail(BillableDetailEntity e) {
+		ItemEntity item = e.getItem();
+		BillableDetail d = new BillableDetail();
+		d.setId(item.getId());
+		d.setItemName(item.getName());
+		d.setItemVendorNo(item.getVendorId());
+		d.setUom(e.getUom());
+		d.setInitialQty(e.getInitialQty());
+		d.setReturnedQty(e.getReturnedQty());
+		d.setQuality(e.getQuality());
+		d.setPriceValue(e.getPriceValue());
+		d.setQtyPerCase(getQtyPerCase(e, item));
+		return d;
+	}
+
 	private String truck(PickListEntity p) {
 		TruckEntity t = p.getTruck();
 		return t == null ? PICK_UP.toString() : t.getName();
@@ -181,13 +183,23 @@ public abstract class AbstractSpunSavedBillableService //
 		return fullName(u);
 	}
 
+	private String helper(PickListEntity p) {
+		UserEntity u = p.getAssistant();
+		return fullName(u);
+	}
+
+	private int getQtyPerCase(BillableDetailEntity e, ItemEntity item) {
+		if (pricingUom != UomType.CS)
+			return 0;
+		return itemService.getCountPerCase(item);
+	}
+
 	private String fullName(UserEntity u) {
 		return u == null ? null : u.getName() + " " + u.getSurname();
 	}
 
-	private String helper(PickListEntity p) {
-		UserEntity u = p.getAssistant();
-		return fullName(u);
+	protected String getTotalInText(BigDecimal t) {
+		return "[TOTAL] " + toCurrencyText(t);
 	}
 
 	@Override
@@ -212,6 +224,11 @@ public abstract class AbstractSpunSavedBillableService //
 		return e;
 	}
 
+	protected BillableEntity update(Billable b) {
+		BillableEntity e = repository.findOne(b.getId());
+		return update(e, b);
+	}
+
 	protected BillableEntity orderNoOnlyEntity(Billable b) {
 		BillableEntity e = new BillableEntity();
 		return setThreePartOrderNo(e, b);
@@ -226,18 +243,23 @@ public abstract class AbstractSpunSavedBillableService //
 		return id != null ? id : incrementBookingId();
 	}
 
-	private Long incrementBookingId() {
-		BillableEntity b = repository.findFirstByBookingIdNotNullOrderByBookingIdDesc();
-		return b == null || b.getBookingId() == null ? 1L : b.getBookingId() + 1;
-	}
-
 	protected List<BillableDetailEntity> entityDetails(BillableEntity e, Billable b) {
 		List<BillableDetail> l = b.getDetails();
 		return l == null ? null
-				: l.stream() //
-						.filter(d -> d != null) //
-						.map(d -> detail(e, d)) //
-						.collect(toList());
+			: l.stream() //
+			.filter(d -> d != null) //
+			.map(d -> detail(e, d)) //
+			.collect(toList());
+	}
+
+	protected BillableEntity update(BillableEntity e, Billable b) {
+		e.setRemarks(b.getRemarks());
+		return e;
+	}
+
+	private Long incrementBookingId() {
+		BillableEntity b = repository.findFirstByBookingIdNotNullOrderByBookingIdDesc();
+		return b == null || b.getBookingId() == null ? 1L : b.getBookingId() + 1;
 	}
 
 	private BillableDetailEntity detail(BillableEntity e, BillableDetail bd) {
@@ -250,27 +272,6 @@ public abstract class AbstractSpunSavedBillableService //
 		ed.setReturnedQty(nullIfZero(bd.getReturnedQty()));
 		ed.setPriceValue(nullIfZero(bd.getPriceValue()));
 		return ed;
-	}
-
-	protected BillableEntity update(Billable b) {
-		BillableEntity e = repository.findOne(b.getId());
-		return update(e, b);
-	}
-
-	protected BillableEntity update(BillableEntity e, Billable b) {
-		e.setRemarks(b.getRemarks());
-		return e;
-	}
-
-	@Override
-	public Billable toOrderNoOnlyBillable(BillableEntity e) {
-		return e == null ? null : setOrderNo(new Billable(), e);
-	}
-
-	protected Billable setOrderNo(Billable b, BillableEntity e) {
-		b.setPrefix(e.getPrefix());
-		b.setSuffix(e.getSuffix());
-		return b;
 	}
 
 	@Override

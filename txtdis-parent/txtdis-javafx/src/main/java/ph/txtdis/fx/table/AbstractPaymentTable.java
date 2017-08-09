@@ -15,8 +15,8 @@ import ph.txtdis.app.BillingApp;
 import ph.txtdis.dto.RemittanceDetail;
 
 public abstract class AbstractPaymentTable //
-		extends AbstractTable<RemittanceDetail> //
-		implements AppTable<RemittanceDetail> {
+	extends AbstractTable<RemittanceDetail> //
+	implements AppTable<RemittanceDetail> {
 
 	@Autowired
 	private BillingApp app;
@@ -30,9 +30,9 @@ public abstract class AbstractPaymentTable //
 	@Override
 	protected List<TableColumn<RemittanceDetail, ?>> addColumns() {
 		return asList( //
-				orderNo.launches(app).ofType(CODE).width(120).build("S/I(D/R) No.", "orderNo"), //
-				customer.launches(app).ofType(TEXT).width(320).build("Customer", "customer"), //
-				total.launches(app).ofType(CURRENCY).build("Amount Due", "totalDueValue"), //
-				payment.launches(app).ofType(CURRENCY).build("Payment", "paymentValue"));
+			orderNo.launches(app).ofType(CODE).width(120).build("S/I(D/R) No.", "orderNo"), //
+			customer.launches(app).ofType(TEXT).width(320).build("Customer", "customer"), //
+			total.launches(app).ofType(CURRENCY).build("Amount Due", "totalDueValue"), //
+			payment.launches(app).ofType(CURRENCY).build("Payment", "paymentValue"));
 	}
 }

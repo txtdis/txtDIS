@@ -6,7 +6,9 @@ import ph.txtdis.service.CustomerSearchableService;
 import ph.txtdis.service.DecisionNeededService;
 
 public interface BadRmaService //
-		extends BillableService, CustomerSearchableService, DecisionNeededService {
+	extends BillableService,
+	CustomerSearchableService,
+	DecisionNeededService {
 
 	boolean isReturnValid();
 

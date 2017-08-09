@@ -1,28 +1,24 @@
 package ph.txtdis.mgdc.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.INTEGER;
-import static ph.txtdis.type.Type.QUANTITY;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.math.BigDecimal;
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.Inventory;
 import ph.txtdis.fx.table.AbstractTable;
 import ph.txtdis.fx.table.Column;
 import ph.txtdis.mgdc.app.LaunchableItemApp;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
+
 @Scope("prototype")
 @Component("inventoryTable")
-public class InventoryTable extends AbstractTable<Inventory> {
+public class InventoryTable
+	extends AbstractTable<Inventory> {
 
 	@Autowired
 	private LaunchableItemApp app;
@@ -42,12 +38,12 @@ public class InventoryTable extends AbstractTable<Inventory> {
 	@Override
 	protected List<TableColumn<Inventory, ?>> addColumns() {
 		return asList( //
-				id.launches(app).ofType(ID).build("ID", "id"), //
-				item.launches(app).ofType(TEXT).width(180).build("Item", "item"), //
-				goodQty.launches(app).ofType(QUANTITY).build("Good Quantity", "goodQty"), //
-				badQty.launches(app).ofType(QUANTITY).build("Bad Quantity", "badQty"), //
-				daysLevel.launches(app).ofType(INTEGER).width(80).build("Days Level", "daysLevel"), //
-				value.launches(app).ofType(CURRENCY).build("Value", "value"), //
-				obsolescenceValue.launches(app).ofType(CURRENCY).build("Allowance for Obsolescence", "obsolesenceValue"));
+			id.launches(app).ofType(ID).build("ID", "id"), //
+			item.launches(app).ofType(TEXT).width(180).build("Item", "item"), //
+			goodQty.launches(app).ofType(QUANTITY).build("Good Quantity", "goodQty"), //
+			badQty.launches(app).ofType(QUANTITY).build("Bad Quantity", "badQty"), //
+			daysLevel.launches(app).ofType(INTEGER).width(80).build("Days Level", "daysLevel"), //
+			value.launches(app).ofType(CURRENCY).build("Value", "value"), //
+			obsolescenceValue.launches(app).ofType(CURRENCY).build("Allowance for Obsolescence", "obsolesenceValue"));
 	}
 }

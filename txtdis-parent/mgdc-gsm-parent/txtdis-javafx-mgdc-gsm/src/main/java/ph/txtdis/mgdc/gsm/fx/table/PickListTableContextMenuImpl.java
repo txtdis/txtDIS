@@ -1,19 +1,18 @@
 package ph.txtdis.mgdc.gsm.fx.table;
 
-import java.util.List;
-
+import javafx.collections.ObservableList;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.collections.ObservableList;
 import ph.txtdis.dto.Booking;
 import ph.txtdis.mgdc.fx.table.AbstractPickListTableContextMenu;
+
+import java.util.List;
 
 @Scope("prototype")
 @Component("pickListTableContextMenu")
 public class PickListTableContextMenuImpl //
-		extends AbstractPickListTableContextMenu {
+	extends AbstractPickListTableContextMenu {
 
 	@Value("${prefix.truck}")
 	private String truckPrefix;

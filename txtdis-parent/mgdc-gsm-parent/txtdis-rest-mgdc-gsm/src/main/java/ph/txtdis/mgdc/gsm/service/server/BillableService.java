@@ -5,5 +5,6 @@ import ph.txtdis.mgdc.gsm.repository.BillableRepository;
 import ph.txtdis.service.DecisionDataUpdate;
 
 public interface BillableService //
-		extends DecisionDataUpdate<BillableEntity, BillableRepository>, QtyPerItemService {
+	extends DecisionDataUpdate<BillableEntity, BillableRepository>,
+	QtyPerItemService {
 }

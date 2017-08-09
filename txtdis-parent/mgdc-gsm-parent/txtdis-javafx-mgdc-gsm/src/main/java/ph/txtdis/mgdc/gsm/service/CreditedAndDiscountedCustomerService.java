@@ -1,25 +1,26 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import javafx.collections.ObservableList;
-import ph.txtdis.dto.CreditDetail;
-import ph.txtdis.dto.Location;
-import ph.txtdis.dto.Route;
-import ph.txtdis.dto.Routing;
-import ph.txtdis.dto.WeeklyVisit;
+import ph.txtdis.dto.*;
 import ph.txtdis.mgdc.gsm.dto.Channel;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.service.RouteAssignedCustomerService;
 import ph.txtdis.type.PartnerType;
 import ph.txtdis.type.VisitFrequency;
 
-public interface CreditedAndDiscountedCustomerService //
-		extends CreditGivenCustomerService, CustomerService, RouteAssignedCustomerService {
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
-	CreditDetail createCreditLineUponValidation(int termInDays, int gracePeriodInDays, BigDecimal creditLimit, LocalDate start) throws Exception;
+public interface CreditedAndDiscountedCustomerService //
+	extends CreditGivenCustomerService,
+	CustomerService,
+	RouteAssignedCustomerService {
+
+	CreditDetail createCreditLineUponValidation(int termInDays,
+	                                            int gracePeriodInDays,
+	                                            BigDecimal creditLimit,
+	                                            LocalDate start) throws Exception;
 
 	Customer findNoContactDetails() throws Exception;
 
@@ -43,13 +44,21 @@ public interface CreditedAndDiscountedCustomerService //
 
 	Location getBarangay();
 
+	void setBarangay(Location barangay);
+
 	Channel getChannel();
 
+	void setChannel(Channel channel);
+
 	Location getCity();
+
+	void setCity(Location city);
 
 	long getGracePeriod(Customer c);
 
 	String getName();
+
+	void setName(String name);
 
 	Long getParentId();
 
@@ -57,13 +66,21 @@ public interface CreditedAndDiscountedCustomerService //
 
 	Location getProvince();
 
+	void setProvince(Location province);
+
 	List<Routing> getRouteHistory();
 
+	void setRouteHistory(List<Routing> routings);
+
 	String getStreet();
+
+	void setStreet(String street);
 
 	Customer getVendor() throws Exception;
 
 	VisitFrequency getVisitFrequency();
+
+	void setVisitFrequency(VisitFrequency freq);
 
 	List<WeeklyVisit> getVisitSchedule(Channel c);
 
@@ -83,29 +100,14 @@ public interface CreditedAndDiscountedCustomerService //
 
 	List<Channel> listVisitedChannels();
 
-	void setBarangay(Location barangay);
-
-	void setChannel(Channel channel);
-
-	void setCity(Location city);
-
-	void setName(String name);
-
 	void setNameUponValidation(String name) throws Exception;
 
 	void setParentIfExists(Long id) throws Exception;
 
-	void setProvince(Location province);
-
 	void setRouteAsPickUpAndChannelAsWarehouseSales() throws Exception;
-
-	void setRouteHistory(List<Routing> routings);
-
-	void setStreet(String street);
-
-	void setVisitFrequency(VisitFrequency freq);
 
 	void setVisitSchedule(List<WeeklyVisit> visits);
 
-	void verifyUserIsAllowedToChangeSchedule(ObservableList<WeeklyVisit> old, ObservableList<WeeklyVisit> changed) throws Exception;
+	void verifyUserIsAllowedToChangeSchedule(ObservableList<WeeklyVisit> old, ObservableList<WeeklyVisit> changed)
+		throws Exception;
 }

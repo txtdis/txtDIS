@@ -8,10 +8,12 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 
 public class DateInputValidator //
-		implements ChangeListener<String> {
+	implements ChangeListener<String> {
 
 	private boolean ignore;
+
 	private TextField input;
+
 	private String neu;
 
 	public DateInputValidator(DatePicker picker) {
@@ -26,28 +28,30 @@ public class DateInputValidator //
 		validate();
 	}
 
-	private boolean atSecondDigitOfDay() {
-		return getDay().length() == 2;
+	private void validate() {
+		if (disallowedCharacter() || misplacedDateSeparator() || invalidMonth() || improperDay() ||
+			exceededAllowedCharacterLength())
+			ignoreLastCharacter();
 	}
 
 	private boolean disallowedCharacter() {
 		return !neu.matches("[0-9/]*");
 	}
 
+	private boolean misplacedDateSeparator() {
+		return twoSucceedingSeparators() || threeSeparators();
+	}
+
+	private boolean invalidMonth() {
+		return wrongFirstDigitOfMonth() || over12Months() || threeDigitMonth();
+	}
+
+	private boolean improperDay() {
+		return invalidSecondDigitOfDay() || threeDigitDay();
+	}
+
 	private boolean exceededAllowedCharacterLength() {
 		return fiveDigitYear() || neu.length() > 10;
-	}
-
-	private boolean fiveDigitYear() {
-		return StringUtils.countMatches(neu, "/") == 2 && getYear().length() > 4;
-	}
-
-	private String getDay() {
-		return StringUtils.substringAfter(neu, "/");
-	}
-
-	private String getYear() {
-		return StringUtils.substringAfterLast(neu, "/");
 	}
 
 	private void ignoreLastCharacter() {
@@ -56,8 +60,44 @@ public class DateInputValidator //
 		ignore = false;
 	}
 
-	private boolean improperDay() {
-		return invalidSecondDigitOfDay() || threeDigitDay();
+	private boolean twoSucceedingSeparators() {
+		return neu.endsWith("//");
+	}
+
+	private boolean threeSeparators() {
+		return StringUtils.countMatches(neu, "/") > 2;
+	}
+
+	private boolean wrongFirstDigitOfMonth() {
+		return neu.length() == 1 && neu.endsWith("/");
+	}
+
+	private boolean over12Months() {
+		return neu.length() == 2 && incorrectSecondDigitOfMonth();
+	}
+
+	private boolean threeDigitMonth() {
+		return neu.length() == 3 && !neu.endsWith("/");
+	}
+
+	private boolean invalidSecondDigitOfDay() {
+		return atSecondDigitOfDay() && incorrectSecondDigitOfDay();
+	}
+
+	private boolean threeDigitDay() {
+		return StringUtils.countMatches(neu, "/") == 1 && getDay().length() > 2;
+	}
+
+	private boolean fiveDigitYear() {
+		return StringUtils.countMatches(neu, "/") == 2 && getYear().length() > 4;
+	}
+
+	private boolean incorrectSecondDigitOfMonth() {
+		return !StringUtils.endsWithAny(neu, !neu.startsWith("1") ? "/" : "0", "1", "2");
+	}
+
+	private boolean atSecondDigitOfDay() {
+		return getDay().length() == 2;
 	}
 
 	private boolean incorrectSecondDigitOfDay() {
@@ -70,52 +110,15 @@ public class DateInputValidator //
 		return false;
 	}
 
-	private boolean incorrectSecondDigitOfMonth() {
-		return !StringUtils.endsWithAny(neu, !neu.startsWith("1") ? "/" : "0", "1", "2");
+	private String getDay() {
+		return StringUtils.substringAfter(neu, "/");
 	}
 
-	private boolean invalidMonth() {
-		return wrongFirstDigitOfMonth() || over12Months() || threeDigitMonth();
-	}
-
-	private boolean invalidSecondDigitOfDay() {
-		return atSecondDigitOfDay() && incorrectSecondDigitOfDay();
-	}
-
-	private boolean misplacedDateSeparator() {
-		return twoSucceedingSeparators() || threeSeparators();
-	}
-
-	private boolean over12Months() {
-		return neu.length() == 2 && incorrectSecondDigitOfMonth();
+	private String getYear() {
+		return StringUtils.substringAfterLast(neu, "/");
 	}
 
 	private boolean thirtyDayMonth() {
 		return StringUtils.startsWithAny(neu, "4", "6", "9", "11");
-	}
-
-	private boolean threeDigitDay() {
-		return StringUtils.countMatches(neu, "/") == 1 && getDay().length() > 2;
-	}
-
-	private boolean threeDigitMonth() {
-		return neu.length() == 3 && !neu.endsWith("/");
-	}
-
-	private boolean threeSeparators() {
-		return StringUtils.countMatches(neu, "/") > 2;
-	}
-
-	private boolean twoSucceedingSeparators() {
-		return neu.endsWith("//");
-	}
-
-	private void validate() {
-		if (disallowedCharacter() || misplacedDateSeparator() || invalidMonth() || improperDay() || exceededAllowedCharacterLength())
-			ignoreLastCharacter();
-	}
-
-	private boolean wrongFirstDigitOfMonth() {
-		return neu.length() == 1 && neu.endsWith("/");
 	}
 }

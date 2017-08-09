@@ -1,23 +1,22 @@
 package ph.txtdis.dyvek.fx.table;
 
-import static ph.txtdis.type.Type.TEXT;
+import javafx.scene.control.TableColumn;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.dyvek.model.Billable;
+import ph.txtdis.fx.table.Column;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
-import ph.txtdis.dyvek.model.Billable;
-import ph.txtdis.fx.table.Column;
+import static ph.txtdis.type.Type.TEXT;
 
 @Scope("prototype")
 @Component("unbilledListTable")
 public class UnbilledListTableImpl //
-		extends AbstractOrderListTable //
-		implements UnbilledListTable {
+	extends AbstractOrderListTable //
+	implements UnbilledListTable {
 
 	@Autowired
 	private Column<Billable, String> recipient, salesNo;

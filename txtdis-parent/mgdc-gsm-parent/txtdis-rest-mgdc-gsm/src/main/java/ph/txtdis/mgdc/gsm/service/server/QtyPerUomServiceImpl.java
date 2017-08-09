@@ -1,14 +1,7 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.QtyPerUom;
 import ph.txtdis.mgdc.gsm.domain.ItemEntity;
 import ph.txtdis.mgdc.gsm.domain.QtyPerUomEntity;
@@ -16,9 +9,15 @@ import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.gsm.repository.QtyPerUomRepository;
 import ph.txtdis.type.UomType;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.math.BigDecimal.ZERO;
+
 @Service("qtyPerUomService")
 public class QtyPerUomServiceImpl //
-		implements QtyPerUomService {
+	implements QtyPerUomService {
 
 	@Autowired
 	private QtyPerUomRepository repository;
@@ -34,15 +33,6 @@ public class QtyPerUomServiceImpl //
 		return l == null ? null : l.stream().map(e -> toDTO(e)).collect(Collectors.toList());
 	}
 
-	@Override
-	public List<QtyPerUomEntity> toEntities(ItemEntity e, Item i) {
-		try {
-			return i.getQtyPerUomList().stream().map(q -> toEntity(e, q)).collect(Collectors.toList());
-		} catch (Exception x) {
-			return null;
-		}
-	}
-
 	private QtyPerUom toDTO(QtyPerUomEntity e) {
 		QtyPerUom q = new QtyPerUom();
 		q.setId(e.getId());
@@ -54,6 +44,15 @@ public class QtyPerUomServiceImpl //
 		q.setCreatedBy(e.getCreatedBy());
 		q.setCreatedOn(e.getCreatedOn());
 		return q;
+	}
+
+	@Override
+	public List<QtyPerUomEntity> toEntities(ItemEntity e, Item i) {
+		try {
+			return i.getQtyPerUomList().stream().map(q -> toEntity(e, q)).collect(Collectors.toList());
+		} catch (Exception x) {
+			return null;
+		}
 	}
 
 	private QtyPerUomEntity toEntity(ItemEntity i, QtyPerUom t) {

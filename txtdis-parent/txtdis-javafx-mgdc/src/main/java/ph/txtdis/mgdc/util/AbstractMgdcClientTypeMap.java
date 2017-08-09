@@ -1,26 +1,14 @@
 package ph.txtdis.mgdc.util;
 
-import java.util.List;
-
 import org.springframework.core.ParameterizedTypeReference;
-
-import ph.txtdis.dto.Account;
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.Bom;
-import ph.txtdis.dto.Holiday;
-import ph.txtdis.dto.Inventory;
-import ph.txtdis.dto.ItemFamily;
-import ph.txtdis.dto.Location;
-import ph.txtdis.dto.PickList;
-import ph.txtdis.dto.PricingType;
-import ph.txtdis.dto.Route;
-import ph.txtdis.dto.StockTake;
-import ph.txtdis.dto.StockTakeVariance;
+import ph.txtdis.dto.*;
 import ph.txtdis.util.AbstractClientTypeMap;
 import ph.txtdis.util.TypeReference;
 
+import java.util.List;
+
 public abstract class AbstractMgdcClientTypeMap //
-		extends AbstractClientTypeMap {
+	extends AbstractClientTypeMap {
 
 	private static final long serialVersionUID = -1782679034968493608L;
 

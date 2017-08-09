@@ -1,33 +1,36 @@
 package ph.txtdis.service;
 
+import org.springframework.stereotype.Service;
+import ph.txtdis.domain.SyncEntity;
+import ph.txtdis.exception.FailedReplicationException;
+import ph.txtdis.repository.SyncRepository;
+
+import java.time.ZonedDateTime;
+
 import static ph.txtdis.type.SyncType.UPDATE;
 import static ph.txtdis.type.SyncType.VERSION;
 import static ph.txtdis.util.DateTimeUtils.toZonedDateTime;
 import static ph.txtdis.util.NumberUtils.divide;
 
-import java.time.ZonedDateTime;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.domain.SyncEntity;
-import ph.txtdis.exception.FailedReplicationException;
-import ph.txtdis.repository.SyncRepository;
-
 @Service("syncService")
 public class SyncServiceImpl //
-		implements SyncService {
+	implements SyncService {
 
 	private static final String UPLOAD_SUCCESSFUL = "Upload successful";
 
-	@Autowired
-	private BackupService backupService;
+	private final BackupService backupService;
 
-	@Autowired
-	private UploadService uploadService;
+	private final UploadService uploadService;
 
-	@Autowired
-	private SyncRepository syncRepository;
+	private final SyncRepository syncRepository;
+
+	public SyncServiceImpl(BackupService backupService,
+	                       UploadService uploadService,
+	                       SyncRepository syncRepository) {
+		this.backupService = backupService;
+		this.uploadService = uploadService;
+		this.syncRepository = syncRepository;
+	}
 
 	@Override
 	public String upload() throws FailedReplicationException {

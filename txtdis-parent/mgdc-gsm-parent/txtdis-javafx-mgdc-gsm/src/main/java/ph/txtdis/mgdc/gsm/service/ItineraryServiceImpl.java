@@ -1,28 +1,25 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Route;
 import ph.txtdis.excel.ExcelReportWriter;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.gsm.dto.Customer;
-import ph.txtdis.service.SyncService;
 import ph.txtdis.util.DateTimeUtils;
+
+import java.io.IOException;
+import java.util.List;
+
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
 
 @Service("itineraryService")
 public class ItineraryServiceImpl //
-		implements ItineraryService {
+	implements ItineraryService {
 
 	@Autowired
 	private CreditedAndDiscountedCustomerService customerService;
-
-	@Autowired
-	private SyncService syncService;
 
 	@Autowired
 	private ExcelReportWriter excel;
@@ -45,10 +42,11 @@ public class ItineraryServiceImpl //
 	}
 
 	private String excelName() {
-		return "Route Itinerary for " + modulePrefix + " " + selectedRoute + " on " + DateTimeUtils.toDateDisplay(syncService.getServerDate());
+		return "Route Itinerary for " + modulePrefix + " " + selectedRoute + " on " +
+			DateTimeUtils.toDateDisplay(getServerDate());
 	}
 
 	private String sheetName() {
-		return selectedRoute + "." + syncService.getServerDate();
+		return selectedRoute + "." + getServerDate();
 	}
 }

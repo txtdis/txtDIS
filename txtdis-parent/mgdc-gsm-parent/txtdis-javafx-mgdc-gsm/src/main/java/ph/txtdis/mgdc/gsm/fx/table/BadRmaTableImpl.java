@@ -1,22 +1,23 @@
 package ph.txtdis.mgdc.gsm.fx.table;
 
-import static java.util.Arrays.asList;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.mgdc.fx.dialog.BadRmaDialog;
 import ph.txtdis.mgdc.fx.table.BadRmaTable;
 import ph.txtdis.mgdc.gsm.service.BadRmaService;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Scope("prototype")
 @Component("badRmaTable")
-public class BadRmaTableImpl extends AbstractBeverageBillableTable<BadRmaService, BadRmaDialog> implements BadRmaTable {
+public class BadRmaTableImpl
+	extends AbstractBeverageBillableTable<BadRmaService, BadRmaDialog>
+	implements BadRmaTable {
 
 	@Override
 	protected List<TableColumn<BillableDetail, ?>> addColumns() {

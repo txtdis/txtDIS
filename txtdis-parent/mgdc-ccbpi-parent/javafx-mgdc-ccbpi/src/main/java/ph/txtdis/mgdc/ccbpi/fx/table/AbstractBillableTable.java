@@ -24,17 +24,8 @@ import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;
 
 public abstract class AbstractBillableTable<AS extends BillableService, BD extends BillableDialog> // 
-		extends AbstractTable<BillableDetail> //
-		implements BillableTable {
-
-	@Autowired
-	private AppendContextMenu<BillableDetail> append;
-
-	@Autowired
-	private DeleteContextMenu<BillableDetail> subtract;
-
-	@Autowired
-	private Column<BillableDetail, Long> id;
+	extends AbstractTable<BillableDetail> //
+	implements BillableTable {
 
 	@Autowired
 	protected Column<BillableDetail, BigDecimal> price, subtotal;
@@ -54,10 +45,31 @@ public abstract class AbstractBillableTable<AS extends BillableService, BD exten
 	@Autowired
 	protected BD dialog;
 
+	@Autowired
+	private AppendContextMenu<BillableDetail> append;
+
+	@Autowired
+	private DeleteContextMenu<BillableDetail> subtract;
+
+	@Autowired
+	private Column<BillableDetail, Long> id;
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public AbstractBillableTable<AS, BD> build() {
 		return (AbstractBillableTable<AS, BD>) super.build();
+	}
+
+	protected String netQty() {
+		return "finalQty";
+	}
+
+	protected abstract TableColumn<BillableDetail, ?> qtyColumn();
+
+	@Override
+	protected List<TableColumn<BillableDetail, ?>> addColumns() {
+		initializeColumns();
+		return asList(id, name, uom, quality);
 	}
 
 	protected void initializeColumns() {
@@ -71,18 +83,6 @@ public abstract class AbstractBillableTable<AS extends BillableService, BD exten
 
 	protected String subtotal() {
 		return "finalSubtotalValue";
-	}
-
-	protected String netQty() {
-		return "finalQty";
-	}
-
-	protected abstract TableColumn<BillableDetail, ?> qtyColumn();
-
-	@Override
-	protected List<TableColumn<BillableDetail, ?>> addColumns() {
-		initializeColumns();
-		return asList(id, name, uom, quality);
 	}
 
 	@Override

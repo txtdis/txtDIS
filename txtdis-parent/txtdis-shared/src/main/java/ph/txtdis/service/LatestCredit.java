@@ -8,16 +8,15 @@ import java.util.List;
 
 import ph.txtdis.dto.CustomerCredit;
 
-public interface LatestCredit extends LatestApproved {
-
-	<T extends CustomerCredit> T getCredit();
+public interface LatestCredit
+	extends LatestApproved {
 
 	default <T extends CustomerCredit> T getCredit(List<T> list, LocalDate date) {
 		try {
 			return list.stream()//
-					.filter(p -> isApprovedAndStartDateIsNotInTheFuture(p, date))//
-					.max(CustomerCredit::compareTo) //
-					.get();
+				.filter(p -> isApprovedAndStartDateIsNotInTheFuture(p, date))//
+				.max(CustomerCredit::compareTo) //
+				.get();
 		} catch (Exception e) {
 			return null;
 		}
@@ -30,6 +29,8 @@ public interface LatestCredit extends LatestApproved {
 			return ZERO;
 		}
 	}
+
+	<T extends CustomerCredit> T getCredit();
 
 	default int getCreditTerm() {
 		try {

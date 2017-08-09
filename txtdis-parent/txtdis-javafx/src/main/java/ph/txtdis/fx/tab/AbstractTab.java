@@ -10,13 +10,15 @@ import javafx.scene.control.Tab;
 import javafx.scene.layout.VBox;
 import ph.txtdis.fx.control.ErrorHandling;
 import ph.txtdis.fx.dialog.MessageDialog;
-import ph.txtdis.fx.pane.AppBoxPaneFactory;
+import ph.txtdis.fx.pane.PaneFactory;
 import ph.txtdis.fx.pane.AppGridPane;
 
-public abstract class AbstractTab extends Tab implements InputTab {
+public abstract class AbstractTab
+	extends Tab
+	implements InputTab {
 
 	@Autowired
-	protected AppBoxPaneFactory box;
+	protected PaneFactory pane;
 
 	@Autowired
 	protected MessageDialog dialog;
@@ -46,6 +48,16 @@ public abstract class AbstractTab extends Tab implements InputTab {
 		return this;
 	}
 
+	protected VBox mainVerticalPane() {
+		return pane.vertical(mainVerticalPaneNodes());
+	}
+
+	protected abstract void setListeners();
+
+	protected abstract void setBindings();
+
+	protected abstract List<Node> mainVerticalPaneNodes();
+
 	@Override
 	public void disableIf(ObservableBooleanValue b) {
 		disableProperty().bind(b);
@@ -60,14 +72,4 @@ public abstract class AbstractTab extends Tab implements InputTab {
 		dialog.show(e).addParent(this).start();
 		control.handleError();
 	}
-
-	protected VBox mainVerticalPane() {
-		return box.forVerticals(mainVerticalPaneNodes());
-	}
-
-	protected abstract List<Node> mainVerticalPaneNodes();
-
-	protected abstract void setBindings();
-
-	protected abstract void setListeners();
 }

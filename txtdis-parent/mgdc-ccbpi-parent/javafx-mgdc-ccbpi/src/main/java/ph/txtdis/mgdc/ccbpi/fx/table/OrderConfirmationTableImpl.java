@@ -15,8 +15,8 @@ import ph.txtdis.mgdc.ccbpi.service.OrderConfirmationService;
 @Scope("prototype")
 @Component("orderConfirmationTable")
 public class OrderConfirmationTableImpl //
-		extends AbstractBeverageBillableTable<OrderConfirmationService, OrderConfirmationDialog> //
-		implements OrderConfirmationTable {
+	extends AbstractBeverageBillableTable<OrderConfirmationService, OrderConfirmationDialog> //
+	implements OrderConfirmationTable {
 
 	@Override
 	protected List<TableColumn<BillableDetail, ?>> addColumns() {

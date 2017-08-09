@@ -9,7 +9,9 @@ import ph.txtdis.mgdc.ccbpi.domain.BomEntity;
 import ph.txtdis.mgdc.ccbpi.domain.PickListEntity;
 import ph.txtdis.service.SpunSavedKeyedService;
 
-public interface PickListService extends FilteredListService, SpunSavedKeyedService<PickListEntity, PickList, Long> {
+public interface PickListService
+	extends FilteredListService,
+	SpunSavedKeyedService<PickListEntity, PickList, Long> {
 
 	List<PickList> findAllByDate(LocalDate d);
 

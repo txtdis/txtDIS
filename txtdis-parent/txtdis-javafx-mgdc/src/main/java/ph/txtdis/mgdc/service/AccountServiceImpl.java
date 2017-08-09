@@ -1,26 +1,23 @@
 package ph.txtdis.mgdc.service;
 
-import static org.apache.commons.lang3.StringUtils.capitalize;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Account;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.util.ClientTypeMap;
 
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static ph.txtdis.util.UserUtils.username;
+
 @Service("accountService")
-public class AccountServiceImpl implements AccountService {
+public class AccountServiceImpl
+	implements AccountService {
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<Account> readOnlyService;
+	private RestClientService<Account> restClientService;
 
 	@Autowired
 	private RouteService routeService;
@@ -43,13 +40,13 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public ReadOnlyService<Account> getListedReadOnlyService() {
-		return readOnlyService;
+	public String getModuleName() {
+		return "route";
 	}
 
 	@Override
-	public String getModuleName() {
-		return "route";
+	public RestClientService<Account> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -64,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + capitalizedModule() + " Seller History";
+		return username() + "@" + modulePrefix + " " + capitalizedModule() + " Seller History";
 	}
 
 	@Override

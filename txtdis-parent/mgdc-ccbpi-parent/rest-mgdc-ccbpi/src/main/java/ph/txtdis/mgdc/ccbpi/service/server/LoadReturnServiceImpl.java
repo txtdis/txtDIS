@@ -22,7 +22,7 @@ import ph.txtdis.mgdc.ccbpi.repository.PickListRepository;
 
 @Service("loadReturnService")
 public class LoadReturnServiceImpl
-		implements LoadReturnService {
+	implements LoadReturnService {
 
 	@Autowired
 	private PickListRepository repository;
@@ -32,6 +32,11 @@ public class LoadReturnServiceImpl
 
 	@Autowired
 	private PickListService service;
+
+	@Override
+	public PickList findByReferenceId(Long id) {
+		return findByPrimaryKey(id);
+	}
 
 	@Override
 	public PickList findByPrimaryKey(Long id) {
@@ -49,20 +54,9 @@ public class LoadReturnServiceImpl
 	}
 
 	@Override
-	public PickList findByReferenceId(Long id) {
-		return findByPrimaryKey(id);
-	}
-
-	@Override
 	public List<PickListEntity> post(List<PickListEntity> e) {
 		Iterable<PickListEntity> i = repository.save(e);
 		return stream(i.spliterator(), false).collect(toList());
-	}
-
-	@Override
-	public PickListEntity post(PickListEntity e) {
-
-		return repository.save(e);
 	}
 
 	@Override
@@ -82,11 +76,6 @@ public class LoadReturnServiceImpl
 		return l == null ? null : l.stream().map(b -> unpickBilling(b)).collect(Collectors.toList());
 	}
 
-	private BillableEntity unpickBilling(BillableEntity e) {
-		e.setPicking(null);
-		return e;
-	}
-
 	private List<PickListDetailEntity> toDetails(PickListEntity e, PickList p) {
 		Map<Long, PickListDetailEntity> m = new HashMap<>();
 		for (PickListDetailEntity ed : e.getDetails())
@@ -94,6 +83,17 @@ public class LoadReturnServiceImpl
 		for (PickListDetail pd : p.getDetails())
 			setDetail(m, pd);
 		return new ArrayList<>(m.values());
+	}
+
+	@Override
+	public PickListEntity post(PickListEntity e) {
+
+		return repository.save(e);
+	}
+
+	private BillableEntity unpickBilling(BillableEntity e) {
+		e.setPicking(null);
+		return e;
 	}
 
 	private void setDetail(Map<Long, PickListDetailEntity> m, PickListDetail pd) {

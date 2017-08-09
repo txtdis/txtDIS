@@ -1,25 +1,25 @@
 package ph.txtdis.dyvek.service.server;
 
-import static java.time.LocalDate.now;
-import static ph.txtdis.type.PartnerType.VENDOR;
-import static ph.txtdis.util.NumberUtils.isPositive;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dyvek.domain.BillableEntity;
 import ph.txtdis.dyvek.domain.OrderDetailEntity;
 import ph.txtdis.dyvek.model.Billable;
 import ph.txtdis.dyvek.repository.PurchaseRepository;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static java.time.LocalDate.now;
+import static ph.txtdis.type.PartnerType.VENDOR;
+import static ph.txtdis.util.NumberUtils.isPositive;
+import static ph.txtdis.util.UserUtils.username;
+
 @Service("purchaseService")
 public class PurchaseServiceImpl //
-		extends AbstractSpunSavedBillableService<PurchaseRepository> //
-		implements PurchaseService {
+	extends AbstractSpunSavedBillableService<PurchaseRepository> //
+	implements PurchaseService {
 
 	@Autowired
 	private DeliveryService deliveryService;
@@ -53,42 +53,6 @@ public class PurchaseServiceImpl //
 	}
 
 	@Override
-	protected BillableEntity firstEntity() {
-		return repository.findFirstByDeliveryNullAndCustomerTypeOrderByIdAsc(VENDOR);
-	}
-
-	@Override
-	protected BillableEntity nextEntity(Long id) {
-		return repository.findFirstByDeliveryNullAndCustomerTypeAndIdGreaterThanOrderByIdAsc(VENDOR, id);
-	}
-
-	@Override
-	protected BillableEntity lastEntity() {
-		return repository.findFirstByDeliveryNullAndCustomerTypeOrderByIdDesc(VENDOR);
-	}
-
-	@Override
-	protected BillableEntity previousEntity(Long id) {
-		return repository.findFirstByDeliveryNullAndCustomerTypeAndIdLessThanOrderByIdDesc(VENDOR, id);
-	}
-
-	@Override
-	public List<Billable> search(String po) {
-		List<BillableEntity> l = repository.findByDeliveryNullAndCustomerTypeAndOrderNoNotNullAndOrderNoContainingIgnoreCase(VENDOR, po);
-		return toModels(l);
-	}
-
-	@Override
-	public BillableEntity toEntity(Billable b) {
-		BillableEntity e = super.toEntity(b);
-		if (e == null)
-			return null;
-		e.setOrderNo(b.getPurchaseNo());
-		e.setCustomer(customer(b.getVendor()));
-		return e;
-	}
-
-	@Override
 	public Billable toModel(BillableEntity e) {
 		Billable b = super.toModel(e);
 		if (b == null)
@@ -116,6 +80,43 @@ public class PurchaseServiceImpl //
 	private ZonedDateTime closedOn(BillableEntity e) {
 		OrderDetailEntity d = e.getOrder();
 		return e == null ? null : d.getClosedOn();
+	}
+
+	@Override
+	protected BillableEntity firstEntity() {
+		return repository.findFirstByDeliveryNullAndCustomerTypeOrderByIdAsc(VENDOR);
+	}
+
+	@Override
+	protected BillableEntity nextEntity(Long id) {
+		return repository.findFirstByDeliveryNullAndCustomerTypeAndIdGreaterThanOrderByIdAsc(VENDOR, id);
+	}
+
+	@Override
+	protected BillableEntity lastEntity() {
+		return repository.findFirstByDeliveryNullAndCustomerTypeOrderByIdDesc(VENDOR);
+	}
+
+	@Override
+	protected BillableEntity previousEntity(Long id) {
+		return repository.findFirstByDeliveryNullAndCustomerTypeAndIdLessThanOrderByIdDesc(VENDOR, id);
+	}
+
+	@Override
+	public List<Billable> search(String po) {
+		List<BillableEntity> l =
+			repository.findByDeliveryNullAndCustomerTypeAndOrderNoNotNullAndOrderNoContainingIgnoreCase(VENDOR, po);
+		return toModels(l);
+	}
+
+	@Override
+	public BillableEntity toEntity(Billable b) {
+		BillableEntity e = super.toEntity(b);
+		if (e == null)
+			return null;
+		e.setOrderNo(b.getPurchaseNo());
+		e.setCustomer(customer(b.getVendor()));
+		return e;
 	}
 
 	@Override

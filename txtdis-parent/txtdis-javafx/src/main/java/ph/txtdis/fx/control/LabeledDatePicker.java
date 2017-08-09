@@ -17,7 +17,8 @@ import javafx.scene.Node;
 
 @Component
 @Scope("prototype")
-public class LabeledDatePicker implements InputNode<LocalDate> {
+public class LabeledDatePicker
+	implements InputNode<LocalDate> {
 
 	@Autowired
 	private LabelFactory label;

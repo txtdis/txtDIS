@@ -1,20 +1,19 @@
 package ph.txtdis.service;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsSeller;
 import ph.txtdis.dto.Account;
 import ph.txtdis.dto.Route;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.asList;
+
 @Service("routeService")
 public class EdmsRouteServiceImpl //
-		implements EdmsRouteService {
+	implements EdmsRouteService {
 
 	@Autowired
 	private EdmsService edmsService;
@@ -23,22 +22,20 @@ public class EdmsRouteServiceImpl //
 	private EdmsSellerService sellerService;
 
 	@Override
-	public Route toNameOnlyRouteFromSeller(String sellerCode) {
-		EdmsSeller s = sellerService.findByCode(sellerCode);
-		return toNameOnlyRouteFromTruck(s.getTruckCode());
-	}
-
-	@Override
-	public Route toNameOnlyRouteFromTruck(String truckCode) {
-		Route r = new Route();
-		r.setName(truckCode);
-		return r;
+	public List<Route> findByOrderByNameAsc() {
+		return sellerService.getAll().map(s -> toRoute(s)).collect(Collectors.toList());
 	}
 
 	private Route toRoute(EdmsSeller s) {
 		Route r = toNameOnlyRouteFromSeller(s.getCode());
 		r.setSellerHistory(getSellerHistory(s));
 		return r;
+	}
+
+	@Override
+	public Route toNameOnlyRouteFromSeller(String sellerCode) {
+		EdmsSeller s = sellerService.findByCode(sellerCode);
+		return toNameOnlyRouteFromTruck(s.getTruckCode());
 	}
 
 	private List<Account> getSellerHistory(EdmsSeller s) {
@@ -49,8 +46,10 @@ public class EdmsRouteServiceImpl //
 	}
 
 	@Override
-	public List<Route> findByOrderByNameAsc() {
-		return sellerService.getAll().map(s -> toRoute(s)).collect(Collectors.toList());
+	public Route toNameOnlyRouteFromTruck(String truckCode) {
+		Route r = new Route();
+		r.setName(truckCode);
+		return r;
 	}
 
 	@Override

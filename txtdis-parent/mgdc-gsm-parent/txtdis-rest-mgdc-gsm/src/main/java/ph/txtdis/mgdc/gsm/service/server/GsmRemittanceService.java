@@ -1,13 +1,15 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.Remittance;
 import ph.txtdis.mgdc.gsm.domain.RemittanceEntity;
 import ph.txtdis.type.PaymentType;
 
-public interface GsmRemittanceService extends Imported, PastValidationPeriodRemittanceService {
+import java.time.LocalDate;
+import java.util.List;
+
+public interface GsmRemittanceService
+	extends Imported,
+	PastValidationPeriodRemittanceService {
 
 	List<RemittanceEntity> findAllByDraweeBank(String name);
 

@@ -20,7 +20,7 @@ import ph.txtdis.mgdc.domain.AbstractItemEntity;
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "item")
 public class ItemEntity //
-		extends AbstractItemEntity {
+	extends AbstractItemEntity {
 
 	private static final long serialVersionUID = -3012020260825126952L;
 

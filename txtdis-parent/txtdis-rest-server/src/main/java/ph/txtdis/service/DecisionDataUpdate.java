@@ -1,14 +1,14 @@
 package ph.txtdis.service;
 
+import org.springframework.data.repository.CrudRepository;
+import ph.txtdis.dto.DecisionNeededValidatedCreatedKeyed;
+
 import static ph.txtdis.util.DateTimeUtils.toZonedDateTime;
 import static ph.txtdis.util.TextUtils.toBoolean;
 import static ph.txtdis.util.TextUtils.toText;
 
-import org.springframework.data.repository.CrudRepository;
-
-import ph.txtdis.dto.DecisionNeededValidatedCreatedKeyed;
-
-public interface DecisionDataUpdate<T extends DecisionNeededValidatedCreatedKeyed<Long>, R extends CrudRepository<T, Long>> {
+public interface DecisionDataUpdate<T extends DecisionNeededValidatedCreatedKeyed<Long>, R extends CrudRepository<T,
+	Long>> {
 
 	default T updateDecisionData(R repository, String[] s) {
 		T t = repository.findOne(Long.valueOf(s[1]));

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 @Service("truckLogService")
 public class TruckLogServiceImpl //
-		implements TruckLogService {
+	implements TruckLogService {
 
 	@Override
 	public void reset() {

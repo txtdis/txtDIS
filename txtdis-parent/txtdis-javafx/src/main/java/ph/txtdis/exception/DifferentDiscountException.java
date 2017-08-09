@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class DifferentDiscountException extends Exception {
+public class DifferentDiscountException
+	extends Exception {
 
 	private static final long serialVersionUID = 3516715385558159044L;
 

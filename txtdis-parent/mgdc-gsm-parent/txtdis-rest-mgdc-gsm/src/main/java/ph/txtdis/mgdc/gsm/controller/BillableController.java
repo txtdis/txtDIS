@@ -1,26 +1,25 @@
 package ph.txtdis.mgdc.gsm.controller;
 
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
-import java.sql.Date;
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.controller.AbstractSpunSavedReferencedKeyedController;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.service.server.AllBillingService;
 import ph.txtdis.type.ModuleType;
 
+import java.sql.Date;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 @RequestMapping("/billables")
 @RestController("billableController")
 public class BillableController //
-		extends AbstractSpunSavedReferencedKeyedController<AllBillingService, BillableEntity, Billable> {
+	extends AbstractSpunSavedReferencedKeyedController<AllBillingService, BillableEntity, Billable> {
 
 	@RequestMapping(path = "/aged", method = GET)
 	public ResponseEntity<?> aged(@RequestParam("customer") Long id) {
@@ -48,7 +47,7 @@ public class BillableController //
 
 	@RequestMapping(path = "/latest", method = GET)
 	public ResponseEntity<?> latest(@RequestParam("prefix") String prefix, @RequestParam("suffix") String suffix,
-			@RequestParam("startId") Long startId, @RequestParam("endId") Long endId) {
+	                                @RequestParam("startId") Long startId, @RequestParam("endId") Long endId) {
 		Billable b = service.findLatest(prefix, suffix, startId, endId);
 		return new ResponseEntity<>(b, OK);
 	}
@@ -60,7 +59,9 @@ public class BillableController //
 	}
 
 	@RequestMapping(path = "/orderNo", method = GET)
-	public ResponseEntity<?> orderNo(@RequestParam("prefix") String p, @RequestParam("id") Long id, @RequestParam("suffix") String s) {
+	public ResponseEntity<?> orderNo(@RequestParam("prefix") String p,
+	                                 @RequestParam("id") Long id,
+	                                 @RequestParam("suffix") String s) {
 		Billable b = service.findByOrderNo(p, id, s);
 		return new ResponseEntity<>(b, OK);
 	}

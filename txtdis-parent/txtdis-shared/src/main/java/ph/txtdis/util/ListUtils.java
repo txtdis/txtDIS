@@ -1,8 +1,8 @@
 package ph.txtdis.util;
 
-import static java.util.Collections.emptyList;
-
 import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 public class ListUtils {
 

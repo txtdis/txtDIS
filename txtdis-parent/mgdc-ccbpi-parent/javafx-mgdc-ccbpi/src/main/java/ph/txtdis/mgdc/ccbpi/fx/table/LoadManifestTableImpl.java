@@ -15,8 +15,8 @@ import ph.txtdis.mgdc.ccbpi.service.LoadManifestService;
 @Scope("prototype")
 @Component("loadManifestTable")
 public class LoadManifestTableImpl // 
-		extends AbstractBeverageBillableTable<LoadManifestService, LoadManifestDialog> //
-		implements LoadManifestTable {
+	extends AbstractBeverageBillableTable<LoadManifestService, LoadManifestDialog> //
+	implements LoadManifestTable {
 
 	@Override
 	protected List<TableColumn<BillableDetail, ?>> addColumns() {

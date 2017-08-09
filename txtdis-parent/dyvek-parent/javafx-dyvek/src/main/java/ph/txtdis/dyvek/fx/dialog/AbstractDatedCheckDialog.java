@@ -1,10 +1,6 @@
 package ph.txtdis.dyvek.fx.dialog;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledDatePicker;
@@ -12,8 +8,11 @@ import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.fx.dialog.AbstractCheckDialog;
 import ph.txtdis.service.BankDrawnCheckService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractDatedCheckDialog<T extends Keyed<Long>, S extends BankDrawnCheckService<T>> //
-		extends AbstractCheckDialog<T, S> {
+	extends AbstractCheckDialog<T, S> {
 
 	@Autowired
 	protected LabeledDatePicker datePicker;

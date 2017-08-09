@@ -1,17 +1,16 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static org.apache.log4j.Logger.getLogger;
-
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.info.Information;
 import ph.txtdis.type.QualityType;
 
+import static org.apache.log4j.Logger.getLogger;
+
 @Service("goodRmaService")
 public class GoodRmaServiceImpl //
-		extends AbstractCustomerValidatedRmaService //
-		implements GoodRefundedRmaService {
+	extends AbstractCustomerValidatedRmaService //
+	implements GoodRefundedRmaService {
 
 	private static Logger logger = getLogger(GoodRmaServiceImpl.class);
 

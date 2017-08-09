@@ -1,19 +1,18 @@
 package ph.txtdis.mgdc.controller;
 
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
-import java.sql.Date;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import ph.txtdis.dto.StockTakeVariance;
 import ph.txtdis.mgdc.service.server.StockTakeVarianceService;
+
+import java.sql.Date;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RequestMapping("/stockTakeVariances")
 @RestController("stockTakeVarianceController")

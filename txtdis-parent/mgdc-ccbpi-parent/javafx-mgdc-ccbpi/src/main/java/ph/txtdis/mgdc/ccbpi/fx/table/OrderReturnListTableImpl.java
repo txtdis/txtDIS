@@ -7,7 +7,9 @@ import ph.txtdis.mgdc.ccbpi.app.OrderReturnApp;
 
 @Scope("prototype")
 @Component("orderReturnListTable")
-public class OrderReturnListTableImpl extends AbstractOrderListTable<OrderReturnApp> implements OrderReturnListTable {
+public class OrderReturnListTableImpl
+	extends AbstractOrderListTable<OrderReturnApp>
+	implements OrderReturnListTable {
 
 	@Override
 	protected String qtyAndValuePrefix() {

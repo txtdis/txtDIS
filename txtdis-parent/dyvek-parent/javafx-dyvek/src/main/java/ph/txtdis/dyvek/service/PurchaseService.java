@@ -6,7 +6,7 @@ import java.util.List;
 import ph.txtdis.dyvek.model.Billable;
 
 public interface PurchaseService //
-		extends OrderService {
+	extends OrderService {
 
 	List<Billable> findExpiringTheFollowingDayOrHaveExpired();
 

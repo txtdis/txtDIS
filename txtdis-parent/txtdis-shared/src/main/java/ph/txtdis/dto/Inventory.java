@@ -1,12 +1,12 @@
 package ph.txtdis.dto;
 
-import java.math.BigDecimal;
-
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 public class Inventory //
-		implements Keyed<Long> {
+	implements Keyed<Long> {
 
 	private Long id;
 

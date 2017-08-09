@@ -4,5 +4,5 @@ import ph.txtdis.app.SelectableListApp;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 
 public interface CustomerListApp //
-		extends SelectableListApp<Customer> {
+	extends SelectableListApp<Customer> {
 }

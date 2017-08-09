@@ -16,8 +16,10 @@ import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.util.ClientTypeMap;
 import ph.txtdis.util.DateTimeUtils;
 
+import static ph.txtdis.util.UserUtils.*;
+
 public abstract class AbstractCustomerReceivableService //
-		implements CustomerReceivableService {
+	implements CustomerReceivableService {
 
 	protected final static int CUSTOMER_ID = 0;
 
@@ -35,14 +37,13 @@ public abstract class AbstractCustomerReceivableService //
 
 	private final static int AGING = 7;
 
-	@Autowired
-	private CredentialService credentialService;
+	protected String customerName;
 
 	@Autowired
-	private ReadOnlyService<CustomerReceivable> listedReadOnlyService;
+	private RestClientService<CustomerReceivable> restClientService;
 
 	@Autowired
-	private ReadOnlyService<CustomerReceivableReport> readOnlyService;
+	private RestClientService<CustomerReceivableReport> reportRestClientService;
 
 	@Autowired
 	private ExcelReportWriter excel;
@@ -55,29 +56,7 @@ public abstract class AbstractCustomerReceivableService //
 
 	private CustomerReceivableReport report;
 
-	protected String customerName;
-
 	private int columnIndex;
-
-	@Override
-	public String dayCount() {
-		switch (columnIndex) {
-			case CURRENT:
-				return "Current";
-			case ONE_TO_SEVEN:
-				return "1-7 Day Overdue";
-			case EIGHT_TO_FIFTEEN:
-				return "8-15 Day Overdue";
-			case SIXTEEN_TO_THIRTY:
-				return "15-30 Day Overdue";
-			case MORE_THAN_THIRTY:
-				return ">30 Day Overdue";
-			case AGING:
-				return "Aged";
-			default:
-				return "All";
-		}
-	}
 
 	@Override
 	public String getHeaderName() {
@@ -85,13 +64,8 @@ public abstract class AbstractCustomerReceivableService //
 	}
 
 	@Override
-	public ReadOnlyService<CustomerReceivable> getListedReadOnlyService() {
-		return listedReadOnlyService;
-	}
-
-	@Override
-	public String getModuleName() {
-		return "customerReceivable";
+	public RestClientService<CustomerReceivable> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -106,7 +80,7 @@ public abstract class AbstractCustomerReceivableService //
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + customerName + " SOA";
+		return username() + "@" + modulePrefix + " " + customerName + " SOA";
 	}
 
 	@Override
@@ -120,15 +94,27 @@ public abstract class AbstractCustomerReceivableService //
 	}
 
 	@Override
-	public List<CustomerReceivable> list() {
-		return report == null ? new ArrayList<>() : report.getReceivables();
+	public List<CustomerReceivable> listReceivables(String... ids) throws Exception {
+		listInvoicesByCustomerBetweenTwoDayCounts(ids);
+		return list();
 	}
 
 	@Override
 	public void listInvoicesByCustomerBetweenTwoDayCounts(String... ids) throws Exception {
 		columnIndex = Integer.valueOf(ids[COLUMN_INDEX]);
-		report = readOnlyService.module(getModuleName())
-				.getOne("?customer=" + ids[CUSTOMER_ID] + "&lowerDayCount=" + lowerDayCount() + "&upperDayCount=" + upperDayCount());
+		report = reportRestClientService.module(getModuleName())
+			.getOne("?customer=" + ids[CUSTOMER_ID] + "&lowerDayCount=" + lowerDayCount() + "&upperDayCount=" +
+				upperDayCount());
+	}
+
+	@Override
+	public List<CustomerReceivable> list() {
+		return report == null ? new ArrayList<>() : report.getReceivables();
+	}
+
+	@Override
+	public String getModuleName() {
+		return "customerReceivable";
 	}
 
 	private int lowerDayCount() {
@@ -163,12 +149,6 @@ public abstract class AbstractCustomerReceivableService //
 	}
 
 	@Override
-	public List<CustomerReceivable> listReceivables(String... ids) throws Exception {
-		listInvoicesByCustomerBetweenTwoDayCounts(ids);
-		return list();
-	}
-
-	@Override
 	public void reset() {
 		report = null;
 		customerName = null;
@@ -182,7 +162,12 @@ public abstract class AbstractCustomerReceivableService //
 	}
 
 	private String excelName() {
-		return dottedDayCount() + ".Receivables-" + customerFileName() + "." + DateTimeUtils.toTimestampFilename(getTimestamp());
+		return dottedDayCount() + ".Receivables-" + customerFileName() + "." +
+			DateTimeUtils.toTimestampFilename(getTimestamp());
+	}
+
+	private String getExcelSheetName() {
+		return dayCount().replace(" Day Overdue", "").toUpperCase();
 	}
 
 	private String dottedDayCount() {
@@ -191,13 +176,29 @@ public abstract class AbstractCustomerReceivableService //
 
 	private String customerFileName() {
 		return customerName.replace(" ", ".") //
-		//.replace("(", "-") //
-		//.replace(")", "") //
-		//.replace("Ñ", "N")
-		;
+			//.replace("(", "-") //
+			//.replace(")", "") //
+			//.replace("Ñ", "N")
+			;
 	}
 
-	private String getExcelSheetName() {
-		return dayCount().replace(" Day Overdue", "").toUpperCase();
+	@Override
+	public String dayCount() {
+		switch (columnIndex) {
+			case CURRENT:
+				return "Current";
+			case ONE_TO_SEVEN:
+				return "1-7 Day Overdue";
+			case EIGHT_TO_FIFTEEN:
+				return "8-15 Day Overdue";
+			case SIXTEEN_TO_THIRTY:
+				return "15-30 Day Overdue";
+			case MORE_THAN_THIRTY:
+				return ">30 Day Overdue";
+			case AGING:
+				return "Aged";
+			default:
+				return "All";
+		}
 	}
 }

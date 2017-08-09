@@ -1,20 +1,19 @@
 package ph.txtdis.mgdc.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractDecisionNeededValidatedCreatedKeyedEntity;
+
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractCustomerDiscountEntity //
-		extends AbstractDecisionNeededValidatedCreatedKeyedEntity<Long> {
+	extends AbstractDecisionNeededValidatedCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -5451725270886595800L;
 

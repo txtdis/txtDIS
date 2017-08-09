@@ -1,28 +1,27 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static ph.txtdis.type.PartnerType.VENDOR;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.repository.NoPurchaseOrderReceiptRepository;
-import ph.txtdis.service.SavingService;
+import ph.txtdis.service.RestClientService;
+
+import java.util.List;
+
+import static ph.txtdis.type.PartnerType.VENDOR;
 
 @Service("purchaseReceiptService")
 public class PurchaseReceiptServiceImpl //
-		extends AbstractPurchaseReceiptService //
-		implements GsmPurchaseReceiptService {
+	extends AbstractPurchaseReceiptService //
+	implements GsmPurchaseReceiptService {
 
 	@Autowired
 	private NoPurchaseOrderReceiptRepository noPurchaseOrderReceiptRepository;
 
 	@Autowired
-	private SavingService<Billable> savingService;
+	private RestClientService<Billable> restClientService;
 
 	@Override
 	public Billable findByPrimaryKey(Long id) {
@@ -49,7 +48,7 @@ public class PurchaseReceiptServiceImpl //
 
 	@Override
 	public Billable saveToEdms(Billable t) throws Exception {
-		savingService.module("billable").save(t);
+		restClientService.module("billable").save(t);
 		return t;
 	}
 }

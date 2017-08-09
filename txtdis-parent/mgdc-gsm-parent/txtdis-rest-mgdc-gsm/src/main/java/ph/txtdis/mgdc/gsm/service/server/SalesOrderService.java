@@ -1,13 +1,13 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface SalesOrderService //
-		extends BookingService {
+	extends BookingService {
 
 	List<BillableEntity> findAllPicked();
 

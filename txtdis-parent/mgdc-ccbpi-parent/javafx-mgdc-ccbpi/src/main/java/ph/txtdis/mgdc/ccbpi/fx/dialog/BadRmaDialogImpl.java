@@ -10,6 +10,6 @@ import ph.txtdis.mgdc.fx.dialog.BadRmaDialog;
 @Scope("prototype")
 @Component("badRmaDialog")
 public class BadRmaDialogImpl //
-		extends AbstractAllItemInCasesAndBottlesInputDialog<BadRmaService, BillableDetail> //
-		implements BadRmaDialog {
+	extends AbstractAllItemInCasesAndBottlesInputDialog<BadRmaService, BillableDetail> //
+	implements BadRmaDialog {
 }

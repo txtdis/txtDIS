@@ -1,27 +1,26 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import java.util.List;
-
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.stage.Stage;
 import ph.txtdis.dto.Route;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.fx.dialog.ExTruckRouteItineraryDialog;
 import ph.txtdis.mgdc.gsm.fx.table.RouteItineraryTable;
 import ph.txtdis.mgdc.gsm.service.ItineraryService;
 
+import java.util.List;
+
 @Scope("prototype")
 @Component("routeItineraryApp")
 public class RouteItineraryAppImpl //
-		implements RouteItineraryApp {
+	implements RouteItineraryApp {
 
 	@Autowired
-	private AppButtonImpl routeItineraryButton;
+	private AppButton routeItineraryButton;
 
 	@Autowired
 	private ExTruckRouteItineraryDialog routeItineraryDialog;
@@ -37,7 +36,7 @@ public class RouteItineraryAppImpl //
 	private Stage stage;
 
 	@Override
-	public AppButtonImpl addButton(Stage stage, ItineraryService service) {
+	public AppButton addButton(Stage stage, ItineraryService service) {
 		this.itineraryService = service;
 		routeItineraryButton.icon("route").tooltip("DRoAR...").build();
 		routeItineraryButton.onAction(e -> generateRouteItinerary());

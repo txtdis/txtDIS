@@ -1,19 +1,19 @@
 package ph.txtdis.dto;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Remittance //
-		extends AbstractDecisionNeeded<Long> //
-		implements DecisionNeededValidatedCreatedKeyed<Long> {
+public class Remittance
+	extends AbstractDecisionNeeded<Long>
+	implements DecisionNeededValidatedCreatedKeyed<Long> {
 
 	private BigDecimal value;
 
@@ -23,9 +23,9 @@ public class Remittance //
 
 	private Long checkId;
 
-	private String depositorBank, draweeBank, depositor, receivedBy, remarks, collector;
+	private String depositorBank, draweeBank, depositor, receivedBy, receivedFrom, remarks;
 
-	private ZonedDateTime receivedOn, depositedOn, depositorOn;
+	private ZonedDateTime depositedOn, depositorOn, receivedOn;
 
 	public List<RemittanceDetail> getDetails() {
 		return details == null ? Collections.emptyList() : details;

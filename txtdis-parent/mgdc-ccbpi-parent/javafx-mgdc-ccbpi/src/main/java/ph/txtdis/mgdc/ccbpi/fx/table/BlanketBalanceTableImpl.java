@@ -16,7 +16,9 @@ import ph.txtdis.mgdc.ccbpi.service.BlanketBalanceService;
 
 @Scope("prototype")
 @Component("blanketBalanceTable")
-public class BlanketBalanceTableImpl extends AbstractVarianceTable<BlanketBalanceService> implements BlanketBalanceTable {
+public class BlanketBalanceTableImpl
+	extends AbstractVarianceTable<BlanketBalanceService>
+	implements BlanketBalanceTable {
 
 	@Autowired
 	private Column<SalesItemVariance, String> orderNo, customer;

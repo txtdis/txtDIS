@@ -1,12 +1,5 @@
 package ph.txtdis.fx.table;
 
-import static javafx.collections.FXCollections.emptyObservableList;
-import static javafx.collections.FXCollections.observableList;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
@@ -21,10 +14,18 @@ import javafx.scene.text.TextAlignment;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javafx.collections.FXCollections.emptyObservableList;
+import static javafx.collections.FXCollections.observableList;
+
 @Getter
 @Setter
-public abstract class AbstractTable<S> extends TableView<S> //
-		implements AppTable<S> {
+public abstract class AbstractTable<S>
+	extends TableView<S> //
+	implements AppTable<S> {
 
 	private ChangeListener<? super ObservableList<S>> changeListener;
 
@@ -81,13 +82,13 @@ public abstract class AbstractTable<S> extends TableView<S> //
 	}
 
 	@Override
-	public int getColumnCount() {
-		return getColumns().size();
+	public int getColumnIndexOfFirstTotal() {
+		return getColumnCount() - getColumnTotals().size();
 	}
 
 	@Override
-	public int getColumnIndexOfFirstTotal() {
-		return getColumnCount() - getColumnTotals().size();
+	public int getColumnCount() {
+		return getColumns().size();
 	}
 
 	@Override
@@ -107,6 +108,11 @@ public abstract class AbstractTable<S> extends TableView<S> //
 	}
 
 	@Override
+	public void setValue(S value) {
+		setItem(value);
+	}
+
+	@Override
 	public BooleanBinding isEmpty() {
 		return itemsProperty().isEqualTo(emptyObservableList());
 	}
@@ -114,6 +120,20 @@ public abstract class AbstractTable<S> extends TableView<S> //
 	@Override
 	public void items(List<S> list) {
 		setItems(list == null ? emptyObservableList() : observableList(list));
+	}
+
+	@Override
+	public void readOnly() {
+		editableProperty().unbind();
+		editableProperty().set(false);
+	}
+
+	@Override
+	public void removeListener() {
+		if (invalidationListener != null)
+			itemsProperty().removeListener(invalidationListener);
+		if (changeListener != null)
+			itemsProperty().removeListener(changeListener);
 	}
 
 	@Override
@@ -132,14 +152,6 @@ public abstract class AbstractTable<S> extends TableView<S> //
 	}
 
 	@Override
-	public void removeListener() {
-		if (invalidationListener != null)
-			itemsProperty().removeListener(invalidationListener);
-		if (changeListener != null)
-			itemsProperty().removeListener(changeListener);
-	}
-
-	@Override
 	public void setOnItemChange(InvalidationListener listener) {
 		invalidationListener = listener;
 		itemsProperty().addListener(listener);
@@ -149,10 +161,5 @@ public abstract class AbstractTable<S> extends TableView<S> //
 	public void setOnItemCheckBoxSelectionChange(ChangeListener<? super ObservableList<S>> listener) {
 		changeListener = listener;
 		itemsProperty().addListener(listener);
-	}
-
-	@Override
-	public void setValue(S value) {
-		setItem(value);
 	}
 }

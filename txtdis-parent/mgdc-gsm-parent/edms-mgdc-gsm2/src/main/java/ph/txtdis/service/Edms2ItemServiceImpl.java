@@ -1,15 +1,7 @@
 package ph.txtdis.service;
 
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.ZERO;
-import static ph.txtdis.util.Code.BTL;
-import static ph.txtdis.util.Code.CS;
-
-import java.math.BigDecimal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsInventory;
 import ph.txtdis.domain.EdmsItem;
 import ph.txtdis.domain.EdmsSalesOrderDetail;
@@ -17,8 +9,16 @@ import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.repository.EdmsInventoryRepository;
 import ph.txtdis.util.Code;
 
+import java.math.BigDecimal;
+
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+import static ph.txtdis.util.Code.BTL;
+import static ph.txtdis.util.Code.CS;
+
 @Service("itemService")
-public class Edms2ItemServiceImpl extends AbstractEdmsItemService {
+public class Edms2ItemServiceImpl
+	extends AbstractEdmsItemService {
 
 	@Autowired
 	private EdmsInventoryRepository edmsInventoryRepository;

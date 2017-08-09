@@ -16,7 +16,7 @@ import ph.txtdis.mgdc.controller.AbstractSpunSavedReferencedKeyedController;
 @RequestMapping("/loadManifests")
 @RestController("loadManifestController")
 public class LoadManifestController //
-		extends AbstractSpunSavedReferencedKeyedController<LoadManifestService, BillableEntity, Billable> {
+	extends AbstractSpunSavedReferencedKeyedController<LoadManifestService, BillableEntity, Billable> {
 
 	@RequestMapping(path = "/lm", method = GET)
 	public ResponseEntity<?> find(@RequestParam("shipment") Long id) {

@@ -1,8 +1,10 @@
 package ph.txtdis.fx.dialog;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static ph.txtdis.type.Type.TEXT;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import ph.txtdis.service.SavedByName;
 import ph.txtdis.service.UniqueNamedService;
 
 public abstract class AbstractNameListDialog<T extends Keyed<Long>, S extends UniqueNamedService<T>> //
-		extends AbstractFieldDialog<T> {
+	extends AbstractFieldDialog<T> {
 
 	@Autowired
 	protected LabeledField<String> nameField;
@@ -23,25 +25,25 @@ public abstract class AbstractNameListDialog<T extends Keyed<Long>, S extends Un
 	@Autowired
 	protected S service;
 
-	private void findDuplicate(String name) throws Exception {
-		if (!name.isEmpty())
-			service.confirmUniqueness(name);
+	@Override
+	protected List<InputNode<?>> addNodes() {
+		nameField.name("Name").build(TEXT);
+		nameField.onAction(e -> verifyNameIsUnique());
+		return singletonList(nameField);
 	}
 
 	private void verifyNameIsUnique() {
 		try {
 			findDuplicate(nameField.getValue());
 		} catch (Exception e) {
-			dialog.show(e).addParent(this).start();
+			messageDialog().show(e).addParent(this).start();
 			refresh();
 		}
 	}
 
-	@Override
-	protected List<InputNode<?>> addNodes() {
-		nameField.name("Name").build(TEXT);
-		nameField.onAction(e -> verifyNameIsUnique());
-		return asList(nameField);
+	private void findDuplicate(String name) throws Exception {
+		if (!name.isEmpty())
+			service.confirmUniqueness(name);
 	}
 
 	@Override

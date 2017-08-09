@@ -1,47 +1,30 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.springframework.util.StringUtils.capitalize;
-import static ph.txtdis.type.ItemType.PURCHASED;
-import static ph.txtdis.type.UserType.MANAGER;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.exception.DeactivatedException;
 import ph.txtdis.exception.NoVendorIdPurchasedItemException;
 import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SpunKeyedService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.util.ClientTypeMap;
 
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.springframework.util.StringUtils.capitalize;
+import static ph.txtdis.type.ItemType.PURCHASED;
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.UserUtils.isUser;
+import static ph.txtdis.util.UserUtils.username;
+
 public abstract class AbstractItemService //
-		implements BommedDiscountedPricedValidatedItemService {
+	implements BommedDiscountedPricedValidatedItemService {
 
 	private static final String ITEM = "item";
-
-	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<Item> itemReadOnlyService;
-
-	@Autowired
-	private SavingService<Item> savingService;
-
-	@Autowired
-	private SpunKeyedService<Item, Long> spunService;
-
-	@Autowired
-	private ClientTypeMap typeMap;
 
 	@Value("${prefix.module}")
 	protected String modulePrefix;
@@ -50,13 +33,25 @@ public abstract class AbstractItemService //
 
 	protected List<Item> items;
 
+	@Autowired
+	private RestClientService<Item> restClientService;
+
+	@Autowired
+	private ClientTypeMap typeMap;
+
 	public AbstractItemService() {
 		reset();
 	}
 
 	@Override
+	public void reset() {
+		item = null;
+		items = null;
+	}
+
+	@Override
 	public boolean canApprove() {
-		return credentialService.isUser(MANAGER);
+		return isUser(MANAGER);
 	}
 
 	@Override
@@ -72,21 +67,17 @@ public abstract class AbstractItemService //
 		return i;
 	}
 
-	protected Item findItem(String endPt) throws Exception {
-		return itemReadOnlyService.module(ITEM).getOne("/" + endPt);
+	Item findItem(String endPt) throws Exception {
+		return itemService().getOne("/" + endPt);
+	}
+
+	private RestClientService<Item> itemService() {
+		return restClientService.module(ITEM);
 	}
 
 	@Override
 	public Item findByName(String name) throws Exception {
 		return findItem("find?name=" + name);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Item get() {
-		if (item == null)
-			item = new Item();
-		return item;
 	}
 
 	@Override
@@ -100,13 +91,21 @@ public abstract class AbstractItemService //
 	}
 
 	@Override
-	public ZonedDateTime getCreatedOn() {
-		return get().getCreatedOn();
+	@SuppressWarnings("unchecked")
+	public Item get() {
+		if (item == null)
+			item = new Item();
+		return item;
 	}
 
 	@Override
 	public String getDecidedBy() {
 		return getUsername();
+	}
+
+	@Override
+	public String getUsername() {
+		return username();
 	}
 
 	@Override
@@ -117,6 +116,11 @@ public abstract class AbstractItemService //
 	@Override
 	public Long getId() {
 		return get().getId();
+	}
+
+	@Override
+	public void setId(Long id) {
+		get().setId(id);
 	}
 
 	@Override
@@ -135,19 +139,8 @@ public abstract class AbstractItemService //
 	}
 
 	@Override
-	public ReadOnlyService<Item> getListedReadOnlyService() {
-		return getReadOnlyService();
-	}
-
-	@Override
 	public String getModuleName() {
 		return ITEM;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public ReadOnlyService<Item> getReadOnlyService() {
-		return itemReadOnlyService;
 	}
 
 	@Override
@@ -157,18 +150,13 @@ public abstract class AbstractItemService //
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public SavingService<Item> getSavingService() {
-		return savingService;
-	}
-
-	@Override
-	public SpunKeyedService<Item, Long> getSpunService() {
-		return spunService;
+	public RestClientService<Item> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + BommedDiscountedPricedValidatedItemService.super.getTitleName();
+		return username() + "@" + modulePrefix + " " + BommedDiscountedPricedValidatedItemService.super.getTitleName();
 	}
 
 	@Override
@@ -177,13 +165,13 @@ public abstract class AbstractItemService //
 	}
 
 	@Override
-	public String getUsername() {
-		return credentialService.username();
+	public boolean isNew() {
+		return getCreatedOn() == null;
 	}
 
 	@Override
-	public boolean isNew() {
-		return getCreatedOn() == null;
+	public ZonedDateTime getCreatedOn() {
+		return get().getCreatedOn();
 	}
 
 	@Override
@@ -194,16 +182,14 @@ public abstract class AbstractItemService //
 	@Override
 	public List<String> listNames() {
 		try {
-			return getList("").stream().map(i -> i.getName()).collect(toList());
+			return getList("").stream().map(Item::getName).collect(toList());
 		} catch (Exception e) {
 			return emptyList();
 		}
 	}
 
-	@Override
-	public void reset() {
-		item = null;
-		items = null;
+	protected List<Item> getList(String endPt) throws Exception {
+		return itemService().getList(endPt);
 	}
 
 	@Override
@@ -212,17 +198,8 @@ public abstract class AbstractItemService //
 		return items = getList(endPt);
 	}
 
-	protected List<Item> getList(String endPt) throws Exception {
-		return itemReadOnlyService.module(ITEM).getList(endPt);
-	}
-
 	@Override
 	public <T extends Keyed<Long>> void set(T t) {
 		item = (Item) t;
-	}
-
-	@Override
-	public void setId(Long id) {
-		get().setId(id);
 	}
 }

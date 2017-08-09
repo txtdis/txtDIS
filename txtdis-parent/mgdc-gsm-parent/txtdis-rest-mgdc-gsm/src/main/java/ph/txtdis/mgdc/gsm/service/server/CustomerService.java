@@ -1,15 +1,15 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.service.SpunSavedKeyedService;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface CustomerService //
-		extends SpunSavedKeyedService<CustomerEntity, Customer, Long> {
+	extends SpunSavedKeyedService<CustomerEntity, Customer, Long> {
 
 	boolean canPayPostDatedCheck(CustomerEntity e, LocalDate d);
 

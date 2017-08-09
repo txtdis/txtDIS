@@ -1,17 +1,12 @@
 package ph.txtdis.util;
 
-import java.util.Base64;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
-import ph.txtdis.service.CredentialService;
+import java.util.Base64;
 
-public abstract class AbstractHttpHeader implements HttpHeader {
-
-	@Autowired
-	protected CredentialService credentialService;
+public abstract class AbstractHttpHeader
+	implements HttpHeader {
 
 	private MultiValueMap<String, String> headers;
 

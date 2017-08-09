@@ -1,30 +1,29 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.exception.FailedPrintingException;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.printer.ReturnedMaterialPrinter;
 import ph.txtdis.mgdc.gsm.repository.RmaRepository;
-import ph.txtdis.service.CredentialService;
+
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static ph.txtdis.util.UserUtils.username;
 
 public abstract class AbstractRmaService<AR extends RmaRepository> //
-		extends AbstractSpunSavedBillableService //
-		implements BillingDataService, RmaService, ReceivableService {
-
-	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReturnedMaterialPrinter printer;
+	extends AbstractSpunSavedBillableService //
+	implements BillingDataService,
+	RmaService,
+	ReceivableService {
 
 	@Autowired
 	protected AR rmaRepository;
+
+	@Autowired
+	private ReturnedMaterialPrinter printer;
 
 	@Override
 	public Billable findOpenRmaByCustomerId(Long id) throws Exception {
@@ -61,18 +60,18 @@ public abstract class AbstractRmaService<AR extends RmaRepository> //
 		}
 	}
 
-	private BillableEntity printRma(BillableEntity b) throws Exception {
-		if (!b.getOrderDate().isBefore(LocalDate.now()))
-			printer.print(b);
-		b.setReceivingModifiedBy(credentialService.username());
-		b.setReceivingModifiedOn(ZonedDateTime.now());
-		return repository.save(b);
-	}
-
 	@Override
 	public Billable toModel(BillableEntity e) {
 		Billable b = super.toModel(e);
 		return b == null ? null : setPrintingData(b, e);
+	}
+
+	private BillableEntity printRma(BillableEntity b) throws Exception {
+		if (!b.getOrderDate().isBefore(LocalDate.now()))
+			printer.print(b);
+		b.setReceivingModifiedBy(username());
+		b.setReceivingModifiedOn(ZonedDateTime.now());
+		return repository.save(b);
 	}
 
 	private Billable setPrintingData(Billable b, BillableEntity e) {

@@ -1,13 +1,13 @@
 package ph.txtdis.mgdc.service.server;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.Holiday;
 import ph.txtdis.service.SavedService;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface HolidayService //
-		extends SavedService<Holiday> {
+	extends SavedService<Holiday> {
 
 	Holiday findByDate(LocalDate d);
 

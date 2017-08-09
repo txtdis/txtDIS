@@ -1,16 +1,5 @@
 package ph.txtdis.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.TEXT;
-import static ph.txtdis.type.Type.TIMESTAMP;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -19,20 +8,32 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.stage.Stage;
-import ph.txtdis.fx.control.AppButtonImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
+import ph.txtdis.fx.control.ButtonFactory;
 import ph.txtdis.fx.control.LabelFactory;
-import ph.txtdis.fx.dialog.AuditDialogImpl;
+import ph.txtdis.fx.dialog.AuditDialog;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.info.Information;
 import ph.txtdis.service.DecisionNeededService;
 import ph.txtdis.service.SavedService;
 import ph.txtdis.util.ClientTypeMap;
 
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.TEXT;
+import static ph.txtdis.type.Type.TIMESTAMP;
+
 @Scope("prototype")
 @Component("decisionNeededApp")
-public class DecisionNeededAppImpl //
-		implements DecisionNeededApp {
+public class DecisionNeededAppImpl
+	implements DecisionNeededApp {
 
 	private static final String BASE = "-fx-text-base-color; ";
 
@@ -40,11 +41,9 @@ public class DecisionNeededAppImpl //
 
 	private static final String BRIGHT_GREEN = "#00ff00; ";
 
-	@Autowired
-	private AppButtonImpl decisionButton;
+	private AppButton decisionButton;
 
-	@Autowired
-	private AuditDialogImpl decisionDialog;
+	private AuditDialog decisionDialog;
 
 	@Autowired
 	private AppFieldImpl<String> decidedByDisplay;
@@ -53,13 +52,10 @@ public class DecisionNeededAppImpl //
 	private AppFieldImpl<ZonedDateTime> decidedOnDisplay;
 
 	@Autowired
+	private ButtonFactory button;
+
+	@Autowired
 	private LabelFactory label;
-
-	@Autowired
-	private MessageDialog dialog;
-
-	@Autowired
-	private ClientTypeMap map;
 
 	private BooleanProperty canBeApproved = new SimpleBooleanProperty(false);
 
@@ -75,9 +71,9 @@ public class DecisionNeededAppImpl //
 	}
 
 	private List<Node> decisionNodes(String s) {
-		return decisionDisplays = asList(label.name(s + " by"), //
-				decidedByDisplay.readOnly().width(120).build(TEXT), label.name("on"), //
-				decidedOnDisplay.readOnly().build(TIMESTAMP));
+		return decisionDisplays = asList(label.name(s + " by"),
+			decidedByDisplay.readOnly().width(120).build(TEXT), label.name("on"),
+			decidedOnDisplay.readOnly().build(TIMESTAMP));
 	}
 
 	@Override
@@ -86,8 +82,8 @@ public class DecisionNeededAppImpl //
 	}
 
 	@Override
-	public AppButtonImpl addDecisionButton() {
-		return decisionButton.icon("decision").tooltip("Decide...").build();
+	public AppButton addDecisionButton() {
+		return decisionButton = button.icon("decision").tooltip("Decide...").build();
 	}
 
 	@Override
@@ -128,10 +124,15 @@ public class DecisionNeededAppImpl //
 	}
 
 	private void updateButton(String icon, String color, String tooltip) {
-		decisionButton.setText(map.icon(icon));
+		decisionButton.setText(clientTypeMap().icon(icon));
 		decisionButton.getTooltip().setText(tooltip);
 		decisionButton.onAction(color.equals(BASE) ? event : null);
 		setButtonStyle(color);
+	}
+
+	@Lookup
+	ClientTypeMap clientTypeMap() {
+		return null;
 	}
 
 	private void setButtonStyle(String color) {
@@ -155,22 +156,32 @@ public class DecisionNeededAppImpl //
 	}
 
 	private void decisionDialog(Stage stage, DecisionNeededService service) {
-		decisionDialog //
-				.disableApprovalButtonIf(canBeApproved.not()) //
-				.disableRejectionButtonIf(canBeRejected.not()) //
-				.addParent(stage).start();
+		decisionDialog = decisionDialog();
+		decisionDialog
+			.disableApprovalButtonIf(canBeApproved.not())
+			.disableRejectionButtonIf(canBeRejected.not())
+			.addParent(stage).start();
 		if (isValid() != null)
 			saveDecision(stage, service);
+	}
+
+	@Lookup
+	AuditDialog decisionDialog() {
+		return null;
+	}
+
+	private Boolean isValid() {
+		return decisionDialog.isValid();
 	}
 
 	private void saveDecision(Stage stage, DecisionNeededService service) {
 		try {
 			saveDecision(service);
 		} catch (Information i) {
-			dialog.show(i).addParent(stage).start();
+			messageDialog().show(i).addParent(stage).start();
 		} catch (Exception e) {
 			e.printStackTrace();
-			dialog.show(e).addParent(stage).start();
+			messageDialog().show(e).addParent(stage).start();
 		}
 	}
 
@@ -179,8 +190,9 @@ public class DecisionNeededAppImpl //
 		((SavedService<?>) service).save();
 	}
 
-	private Boolean isValid() {
-		return decisionDialog.isValid();
+	@Lookup
+	MessageDialog messageDialog() {
+		return null;
 	}
 
 	private String remarks() {

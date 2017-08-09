@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class AlreadyReferencedBookingIdException extends Exception {
+public class AlreadyReferencedBookingIdException
+	extends Exception {
 
 	private static final long serialVersionUID = -1428885265318163309L;
 

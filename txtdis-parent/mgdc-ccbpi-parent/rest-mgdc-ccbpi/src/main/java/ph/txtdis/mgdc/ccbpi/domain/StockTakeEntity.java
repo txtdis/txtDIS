@@ -18,7 +18,7 @@ import ph.txtdis.mgdc.domain.AbstractStockTakeEntity;
 @Table(name = "stock_take")
 @EqualsAndHashCode(callSuper = true)
 public class StockTakeEntity //
-		extends AbstractStockTakeEntity {
+	extends AbstractStockTakeEntity {
 
 	private static final long serialVersionUID = 7630222117410458884L;
 

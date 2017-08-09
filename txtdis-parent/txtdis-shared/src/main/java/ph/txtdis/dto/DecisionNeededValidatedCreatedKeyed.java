@@ -3,7 +3,10 @@ package ph.txtdis.dto;
 import java.time.ZonedDateTime;
 
 public interface DecisionNeededValidatedCreatedKeyed<PK> //
-		extends CreationLogged, Validated, Remarked, Keyed<PK> {
+	extends CreationLogged,
+	Validated,
+	Remarked,
+	Keyed<PK> {
 
 	void setIsValid(Boolean isValid);
 

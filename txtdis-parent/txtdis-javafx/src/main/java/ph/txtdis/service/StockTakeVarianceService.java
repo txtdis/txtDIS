@@ -1,12 +1,13 @@
 package ph.txtdis.service;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.StockTakeVariance;
 import ph.txtdis.info.Information;
 
-public interface StockTakeVarianceService extends VarianceService<StockTakeVariance> {
+import java.time.LocalDate;
+import java.util.List;
+
+public interface StockTakeVarianceService
+	extends VarianceService<StockTakeVariance> {
 
 	boolean canApprove();
 
@@ -15,8 +16,6 @@ public interface StockTakeVarianceService extends VarianceService<StockTakeVaria
 	LocalDate getLatestCountDate();
 
 	LocalDate getPreviousCountDate();
-
-	LocalDate getServerDate();
 
 	String getUsername();
 

@@ -1,26 +1,21 @@
 package ph.txtdis.domain;
 
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.EAGER;
+import lombok.Data;
+import ph.txtdis.dto.Keyed;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-import lombok.Data;
-import ph.txtdis.dto.Keyed;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.EAGER;
 
 @Data
 @Entity
 @Table(name = "users")
 public class UserEntity //
-		implements Keyed<String>, Serializable {
+	implements Keyed<String>,
+	Serializable {
 
 	private static final long serialVersionUID = -2632553934643767369L;
 

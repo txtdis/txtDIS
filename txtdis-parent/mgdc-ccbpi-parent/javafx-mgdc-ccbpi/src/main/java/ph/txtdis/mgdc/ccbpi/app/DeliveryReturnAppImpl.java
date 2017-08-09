@@ -21,8 +21,8 @@ import ph.txtdis.mgdc.ccbpi.service.DeliveryReturnService;
 @Scope("prototype")
 @Component("deliveryReturnApp")
 public class DeliveryReturnAppImpl //
-		extends AbstractKeyedApp<DeliveryReturnService, PickList, Long, Long> //
-		implements DeliveryReturnApp {
+	extends AbstractKeyedApp<DeliveryReturnService, PickList, Long, Long> //
+	implements DeliveryReturnApp {
 
 	@Autowired
 	private AppFieldImpl<Long> pickListIdInput;
@@ -38,7 +38,7 @@ public class DeliveryReturnAppImpl //
 
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
-		return asList(gridPane(), box.forHorizontalPane(table.build()), trackedPane());
+		return asList(gridPane(), pane.centeredHorizontal(table.build()), trackedPane());
 	}
 
 	private AppGridPane gridPane() {
@@ -51,17 +51,10 @@ public class DeliveryReturnAppImpl //
 	}
 
 	@Override
-	public void refresh() {
-		super.refresh();
-		orderDateDisplay.setValue(service.getPickDate());
-		table.items(service.getDetails());
-	}
-
-	@Override
 	protected void setBindings() {
 		saveButton.disableIf(table.isEmpty()//
-				.or(table.disabled())//
-				.or(isPosted()));
+			.or(table.disabled())//
+			.or(isPosted()));
 		table.disableIf(pickListIdInput.isEmpty());
 	}
 
@@ -87,5 +80,12 @@ public class DeliveryReturnAppImpl //
 				refresh();
 				clearControlAfterShowingErrorDialog(e, pickListIdInput);
 			}
+	}
+
+	@Override
+	public void refresh() {
+		super.refresh();
+		orderDateDisplay.setValue(service.getPickDate());
+		table.items(service.getDetails());
 	}
 }

@@ -7,21 +7,23 @@ import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.service.SubheadedTotaledService;
 
 public interface CokeBillableService //
-		extends BillableService, UpToReturnableQtyReceivingService, SubheadedTotaledService<BillableDetail> {
+	extends BillableService,
+	UpToReturnableQtyReceivingService,
+	SubheadedTotaledService<BillableDetail> {
 
 	String getReferenceOrderNo();
-
-	boolean isADeliveryList();
-
-	default boolean isADeliveryListOrAnOrderConfirmation() {
-		return isADeliveryList() || isAnOrderConfirmation();
-	}
 
 	default boolean isADeliveryListOrAnOrderConfirmationOrALoadManifest() {
 		return isADeliveryListOrAnOrderConfirmation() || isALoadManifest();
 	}
 
+	default boolean isADeliveryListOrAnOrderConfirmation() {
+		return isADeliveryList() || isAnOrderConfirmation();
+	}
+
 	boolean isALoadManifest();
+
+	boolean isADeliveryList();
 
 	boolean isAnOrderConfirmation();
 

@@ -18,7 +18,7 @@ import ph.txtdis.fx.table.AbstractTable;
 import ph.txtdis.fx.table.Column;
 
 public abstract class AbstractOrderListTable<App extends LaunchableApp> // 
-		extends AbstractTable<SalesItemVariance> {
+	extends AbstractTable<SalesItemVariance> {
 
 	@Autowired
 	private Column<SalesItemVariance, String> orderNo, customer;
@@ -35,10 +35,10 @@ public abstract class AbstractOrderListTable<App extends LaunchableApp> //
 	@Override
 	protected List<TableColumn<SalesItemVariance, ?>> addColumns() {
 		return asList( //
-				orderNo.ofType(TEXT).launches(app).width(180).build("Order No.", "orderNo"), //
-				customer.ofType(TEXT).launches(app).width(240).build("Outlet", "customer"), //
-				qty.ofType(FRACTION).launches(app).build("Quantity", qtyAndValuePrefix() + "QtyInFractions"), //
-				value.ofType(CURRENCY).launches(app).build("Amount", qtyAndValuePrefix() + "Value"));
+			orderNo.ofType(TEXT).launches(app).width(180).build("Order No.", "orderNo"), //
+			customer.ofType(TEXT).launches(app).width(240).build("Outlet", "customer"), //
+			qty.ofType(FRACTION).launches(app).build("Quantity", qtyAndValuePrefix() + "QtyInFractions"), //
+			value.ofType(CURRENCY).launches(app).build("Amount", qtyAndValuePrefix() + "Value"));
 	}
 
 	protected abstract String qtyAndValuePrefix();

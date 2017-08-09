@@ -17,7 +17,9 @@ import ph.txtdis.util.NumberUtils;
 @Entity
 @Table(name = "tr_ilr_details")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsIncomingLoadDetail extends EdmsAbstractReferencedItemCodeIdDetail implements Serializable {
+public class EdmsIncomingLoadDetail
+	extends EdmsAbstractReferencedItemCodeIdDetail
+	implements Serializable {
 
 	private static final long serialVersionUID = -2615910955094613912L;
 
@@ -50,6 +52,7 @@ public class EdmsIncomingLoadDetail extends EdmsAbstractReferencedItemCodeIdDeta
 
 	@Override
 	public String toString() {
-		return getReferenceNo() + ": " + itemName + " - " + NumberUtils.toIdText(fullCaseQty) + "CS" + NumberUtils.toIdText(fullBottleQty);
+		return getReferenceNo() + ": " + itemName + " - " + NumberUtils.toIdText(fullCaseQty) + "CS" +
+			NumberUtils.toIdText(fullBottleQty);
 	}
 }

@@ -2,7 +2,6 @@ package ph.txtdis.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsSupervisor;
 import ph.txtdis.repository.EdmsAreaRepository;
 import ph.txtdis.repository.EdmsDistrictRepository;
@@ -11,7 +10,7 @@ import ph.txtdis.repository.EdmsTerritoryRepository;
 
 @Service("vendorService")
 public class EdmsVendorServiceImpl //
-		implements EdmsVendorService {
+	implements EdmsVendorService {
 
 	@Autowired
 	private EdmsSupervisorRepository edmsSupervisorRepository;

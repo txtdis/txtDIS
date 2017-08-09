@@ -1,21 +1,20 @@
 package ph.txtdis.dyvek.controller;
 
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.dyvek.service.server.OpenListedSearchedSpunSavedOrderService;
 
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 public abstract class AbstractOpenListedSearchedSpunSavedController< //
-		S extends OpenListedSearchedSpunSavedOrderService<E, T>, //
-		E extends Keyed<Long>, //
-		T extends Keyed<Long>> //
-		extends AbstractSearchedSpunSavedOrderController<S, E, T> {
+	S extends OpenListedSearchedSpunSavedOrderService<E, T>, //
+	E extends Keyed<Long>, //
+	T extends Keyed<Long>> //
+	extends AbstractSearchedSpunSavedOrderController<S, E, T> {
 
 	@RequestMapping(method = GET)
 	public ResponseEntity<?> get() {

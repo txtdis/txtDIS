@@ -20,7 +20,9 @@ import ph.txtdis.util.TypeStyle;
 
 @Scope("prototype")
 @Component("column")
-public class Column<S extends Keyed<?>, T> extends TableColumn<S, T> implements AppTableColumn {
+public class Column<S extends Keyed<?>, T>
+	extends TableColumn<S, T>
+	implements AppTableColumn {
 
 	@Autowired
 	private TabularCell<S, T> cell;
@@ -54,6 +56,39 @@ public class Column<S extends Keyed<?>, T> extends TableColumn<S, T> implements 
 		return this;
 	}
 
+	private void makeHeaderWrappable(String name) {
+		Label label = new Label(name);
+		label.setStyle(" -fx-padding: 8px; ");
+		label.setWrapText(true);
+		label.setAlignment(Pos.CENTER);
+		label.setTextAlignment(TextAlignment.CENTER);
+		setGraphic(labelStack(label));
+	}
+
+	private void setColumnWidth(int width) {
+		setMinWidth(width);
+		setPrefWidth(width);
+		setMaxWidth(width);
+	}
+
+	private int width() {
+		return width != 0 ? width : TypeStyle.width(type);
+	}
+
+	private TableCell<S, T> cell(String field) {
+		if (type == CHECKBOX)
+			return cell.get(field);
+		return cell.get(app, type);
+	}
+
+	private StackPane labelStack(Label label) {
+		StackPane stack = new StackPane();
+		stack.getChildren().add(label);
+		stack.prefWidthProperty().bind(widthProperty().subtract(5));
+		label.prefWidthProperty().bind(stack.prefWidthProperty());
+		return stack;
+	}
+
 	public Column<S, T> launches(LaunchableApp app) {
 		this.app = app;
 		return this;
@@ -78,38 +113,5 @@ public class Column<S extends Keyed<?>, T> extends TableColumn<S, T> implements 
 	public Column<S, T> width(int width) {
 		this.width = width;
 		return this;
-	}
-
-	private TableCell<S, T> cell(String field) {
-		if (type == CHECKBOX)
-			return cell.get(field);
-		return cell.get(app, type);
-	}
-
-	private void makeHeaderWrappable(String name) {
-		Label label = new Label(name);
-		label.setStyle(" -fx-padding: 8px; ");
-		label.setWrapText(true);
-		label.setAlignment(Pos.CENTER);
-		label.setTextAlignment(TextAlignment.CENTER);
-		setGraphic(labelStack(label));
-	}
-
-	private StackPane labelStack(Label label) {
-		StackPane stack = new StackPane();
-		stack.getChildren().add(label);
-		stack.prefWidthProperty().bind(widthProperty().subtract(5));
-		label.prefWidthProperty().bind(stack.prefWidthProperty());
-		return stack;
-	}
-
-	private void setColumnWidth(int width) {
-		setMinWidth(width);
-		setPrefWidth(width);
-		setMaxWidth(width);
-	}
-
-	private int width() {
-		return width != 0 ? width : TypeStyle.width(type);
 	}
 }

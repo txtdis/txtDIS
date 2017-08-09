@@ -1,8 +1,8 @@
 package ph.txtdis.mgdc.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.Location;
+
+import java.util.List;
 
 public interface LocationService {
 

@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class NotNextWorkDayException extends Exception {
+public class NotNextWorkDayException
+	extends Exception {
 
 	private static final long serialVersionUID = 6963002563936579349L;
 

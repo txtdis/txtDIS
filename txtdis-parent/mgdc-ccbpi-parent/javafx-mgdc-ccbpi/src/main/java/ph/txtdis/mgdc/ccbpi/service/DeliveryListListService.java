@@ -1,7 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
 public interface DeliveryListListService //
-		extends ListService {
+	extends ListService {
 
 	void listDDL(String[] ids) throws Exception;
 }

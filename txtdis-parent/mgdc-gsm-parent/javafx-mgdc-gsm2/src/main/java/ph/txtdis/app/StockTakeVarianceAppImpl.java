@@ -5,5 +5,6 @@ import org.springframework.stereotype.Component;
 
 @Scope("prototype")
 @Component("stockTakeVarianceApp")
-public class StockTakeVarianceAppImpl extends AbstractStockTakeVarianceApp {
+public class StockTakeVarianceAppImpl
+	extends AbstractStockTakeVarianceApp {
 }

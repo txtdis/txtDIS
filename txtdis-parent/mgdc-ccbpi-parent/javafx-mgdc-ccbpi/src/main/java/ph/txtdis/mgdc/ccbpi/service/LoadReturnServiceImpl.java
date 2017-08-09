@@ -3,6 +3,7 @@ package ph.txtdis.mgdc.ccbpi.service;
 import static java.util.stream.Collectors.toList;
 import static ph.txtdis.type.BeverageType.EMPTIES;
 import static ph.txtdis.type.DeliveryType.PICK_UP;
+import static ph.txtdis.util.UserUtils.username;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -27,8 +28,8 @@ import ph.txtdis.util.NumberUtils;
 
 @Service("loadReturnService")
 public class LoadReturnServiceImpl //
-		extends AbstractLoadingService //
-		implements LoadReturnService {
+	extends AbstractLoadingService //
+	implements LoadReturnService {
 
 	@Autowired
 	private BommedDiscountedPricedValidatedItemService itemService;
@@ -56,6 +57,16 @@ public class LoadReturnServiceImpl //
 	}
 
 	@Override
+	public Item getItem() {
+		return item;
+	}
+
+	@Override
+	public void setItem(Item item) {
+		this.item = item;
+	}
+
+	@Override
 	public String getAlternateName() {
 		return "Load-in";
 	}
@@ -71,20 +82,6 @@ public class LoadReturnServiceImpl //
 	}
 
 	@Override
-	public List<PickListDetail> getDetails() {
-		List<PickListDetail> details = get().getDetails();
-		return details == null ? null
-				: details.stream() //
-						.filter(d -> d != null && NumberUtils.isPositive(d.getReturnedQty())) //
-						.collect(Collectors.toList());
-	}
-
-	@Override
-	public Item getItem() {
-		return item;
-	}
-
-	@Override
 	public BommedDiscountedPricedValidatedItemService getItemService() {
 		return itemService;
 	}
@@ -95,14 +92,14 @@ public class LoadReturnServiceImpl //
 	}
 
 	@Override
-	public List<PickListDetail> getPickedDetails() {
-		return pickedDetails;
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
 	public PickListDetail getReceivingDetail() {
 		return receivingDetail;
+	}
+
+	@Override
+	public void setReceivingDetail(ReceivingDetail detail) {
+		receivingDetail = (PickListDetail) detail;
 	}
 
 	@Override
@@ -112,31 +109,45 @@ public class LoadReturnServiceImpl //
 	}
 
 	@Override
-	public boolean isAppendable() {
-		return isNew();
-	}
-
-	@Override
 	public boolean isNew() {
 		return get().getReceivedOn() == null;
 	}
 
 	@Override
+	public boolean isAppendable() {
+		return isNew();
+	}
+
+	@Override
 	public List<String> listReceivableItemNames() {
 		return pickedDetails.stream() //
-				.map(d -> d.getItemName()) //
-				.filter(n -> nonReturnedItem(n)).distinct() //
-				.collect(toList());
+			.map(d -> d.getItemName()) //
+			.filter(n -> nonReturnedItem(n)).distinct() //
+			.collect(toList());
 	}
 
 	@Override
 	public boolean nonReturnedItem(String name) {
 		return getDetails() == null ? true //
-				: !getDetails().stream().anyMatch(d -> isItemReturned(name, d));
+			: !getDetails().stream().anyMatch(d -> isItemReturned(name, d));
+	}
+
+	@Override
+	public List<PickListDetail> getDetails() {
+		List<PickListDetail> details = get().getDetails();
+		return details == null ? null
+			: details.stream() //
+			.filter(d -> d != null && NumberUtils.isPositive(d.getReturnedQty())) //
+			.collect(Collectors.toList());
 	}
 
 	private boolean isItemReturned(String name, PickListDetail d) {
 		return !NumberUtils.isZero(d.getReturnedQty()) && name.equalsIgnoreCase(d.getItemName());
+	}
+
+	@Override
+	public void setDetails(List<PickListDetail> l) {
+		get().setDetails(l);
 	}
 
 	@Override
@@ -160,16 +171,20 @@ public class LoadReturnServiceImpl //
 		setDetails(returnAll());
 	}
 
-	private List<Booking> getBookings() {
-		return get().getBookings();
-	}
-
 	private void verifyNoOCSHasAnRR() throws Exception {
 		List<Billable> l = getBookings().stream().map(b -> toBillable(b)).collect(Collectors.toList());
 		Billable ocs = l.stream().filter(b -> b.getReceivedOn() != null).findFirst().orElse(null);
 		if (ocs != null)
 			throw new InvalidException("Cannot do a full return for " + getAbbreviatedModuleNoPrompt() + getId() //
-					+ "\nsince an R/R exists for its picked OCS numbered " + ocsNo(ocs));
+				+ "\nsince an R/R exists for its picked OCS numbered " + ocsNo(ocs));
+	}
+
+	private List<PickListDetail> returnAll() {
+		return getPickedDetails().stream().map(d -> setReturnedQty(d)).collect(Collectors.toList());
+	}
+
+	private List<Booking> getBookings() {
+		return get().getBookings();
 	}
 
 	private Billable toBillable(Booking b) {
@@ -182,32 +197,18 @@ public class LoadReturnServiceImpl //
 
 	private String ocsNo(Billable ocs) {
 		return getBookings().stream() //
-				.filter(b -> b.getId().equals(ocs.getId())) //
-				.findFirst().orElse(new Booking()).getLocation();
+			.filter(b -> b.getId().equals(ocs.getId())) //
+			.findFirst().orElse(new Booking()).getLocation();
 	}
 
-	private List<PickListDetail> returnAll() {
-		return getPickedDetails().stream().map(d -> setReturnedQty(d)).collect(Collectors.toList());
+	@Override
+	public List<PickListDetail> getPickedDetails() {
+		return pickedDetails;
 	}
 
 	private PickListDetail setReturnedQty(PickListDetail d) {
 		d.setReturnedQty(d.getInitialQty());
 		return d;
-	}
-
-	@Override
-	public void setDetails(List<PickListDetail> l) {
-		get().setDetails(l);
-	}
-
-	@Override
-	public void setItem(Item item) {
-		this.item = item;
-	}
-
-	@Override
-	public void setReceivingDetail(ReceivingDetail detail) {
-		receivingDetail = (PickListDetail) detail;
 	}
 
 	@Override

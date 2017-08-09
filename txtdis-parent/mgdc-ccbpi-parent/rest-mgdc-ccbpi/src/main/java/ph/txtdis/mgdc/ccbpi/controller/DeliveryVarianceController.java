@@ -7,5 +7,6 @@ import ph.txtdis.mgdc.ccbpi.service.server.DeliveryVarianceService;
 
 @RequestMapping("/deliveryVariances")
 @RestController("deliveryVarianceController")
-public class DeliveryVarianceController extends AbstractVarianceController<DeliveryVarianceService> {
+public class DeliveryVarianceController
+	extends AbstractVarianceController<DeliveryVarianceService> {
 }

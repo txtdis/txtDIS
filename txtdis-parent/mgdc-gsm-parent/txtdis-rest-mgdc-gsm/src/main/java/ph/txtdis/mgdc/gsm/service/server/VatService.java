@@ -1,10 +1,10 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
+import ph.txtdis.mgdc.gsm.dto.Vat;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
-import ph.txtdis.mgdc.gsm.dto.Vat;
 
 public interface VatService {
 

@@ -1,28 +1,29 @@
 package ph.txtdis.dyvek.fx.dialog;
 
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
 import ph.txtdis.app.RemittanceApp;
 import ph.txtdis.dyvek.app.ClientBillingApp;
 import ph.txtdis.dyvek.app.CommissionApp;
 import ph.txtdis.dyvek.app.ExpenseApp;
 import ph.txtdis.dyvek.app.TruckLogApp;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.dialog.AbstractMenu;
 import ph.txtdis.util.FontIcon;
+
+import static ph.txtdis.util.UserUtils.username;
 
 @Scope("prototype")
 @Component("truckingMenu")
 public class TruckingMenuImpl //
-		extends AbstractMenu //
-		implements TruckingMenu {
+	extends AbstractMenu //
+	implements TruckingMenu {
 
 	@Autowired
-	private AppButtonImpl truckLogButton, commissionButton, clientBillingButton, remittanceButton, expenseButton;
+	private AppButton truckLogButton, commissionButton, clientBillingButton, remittanceButton, expenseButton;
 
 	@Autowired
 	private TruckLogApp truckLogApp;
@@ -63,25 +64,25 @@ public class TruckingMenuImpl //
 	}
 
 	@Override
-	public void goToDefaultFocus() {
-		requestFocus();
-	}
-
-	@Override
-	public void initialize() {
-		getIcons().add(new FontIcon("\ue950"));
-		setTitle(credentialService.username() + "@" + modulePrefix + " Trucking Menu");
-		setScene(createScene());
-	}
-
-	@Override
 	public void refresh() {
 		goToDefaultFocus();
+	}
+
+	@Override
+	public void goToDefaultFocus() {
+		requestFocus();
 	}
 
 	@Override
 	public void start() {
 		initialize();
 		show();
+	}
+
+	@Override
+	public void initialize() {
+		getIcons().add(new FontIcon("\ue950"));
+		setTitle(username() + "@" + modulePrefix + " Trucking Menu");
+		setScene(createScene());
 	}
 }

@@ -1,7 +1,7 @@
 package ph.txtdis.dyvek.fx.dialog;
 
-import ph.txtdis.app.StartableApp;
+import ph.txtdis.app.App;
 
 public interface TruckingMenu //
-		extends StartableApp {
+	extends App {
 }

@@ -9,5 +9,6 @@ import ph.txtdis.mgdc.ccbpi.service.DeliveryListService;
 @Scope("prototype")
 @Component("deliveryListDialog")
 public class DeliveryListDialogImpl //
-		extends AbstractAllItemInCasesAndBottlesInputDialog<DeliveryListService, BillableDetail> implements DeliveryListDialog {
+	extends AbstractAllItemInCasesAndBottlesInputDialog<DeliveryListService, BillableDetail>
+	implements DeliveryListDialog {
 }

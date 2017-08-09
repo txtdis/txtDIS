@@ -9,8 +9,8 @@ import ph.txtdis.mgdc.ccbpi.service.OrderConfirmationListService;
 @Scope("prototype")
 @Component("orderConfirmationListApp")
 public class OrderConfirmationListAppImpl //
-		extends AbstractTotaledListApp<OrderConfirmationListTable, OrderConfirmationListService> //
-		implements OrderConfirmationListApp {
+	extends AbstractTotaledListApp<OrderConfirmationListTable, OrderConfirmationListService> //
+	implements OrderConfirmationListApp {
 
 	@Override
 	protected void setList(String[] ids) throws Exception {

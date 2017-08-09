@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class EdmsAbstractBillingDetail //
-		extends EdmsAbstractBillableDetail {
+	extends EdmsAbstractBillableDetail {
 
 	@Column(name = "soRecId")
 	private Long salesOrderDetailId;

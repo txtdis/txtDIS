@@ -7,7 +7,10 @@ import javafx.event.EventHandler;
 import ph.txtdis.type.Type;
 
 public interface AppField<T> //
-		extends ErrorHandling, FocusRequested, InputControl<T>, StylableTextField {
+	extends ErrorHandling,
+	FocusRequested,
+	InputControl<T>,
+	StylableTextField {
 
 	AppFieldImpl<T> build(Type type);
 

@@ -1,50 +1,36 @@
 package ph.txtdis.dyvek.service;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.UserType.CASHIER;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.STOCK_CHECKER;
-import static ph.txtdis.util.NumberUtils.zeroIfNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.dto.Keyed;
+import ph.txtdis.dyvek.model.Billable;
+import ph.txtdis.dyvek.model.BillableDetail;
+import ph.txtdis.info.Information;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import ph.txtdis.dto.Keyed;
-import ph.txtdis.dyvek.model.Billable;
-import ph.txtdis.dyvek.model.BillableDetail;
-import ph.txtdis.info.Information;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SpunKeyedService;
-import ph.txtdis.util.ClientTypeMap;
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.NumberUtils.zeroIfNull;
+import static ph.txtdis.util.UserUtils.isUser;
 
 public abstract class AbstractOrderService<CS extends CustomerService> //
-		implements OrderService {
+	implements OrderService {
 
 	protected static final String CUSTOMER_NO = "Customer No. ";
 
 	@Autowired
-	private CredentialService credentialService;
+	protected CS customerService;
 
 	@Autowired
 	private ItemService itemService;
 
 	@Autowired
-	private ReadOnlyService<Billable> readOnlyService;
-
-	@Autowired
-	private SavingService<Billable> savingService;
-
-	@Autowired
-	private SpunKeyedService<Billable, Long> spunService;
-
-	@Autowired
-	protected CS customerService;
+	private RestClientService<Billable> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -58,21 +44,15 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 	}
 
 	@Override
+	public void reset() {
+		billable = null;
+		billables = null;
+	}
+
+	@Override
 	public void close() throws Information, Exception {
 		get().setClosedBy("");
 		save();
-	}
-
-	protected Billable findBillable(String endPt) throws Exception {
-		return readService().getOne(endPt);
-	}
-
-	private ReadOnlyService<Billable> readService() {
-		return getListedReadOnlyService().module(getModuleName());
-	}
-
-	protected List<Billable> findBillables(String endPt) throws Exception {
-		return readService().getList(endPt);
 	}
 
 	@Override
@@ -81,6 +61,11 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 		if (billable == null)
 			set(new Billable());
 		return billable;
+	}
+
+	@Override
+	public <T extends Keyed<Long>> void set(T t) {
+		billable = (Billable) t;
 	}
 
 	@Override
@@ -119,13 +104,8 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 	}
 
 	@Override
-	public String getItem() {
-		return get().getItem();
-	}
-
-	@Override
-	public ReadOnlyService<Billable> getListedReadOnlyService() {
-		return getReadOnlyService();
+	public void setId(Long id) {
+		get().setId(id);
 	}
 
 	@Override
@@ -149,6 +129,11 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 	}
 
 	@Override
+	public void setOrderDate(LocalDate d) {
+		get().setOrderDate(d);
+	}
+
+	@Override
 	public BigDecimal getPriceValue() {
 		return zeroIfNull(get().getPriceValue());
 	}
@@ -159,9 +144,8 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public ReadOnlyService<Billable> getReadOnlyService() {
-		return readOnlyService;
+	public void setQty(BigDecimal qty) {
+		get().setTotalQty(qty);
 	}
 
 	@Override
@@ -175,14 +159,15 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public SavingService<Billable> getSavingService() {
-		return savingService;
+	public void setRemarks(String text) {
+		if (text != null && !text.trim().isEmpty())
+			get().setRemarks(text.trim());
 	}
 
 	@Override
-	public SpunKeyedService<Billable, Long> getSpunService() {
-		return spunService;
+	@SuppressWarnings("unchecked")
+	public RestClientService<Billable> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
@@ -201,6 +186,16 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 	}
 
 	@Override
+	public String getItem() {
+		return get().getItem();
+	}
+
+	@Override
+	public void setItem(String name) {
+		get().setItem(name);
+	}
+
+	@Override
 	public List<Billable> listSearched() {
 		return billables;
 	}
@@ -210,10 +205,18 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 		set(findBillable("/" + keyId));
 	}
 
+	protected Billable findBillable(String endPt) throws Exception {
+		return billableService().getOne(endPt);
+	}
+
+	private RestClientService<Billable> billableService() {
+		return restClientService.module(getModuleName());
+	}
+
 	@Override
-	public void reset() {
-		billable = null;
-		billables = null;
+	@SuppressWarnings("unchecked")
+	public RestClientService<Billable> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -221,24 +224,8 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 		return billables = findBillables("/search?orderNo=" + text);
 	}
 
-	@Override
-	public <T extends Keyed<Long>> void set(T t) {
-		billable = (Billable) t;
-	}
-
-	@Override
-	public void setId(Long id) {
-		get().setId(id);
-	}
-
-	@Override
-	public void setItem(String name) {
-		get().setItem(name);
-	}
-
-	@Override
-	public void setOrderDate(LocalDate d) {
-		get().setOrderDate(d);
+	protected List<Billable> findBillables(String endPt) throws Exception {
+		return billableService().getList(endPt);
 	}
 
 	@Override
@@ -247,26 +234,15 @@ public abstract class AbstractOrderService<CS extends CustomerService> //
 		get().setTotalValue(getQty().multiply(getPriceValue()));
 	}
 
-	@Override
-	public void setQty(BigDecimal qty) {
-		get().setTotalQty(qty);
-	}
-
-	@Override
-	public void setRemarks(String text) {
-		if (text != null && !text.trim().isEmpty())
-			get().setRemarks(text.trim());
-	}
-
 	protected boolean isCashier() {
-		return credentialService.isUser(CASHIER);
+		return isUser(CASHIER);
 	}
 
 	protected boolean isManager() {
-		return credentialService.isUser(MANAGER);
+		return isUser(MANAGER);
 	}
 
 	protected boolean isStockChecker() {
-		return credentialService.isUser(STOCK_CHECKER);
+		return isUser(STOCK_CHECKER);
 	}
 }

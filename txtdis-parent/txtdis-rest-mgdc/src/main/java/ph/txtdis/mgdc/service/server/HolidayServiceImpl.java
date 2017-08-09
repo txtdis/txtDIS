@@ -1,27 +1,36 @@
 package ph.txtdis.mgdc.service.server;
 
-import static java.time.DayOfWeek.SUNDAY;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Holiday;
 import ph.txtdis.mgdc.domain.HolidayEntity;
 import ph.txtdis.mgdc.repository.HolidayRepository;
 import ph.txtdis.service.AbstractSavedReferencedKeyedService;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.time.DayOfWeek.SUNDAY;
+
 @Service("holidayService")
 public class HolidayServiceImpl //
-		extends AbstractSavedReferencedKeyedService<HolidayRepository, HolidayEntity, Holiday, Long> //
-		implements HolidayService {
+	extends AbstractSavedReferencedKeyedService<HolidayRepository, HolidayEntity, Holiday, Long> //
+	implements HolidayService {
 
 	@Override
 	public Holiday findByDate(LocalDate d) {
 		HolidayEntity e = repository.findByDeclaredDate(d);
 		return e == null ? null : toModel(e);
+	}
+
+	@Override
+	protected Holiday toModel(HolidayEntity e) {
+		Holiday h = new Holiday();
+		h.setDeclaredDate(e.getDeclaredDate());
+		h.setName(e.getName());
+		h.setCreatedBy(e.getCreatedBy());
+		h.setCreatedOn(e.getCreatedOn());
+		return h;
 	}
 
 	@Override
@@ -49,16 +58,6 @@ public class HolidayServiceImpl //
 
 	private boolean isAHoliday(LocalDate d) {
 		return repository.findByDeclaredDate(d) != null;
-	}
-
-	@Override
-	protected Holiday toModel(HolidayEntity e) {
-		Holiday h = new Holiday();
-		h.setDeclaredDate(e.getDeclaredDate());
-		h.setName(e.getName());
-		h.setCreatedBy(e.getCreatedBy());
-		h.setCreatedOn(e.getCreatedOn());
-		return h;
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import ph.txtdis.type.UomType;
 
 @Service("stockTakeService")
 public class StockTakeServiceImpl //
-		implements StockTakeService {
+	implements StockTakeService {
 
 	@Autowired
 	private ItemService itemService;
@@ -45,12 +45,56 @@ public class StockTakeServiceImpl //
 		return toStockTake(i);
 	}
 
+	public StockTake toStockTake(StockTakeEntity p) {
+		return p == null ? null : convert(p);
+	}
+
+	private StockTake convert(StockTakeEntity e) {
+		StockTake s = new StockTake();
+		s.setId(e.getId());
+		s.setCountDate(e.getStockTakeDate());
+		s.setWarehouse(toName(e.getWarehouse()));
+		s.setChecker(toName(e.getChecker()));
+		s.setTaker(toName(e.getTaker()));
+		s.setDetails(toStockTakeDetails(e));
+		s.setCreatedBy(e.getCreatedBy());
+		s.setCreatedOn(e.getCreatedOn());
+		return s;
+	}
+
+	private List<StockTakeDetail> toStockTakeDetails(StockTakeEntity i) {
+		return i.getDetails().stream().map(id -> toStockTakeDetail(id)).collect(toList());
+	}
+
+	private StockTakeDetail toStockTakeDetail(StockTakeDetailEntity e) {
+		StockTakeDetail d = new StockTakeDetail();
+		ItemEntity i = e.getItem();
+		d.setId(i.getId());
+		d.setName(i.getName());
+		d.setQty(e.getQty());
+		d.setQuality(e.getQuality());
+		d.setUom(e.getUom());
+		d.setQtyPerCase(getQtyPerCase(e));
+		return d;
+	}
+
+	private int getQtyPerCase(StockTakeDetailEntity e) {
+		if (e.getUom() != UomType.CS)
+			return 0;
+		return itemService.getCountPerCase(e.getItem());
+	}
+
 	@Override
 	public StockTake findByDate(LocalDate d) throws Exception {
 		StockTakeEntity i = findLatestEntityOnOrBeforeCutoff(d);
 		if (i == null)
 			throw new NotFoundException("Stock take on " + toDateDisplay(d));
 		return toStockTake(i);
+	}
+
+	@Override
+	public StockTakeEntity findLatestEntityOnOrBeforeCutoff(LocalDate d) {
+		return stockTakeRepository.findFirstByStockTakeDateLessThanEqualOrderByStockTakeDateDesc(d);
 	}
 
 	@Override
@@ -71,11 +115,6 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
-	public StockTakeEntity findLatestEntityOnOrBeforeCutoff(LocalDate d) {
-		return stockTakeRepository.findFirstByStockTakeDateLessThanEqualOrderByStockTakeDateDesc(d);
-	}
-
-	@Override
 	public StockTake first() {
 		StockTakeEntity i = stockTakeRepository.findFirstByOrderByIdAsc();
 		return toStockTake(i);
@@ -85,6 +124,16 @@ public class StockTakeServiceImpl //
 	public StockTake firstToSpin() {
 		StockTakeEntity i = firstSpun();
 		return spunIdOnlyStockTake(i);
+	}
+
+	private StockTakeEntity firstSpun() {
+		return stockTakeRepository.findFirstByOrderByIdAsc();
+	}
+
+	private StockTake spunIdOnlyStockTake(StockTakeEntity i) {
+		StockTake a = new StockTake();
+		a.setId(i.getId());
+		return a;
 	}
 
 	@Override
@@ -97,6 +146,10 @@ public class StockTakeServiceImpl //
 	public StockTake lastToSpin() {
 		StockTakeEntity i = lastSpun();
 		return spunIdOnlyStockTake(i);
+	}
+
+	private StockTakeEntity lastSpun() {
+		return stockTakeRepository.findFirstByOrderByIdDesc();
 	}
 
 	@Override
@@ -118,75 +171,6 @@ public class StockTakeServiceImpl //
 		return toStockTake(i);
 	}
 
-	private StockTakeEntity firstSpun() {
-		return stockTakeRepository.findFirstByOrderByIdAsc();
-	}
-
-	private StockTakeEntity lastSpun() {
-		return stockTakeRepository.findFirstByOrderByIdDesc();
-	}
-
-	private StockTake spunIdOnlyStockTake(StockTakeEntity i) {
-		StockTake a = new StockTake();
-		a.setId(i.getId());
-		return a;
-	}
-
-	public List<StockTake> toStockTake(List<StockTakeEntity> p) {
-		return p == null ? null : convert(p);
-	}
-
-	public StockTake toStockTake(StockTakeEntity p) {
-		return p == null ? null : convert(p);
-	}
-
-	private List<StockTake> convert(List<StockTakeEntity> l) {
-		return l.stream().map(p -> convert(p)).collect(toList());
-	}
-
-	private StockTake convert(StockTakeEntity e) {
-		StockTake s = new StockTake();
-		s.setId(e.getId());
-		s.setCountDate(e.getStockTakeDate());
-		s.setWarehouse(toName(e.getWarehouse()));
-		s.setChecker(toName(e.getChecker()));
-		s.setTaker(toName(e.getTaker()));
-		s.setDetails(toStockTakeDetails(e));
-		s.setCreatedBy(e.getCreatedBy());
-		s.setCreatedOn(e.getCreatedOn());
-		return s;
-	}
-
-	private String toName(UserEntity user) {
-		return user == null ? null : user.getName();
-	}
-
-	private String toName(WarehouseEntity u) {
-		return u == null ? null : u.getName();
-	}
-
-	private StockTakeDetail toStockTakeDetail(StockTakeDetailEntity e) {
-		StockTakeDetail d = new StockTakeDetail();
-		ItemEntity i = e.getItem();
-		d.setId(i.getId());
-		d.setName(i.getName());
-		d.setQty(e.getQty());
-		d.setQuality(e.getQuality());
-		d.setUom(e.getUom());
-		d.setQtyPerCase(getQtyPerCase(e));
-		return d;
-	}
-
-	private int getQtyPerCase(StockTakeDetailEntity e) {
-		if (e.getUom() != UomType.CS)
-			return 0;
-		return itemService.getCountPerCase(e.getItem());
-	}
-
-	private List<StockTakeDetail> toStockTakeDetails(StockTakeEntity i) {
-		return i.getDetails().stream().map(id -> toStockTakeDetail(id)).collect(toList());
-	}
-
 	public StockTakeEntity toStockTaking(StockTake l) {
 		return l == null ? null : create(l);
 	}
@@ -201,8 +185,12 @@ public class StockTakeServiceImpl //
 		return e;
 	}
 
-	private ItemEntity toItem(StockTakeDetail ad) {
-		return itemService.findEntityByPrimaryKey(ad.getId());
+	private WarehouseEntity toWarehouse(StockTake s) {
+		return s == null ? null : warehouseRepository.findByNameIgnoreCase(s.getWarehouse());
+	}
+
+	private UserEntity toUser(String n) {
+		return n == null ? null : userRepository.findOne(n);
 	}
 
 	protected List<StockTakeDetailEntity> toStockTakingDetails(StockTakeEntity i, StockTake e) {
@@ -219,11 +207,23 @@ public class StockTakeServiceImpl //
 		return ed;
 	}
 
-	private UserEntity toUser(String n) {
-		return n == null ? null : userRepository.findOne(n);
+	private ItemEntity toItem(StockTakeDetail ad) {
+		return itemService.findEntityByPrimaryKey(ad.getId());
 	}
 
-	private WarehouseEntity toWarehouse(StockTake s) {
-		return s == null ? null : warehouseRepository.findByNameIgnoreCase(s.getWarehouse());
+	public List<StockTake> toStockTake(List<StockTakeEntity> p) {
+		return p == null ? null : convert(p);
+	}
+
+	private List<StockTake> convert(List<StockTakeEntity> l) {
+		return l.stream().map(p -> convert(p)).collect(toList());
+	}
+
+	private String toName(UserEntity user) {
+		return user == null ? null : user.getName();
+	}
+
+	private String toName(WarehouseEntity u) {
+		return u == null ? null : u.getName();
 	}
 }

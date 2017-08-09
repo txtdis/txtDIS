@@ -1,12 +1,13 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dto.Truck;
 import ph.txtdis.service.ServerTruckService;
 
+import java.util.List;
+
 public interface ImportedTruckService //
-		extends ServerTruckService, Imported {
+	extends ServerTruckService,
+	Imported {
 
 	List<Truck> list();
 

@@ -10,9 +10,9 @@ import ph.txtdis.dyvek.service.CashAdvanceLiquidationService;
 
 @Scope("prototype")
 @Component("cashAdvanceLiquidationApp")
-public class CashAdvanceLiquidationAppImpl //
-		extends AbstractTableApp<CashAdvanceLiquidationTable, CashAdvanceLiquidationService, RemittanceDetail>//
-		implements CashAdvanceLiquidationApp {
+public class CashAdvanceLiquidationAppImpl
+	extends AbstractTableApp<CashAdvanceLiquidationTable, CashAdvanceLiquidationService, RemittanceDetail>
+	implements CashAdvanceLiquidationApp {
 
 	@Override
 	public void actOn(String... keys) {

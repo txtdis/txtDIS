@@ -15,8 +15,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "tr_cm_header")
 @EqualsAndHashCode(callSuper = true)
 public class EdmsCreditMemo //
-		extends EdmsAbstractPaidTransported //
-		implements Serializable {
+	extends EdmsAbstractPaidTransported //
+	implements Serializable {
 
 	private static final long serialVersionUID = 586806393911673808L;
 

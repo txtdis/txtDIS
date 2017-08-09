@@ -9,12 +9,12 @@ import ph.txtdis.dyvek.service.PurchaseService;
 
 @Scope("prototype")
 @Component("openPurchaseOrderListApp")
-public class OpenPurchaseListAppImpl //
-		extends AbstractOpenOrderListApp<PurchaseListTable, PurchaseService> //
-		implements OpenPurchaseListApp {
+public class OpenPurchaseListAppImpl
+	extends AbstractOpenOrderListApp<PurchaseListTable, PurchaseService>
+	implements OpenPurchaseListApp {
 
 	@Override
 	protected HBox tablePane() {
-		return box.forHorizontalPane(table.noStatusColumn().build());
+		return pane.centeredHorizontal(table.noStatusColumn().build());
 	}
 }

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 
 @Service("bankService")
 public class BankServiceImpl //
-		extends AbstractCustomerService //
-		implements BankService {
+	extends AbstractCustomerService //
+	implements BankService {
 
 	@Override
 	public String getHeaderName() {

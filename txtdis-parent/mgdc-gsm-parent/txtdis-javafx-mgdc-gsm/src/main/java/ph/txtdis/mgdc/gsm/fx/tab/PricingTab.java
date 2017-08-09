@@ -1,24 +1,24 @@
 package ph.txtdis.mgdc.gsm.fx.tab;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.fx.tab.AbstractTab;
 import ph.txtdis.mgdc.gsm.fx.table.PricingTable;
 import ph.txtdis.mgdc.gsm.service.BommedDiscountedPricedValidatedItemService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Scope("prototype")
 @Component("pricingTab")
-public class PricingTab extends AbstractTab {
+public class PricingTab
+	extends AbstractTab {
 
 	@Autowired
 	private BommedDiscountedPricedValidatedItemService service;
@@ -58,7 +58,7 @@ public class PricingTab extends AbstractTab {
 
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
-		return asList(box.forHorizontalPane(table.build()));
+		return asList(pane.centeredHorizontal(table.build()));
 	}
 
 	@Override

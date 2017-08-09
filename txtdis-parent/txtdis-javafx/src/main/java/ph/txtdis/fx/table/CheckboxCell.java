@@ -6,9 +6,11 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import ph.txtdis.util.ReflectionUtils;
 
-public class CheckboxCell<T extends Object> extends CheckBoxTableCell<T, Boolean> {
+public class CheckboxCell<T extends Object>
+	extends CheckBoxTableCell<T, Boolean> {
 
 	private final CheckBox checkBox;
+
 	private final String field;
 
 	public CheckboxCell(String field) {

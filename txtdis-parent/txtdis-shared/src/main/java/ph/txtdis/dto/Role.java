@@ -7,7 +7,7 @@ import ph.txtdis.type.UserType;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Role //
-		extends AbstractKeyed<Long> {
+	extends AbstractKeyed<Long> {
 
 	private boolean isEnabled;
 

@@ -1,15 +1,7 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CODE;
-import static ph.txtdis.type.Type.ID;
-
-import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.binding.BooleanBinding;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCombo;
 import ph.txtdis.fx.control.LabeledDatePicker;
@@ -18,8 +10,15 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.gsm.service.CreditedAndDiscountedCustomerService;
 import ph.txtdis.mgdc.gsm.service.RefundedRmaService;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.CODE;
+import static ph.txtdis.type.Type.ID;
+
 public abstract class AbstractRmaPaymentDialog<RRS extends RefundedRmaService> //
-		extends AbstractFieldDialog<LocalDate> {
+	extends AbstractFieldDialog<LocalDate> {
 
 	@Autowired
 	private LabeledCombo<String> bankCombo;
@@ -42,12 +41,12 @@ public abstract class AbstractRmaPaymentDialog<RRS extends RefundedRmaService> /
 	@Override
 	protected List<InputNode<?>> addNodes() {
 		return asList(//
-				bankCombo(), //
-				checkIdField(), //
-				prefixField.name("S/I Code").build(CODE), //
-				idField.name("S/I No.").build(ID), //
-				suffixField(), //
-				datePicker.name("Date")); //
+			bankCombo(), //
+			checkIdField(), //
+			prefixField.name("S/I Code").build(CODE), //
+			idField.name("S/I No.").build(ID), //
+			suffixField(), //
+			datePicker.name("Date")); //
 	}
 
 	private LabeledCombo<String> bankCombo() {
@@ -62,18 +61,18 @@ public abstract class AbstractRmaPaymentDialog<RRS extends RefundedRmaService> /
 		return checkIdField;
 	}
 
+	private LabeledField<String> suffixField() {
+		suffixField.name("S/I Series").width(40).build(CODE);
+		suffixField.onAction(e -> updateUponInvoiceNoValidation());
+		return suffixField;
+	}
+
 	private void updateUponCheckIdValidation() {
 		try {
 			rmaService.updateUponCheckIdValidation(bankCombo.getValue(), checkIdField.getValue());
 		} catch (Exception e) {
 			resetNodesOnError(e);
 		}
-	}
-
-	private LabeledField<String> suffixField() {
-		suffixField.name("S/I Series").width(40).build(CODE);
-		suffixField.onAction(e -> updateUponInvoiceNoValidation());
-		return suffixField;
 	}
 
 	private void updateUponInvoiceNoValidation() {
@@ -92,9 +91,9 @@ public abstract class AbstractRmaPaymentDialog<RRS extends RefundedRmaService> /
 	@Override
 	protected BooleanBinding getAddButtonDisableBindings() {
 		return bankCombo.isEmpty() //
-				.or(checkIdField.isEmpty()) //
-				.or(idField.isEmpty()) //
-				.or(datePicker.isEmpty());
+			.or(checkIdField.isEmpty()) //
+			.or(idField.isEmpty()) //
+			.or(datePicker.isEmpty());
 	}
 
 	@Override

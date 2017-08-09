@@ -1,18 +1,17 @@
 package ph.txtdis.mgdc.service;
 
-import static java.math.BigDecimal.ZERO;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.Billable;
+import ph.txtdis.dto.BillableDetail;
 
 import java.math.BigDecimal;
 import java.util.function.Function;
 
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.BillableDetail;
+import static java.math.BigDecimal.ZERO;
 
 @Service("totaledBillableService")
 public class TotaledBillableServiceImpl //
-		implements TotaledBillableService {
+	implements TotaledBillableService {
 
 	@Override
 	public Billable updateFinalTotals(Billable b) {

@@ -17,12 +17,11 @@ import ph.txtdis.dto.Truck;
 import ph.txtdis.dto.User;
 import ph.txtdis.dto.Warehouse;
 
-@EqualsAndHashCode(callSuper = true)
 public abstract class AbstractTypeMap //
-		extends LinkedHashMap<String, TypeReference> //
-		implements TypeMap {
+	extends LinkedHashMap<String, TypeReference> //
+	implements TypeMap {
 
-	private static final long serialVersionUID = -6805898257725092194L;
+	protected static final long serialVersionUID = -6805898257725092194L;
 
 	public AbstractTypeMap() {
 		put("accept", new TypeReference("\ue95f", null));

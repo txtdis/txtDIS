@@ -1,25 +1,10 @@
 package ph.txtdis.dyvek.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
-import static ph.txtdis.type.UserType.AUDITOR;
-import static ph.txtdis.type.UserType.OWNER;
-import static ph.txtdis.type.UserType.SALES_ENCODER;
-import static ph.txtdis.util.NumberUtils.isPositive;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.User;
-import ph.txtdis.dyvek.fx.table.AssignmentTable;
 import ph.txtdis.dyvek.model.Billable;
 import ph.txtdis.dyvek.model.BillableDetail;
 import ph.txtdis.excel.ExcelBillWriter;
@@ -27,10 +12,21 @@ import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.info.Information;
 import ph.txtdis.service.UserService;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.NumberUtils.isPositive;
+
 @Service("clientBillingService")
-public class ClientBillingServiceImpl //
-		extends AbstractBillingService //
-		implements ClientBillingService {
+public class ClientBillingServiceImpl 
+	extends AbstractBillingService 
+	implements ClientBillingService {
 
 	@Autowired
 	private UserService userService;
@@ -54,8 +50,13 @@ public class ClientBillingServiceImpl //
 	private String defaultBillingAddress;
 
 	@Override
-	public void generateBill(AssignmentTable table) throws Exception {
+	public void generateBill() throws Exception {
 		excel.write();
+	}
+
+	@Override
+	public String getAlternateName() {
+		return "Bill";
 	}
 
 	@Override
@@ -64,13 +65,17 @@ public class ClientBillingServiceImpl //
 	}
 
 	@Override
-	public String getHeaderName() {
-		return "Customer Billing";
+	public void setDetails(List<BillableDetail> l) {
+		if (l != null)
+			l = l.stream()
+				.filter(d -> d != null && isPositive(d.getAssignedQty()))
+				.collect(toList());
+		get().setBookings(l);
 	}
 
 	@Override
-	public String getItem() {
-		return get().getItemDescription();
+	public String getHeaderName() {
+		return "Customer Billing";
 	}
 
 	@Override
@@ -89,23 +94,9 @@ public class ClientBillingServiceImpl //
 	}
 
 	@Override
-	public String getSalesNo() {
-		return get().getSalesNo();
-	}
-
-	@Override
 	public void save() throws Information, Exception {
 		get().setCreatedBy("");
 		super.save();
-	}
-
-	@Override
-	public void setDetails(List<BillableDetail> l) {
-		if (l != null)
-			l = l.stream() //
-					.filter(d -> d != null && isPositive(d.getAssignedQty())) //
-					.collect(toList());
-		get().setBookings(l);
 	}
 
 	@Override
@@ -118,10 +109,10 @@ public class ClientBillingServiceImpl //
 
 	@Override
 	public void updateTotals(List<BillableDetail> items) {
-		get().setTotalValue(items //
-				.stream() //
-				.map(d -> d.getValue()) //
-				.reduce(ZERO, BigDecimal::add));
+		get().setTotalValue(items 
+			.stream() 
+			.map(BillableDetail::getValue)
+			.reduce(ZERO, BigDecimal::add));
 	}
 
 	@Override
@@ -129,6 +120,11 @@ public class ClientBillingServiceImpl //
 		if (alternateBillingItems.contains(getItem()))
 			return alternateBillingName;
 		return defaultBillingName;
+	}
+
+	@Override
+	public String getItem() {
+		return get().getItemDescription();
 	}
 
 	@Override
@@ -164,6 +160,11 @@ public class ClientBillingServiceImpl //
 	}
 
 	@Override
+	public String getSalesNo() {
+		return get().getSalesNo();
+	}
+
+	@Override
 	public String getPaymentType() {
 		return "COD";
 	}
@@ -180,8 +181,8 @@ public class ClientBillingServiceImpl //
 
 	@Override
 	public List<String> getTableColumnHeaders() {
-		return asList( //
-				"Date", "D/R No.", "Destination Weight", "Unit Price", "Amount");
+		return asList( 
+			"Date", "D/R No.", "Destination Weight", "Unit Price", "Amount");
 	}
 
 	@Override

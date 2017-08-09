@@ -1,19 +1,15 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-import static ph.txtdis.util.NumberUtils.divide;
-
-import java.math.BigDecimal;
-
 import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.gsm.domain.ItemEntity;
 import ph.txtdis.mgdc.gsm.domain.QtyPerUomEntity;
 
-public interface ReportUom {
+import java.math.BigDecimal;
 
-	default QtyPerUomEntity getReportUom(ItemEntity i) {
-		return i.getQtyPerUomList().stream().filter(q -> q.getReported() == true).findAny().get();
-	}
+import static java.math.BigDecimal.ZERO;
+import static ph.txtdis.util.NumberUtils.divide;
+
+public interface ReportUom {
 
 	default BigDecimal getReportUomQty(BillableDetailEntity d) {
 		return divide(d.getInitialQty(), getUnitQtyPerReportUom(d.getItem()));
@@ -25,5 +21,9 @@ public interface ReportUom {
 		} catch (Exception e) {
 			return ZERO;
 		}
+	}
+
+	default QtyPerUomEntity getReportUom(ItemEntity i) {
+		return i.getQtyPerUomList().stream().filter(q -> q.getReported() == true).findAny().get();
 	}
 }

@@ -18,7 +18,7 @@ import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.ccbpi.service.BommedDiscountedPricedValidatedItemService;
 
 public abstract class AbstractItemInputtedDialog //
-		implements ItemInputtedDialog {
+	implements ItemInputtedDialog {
 
 	@Autowired
 	protected LabeledField<String> itemNameDisplay;
@@ -46,11 +46,6 @@ public abstract class AbstractItemInputtedDialog //
 
 	private LabeledField<String> itemNameDisplay() {
 		return itemNameDisplay.name("Description").readOnly().build(TEXT);
-	}
-
-	@Override
-	public Long getId() {
-		return itemIdField.getValue();
 	}
 
 	@Override
@@ -90,5 +85,10 @@ public abstract class AbstractItemInputtedDialog //
 		Item i = itemService.findById(getId());
 		itemNameDisplay.setValue(i.getName());
 		return i;
+	}
+
+	@Override
+	public Long getId() {
+		return itemIdField.getValue();
 	}
 }

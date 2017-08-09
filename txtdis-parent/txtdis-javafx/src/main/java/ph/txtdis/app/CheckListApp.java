@@ -2,7 +2,6 @@ package ph.txtdis.app;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.Remittance;
 import ph.txtdis.fx.table.RemittanceListTableImpl;
 import ph.txtdis.service.RemittanceService;
@@ -10,7 +9,7 @@ import ph.txtdis.service.RemittanceService;
 @Scope("prototype")
 @Component("checkListApp")
 public class CheckListApp //
-		extends AbstractListApp<RemittanceListTableImpl, RemittanceService, Remittance> {
+	extends AbstractListApp<RemittanceListTableImpl, RemittanceService, Remittance> {
 
 	private String bank;
 

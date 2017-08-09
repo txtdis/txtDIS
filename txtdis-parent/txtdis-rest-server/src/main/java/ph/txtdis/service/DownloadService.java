@@ -1,10 +1,10 @@
 package ph.txtdis.service;
 
-import java.util.Date;
-
 import ph.txtdis.exception.FailedReplicationException;
 import ph.txtdis.exception.NoNewerFileException;
 import ph.txtdis.type.SyncType;
+
+import java.util.Date;
 
 public interface DownloadService {
 

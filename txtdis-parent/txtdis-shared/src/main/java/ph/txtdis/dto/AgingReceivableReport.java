@@ -1,10 +1,10 @@
 package ph.txtdis.dto;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
-
-import lombok.Data;
 
 @Data
 public class AgingReceivableReport {

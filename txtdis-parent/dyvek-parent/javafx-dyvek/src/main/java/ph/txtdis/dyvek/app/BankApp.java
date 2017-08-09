@@ -1,7 +1,7 @@
 package ph.txtdis.dyvek.app;
 
-import ph.txtdis.app.StartableApp;
+import ph.txtdis.app.App;
 
-public interface BankApp //
-		extends StartableApp {
+public interface BankApp
+	extends App {
 }

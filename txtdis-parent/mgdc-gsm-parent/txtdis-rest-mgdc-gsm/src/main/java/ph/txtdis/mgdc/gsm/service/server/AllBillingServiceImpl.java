@@ -1,31 +1,8 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-import static java.time.LocalDate.now;
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static ph.txtdis.type.ModuleType.INVOICE;
-import static ph.txtdis.type.ModuleType.SALES_ORDER;
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-import static ph.txtdis.type.PartnerType.OUTLET;
-import static ph.txtdis.type.PartnerType.VENDOR;
-import static ph.txtdis.type.ScriptType.PAYMENT_VALIDATION;
-import static ph.txtdis.util.NumberUtils.nullIfZero;
-import static ph.txtdis.util.NumberUtils.toLong;
-import static ph.txtdis.util.TextUtils.nullIfEmpty;
-import static ph.txtdis.util.TextUtils.to3PartIdNo;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.Remittance;
 import ph.txtdis.dto.RemittanceDetail;
@@ -33,10 +10,30 @@ import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
 import ph.txtdis.type.ModuleType;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.math.BigDecimal.ZERO;
+import static java.time.LocalDate.now;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.removeEnd;
+import static ph.txtdis.type.ModuleType.INVOICE;
+import static ph.txtdis.type.ModuleType.SALES_ORDER;
+import static ph.txtdis.type.PartnerType.*;
+import static ph.txtdis.type.ScriptType.PAYMENT_VALIDATION;
+import static ph.txtdis.util.NumberUtils.nullIfZero;
+import static ph.txtdis.util.NumberUtils.toLong;
+import static ph.txtdis.util.TextUtils.nullIfEmpty;
+import static ph.txtdis.util.TextUtils.to3PartIdNo;
+
 @Service("billingService")
 public class AllBillingServiceImpl //
-		extends AbstractSpunSavedBillableService //
-		implements AllBillingService {
+	extends AbstractSpunSavedBillableService //
+	implements AllBillingService {
 
 	@Autowired
 	private LoadOrderService loadOrderService;
@@ -46,14 +43,15 @@ public class AllBillingServiceImpl //
 
 	@Override
 	public List<Billable> findAllAged(Long customerId) {
-		List<BillableEntity> l = repository.findByNumIdNotNullAndRmaNullAndFullyPaidFalseAndCustomerIdAndOrderDateGreaterThanEqualAndDueDateLessThan( ///
+		List<BillableEntity> l = repository
+			.findByNumIdNotNullAndRmaNullAndFullyPaidFalseAndCustomerIdAndOrderDateGreaterThanEqualAndDueDateLessThan( ///
 				customerId, goLive(), LocalDate.now());
 		return toModels(filterOutInvalid(l));
 	}
 
 	private List<BillableEntity> filterOutInvalid(List<BillableEntity> l) {
 		return l == null ? null //
-				: l.stream().filter(e -> isNotInvalid(e)).collect(toList());
+			: l.stream().filter(e -> isNotInvalid(e)).collect(toList());
 	}
 
 	private boolean isNotInvalid(BillableEntity e) {
@@ -62,7 +60,8 @@ public class AllBillingServiceImpl //
 
 	@Override
 	public List<Billable> findAllAging(Long customerId) {
-		List<BillableEntity> l = repository.findByNumIdNotNullAndRmaNullAndFullyPaidFalseAndCustomerIdAndOrderDateGreaterThanEqual( //
+		List<BillableEntity> l =
+			repository.findByNumIdNotNullAndRmaNullAndFullyPaidFalseAndCustomerIdAndOrderDateGreaterThanEqual( //
 				customerId, goLive());
 		return toModels(filterOutInvalid(l));
 	}
@@ -70,19 +69,15 @@ public class AllBillingServiceImpl //
 	@Override
 	public List<BillableEntity> findAllValidOutletBillingsBetweenDates(LocalDate start, LocalDate end) {
 		List<BillableEntity> l = repository.findByCustomerTypeAndNumIdNotNullAndRmaNullAndOrderDateBetween( //
-				OUTLET, start, end);
+			OUTLET, start, end);
 		return filterOutInvalid(l);
 	}
 
 	@Override
 	public List<Billable> findAllUnpaid(Long customerId) {
-		List<BillableEntity> l = repository.findByNumIdNotNullAndRmaNullAndFullyPaidFalseAndCustomerIdOrderByOrderDateDesc(customerId);
+		List<BillableEntity> l =
+			repository.findByNumIdNotNullAndRmaNullAndFullyPaidFalseAndCustomerIdOrderByOrderDateDesc(customerId);
 		return toModels(filterOutInvalid(l));
-	}
-
-	@Override
-	public Billable findByBookingId(Long id) {
-		return loadOrderService.findAsReference(id);
 	}
 
 	@Override
@@ -92,7 +87,8 @@ public class AllBillingServiceImpl //
 		for (int i = 0; i < l.size(); i++)
 			if (!greaterThan30DayGapBetweenInvoices(l, i))
 				noGreaterThan30dayGapInvoices.add(l.get(i));
-		BigDecimal v = noGreaterThan30dayGapInvoices.stream().map(BillableEntity::getTotalValue).reduce(ZERO, BigDecimal::add);
+		BigDecimal v =
+			noGreaterThan30dayGapInvoices.stream().map(BillableEntity::getTotalValue).reduce(ZERO, BigDecimal::add);
 		return toTotalValueOnlyBillable(v);
 	}
 
@@ -108,12 +104,12 @@ public class AllBillingServiceImpl //
 		return getInvoiceDate(l, i);
 	}
 
-	private LocalDate getInvoiceDate(List<BillableEntity> l, int i) {
-		return l.get(i).getOrderDate();
-	}
-
 	private LocalDate latestInvoiceDate(List<BillableEntity> l, int i) {
 		return i == 0 ? LocalDate.now() : getInvoiceDate(l, i);
+	}
+
+	private LocalDate getInvoiceDate(List<BillableEntity> l, int i) {
+		return l.get(i).getOrderDate();
 	}
 
 	@Override
@@ -123,7 +119,8 @@ public class AllBillingServiceImpl //
 	}
 
 	private Billable findByCustomerPurchasedItemId(Long customerId, Long itemId, LocalDate start) {
-		BillableEntity e = repository.findFirstByNumIdNotNullAndRmaNullAndCustomerIdAndOrderDateBetweenAndDetails_Item_IdOrderByOrderDateDesc( //
+		BillableEntity e = repository
+			.findFirstByNumIdNotNullAndRmaNullAndCustomerIdAndOrderDateBetweenAndDetails_Item_IdOrderByOrderDateDesc( //
 				customerId, start, now(), itemId);
 		return toModel(e);
 	}
@@ -150,22 +147,23 @@ public class AllBillingServiceImpl //
 
 	private BillableEntity getEntity(String[] threePartIdNo) {
 		return repository.findByPrefixAndSuffixAndNumId(//
-				threePartIdNo[0], threePartIdNo[2], toLong(threePartIdNo[1]));
+			threePartIdNo[0], threePartIdNo[2], toLong(threePartIdNo[1]));
 	}
 
 	@Override
 	public Billable findLatest(String prefix, String suffix, Long start, Long end) {
 		BillableEntity b = repository.findFirstByPrefixAndSuffixAndNumIdBetweenOrderByNumIdDesc(//
-				nullIfEmpty(prefix), nullIfEmpty(suffix), start, end);
+			nullIfEmpty(prefix), nullIfEmpty(suffix), start, end);
 		return toOrderNoOnlyBillable(b);
 	}
 
 	@Override
 	public Billable findNotFullyPaidNotInvalidCOD(LocalDate d) {
-		List<BillableEntity> l = repository.findByCustomerTypeNotAndNumIdNotNullAndRmaNullAndFullyPaidFalseAndUnpaidValueGreaterThanAndOrderDateBetween( //
+		List<BillableEntity> l = repository
+			.findByCustomerTypeNotAndNumIdNotNullAndRmaNullAndFullyPaidFalseAndUnpaidValueGreaterThanAndOrderDateBetween(//
 				VENDOR, ZERO, goLive(), billingCutoff(d));
 		return toOrderNoOnlyBillable(l == null ? null : //
-				l.stream().filter(b -> isNotInvalidAndIsCOD(b)).findFirst().orElse(null));
+			l.stream().filter(b -> isNotInvalidAndIsCOD(b)).findFirst().orElse(null));
 	}
 
 	private boolean isNotInvalidAndIsCOD(BillableEntity e) {
@@ -197,9 +195,15 @@ public class AllBillingServiceImpl //
 
 	private BillableEntity findCorrectedBilling(BillableEntity e) {
 		return findEntityByOrderNo( //
-				e.getPrefix(), //
-				e.getNumId(), //
-				suffixEndingWithAnXRemoved(e));
+			e.getPrefix(), //
+			e.getNumId(), //
+			suffixEndingWithAnXRemoved(e));
+	}
+
+	private Billable findExtractedBooking(BillableEntity e) {
+		Billable b = findByBookingId(-e.getBookingId());
+		b.setLoaded(b.getCustomerName().startsWith(EX_TRUCK.toString()));
+		return setDueDateAndCustomerDataAndOrderNoWithoutXs(b, e);
 	}
 
 	private String suffixEndingWithAnXRemoved(BillableEntity e) {
@@ -208,10 +212,9 @@ public class AllBillingServiceImpl //
 		return nullIfEmpty(s);
 	}
 
-	private Billable findExtractedBooking(BillableEntity e) {
-		Billable b = findByBookingId(-e.getBookingId());
-		b.setLoaded(b.getCustomerName().startsWith(EX_TRUCK.toString()));
-		return setDueDateAndCustomerDataAndOrderNoWithoutXs(b, e);
+	@Override
+	public Billable findByBookingId(Long id) {
+		return loadOrderService.findAsReference(id);
 	}
 
 	protected Billable setDueDateAndCustomerDataAndOrderNoWithoutXs(Billable b, BillableEntity e) {

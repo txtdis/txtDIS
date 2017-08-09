@@ -1,20 +1,20 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Routing;
 import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
 import ph.txtdis.mgdc.gsm.domain.RoutingEntity;
 import ph.txtdis.mgdc.gsm.repository.RoutingRepository;
 import ph.txtdis.mgdc.service.server.RouteService;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
 @Service("routingService")
-public class RoutingServiceImpl implements RoutingService {
+public class RoutingServiceImpl
+	implements RoutingService {
 
 	@Autowired
 	private RoutingRepository repository;

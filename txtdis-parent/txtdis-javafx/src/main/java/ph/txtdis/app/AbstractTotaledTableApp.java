@@ -1,34 +1,34 @@
 package ph.txtdis.app;
 
-import static ph.txtdis.type.Type.CURRENCY;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.fx.control.AppFieldImpl;
+import ph.txtdis.fx.control.LabelFactory;
+import ph.txtdis.fx.pane.PaneFactory;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.service.SubheadedTotaledService;
+import ph.txtdis.service.TotaledService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import static ph.txtdis.type.Type.CURRENCY;
 
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import ph.txtdis.fx.control.AppFieldImpl;
-import ph.txtdis.fx.control.LabelFactory;
-import ph.txtdis.fx.pane.AppBoxPaneFactory;
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.SubheadedTotaledService;
-import ph.txtdis.service.TotaledService;
-
-public abstract class AbstractTotaledTableApp<T> implements TotaledTableApp<T> {
+public abstract class AbstractTotaledTableApp<T>
+	implements TotaledTableApp<T> {
 
 	@Autowired
-	private LabelFactory label;
-
-	@Autowired
-	protected AppBoxPaneFactory box;
+	protected PaneFactory pane;
 
 	@Autowired
 	protected List<AppFieldImpl<BigDecimal>> totalDisplays;
+
+	@Autowired
+	private LabelFactory label;
 
 	private AppTable<T> table;
 
@@ -37,29 +37,29 @@ public abstract class AbstractTotaledTableApp<T> implements TotaledTableApp<T> {
 	@Override
 	public VBox addNoSubHeadTablePane(AppTable<T> t) {
 		subheadPane();
-		VBox v = box.forVerticals(t.build(), totalPane());
-		return addTablePane(t, v);
-	}
-
-	@Override
-	public VBox addTablePane(AppTable<T> t) {
-		VBox v = box.forVerticals(subheadPane(), t.build(), totalPane());
+		VBox v = pane.vertical(t.build(), totalPane());
 		return addTablePane(t, v);
 	}
 
 	private HBox subheadPane() {
 		subhead = label.subheader("");
-		return box.forSubheader(subhead);
+		return pane.forSubheader(subhead);
 	}
 
 	private Node totalPane() {
-		return box.forTableTotals(totalDisplays);
+		return pane.forTableTotals(totalDisplays);
 	}
 
 	private VBox addTablePane(AppTable<T> t, VBox v) {
 		table = t;
-		HBox h = box.forHorizontalPane(v);
-		return box.forVerticals(h);
+		HBox h = pane.centeredHorizontal(v);
+		return pane.vertical(h);
+	}
+
+	@Override
+	public VBox addTablePane(AppTable<T> t) {
+		VBox v = pane.vertical(subheadPane(), t.build(), totalPane());
+		return addTablePane(t, v);
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public abstract class AbstractTotaledTableApp<T> implements TotaledTableApp<T> {
 		totalDisplays = new ArrayList<>();
 		for (int i = 0; i < count; i++)
 			totalDisplays.add(new AppFieldImpl<BigDecimal>().readOnly().build(CURRENCY));
-		return box.forTableTotals(totalDisplays);
+		return pane.forTableTotals(totalDisplays);
 	}
 
 	@Override

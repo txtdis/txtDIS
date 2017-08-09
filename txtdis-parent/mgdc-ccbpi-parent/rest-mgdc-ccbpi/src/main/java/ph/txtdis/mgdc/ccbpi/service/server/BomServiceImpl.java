@@ -19,21 +19,13 @@ import ph.txtdis.mgdc.ccbpi.dto.Item;
 
 @Service("bomService")
 public class BomServiceImpl //
-		implements BomService {
+	implements BomService {
 
 	@Autowired
 	private ReceivingService receivingService;
 
 	@Autowired
 	private ItemService itemService;
-
-	@Override
-	public BomEntity createComponentOnly(ItemEntity part, BigDecimal qty) {
-		BomEntity e = new BomEntity();
-		e.setPart(part);
-		e.setQty(qty);
-		return e;
-	}
 
 	@Override
 	public List<Bom> extractAll(Long itemId, String itemName, BigDecimal qty) {
@@ -49,14 +41,6 @@ public class BomServiceImpl //
 		} catch (Exception e) {
 			return asList(createComponentOnly(itemId, itemName, qty));
 		}
-	}
-
-	private Bom createComponentOnly(Long itemId, String itemName, BigDecimal qty) {
-		Bom b = new Bom();
-		b.setId(itemId);
-		b.setPart(itemName);
-		b.setQty(qty);
-		return b;
 	}
 
 	@Override
@@ -79,6 +63,27 @@ public class BomServiceImpl //
 	public List<Bom> getBadIncomingList(LocalDate start, LocalDate end) {
 		List<BomEntity> l = receivingService.listBadItemsIncomingQty(start, end);
 		return toBoms(l);
+	}
+
+	@Override
+	public List<Bom> toBoms(List<BomEntity> l) {
+		return l == null ? null : l.stream().map(e -> toBom(e)).collect(toList());
+	}
+
+	private Bom toBom(BomEntity e) {
+		ItemEntity i = e.getPart();
+		Bom b = createComponentOnly(i.getId(), i.getName(), e.getQty());
+		b.setCreatedBy(e.getCreatedBy());
+		b.setCreatedOn(e.getCreatedOn());
+		return b;
+	}
+
+	private Bom createComponentOnly(Long itemId, String itemName, BigDecimal qty) {
+		Bom b = new Bom();
+		b.setId(itemId);
+		b.setPart(itemName);
+		b.setQty(qty);
+		return b;
 	}
 
 	@Override
@@ -124,15 +129,10 @@ public class BomServiceImpl //
 	}
 
 	@Override
-	public List<Bom> toBoms(List<BomEntity> l) {
-		return l == null ? null : l.stream().map(e -> toBom(e)).collect(toList());
-	}
-
-	private Bom toBom(BomEntity e) {
-		ItemEntity i = e.getPart();
-		Bom b = createComponentOnly(i.getId(), i.getName(), e.getQty());
-		b.setCreatedBy(e.getCreatedBy());
-		b.setCreatedOn(e.getCreatedOn());
-		return b;
+	public BomEntity createComponentOnly(ItemEntity part, BigDecimal qty) {
+		BomEntity e = new BomEntity();
+		e.setPart(part);
+		e.setQty(qty);
+		return e;
 	}
 }

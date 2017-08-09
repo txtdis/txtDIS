@@ -16,7 +16,7 @@ import ph.txtdis.type.ItemType;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Item //
-		extends AbstractModificationTracked<Long> {
+	extends AbstractModificationTracked<Long> {
 
 	private boolean notDiscounted;
 

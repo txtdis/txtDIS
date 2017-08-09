@@ -1,25 +1,19 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import static org.apache.log4j.Logger.getLogger;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
-import ph.txtdis.app.StartableApp;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.app.App;
 import ph.txtdis.dto.Billable;
 import ph.txtdis.exception.BadCreditException;
 import ph.txtdis.exception.ExceededCreditLimitException;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.app.MultiTypeBillingApp;
@@ -29,16 +23,21 @@ import ph.txtdis.mgdc.gsm.service.GsmBookingService;
 import ph.txtdis.type.ModuleType;
 import ph.txtdis.type.Type;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.apache.log4j.Logger.getLogger;
+
 @Scope("prototype")
 @Component("bookingApp")
 public class BookingAppImpl //
-		extends AbstractBillableApp<GsmBookingService, SalesOrderTable, Long> //
-		implements SalesOrderApp {
+	extends AbstractBillableApp<GsmBookingService, SalesOrderTable, Long> //
+	implements SalesOrderApp {
 
 	private static Logger logger = getLogger(BookingAppImpl.class);
 
 	@Autowired
-	private AppButtonImpl changeDetailsButton, overrideButton;
+	private AppButton changeDetailsButton, overrideButton;
 
 	@Autowired
 	private AppCombo<String> exTruckCombo;
@@ -54,14 +53,19 @@ public class BookingAppImpl //
 	private ModuleType type;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		if (!isExTruck()) {
 			b.add(overrideButton);
 			b.add(changeDetailsButton);
-		} else
+		}
+		else
 			b.add(routeItineraryApp.addButton(this, service));
 		return b;
+	}
+
+	private boolean isExTruck() {
+		return type == ModuleType.EX_TRUCK;
 	}
 
 	@Override
@@ -85,10 +89,6 @@ public class BookingAppImpl //
 			customerWithDueDateGridLine();
 	}
 
-	private boolean isExTruck() {
-		return type == ModuleType.EX_TRUCK;
-	}
-
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
 		List<Node> l = new ArrayList<>(super.mainVerticalPaneNodes());
@@ -96,6 +96,13 @@ public class BookingAppImpl //
 			l.add(vatAndTotalPane());
 		l.add(trackedPane());
 		return l;
+	}
+
+	@Override
+	protected HBox trackedPane() {
+		List<Node> l = new ArrayList<>(super.trackedPane().getChildren());
+		l.addAll(decisionNodes());
+		return pane.centeredHorizontal(l);
 	}
 
 	@Override
@@ -134,7 +141,7 @@ public class BookingAppImpl //
 	}
 
 	private void correctInvalidBilling(Billable b) {
-		dialog.showError("Correct invalid S/I & D/R's first").addParent(this).start();
+		messageDialog.showError("Correct invalid S/I & D/R's first").addParent(this).start();
 		close();
 		billingApp.type(b.type()).start();
 		billingApp.show(b);
@@ -148,10 +155,10 @@ public class BookingAppImpl //
 	@Override
 	protected BooleanBinding saveButtonDisableBinding() {
 		return table.isEmpty() //
-				.or(changeDetailsButton.disabledProperty().not()) //
-				.or(isPosted() //
-						.and(canChangeDetails.not() //
-								.and(detailsChanged.not())));
+			.or(changeDetailsButton.disabledProperty().not()) //
+			.or(isPosted() //
+				.and(canChangeDetails.not() //
+					.and(detailsChanged.not())));
 	}
 
 	@Override
@@ -167,8 +174,8 @@ public class BookingAppImpl //
 		overrideButton.disableIf(invalidSalesOrderCanBeOverriden.not());
 		decisionButton.disable();
 		changeDetailsButton.disableIf( //
-				canChangeDetails.not() //
-						.or(detailsChanged));
+			canChangeDetails.not() //
+				.or(detailsChanged));
 	}
 
 	@Override
@@ -180,7 +187,7 @@ public class BookingAppImpl //
 		exTruckCombo.disableIf(orderDatePicker.disabled());
 		if (isExTruck())
 			remarksDisplay.editableIf(isNew() //
-					.and(exTruckCombo.isNotEmpty()));
+				.and(exTruckCombo.isNotEmpty()));
 	}
 
 	@Override
@@ -209,29 +216,29 @@ public class BookingAppImpl //
 	}
 
 	private void showProceedAndGetApprovalLaterOrExitDialog(String badCreditMsg) {
-		dialog.showOption(badCreditMsg, "Book—get approval later", "Exit");
-		dialog.setOnOptionSelection(e -> setCustomerDataAndTemporarilyInvalidateAwaitingApproval(badCreditMsg));
-		dialog.setOnDefaultSelection(e -> resetCustomerData());
-		dialog.addParent(this).start();
+		messageDialog.showOption(badCreditMsg, "Book—get approval later", "Exit");
+		messageDialog.setOnOptionSelection(e -> setCustomerDataAndTemporarilyInvalidateAwaitingApproval(badCreditMsg));
+		messageDialog.setOnDefaultSelection(e -> resetCustomerData());
+		messageDialog.addParent(this).start();
 	}
 
 	private void setCustomerDataAndTemporarilyInvalidateAwaitingApproval(String badCreditMessage) {
 		service.setCustomerRelatedData();
 		service.invalidateAwaitingApproval(badCreditMessage);
 		decisionNeededApp.refresh(service);
-		dialog.close();
+		messageDialog.close();
 	}
 
 	private void resetCustomerData() {
 		service.reset();
-		dialog.close();
+		messageDialog.close();
 	}
 
 	private void overrideInvalidation() {
 		try {
 			service.overrideInvalidation();
 		} catch (Information i) {
-			dialog.show(i).addParent(this).start();
+			messageDialog.show(i).addParent(this).start();
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {
@@ -294,14 +301,7 @@ public class BookingAppImpl //
 	}
 
 	@Override
-	protected HBox trackedPane() {
-		List<Node> l = new ArrayList<>(super.trackedPane().getChildren());
-		l.addAll(decisionNodes());
-		return box.forHorizontalPane(l);
-	}
-
-	@Override
-	public StartableApp type(ModuleType type) {
+	public App type(ModuleType type) {
 		this.type = type;
 		return this;
 	}

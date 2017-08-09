@@ -12,8 +12,8 @@ import ph.txtdis.type.ModuleType;
 
 @Service("orderConfirmationListService")
 public class OrderConfirmationListServiceImpl //
-		extends AbstractListService //
-		implements OrderConfirmationListService {
+	extends AbstractListService //
+	implements OrderConfirmationListService {
 
 	private static Logger logger = getLogger(OrderConfirmationListServiceImpl.class);
 
@@ -51,7 +51,9 @@ public class OrderConfirmationListServiceImpl //
 
 	private void listForBookingVariance(String[] ids) throws Exception {
 		item = item(itemVendorNo(ids));
-		list = getList("/ocsList?itemVendorNo=" + itemVendorNo(ids) + "&route=" + route(ids) + "&start=" + startDate(ids) + "&end=" + endDate(ids));
+		list = getList(
+			"/ocsList?itemVendorNo=" + itemVendorNo(ids) + "&route=" + route(ids) + "&start=" + startDate(ids) + "&end=" +
+				endDate(ids));
 	}
 
 	private void listForRemittanceVariance(String[] ids) throws Exception {
@@ -64,12 +66,12 @@ public class OrderConfirmationListServiceImpl //
 			deliveredList(ids);
 	}
 
-	private boolean isUnpickedQty(String[] ids) {
-		return columnIdx(ids) == 2;
-	}
-
 	private Integer columnIdx(String[] ids) {
 		return Integer.valueOf(ids[1]);
+	}
+
+	private boolean isUnpickedQty(String[] ids) {
+		return columnIdx(ids) == 2;
 	}
 
 	private void unpickedList(String[] ids) throws Exception {
@@ -79,10 +81,6 @@ public class OrderConfirmationListServiceImpl //
 		logger.info("\n    StartDate@unpickedList = " + startDate(ids));
 		logger.info("\n    EndDate@unpickedList = " + endDate(ids));
 		logger.info("\n    UnpickedList@unpickedList = " + list);
-	}
-
-	private List<SalesItemVariance> list(String endPt) throws Exception {
-		return getListedReadOnlyService().module("remittanceVariance").getList(endPt);
 	}
 
 	private boolean isLoadedQty(String[] ids) {
@@ -109,5 +107,9 @@ public class OrderConfirmationListServiceImpl //
 		logger.info("\n    StartDate@deliveredList = " + startDate(ids));
 		logger.info("\n    EndDate@deliveredList = " + endDate(ids));
 		logger.info("\n    DeliveredList@loadedList = " + list);
+	}
+
+	private List<SalesItemVariance> list(String endPt) throws Exception {
+		return getRestClientServiceForLists().module("remittanceVariance").getList(endPt);
 	}
 }

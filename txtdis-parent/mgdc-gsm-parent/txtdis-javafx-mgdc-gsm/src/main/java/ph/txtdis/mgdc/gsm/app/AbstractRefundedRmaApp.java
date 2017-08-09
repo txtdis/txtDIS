@@ -1,36 +1,33 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import static ph.txtdis.type.Type.CODE;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
-import ph.txtdis.app.StartableApp;
-import ph.txtdis.fx.control.AppButtonImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.app.App;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.dialog.InputtedDialog;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.fx.table.BillableTable;
 import ph.txtdis.mgdc.gsm.service.RefundedRmaService;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static ph.txtdis.type.Type.*;
+
 public abstract class AbstractRefundedRmaApp< //
-		RS extends RefundedRmaService, //
-		BT extends BillableTable, //
-		RPD extends InputtedDialog<LocalDate>> //
-		extends AbstractRmaApp<RS, BT> {
+	RS extends RefundedRmaService, //
+	BT extends BillableTable, //
+	RPD extends InputtedDialog<LocalDate>> //
+	extends AbstractRmaApp<RS, BT> {
 
 	@Autowired
-	private AppButtonImpl paymentButton, printButton;
+	private AppButton paymentButton, printButton;
 
 	@Autowired
 	private AppFieldImpl<Long> checkIdDisplay;
@@ -44,8 +41,8 @@ public abstract class AbstractRefundedRmaApp< //
 	private BooleanProperty isPrinted;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		b.add(b.size() - 1, printButton);
 		b.add(paymentButton);
 		return b;
@@ -69,7 +66,7 @@ public abstract class AbstractRefundedRmaApp< //
 	protected HBox receivingPane() {
 		List<Node> l = new ArrayList<>(receivingNodes());
 		l.addAll(billingNodes("Paid"));
-		return box.forHorizontalPane(l);
+		return pane.centeredHorizontal(l);
 	}
 
 	@Override
@@ -105,10 +102,14 @@ public abstract class AbstractRefundedRmaApp< //
 	protected void setBindings() {
 		super.setBindings();
 		printButton.disableIf(notValidReturn() //
-				.or(isPrinted));
+			.or(isPrinted));
 		paymentButton.disableIf(notValidReturn() //
-				.or(receivedOnDisplay.isEmpty())//
-				.or(isPaid()));
+			.or(receivedOnDisplay.isEmpty())//
+			.or(isPaid()));
+	}
+
+	private BooleanBinding isPaid() {
+		return billedOnDisplay.isNotEmpty();
 	}
 
 	@Override
@@ -134,7 +135,7 @@ public abstract class AbstractRefundedRmaApp< //
 	}
 
 	private void saveInputtedReturnPaymentData() {
-		((StartableApp) paymentDialog).addParent(this).start();
+		((App) paymentDialog).addParent(this).start();
 		List<LocalDate> d = paymentDialog.getAddedItems();
 		saveInputtedReturnPaymentData(d);
 	}
@@ -142,7 +143,8 @@ public abstract class AbstractRefundedRmaApp< //
 	private void saveInputtedReturnPaymentData(List<LocalDate> d) {
 		if (d != null) {
 			saveInputtedReturnPaymentData(d.get(0));
-		} else
+		}
+		else
 			service.clearInputtedReturnPaymentData();
 	}
 
@@ -150,7 +152,7 @@ public abstract class AbstractRefundedRmaApp< //
 		try {
 			service.saveReturnPaymentData(d);
 		} catch (Information i) {
-			dialog.show(i).addParent(this).start();
+			messageDialog.show(i).addParent(this).start();
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {
@@ -179,16 +181,12 @@ public abstract class AbstractRefundedRmaApp< //
 	@Override
 	protected void setButtonBindings() {
 		invalidateButton.disableIf(isNew() //
-				.or(notValidReturn()) //
-				.or(isPaid()));
+			.or(notValidReturn()) //
+			.or(isPaid()));
 		receiptButton.disableIf(isPrinted.not() //
-				.or(notValidReturn()) //
-				.or(receivedOnDisplay.isNotEmpty()) //
-				.or(isPaid()));
+			.or(notValidReturn()) //
+			.or(receivedOnDisplay.isNotEmpty()) //
+			.or(isPaid()));
 		saveButton.disableIf(isPosted());
-	}
-
-	private BooleanBinding isPaid() {
-		return billedOnDisplay.isNotEmpty();
 	}
 }

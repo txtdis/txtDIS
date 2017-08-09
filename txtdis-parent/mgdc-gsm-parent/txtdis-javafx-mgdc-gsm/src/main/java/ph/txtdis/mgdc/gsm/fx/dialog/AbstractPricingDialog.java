@@ -1,13 +1,6 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Price;
 import ph.txtdis.dto.PricingType;
 import ph.txtdis.fx.control.InputNode;
@@ -17,9 +10,15 @@ import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.gsm.service.BommedDiscountedPricedValidatedItemService;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.CURRENCY;
+
 public abstract class AbstractPricingDialog //
-		extends AbstractFieldDialog<Price> //
-		implements PricingDialog {
+	extends AbstractFieldDialog<Price> //
+	implements PricingDialog {
 
 	@Autowired
 	protected LabeledCombo<PricingType> typeCombo;

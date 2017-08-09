@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class OpenBadOrReturnOrderException extends Exception {
+public class OpenBadOrReturnOrderException
+	extends Exception {
 
 	private static final long serialVersionUID = -2736815712342898065L;
 

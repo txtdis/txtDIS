@@ -12,7 +12,7 @@ import ph.txtdis.dto.Keyed;
 @Data
 @MappedSuperclass
 public abstract class EdmsAbstractId //
-		implements Keyed<Long> {
+	implements Keyed<Long> {
 
 	@Id
 	@Column(name = "id")

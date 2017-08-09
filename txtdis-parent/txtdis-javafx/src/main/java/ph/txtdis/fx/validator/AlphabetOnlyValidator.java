@@ -5,7 +5,7 @@ import javafx.beans.value.ObservableValue;
 import ph.txtdis.fx.control.AppFieldImpl;
 
 public class AlphabetOnlyValidator //
-		implements ChangeListener<String> {
+	implements ChangeListener<String> {
 
 	private boolean ignore;
 
@@ -29,11 +29,13 @@ public class AlphabetOnlyValidator //
 			ignore = true;
 			input.setText(oldValue);
 			ignore = false;
-		} else if (newValue.length() > maxLength) {
+		}
+		else if (newValue.length() > maxLength) {
 			ignore = true;
 			input.setText(newValue.substring(0, maxLength));
 			ignore = false;
-		} else {
+		}
+		else {
 			input.setText(newValue.toUpperCase());
 		}
 	}

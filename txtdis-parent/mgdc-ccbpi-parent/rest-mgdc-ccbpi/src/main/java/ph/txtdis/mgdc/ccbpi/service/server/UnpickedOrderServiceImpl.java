@@ -17,7 +17,8 @@ import ph.txtdis.mgdc.ccbpi.domain.PickListEntity;
 import ph.txtdis.mgdc.ccbpi.repository.OrderConfirmationRepository;
 
 @Service("unpickedOrderService")
-public class UnpickedOrderServiceImpl implements UnpickedOrderService {
+public class UnpickedOrderServiceImpl
+	implements UnpickedOrderService {
 
 	private static Logger logger = getLogger(UnpickedOrderServiceImpl.class);
 
@@ -29,12 +30,16 @@ public class UnpickedOrderServiceImpl implements UnpickedOrderService {
 
 	@Override
 	public List<BillableEntity> list(String collector, LocalDate start, LocalDate end) {
-		List<BillableEntity> allUnpickedOrders = ocsRepository.findByCustomerNotNullAndDueDateBetweenAndPickingNull(start, end);
+		List<BillableEntity> allUnpickedOrders =
+			ocsRepository.findByCustomerNotNullAndDueDateBetweenAndPickingNull(start, end);
 		logger.info("\n    UnpickedOrderConfirmations@list = " + allUnpickedOrders);
 		return filterCollector(allUnpickedOrders, collector, start, end);
 	}
 
-	private List<BillableEntity> filterCollector(List<BillableEntity> allUnpickedOrders, String collector, LocalDate start, LocalDate end) {
+	private List<BillableEntity> filterCollector(List<BillableEntity> allUnpickedOrders,
+	                                             String collector,
+	                                             LocalDate start,
+	                                             LocalDate end) {
 		try {
 			return collector.isEmpty() ? allUnpickedOrders : unpickedOrders(allUnpickedOrders, collector, start, end);
 		} catch (Exception e) {
@@ -42,19 +47,24 @@ public class UnpickedOrderServiceImpl implements UnpickedOrderService {
 		}
 	}
 
-	private List<BillableEntity> unpickedOrders(List<BillableEntity> allUnpickedOrders, String collector, LocalDate start, LocalDate end) {
+	private List<BillableEntity> unpickedOrders(List<BillableEntity> allUnpickedOrders,
+	                                            String collector,
+	                                            LocalDate start,
+	                                            LocalDate end) {
 		List<BillableEntity> combinedUnpickedOrders = new ArrayList<>();
 		for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1L))
 			combinedUnpickedOrders.addAll(unpickedOrders(allUnpickedOrders, collector, date));
 		return combinedUnpickedOrders;
 	}
 
-	private List<BillableEntity> unpickedOrders(List<BillableEntity> allUnpickedOrders, String collector, LocalDate date) {
+	private List<BillableEntity> unpickedOrders(List<BillableEntity> allUnpickedOrders,
+	                                            String collector,
+	                                            LocalDate date) {
 		List<PickListEntity> pickLists = pickListService.list(collector, date, date);
 		return pickLists == null ? Collections.emptyList() //
-				: allUnpickedOrders.stream() //
-						.filter(e -> e.getDueDate().isEqual(date) && areRoutesTheSame(pickLists, e)) //
-						.collect(Collectors.toList());
+			: allUnpickedOrders.stream() //
+			.filter(e -> e.getDueDate().isEqual(date) && areRoutesTheSame(pickLists, e)) //
+			.collect(Collectors.toList());
 	}
 
 	private boolean areRoutesTheSame(List<PickListEntity> pickLists, BillableEntity b) {
@@ -69,9 +79,9 @@ public class UnpickedOrderServiceImpl implements UnpickedOrderService {
 
 	private String collector(List<PickListEntity> pickLists) throws Exception {
 		String collector = pickLists.stream() //
-				.min((a, b) -> a.getId().compareTo(b.getId())) //
-				.get().getBillings().get(0) //
-				.getCustomer().getRoute().getName();
+			.min((a, b) -> a.getId().compareTo(b.getId())) //
+			.get().getBillings().get(0) //
+			.getCustomer().getRoute().getName();
 		logger.info("\n    PickListRoute = " + collector);
 		return collector;
 	}

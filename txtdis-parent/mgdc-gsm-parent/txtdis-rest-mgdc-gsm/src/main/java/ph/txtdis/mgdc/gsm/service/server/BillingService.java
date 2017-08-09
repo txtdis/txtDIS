@@ -5,5 +5,6 @@ import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.service.server.SpunSavedReferencedKeyedService;
 
 public interface BillingService //
-		extends BillableService, SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
+	extends BillableService,
+	SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
 }

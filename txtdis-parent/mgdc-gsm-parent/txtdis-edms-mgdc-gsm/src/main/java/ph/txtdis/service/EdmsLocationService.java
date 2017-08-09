@@ -1,9 +1,9 @@
 package ph.txtdis.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.Location;
 import ph.txtdis.mgdc.gsm.dto.Customer;
+
+import java.util.List;
 
 public interface EdmsLocationService {
 

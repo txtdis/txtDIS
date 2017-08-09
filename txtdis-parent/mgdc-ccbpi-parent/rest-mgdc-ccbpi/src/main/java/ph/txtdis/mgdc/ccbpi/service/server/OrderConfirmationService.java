@@ -8,7 +8,11 @@ import ph.txtdis.mgdc.ccbpi.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.ccbpi.domain.BillableEntity;
 import ph.txtdis.mgdc.ccbpi.domain.BomEntity;
 
-public interface OrderConfirmationService extends BookingService, FilteredListService, QtyPerItemService, SpunSavedBillableService {
+public interface OrderConfirmationService
+	extends BookingService,
+	FilteredListService,
+	QtyPerItemService,
+	SpunSavedBillableService {
 
 	Billable find(LocalDate d, Long customerVendorId, Long count);
 

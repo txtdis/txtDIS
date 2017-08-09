@@ -18,7 +18,8 @@ import ph.txtdis.fx.control.FocusRequested;
 import ph.txtdis.fx.control.InputControl;
 
 public interface AppTable<S> //
-		extends FocusRequested, InputControl<S> {
+	extends FocusRequested,
+	InputControl<S> {
 
 	AbstractTable<S> build();
 
@@ -40,9 +41,15 @@ public interface AppTable<S> //
 
 	String getId();
 
+	void setId(String id);
+
 	S getItem();
 
+	void setItem(S item);
+
 	List<S> getItems();
+
+	void setItems(ObservableList<S> l);
 
 	int getLastRowIndex();
 
@@ -52,6 +59,8 @@ public interface AppTable<S> //
 
 	void items(List<S> items);
 
+	void readOnly();
+
 	void refresh();
 
 	void removeListener();
@@ -59,12 +68,6 @@ public interface AppTable<S> //
 	void scrollTo(int i);
 
 	void setContextMenu(ContextMenu createTableMenu);
-
-	void setId(String id);
-
-	void setItem(S item);
-
-	void setItems(ObservableList<S> l);
 
 	void setOnEmpty(String message);
 

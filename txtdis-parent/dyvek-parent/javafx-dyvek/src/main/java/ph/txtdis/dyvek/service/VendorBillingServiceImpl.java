@@ -1,23 +1,54 @@
 package ph.txtdis.dyvek.service;
 
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.Remittance;
+import ph.txtdis.dyvek.model.BillableDetail;
+import ph.txtdis.info.Information;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
 import static java.util.stream.Collectors.toList;
 import static ph.txtdis.util.DateTimeUtils.toDate;
 import static ph.txtdis.util.NumberUtils.isPositive;
 import static ph.txtdis.util.NumberUtils.toBigDecimal;
 
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.Remittance;
-import ph.txtdis.dyvek.model.BillableDetail;
-import ph.txtdis.info.Information;
-
 @Service("vendorBillingService")
-public class VendorBillingServiceImpl //
-		extends AbstractBillingService //
-		implements VendorBillingService {
+public class VendorBillingServiceImpl
+	extends AbstractBillingService
+	implements VendorBillingService {
+
+	@Override
+	public String getCashAdvance() {
+		return getCashAdvanceDate() == null ? null : "CASH ADVANCE";
+	}
+
+	@Override
+	public LocalDate getCashAdvanceDate() {
+		return get().getCashAdvanceDate();
+	}
+
+	@Override
+	public Long getCashAdvanceId() {
+		return get().getCashAdvanceId();
+	}
+
+	@Override
+	public BigDecimal getCashAdvanceValue() {
+		return  get().getCashAdvanceValue();
+	}
+
+	@Override
+	public BigDecimal getCheckValue() {
+		return get().getPaymentValue();
+	}
+
+	@Override
+	public String getColor() {
+		return get().getColor();
+	}
 
 	@Override
 	public String getCustomer() {
@@ -27,6 +58,15 @@ public class VendorBillingServiceImpl //
 	@Override
 	public List<BillableDetail> getDetails() {
 		return get().getPurchases();
+	}
+
+	@Override
+	public void setDetails(List<BillableDetail> l) {
+		if (l != null)
+			l = l.stream()
+				.filter(d -> d != null && isPositive(d.getAssignedQty()))
+				.collect(toList());
+		get().setPurchases(l);
 	}
 
 	@Override
@@ -50,9 +90,33 @@ public class VendorBillingServiceImpl //
 	}
 
 	@Override
-	public void save() throws Information, Exception {
-		get().setCreatedBy("");
-		super.save();
+	public BigDecimal getIodineValue() {
+		return null;
+	}
+
+	@Override
+	public BigDecimal getPercentFreeFattyAcid() {
+		return null;
+	}
+
+	@Override
+	public BigDecimal getGrossWeight() {
+		return null;
+	}
+
+	@Override
+	public BigDecimal getTareWeight() {
+		return null;
+	}
+
+	@Override
+	public String getTruckScaleNo() {
+		return null;
+	}
+
+	@Override
+	public String getTruckPlateNo() {
+		return null;
 	}
 
 	@Override
@@ -67,12 +131,9 @@ public class VendorBillingServiceImpl //
 	}
 
 	@Override
-	public void setDetails(List<BillableDetail> l) {
-		if (l != null)
-			l = l.stream() //
-					.filter(d -> d != null && isPositive(d.getAssignedQty())) //
-					.collect(toList());
-		get().setPurchases(l);
+	public void save() throws Information, Exception {
+		get().setCreatedBy("");
+		super.save();
 	}
 
 	@Override

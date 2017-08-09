@@ -18,26 +18,15 @@ import ph.txtdis.util.NumberUtils;
 
 @Service("salesService")
 public class SalesServiceImpl //
-		extends AbstractOrderService<VendorService> //
-		implements SalesService {
+	extends AbstractOrderService<VendorService> //
+	implements SalesService {
 
 	@Autowired
 	private TradingClientService clientService;
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Billable findByOrderNo(String no) throws Exception {
-		return findBillable("/sales?no=" + no + "&of=" + getCustomer());
-	}
-
-	@Override
 	public String getAlternateName() {
 		return "S/O";
-	}
-
-	@Override
-	public String getCustomer() {
-		return get().getClient();
 	}
 
 	@Override
@@ -56,18 +45,8 @@ public class SalesServiceImpl //
 	}
 
 	@Override
-	public BigDecimal getTolerancePercent() {
-		return NumberUtils.zeroIfNull(get().getTolerancePercent());
-	}
-
-	@Override
 	public List<String> listCustomers() {
 		return isNew() ? clientService.listClients() : asList(get().getClient());
-	}
-
-	@Override
-	public void setCustomer(String name) {
-		get().setClient(name);
 	}
 
 	@Override
@@ -81,6 +60,22 @@ public class SalesServiceImpl //
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public Billable findByOrderNo(String no) throws Exception {
+		return findBillable("/sales?no=" + no + "&of=" + getCustomer());
+	}
+
+	@Override
+	public String getCustomer() {
+		return get().getClient();
+	}
+
+	@Override
+	public void setCustomer(String name) {
+		get().setClient(name);
+	}
+
+	@Override
 	public void setQty(BigDecimal qty) {
 		super.setQty(qty);
 		get().setBalanceQty(qtyPlusTolerance());
@@ -89,6 +84,11 @@ public class SalesServiceImpl //
 	private BigDecimal qtyPlusTolerance() {
 		BigDecimal tolerance = ONE.add(toPercentRate(getTolerancePercent()));
 		return getQty().multiply(tolerance);
+	}
+
+	@Override
+	public BigDecimal getTolerancePercent() {
+		return NumberUtils.zeroIfNull(get().getTolerancePercent());
 	}
 
 	@Override

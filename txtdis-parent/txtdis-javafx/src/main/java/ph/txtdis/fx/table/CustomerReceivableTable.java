@@ -21,7 +21,7 @@ import ph.txtdis.dto.CustomerReceivable;
 @Scope("prototype")
 @Component("customerReceivableTable")
 public class CustomerReceivableTable //
-		extends AbstractTable<CustomerReceivable> {
+	extends AbstractTable<CustomerReceivable> {
 
 	@Autowired
 	private BillingApp app;
@@ -47,10 +47,11 @@ public class CustomerReceivableTable //
 	@Override
 	protected List<TableColumn<CustomerReceivable, ?>> addColumns() {
 		return asList( //
-				id.launches(app).ofType(CODE).width(120).build("S/I(D/R) No.", "orderNo"),
-				orderDate.launches(app).ofType(DATE).build("Date", "orderDate"), //
-				dueDate.launches(app).ofType(DATE).build("Due", "dueDate"), daysOver.launches(app).ofType(INTEGER).build("Days Over", "daysOverCount"),
-				totalValue.launches(app).ofType(CURRENCY).build("Total Amount", "totalValue"),
-				unpaidValue.launches(app).ofType(CURRENCY).build("Unpaid Balance", "unpaidValue"));
+			id.launches(app).ofType(CODE).width(120).build("S/I(D/R) No.", "orderNo"),
+			orderDate.launches(app).ofType(DATE).build("Date", "orderDate"), //
+			dueDate.launches(app).ofType(DATE).build("Due", "dueDate"),
+			daysOver.launches(app).ofType(INTEGER).build("Days Over", "daysOverCount"),
+			totalValue.launches(app).ofType(CURRENCY).build("Total Amount", "totalValue"),
+			unpaidValue.launches(app).ofType(CURRENCY).build("Unpaid Balance", "unpaidValue"));
 	}
 }

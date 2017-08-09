@@ -15,9 +15,9 @@ import ph.txtdis.mgdc.domain.AbstractRoutingEntity;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "routing", //
-		uniqueConstraints = @UniqueConstraint(columnNames = { "customer_id", "start_date" }))
+	uniqueConstraints = @UniqueConstraint(columnNames = {"customer_id", "start_date"}))
 public class RoutingEntity //
-		extends AbstractRoutingEntity {
+	extends AbstractRoutingEntity {
 
 	private static final long serialVersionUID = -4540897080828317375L;
 

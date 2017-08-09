@@ -1,16 +1,18 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.util.List;
-
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.gsm.dto.Channel;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 import ph.txtdis.service.TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService;
 import ph.txtdis.service.UniqueNamedService;
 import ph.txtdis.type.BillingType;
 
+import java.util.List;
+
 public interface ChannelService //
-		extends ListedAndResetableService<Channel>, TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService, UniqueNamedService<Channel> {
+	extends ListedAndResettableService<Channel>,
+	TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService,
+	UniqueNamedService<Channel> {
 
 	Channel getChannelForAll();
 

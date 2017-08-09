@@ -8,7 +8,7 @@ import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.service.SpunSavedKeyedService;
 
 public interface CustomerService //
-		extends SpunSavedKeyedService<CustomerEntity, Customer, Long> {
+	extends SpunSavedKeyedService<CustomerEntity, Customer, Long> {
 
 	List<Customer> findAll();
 

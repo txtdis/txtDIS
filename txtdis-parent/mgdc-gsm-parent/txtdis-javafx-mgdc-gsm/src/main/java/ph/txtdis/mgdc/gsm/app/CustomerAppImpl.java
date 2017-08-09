@@ -1,16 +1,5 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import static java.util.Arrays.asList;
-
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
@@ -18,7 +7,10 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import ph.txtdis.app.AbstractMasterApp;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.app.SelectableListApp;
 import ph.txtdis.fx.tab.InputTab;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.app.LaunchableCustomerApp;
@@ -27,55 +19,57 @@ import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.fx.dialog.CustomerDiscountTab;
 import ph.txtdis.mgdc.gsm.fx.tab.CreditTab;
 import ph.txtdis.mgdc.gsm.service.CustomerService;
-import ph.txtdis.mgdc.gsm.service.Qualified_CreditAndDiscountGivenCustomerService;
 import ph.txtdis.util.ClientTypeMap;
+
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 @Scope("prototype")
 @Component("customerApp")
 public class CustomerAppImpl //
-		extends AbstractMasterApp<CustomerService, Customer> //
-		implements LaunchableCustomerApp {
+	extends AbstractMasterApp<CustomerService, Customer> //
+	implements LaunchableCustomerApp {
 
-	@Autowired
-	private CustomerTab customerTab;
+	private final CustomerTab customerTab;
 
-	@Autowired
-	private CustomerDiscountTab discountTab;
+	private final CustomerDiscountTab discountTab;
 
-	@Autowired
-	private CustomerListApp customerListApp;
+	private final CustomerListApp customerListApp;
 
-	@Autowired
-	private CreditTab creditTab;
+	private final CreditTab creditTab;
 
-	@Autowired
-	private Qualified_CreditAndDiscountGivenCustomerService qualified_CreditAndDiscountGivenCustomerService;
-
-	@Autowired
-	private ClientTypeMap map;
+	private final ClientTypeMap map;
 
 	private BooleanProperty cannotReactivate, creditAndOrDiscountsConnotBeGiven, noChangesNeedingApproval;
 
 	private List<InputTab> inputTabs;
 
+	@Autowired
+	public CustomerAppImpl(CustomerTab customerTab,
+	                       CustomerDiscountTab discountTab,
+	                       CustomerListApp customerListApp,
+	                       CreditTab creditTab, ClientTypeMap map) {
+		this.customerTab = customerTab;
+		this.discountTab = discountTab;
+		this.customerListApp = customerListApp;
+		this.creditTab = creditTab;
+		this.map = map;
+	}
+
 	@Override
 	protected void clear() {
 		super.clear();
-		inputTabs.forEach(t -> t.clear());
+		inputTabs.forEach(InputTab::clear);
 		goToDefaultFocus();
 	}
 
 	@Override
 	public void goToDefaultFocus() {
 		customerTab.select();
-	}
-
-	@Override
-	protected void listSearchResults() throws Exception {
-		customerListApp.addParent(this).start();
-		Customer c = customerListApp.getSelection();
-		if (c != null)
-			service.openByDoubleClickedTableCellId(c.getId());
 	}
 
 	@Override
@@ -92,20 +86,26 @@ public class CustomerAppImpl //
 	}
 
 	private List<Tab> tabs() {
-		return inputTabs().stream().map(t -> t.asTab()).collect(Collectors.toList());
+		return inputTabs().stream().map(InputTab::asTab).collect(toList());
 	}
 
 	private List<InputTab> inputTabs() {
-		return inputTabs = asList( //
-				customerTab.build(), //
-				creditTab.build(), //
-				discountTab.build());
+		return inputTabs = asList(
+			customerTab.build(),
+			creditTab.build(),
+			discountTab.build());
+	}
+
+	@Override
+	protected SelectableListApp<Customer> getSelectableListApp() {
+		return customerListApp;
 	}
 
 	@Override
 	public void refresh() {
-		inputTabs.forEach(t -> t.refresh());
-		creditAndOrDiscountsConnotBeGiven.set(qualified_CreditAndDiscountGivenCustomerService.cannotGiveCreditAndOrDiscount());
+		inputTabs.forEach(InputTab::refresh);
+		creditAndOrDiscountsConnotBeGiven
+			.set(service.cannotGiveCreditAndOrDiscount());
 		cannotReactivate.set(service.cannotReactivate());
 		refreshDeOrReActivationButton(service.getDeactivatedOn());
 		super.refresh();
@@ -130,7 +130,7 @@ public class CustomerAppImpl //
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} catch (Information i) {
-			dialog.show(i).addParent(this).start();
+			messageDialog.show(i).addParent(this).start();
 		} finally {
 			refresh();
 		}
@@ -144,7 +144,7 @@ public class CustomerAppImpl //
 
 	@Override
 	public void save() {
-		inputTabs.forEach(t -> t.save());
+		inputTabs.forEach(InputTab::save);
 		super.save();
 	}
 
@@ -157,14 +157,14 @@ public class CustomerAppImpl //
 		discountTab.disableIf(creditTab.disabledProperty());
 		creditAndOrDiscountsConnotBeGiven = new SimpleBooleanProperty(true);
 		creditTab.disableIf(customerTab.showsPartnerAsACustomer().not() //
-				.or(creditAndOrDiscountsConnotBeGiven));
+			.or(creditAndOrDiscountsConnotBeGiven));
 		super.setBindings();
 	}
 
 	@Override
 	protected void setDecisionButtonBinding() {
 		decisionButton.disableIf(isNew()//
-				.or(noChangesNeedingApproval));
+			.or(noChangesNeedingApproval));
 	}
 
 	@Override
@@ -190,6 +190,11 @@ public class CustomerAppImpl //
 	@Override
 	protected void setSaveButtonBinding() {
 		saveButton.disableIf(isAlreadyDeactivated()//
-				.or(customerTab.hasIncompleteData()));//
+			.or(customerTab.hasIncompleteData()));//
+	}
+
+	@Override
+	public void updateUponVerification(Customer c) throws Exception {
+		service.openByDoubleClickedTableCellId(c.getId());
 	}
 }

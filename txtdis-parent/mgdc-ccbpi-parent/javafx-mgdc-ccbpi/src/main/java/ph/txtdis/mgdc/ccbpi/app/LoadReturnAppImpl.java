@@ -16,7 +16,6 @@ import javafx.scene.Node;
 import ph.txtdis.app.AbstractKeyedApp;
 import ph.txtdis.dto.PickList;
 import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.control.AppButtonImpl;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.mgdc.ccbpi.fx.table.LoadReturnTable;
@@ -25,8 +24,8 @@ import ph.txtdis.mgdc.ccbpi.service.LoadReturnService;
 @Scope("prototype")
 @Component("loadReturnApp")
 public class LoadReturnAppImpl //
-		extends AbstractKeyedApp<LoadReturnService, PickList, Long, Long> //
-		implements LoadReturnApp {
+	extends AbstractKeyedApp<LoadReturnService, PickList, Long, Long> //
+	implements LoadReturnApp {
 
 	@Autowired
 	private AppButton returnButton;
@@ -47,15 +46,15 @@ public class LoadReturnAppImpl //
 	}
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> buttons = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> buttons = new ArrayList<>(super.addButtons());
 		buttons.add(4, returnButton.icon("return").tooltip("Return all").build());
 		return buttons;
 	}
 
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
-		return asList(gridPane(), box.forHorizontalPane(table.build()), trackedPane());
+		return asList(gridPane(), pane.centeredHorizontal(table.build()), trackedPane());
 	}
 
 	private AppGridPane gridPane() {
@@ -70,15 +69,6 @@ public class LoadReturnAppImpl //
 	}
 
 	@Override
-	public void refresh() {
-		super.refresh();
-		orderDateDisplay.setValue(service.getPickDate());
-		truckDisplay.setValue(service.getTruck());
-		pickListIdInput.setValue(service.getId());
-		table.items(service.getDetails());
-	}
-
-	@Override
 	protected void renew() {
 		super.renew();
 		pickListIdInput.requestFocus();
@@ -87,10 +77,10 @@ public class LoadReturnAppImpl //
 	@Override
 	protected void setBindings() {
 		returnButton.disableIf(pickListIdInput.isEmpty() //
-				.or(isPosted()));
+			.or(isPosted()));
 		saveButton.disableIf(table.isEmpty() //
-				.or(table.disabled()) //
-				.or(isPosted()));
+			.or(table.disabled()) //
+			.or(isPosted()));
 		pickListIdInput.disableIf(isPosted());
 		table.disableIf(pickListIdInput.isEmpty());
 	}
@@ -132,5 +122,14 @@ public class LoadReturnAppImpl //
 				refresh();
 				clearControlAfterShowingErrorDialog(e, pickListIdInput);
 			}
+	}
+
+	@Override
+	public void refresh() {
+		super.refresh();
+		orderDateDisplay.setValue(service.getPickDate());
+		truckDisplay.setValue(service.getTruck());
+		pickListIdInput.setValue(service.getId());
+		table.items(service.getDetails());
 	}
 }

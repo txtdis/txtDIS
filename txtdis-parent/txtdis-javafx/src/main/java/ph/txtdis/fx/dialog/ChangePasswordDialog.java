@@ -7,7 +7,8 @@ import ph.txtdis.fx.pane.AppGridPane;
 
 @Scope("prototype")
 @Component("changePasswordDialog")
-public class ChangePasswordDialog extends AbstractPasswordDialog {
+public class ChangePasswordDialog
+	extends AbstractPasswordDialog {
 
 	@Override
 	protected AppGridPane grid() {

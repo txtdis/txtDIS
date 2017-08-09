@@ -1,22 +1,21 @@
 package ph.txtdis.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.fx.table.PaymentTable;
 import ph.txtdis.service.PaymentDetailedRemittanceService;
 import ph.txtdis.service.RemittanceService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractPaymentDetailedRemittanceApp<AS extends RemittanceService> //
-		extends AbstractRemittanceApp<AS> {
+	extends AbstractRemittanceApp<AS> {
 
 	@Autowired
-	private PaymentTable table;
+	protected PaymentTable table;
 
 	@Override
 	protected void clear() {
@@ -32,7 +31,7 @@ public abstract class AbstractPaymentDetailedRemittanceApp<AS extends Remittance
 	}
 
 	private HBox table() {
-		return box.forHorizontalPane(table.build());
+		return pane.centeredHorizontal(table.build());
 	}
 
 	@Override
@@ -45,13 +44,13 @@ public abstract class AbstractPaymentDetailedRemittanceApp<AS extends Remittance
 	protected void setBindings() {
 		super.setBindings();
 		table.disableIf(paymentCombo.disabledProperty() //
-				.or(cash().not().and(draweeBankCombo.disabledProperty())));
+			.or(cash().not().and(draweeBankCombo.disabledProperty())));
 	}
 
 	@Override
 	protected BooleanBinding saveButtonDisableBindings() {
 		return isPosted() //
-				.or(table.isEmpty().and(remarksDisplay.doesNotContain(CANCELLED))) //
-				.or(canPostPaymentData.not());
+			.or(table.isEmpty().and(remarksDisplay.doesNotContain(CANCELLED))) //
+			.or(canPostPaymentData.not());
 	}
 }

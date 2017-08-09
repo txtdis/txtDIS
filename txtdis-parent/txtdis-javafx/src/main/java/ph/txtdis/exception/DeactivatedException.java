@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class DeactivatedException extends InvalidException {
+public class DeactivatedException
+	extends InvalidException {
 
 	private static final long serialVersionUID = -2617612081995129258L;
 

@@ -7,12 +7,14 @@ import java.util.List;
 import ph.txtdis.dyvek.model.CashAdvance;
 import ph.txtdis.info.Information;
 import ph.txtdis.service.BankDrawnCheckService;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 import ph.txtdis.service.TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService;
 import ph.txtdis.type.PartnerType;
 
 public interface CashAdvanceService //
-		extends BankDrawnCheckService<CashAdvance>, ListedAndResetableService<CashAdvance>, TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService {
+	extends BankDrawnCheckService<CashAdvance>,
+	ListedAndResettableService<CashAdvance>,
+	TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService {
 
 	static final String CASH_ADVANCE = "-CASH ADVANCE-";
 

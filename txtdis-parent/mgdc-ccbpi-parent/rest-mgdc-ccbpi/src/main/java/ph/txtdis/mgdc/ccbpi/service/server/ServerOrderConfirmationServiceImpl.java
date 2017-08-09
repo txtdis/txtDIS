@@ -30,10 +30,8 @@ import ph.txtdis.util.DateTimeUtils;
 
 @Service("orderConfirmationService")
 public class ServerOrderConfirmationServiceImpl //
-		extends AbstractSpunSavedBillableService //
-		implements OrderConfirmationService {
-
-	private static Logger logger = getLogger(ServerOrderConfirmationServiceImpl.class);
+	extends AbstractSpunSavedBillableService //
+	implements OrderConfirmationService {
 
 	private static final String MANUAL = OrderConfirmationType.MANUAL.toString();
 
@@ -44,6 +42,8 @@ public class ServerOrderConfirmationServiceImpl //
 	private static final String UNDELIVERED = OrderConfirmationType.UNDELIVERED.toString();
 
 	private static final String WAREHOUSE = OrderConfirmationType.WAREHOUSE.toString();
+
+	private static Logger logger = getLogger(ServerOrderConfirmationServiceImpl.class);
 
 	@Autowired
 	private BillingDetailRepository detailRepository;
@@ -62,10 +62,16 @@ public class ServerOrderConfirmationServiceImpl //
 		return findOrderConfirmation(orderDate(ocsNo), customerVendorId(ocsNo), orderCount(ocsNo));
 	}
 
+	private BillableEntity findOrderConfirmation(LocalDate orderDate, Long customerVendorId, Long orderCount) {
+		if (orderCount == 0)
+			return ocsRepository.findFirstByCustomerVendorIdAndOrderDateOrderByBookingIdDesc(customerVendorId, orderDate);
+		return ocsRepository.findByCustomerVendorIdAndOrderDateAndBookingId(customerVendorId, orderDate, orderCount);
+	}
+
 	private LocalDate orderDate(String id) {
 		return LocalDate.parse( //
-				StringUtils.substringBetween(id, "-", "/"), //
-				DateTimeUtils.orderConfirmationFormat());
+			StringUtils.substringBetween(id, "-", "/"), //
+			DateTimeUtils.orderConfirmationFormat());
 	}
 
 	private Long customerVendorId(String id) {
@@ -83,17 +89,28 @@ public class ServerOrderConfirmationServiceImpl //
 	}
 
 	@Override
-	public List<Billable> findAllUnpicked(LocalDate d) {
-		List<BillableEntity> l = ocsRepository
-				.findByCustomerNotNullAndPrefixInAndDueDateAndPickingNull(Arrays.asList(MANUAL, PARTIAL, REGULAR, UNDELIVERED, WAREHOUSE), d);
-		logger.info("\n    UnpickedOrderConfirmations = " + l);
-		return toModels(l);
+	public Billable toModel(BillableEntity e) {
+		Billable b = super.toModel(e);
+		if (b != null)
+			b.setRoute(routeName(e));
+		return b;
 	}
 
-	private BillableEntity findOrderConfirmation(LocalDate orderDate, Long customerVendorId, Long orderCount) {
-		if (orderCount == 0)
-			return ocsRepository.findFirstByCustomerVendorIdAndOrderDateOrderByBookingIdDesc(customerVendorId, orderDate);
-		return ocsRepository.findByCustomerVendorIdAndOrderDateAndBookingId(customerVendorId, orderDate, orderCount);
+	private String routeName(BillableEntity b) {
+		try {
+			return b.getCustomer().getRoute().getName();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@Override
+	public List<Billable> findAllUnpicked(LocalDate d) {
+		List<BillableEntity> l = ocsRepository
+			.findByCustomerNotNullAndPrefixInAndDueDateAndPickingNull(
+				Arrays.asList(MANUAL, PARTIAL, REGULAR, UNDELIVERED, WAREHOUSE), d);
+		logger.info("\n    UnpickedOrderConfirmations = " + l);
+		return toModels(l);
 	}
 
 	@Override
@@ -105,7 +122,7 @@ public class ServerOrderConfirmationServiceImpl //
 
 	private List<BillableEntity> orderConfirmationList(String route, LocalDate start, LocalDate end) {
 		return ocsRepository.findByCustomerNotNullAndPrefixAndSuffixContainingAndDueDateBetween( //
-				REGULAR, routeName(route), start, end);
+			REGULAR, routeName(route), start, end);
 	}
 
 	private String routeName(String route) {
@@ -120,8 +137,12 @@ public class ServerOrderConfirmationServiceImpl //
 	}
 
 	@Override
-	public List<BillableDetailEntity> getDetailEntityList(String itemVendorNo, String route, LocalDate start, LocalDate end) {
-		List<BillableDetailEntity> list = detailRepository.findByItemVendorIdAndBillingPrefixAndBillingSuffixContainingAndBillingDueDateBetween(
+	public List<BillableDetailEntity> getDetailEntityList(String itemVendorNo,
+	                                                      String route,
+	                                                      LocalDate start,
+	                                                      LocalDate end) {
+		List<BillableDetailEntity> list =
+			detailRepository.findByItemVendorIdAndBillingPrefixAndBillingSuffixContainingAndBillingDueDateBetween(
 				itemVendorNo, REGULAR, routeName(route), start, end);
 		logger.info("\n    OrderConfirmationDetails = " + list);
 		return list == null ? Collections.emptyList() : list;
@@ -133,6 +154,15 @@ public class ServerOrderConfirmationServiceImpl //
 		return getWithDeliveredValue(l);
 	}
 
+	@Override
+	public List<BillableEntity> list(String collector, LocalDate start, LocalDate end) {
+		List<BillableEntity> ocs =
+			ocsRepository.findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContaining( //
+				start, end, collector);
+		logger.info("\n    LoadedOrderConfirmations@listLoaded = " + ocs);
+		return ocs;
+	}
+
 	private Billable getWithDeliveredValue(List<BillableEntity> l) {
 		BigDecimal v = contentsAndEmptiesValue(l);
 		logger.info("\n    ContentsPlusEmpties@getWithDeliveredValue = " + v);
@@ -142,19 +172,9 @@ public class ServerOrderConfirmationServiceImpl //
 	private BigDecimal contentsAndEmptiesValue(List<BillableEntity> l) {
 		BigDecimal contents = contentsValue(l);
 		BigDecimal empties = emptiesValue(l);
-		logger.info("\n    Value@contentsAndEmptiesValue = " + toCurrencyText(contents) + " & " + toCurrencyText(empties));
+		logger
+			.info("\n    Value@contentsAndEmptiesValue = " + toCurrencyText(contents) + " & " + toCurrencyText(empties));
 		return contents.add(empties);
-	}
-
-	private BigDecimal contentsValue(List<BillableEntity> l) {
-		return l == null ? BigDecimal.ZERO //
-				: l.stream().map(b -> b.getTotalValue()).reduce(BigDecimal.ZERO, BigDecimal::add);
-	}
-
-	private BigDecimal emptiesValue(List<BillableEntity> billables) {
-		List<BomEntity> boms = bomService.toEmptiesBomList(QuantityType.ACTUAL, billables);
-		Map<ItemEntity, BigDecimal> map = emptiesService.mapEmptiesPriceValue(PriceType.DEALER, boms);
-		return map.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 	private Billable totalOnlyBillable(BigDecimal v) {
@@ -163,17 +183,21 @@ public class ServerOrderConfirmationServiceImpl //
 		return b;
 	}
 
-	@Override
-	public List<BillableEntity> list(String collector, LocalDate start, LocalDate end) {
-		List<BillableEntity> ocs = ocsRepository.findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContaining( //
-				start, end, collector);
-		logger.info("\n    LoadedOrderConfirmations@listLoaded = " + ocs);
-		return ocs;
+	private BigDecimal contentsValue(List<BillableEntity> l) {
+		return l == null ? BigDecimal.ZERO //
+			: l.stream().map(b -> b.getTotalValue()).reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+
+	private BigDecimal emptiesValue(List<BillableEntity> billables) {
+		List<BomEntity> boms = bomService.toEmptiesBomList(QuantityType.ACTUAL, billables);
+		Map<ItemEntity, BigDecimal> map = emptiesService.mapEmptiesPriceValue(PriceType.DEALER, boms);
+		return map.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 	@Override
 	public List<BillableEntity> listDelivered(String route, LocalDate start, LocalDate end) {
-		List<BillableEntity> ocs = ocsRepository.findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContainingAndTotalValueGreaterThan( //
+		List<BillableEntity> ocs = ocsRepository
+			.findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContainingAndTotalValueGreaterThan( //
 				start, end, route, ZERO);
 		logger.info("\n    DeliveredOrderConfirmations@listDelivered = " + ocs);
 		return ocs;
@@ -181,7 +205,8 @@ public class ServerOrderConfirmationServiceImpl //
 
 	@Override
 	public List<BillableEntity> listUnpicked(String route, LocalDate start, LocalDate end) {
-		List<BillableEntity> ocs = ocsRepository.findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContaining( //
+		List<BillableEntity> ocs =
+			ocsRepository.findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContaining( //
 				start, end, route);
 		logger.info("\n    LoadedOrderConfirmations@listLoaded = " + ocs);
 		return ocs;
@@ -205,21 +230,5 @@ public class ServerOrderConfirmationServiceImpl //
 	@Override
 	protected BillableEntity previousEntity(Long id) {
 		return ocsRepository.findFirstByCustomerNotNullAndIdLessThanOrderByIdDesc(id);
-	}
-
-	@Override
-	public Billable toModel(BillableEntity e) {
-		Billable b = super.toModel(e);
-		if (b != null)
-			b.setRoute(routeName(e));
-		return b;
-	}
-
-	private String routeName(BillableEntity b) {
-		try {
-			return b.getCustomer().getRoute().getName();
-		} catch (Exception e) {
-			return null;
-		}
 	}
 }

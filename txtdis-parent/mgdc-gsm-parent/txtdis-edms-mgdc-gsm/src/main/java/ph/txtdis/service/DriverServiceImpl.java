@@ -1,13 +1,8 @@
 package ph.txtdis.service;
 
-import static java.time.ZonedDateTime.now;
-import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
-import static ph.txtdis.util.DateTimeUtils.toTimestampWithSecondText;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsDriver;
 import ph.txtdis.domain.EdmsSeller;
 import ph.txtdis.dto.PickList;
@@ -15,9 +10,13 @@ import ph.txtdis.dto.User;
 import ph.txtdis.repository.EdmsDriverRepository;
 import ph.txtdis.util.Code;
 
+import static java.time.ZonedDateTime.now;
+import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
+import static ph.txtdis.util.DateTimeUtils.toTimestampWithSecondText;
+
 @Service("driverService")
 public class DriverServiceImpl //
-		implements DriverService {
+	implements DriverService {
 
 	@Autowired
 	private EdmsDriverRepository edmsDriverRepository;

@@ -1,33 +1,26 @@
 package ph.txtdis.dyvek.service;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dyvek.model.Billable;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.UnauthorizedUserException;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+
 @Service("deliveryService")
 public class DeliveryServiceImpl //
-		extends AbstractOrderService<VendorService> //
-		implements DeliveryService {
+	extends AbstractOrderService<VendorService> //
+	implements DeliveryService {
 
 	private static final String SATTELITE = "-SATTELITE-";
 
 	@Autowired
 	private TradingClientService clientService;
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Billable findByOrderNo(String no) throws Exception {
-		return findBillable("/delivery?no=" + no + "&of=" + getCustomer());
-	}
 
 	@Override
 	public List<Billable> findUnpaidBillings(String client) {
@@ -46,8 +39,23 @@ public class DeliveryServiceImpl //
 	}
 
 	@Override
-	public String getCustomer() {
-		return get().getVendor();
+	public void setColor(String color) {
+		get().setColor(color);
+	}
+
+	@Override
+	public BigDecimal getGrossWeight() {
+		return get().getGrossWeight();
+	}
+
+	@Override
+	public void setGrossWeight(BigDecimal gross) {
+		get().setGrossWeight(gross);
+	}
+
+	@Override
+	public BigDecimal getTareWeight() {
+		return get().getTareWeight();
 	}
 
 	@Override
@@ -61,13 +69,13 @@ public class DeliveryServiceImpl //
 	}
 
 	@Override
-	public String getModuleName() {
-		return "deliveryReport";
+	public void setIodineValue(BigDecimal iv) {
+		get().setIodineQty(iv);
 	}
 
 	@Override
-	public BigDecimal getMoistureContent() {
-		return get().getMoisturePercent();
+	public String getModuleName() {
+		return "deliveryReport";
 	}
 
 	@Override
@@ -76,18 +84,13 @@ public class DeliveryServiceImpl //
 	}
 
 	@Override
-	public BigDecimal getPercentLauricFreeFattyAcid() {
-		return get().getLauricPercent();
+	public BigDecimal getPercentFreeFattyAcid() {
+		return get().getFfaPercent();
 	}
 
 	@Override
-	public BigDecimal getPercentOleicFreeFattyAcid() {
-		return get().getOleicPercent();
-	}
-
-	@Override
-	public BigDecimal getSaponificationIndex() {
-		return get().getSaponificationPercent();
+	public void setPercentFreeFattyAcid(BigDecimal ffa) {
+		get().setFfaPercent(ffa);
 	}
 
 	@Override
@@ -96,8 +99,18 @@ public class DeliveryServiceImpl //
 	}
 
 	@Override
+	public void setTruckPlateNo(String no) {
+		get().setTruckPlateNo(no);
+	}
+
+	@Override
 	public String getTruckScaleNo() {
 		return get().getTruckScaleNo();
+	}
+
+	@Override
+	public void setTruckScaleNo(String no) {
+		get().setTruckScaleNo(no);
 	}
 
 	@Override
@@ -109,6 +122,16 @@ public class DeliveryServiceImpl //
 		List<String> l = customerService.listVendors();
 		l.add(SATTELITE);
 		return l;
+	}
+
+	@Override
+	public String getCustomer() {
+		return get().getVendor();
+	}
+
+	@Override
+	public void setCustomer(String name) {
+		get().setVendor(name);
 	}
 
 	@Override
@@ -132,26 +155,6 @@ public class DeliveryServiceImpl //
 	}
 
 	@Override
-	public void setColor(String color) {
-		get().setColor(color);
-	}
-
-	@Override
-	public void setCustomer(String name) {
-		get().setVendor(name);
-	}
-
-	@Override
-	public void setIodineValue(BigDecimal iv) {
-		get().setIodineQty(iv);
-	}
-
-	@Override
-	public void setMoistureContent(BigDecimal mvm) {
-		get().setMoisturePercent(mvm);
-	}
-
-	@Override
 	public void setOrderNoUponValidation(String no) throws Exception {
 		if (!isManager() && !isStockChecker())
 			throw new UnauthorizedUserException("Stock checkers only.");
@@ -162,32 +165,13 @@ public class DeliveryServiceImpl //
 	}
 
 	@Override
-	public void setPercentLauricFFA(BigDecimal ffa) {
-		get().setLauricPercent(ffa);
-	}
-
-	@Override
-	public void setPercentOleicFFA(BigDecimal ffa) {
-		get().setOleicPercent(ffa);
+	@SuppressWarnings("unchecked")
+	public Billable findByOrderNo(String no) throws Exception {
+		return findBillable("/delivery?no=" + no + "&of=" + getCustomer());
 	}
 
 	@Override
 	public void setRecipient(String name) {
 		get().setClient(name);
-	}
-
-	@Override
-	public void setSaponificationIndex(BigDecimal si) {
-		get().setSaponificationPercent(si);
-	}
-
-	@Override
-	public void setTruckPlateNo(String no) {
-		get().setTruckPlateNo(no);
-	}
-
-	@Override
-	public void setTruckScaleNo(String no) {
-		get().setTruckScaleNo(no);
 	}
 }

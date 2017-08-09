@@ -1,22 +1,21 @@
 package ph.txtdis.service;
 
-import static ph.txtdis.util.DateTimeUtils.toTimeDisplay;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.domain.EdmsEndOfDay;
+import ph.txtdis.repository.EdmsEndOfDayRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.domain.EdmsEndOfDay;
-import ph.txtdis.repository.EdmsEndOfDayRepository;
+import static ph.txtdis.util.DateTimeUtils.toTimeDisplay;
 
 @Service("endOfDayService")
 public class EndOfDayServiceImpl //
-		implements EndOfDayService {
+	implements EndOfDayService {
 
 	@Autowired
 	private EdmsEndOfDayRepository repository;

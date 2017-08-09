@@ -13,8 +13,8 @@ import ph.txtdis.mgdc.fx.dialog.BillableDialog;
 @Scope("prototype")
 @Component("receivingDialog")
 public class ReceivingDialogImpl //
-		extends AbstractCasesAndBottlesReceivingDialog<CokeBillableService, BillableDetail> //
-		implements BillableDialog {
+	extends AbstractCasesAndBottlesReceivingDialog<CokeBillableService, BillableDetail> //
+	implements BillableDialog {
 
 	@Override
 	protected List<InputNode<?>> quantitiesInCasesAndBottlesInputs() {

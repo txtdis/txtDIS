@@ -1,7 +1,6 @@
 package ph.txtdis.mgdc.service.server;
 
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.PricingType;
 import ph.txtdis.mgdc.domain.PricingTypeEntity;
 import ph.txtdis.mgdc.repository.PricingTypeRepository;
@@ -9,8 +8,8 @@ import ph.txtdis.service.AbstractCreateNameListService;
 
 @Service("pricingTypeService")
 public class PricingTypeServiceImpl //
-		extends AbstractCreateNameListService<PricingTypeRepository, PricingTypeEntity, PricingType> //
-		implements PricingTypeService {
+	extends AbstractCreateNameListService<PricingTypeRepository, PricingTypeEntity, PricingType> //
+	implements PricingTypeService {
 
 	@Override
 	public PricingTypeEntity findEntityByName(String text) {

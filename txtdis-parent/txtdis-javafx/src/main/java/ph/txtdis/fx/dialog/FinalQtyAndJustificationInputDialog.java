@@ -1,37 +1,28 @@
 package ph.txtdis.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static org.apache.log4j.Logger.getLogger;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import org.apache.log4j.Logger;
+import javafx.scene.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import ph.txtdis.dto.StockTakeVariance;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.TextAreaDisplay;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.type.Type;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Scope("prototype")
 @Component("finalQtyAndJustificationInputDialog")
-public class FinalQtyAndJustificationInputDialog //
-		extends AbstractInputDialog {
-
-	private static Logger logger = getLogger(FinalQtyAndJustificationInputDialog.class);
+public class FinalQtyAndJustificationInputDialog
+	extends AbstractInputDialog {
 
 	@Autowired
 	private AppGridPane grid;
-
-	@Autowired
-	private AppButtonImpl actionButton;
 
 	@Autowired
 	private AppFieldImpl<Integer> caseField, pieceField;
@@ -43,16 +34,7 @@ public class FinalQtyAndJustificationInputDialog //
 
 	public FinalQtyAndJustificationInputDialog varianceToEdit(StockTakeVariance v) {
 		variance = v;
-		logger.info("\n    InitialVariance: " + v);
 		return this;
-	}
-
-	@Override
-	public void refresh() {
-		caseField.setValue(null);
-		pieceField.setValue(null);
-		justificationArea.setValue(null);
-		super.refresh();
 	}
 
 	@Override
@@ -66,14 +48,26 @@ public class FinalQtyAndJustificationInputDialog //
 	}
 
 	public StockTakeVariance getVariance() {
-		logger.info("\n    EditedVariance: " + variance);
 		return variance;
+	}
+
+	@Override
+	protected List<AppButton> buttons() {
+		return asList(actionButton(), closeButton());
+	}
+
+	private AppButton actionButton() {
+		AppButton actionButton = button.large("Input").build();
+		actionButton.onAction(event -> setFinalQtyAndJustification());
+		actionButton.disableIf(caseField.isEmpty()
+			.or(pieceField.isEmpty())
+			.or(justificationArea.isEmpty()));
+		return actionButton;
 	}
 
 	private void setFinalQtyAndJustification() {
 		variance.setFinalQty(unitQtyOfCases().add(qtyInPieces()));
 		variance.setJustification(justificationArea.getValue());
-		logger.info("\n    VarianceOnClose: " + variance);
 		refresh();
 		close();
 	}
@@ -82,30 +76,24 @@ public class FinalQtyAndJustificationInputDialog //
 		return qtyInCases().multiply(qtyPerCase());
 	}
 
+	private BigDecimal qtyInPieces() {
+		return new BigDecimal(pieceField.getValue());
+	}
+
+	@Override
+	public void refresh() {
+		caseField.setValue(null);
+		pieceField.setValue(null);
+		justificationArea.setValue(null);
+		super.refresh();
+	}
+
 	private BigDecimal qtyInCases() {
 		return new BigDecimal(caseField.getValue());
 	}
 
 	private BigDecimal qtyPerCase() {
 		return new BigDecimal(variance.getQtyPerCase());
-	}
-
-	private BigDecimal qtyInPieces() {
-		return new BigDecimal(pieceField.getValue());
-	}
-
-	private Button actionButton() {
-		actionButton.large("Input").build();
-		actionButton.onAction(event -> setFinalQtyAndJustification());
-		actionButton.disableIf(caseField.isEmpty() //
-				.or(pieceField.isEmpty()) //
-				.or(justificationArea.isEmpty()));
-		return actionButton;
-	}
-
-	@Override
-	protected Button[] buttons() {
-		return new Button[] { actionButton(), closeButton() };
 	}
 
 	@Override

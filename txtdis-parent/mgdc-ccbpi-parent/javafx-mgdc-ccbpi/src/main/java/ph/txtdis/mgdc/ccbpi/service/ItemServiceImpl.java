@@ -1,9 +1,11 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
+import static java.util.Collections.emptyList;
 import static ph.txtdis.type.BeverageType.EMPTIES;
 import static ph.txtdis.type.BeverageType.FULL_GOODS;
 import static ph.txtdis.type.UserType.MANAGER;
 import static ph.txtdis.type.UserType.STORE_KEEPER;
+import static ph.txtdis.util.UserUtils.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,15 +23,14 @@ import ph.txtdis.dto.Price;
 import ph.txtdis.dto.PricingType;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.NotFoundException;
-import ph.txtdis.service.CredentialService;
+import ph.txtdis.mgdc.ccbpi.dto.Item;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.PriceType;
+import ph.txtdis.util.UserUtils;
 
 @Service("itemService")
 public class ItemServiceImpl //
-		extends AbstractBommedDiscountedPricedValidatedItemService {
-
-	@Autowired
-	private CredentialService credentialService;
+	extends AbstractBommedDiscountedPricedValidatedItemService {
 
 	@Autowired
 	private ItemFamilyService itemFamilyService;
@@ -53,7 +54,7 @@ public class ItemServiceImpl //
 	public BigDecimal getPrice(Long itemId, Predicate<Price> filter) {
 		try {
 			return findById(itemId).getPriceList().stream().filter(filter) //
-					.max(Comparator.comparing(Price::getStartDate)).get().getPriceValue();
+				.max(Comparator.comparing(Price::getStartDate)).get().getPriceValue();
 		} catch (Exception e) {
 			return BigDecimal.ZERO;
 		}
@@ -65,6 +66,10 @@ public class ItemServiceImpl //
 
 	private boolean isSameType(Price p, PriceType type) {
 		return p.getType().getName().equalsIgnoreCase(type.toString());
+	}
+
+	public RestClientService<Item> getRestClientServiceForLists() {
+		return getRestClientService();
 	}
 
 	@Override
@@ -97,7 +102,7 @@ public class ItemServiceImpl //
 
 	@Override
 	public boolean isAppendable() {
-		return credentialService.isUser(MANAGER) || credentialService.isUser(STORE_KEEPER);
+		return isUser(MANAGER) || isUser(STORE_KEEPER);
 	}
 
 	@Override
@@ -107,6 +112,11 @@ public class ItemServiceImpl //
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	@Override
+	public void setEmpties(String empties) {
+		get().setEmpties(empties);
 	}
 
 	@Override
@@ -124,7 +134,7 @@ public class ItemServiceImpl //
 		try {
 			return getEmptiesList();
 		} catch (Exception e) {
-			return Collections.emptyList();
+			return emptyList();
 		}
 	}
 
@@ -152,10 +162,5 @@ public class ItemServiceImpl //
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void setEmpties(String empties) {
-		get().setEmpties(empties);
 	}
 }

@@ -3,7 +3,10 @@ package ph.txtdis.dto;
 import java.math.BigDecimal;
 
 public interface CustomerCredit //
-		extends ForApproval, Comparable<CustomerCredit>, Keyed<Long>, StartDated {
+	extends ForApproval,
+	Comparable<CustomerCredit>,
+	Keyed<Long>,
+	StartDated {
 
 	int getTermInDays();
 

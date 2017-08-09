@@ -1,13 +1,6 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static ph.txtdis.type.UserType.MANAGER;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.exception.ToBeReturnedItemNotPurchasedWithinTheLastSixMonthException;
@@ -16,9 +9,17 @@ import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.service.TotaledBillableService;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.UserUtils.isUser;
+
 public abstract class AbstractRmaService //
-		extends AbstractBillableService //
-		implements RmaService {
+	extends AbstractBillableService //
+	implements RmaService {
 
 	@Autowired
 	private TotaledBillableService totalService;
@@ -36,13 +37,13 @@ public abstract class AbstractRmaService //
 	}
 
 	@Override
-	public String getAlternateName() {
-		return "RMA";
+	public String getHeaderName() {
+		return getAlternateName();
 	}
 
 	@Override
-	public String getHeaderName() {
-		return getAlternateName();
+	public String getAlternateName() {
+		return "RMA";
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public abstract class AbstractRmaService //
 	@Override
 	public LocalDate getOrderDate() {
 		if (get().getOrderDate() == null)
-			setOrderDate(syncService.getServerDate());
+			setOrderDate(getServerDate());
 		return get().getOrderDate();
 	}
 

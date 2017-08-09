@@ -7,7 +7,9 @@ import ph.txtdis.mgdc.ccbpi.app.OrderConfirmationApp;
 
 @Scope("prototype")
 @Component("orderConfirmationListTable")
-public class OrderConfirmationListTableImpl extends AbstractOrderListTable<OrderConfirmationApp> implements OrderConfirmationListTable {
+public class OrderConfirmationListTableImpl
+	extends AbstractOrderListTable<OrderConfirmationApp>
+	implements OrderConfirmationListTable {
 
 	@Override
 	protected String qtyAndValuePrefix() {

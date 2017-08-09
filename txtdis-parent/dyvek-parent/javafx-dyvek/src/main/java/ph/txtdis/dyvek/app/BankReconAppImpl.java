@@ -1,19 +1,18 @@
 package ph.txtdis.dyvek.app;
 
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
 import ph.txtdis.app.AbstractApp;
 import ph.txtdis.dyvek.service.BankReconService;
+
+import java.util.List;
 
 @Scope("prototype")
 @Component("bankReconApp")
 public class BankReconAppImpl //
-		extends AbstractApp<BankReconService>//
-		implements BankReconApp {
+	extends AbstractApp<BankReconService>//
+	implements BankReconApp {
 
 	@Override
 	public void goToDefaultFocus() {

@@ -1,24 +1,20 @@
 package ph.txtdis.mgdc.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractDecisionNeededValidatedCreatedKeyedEntity;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "price", //
-		uniqueConstraints = @UniqueConstraint(columnNames = { "item_id", "start_date", "type_id" }))
-public class PriceEntity extends AbstractDecisionNeededValidatedCreatedKeyedEntity<Long> {
+	uniqueConstraints = @UniqueConstraint(columnNames = {"item_id", "start_date", "type_id"}))
+public class PriceEntity
+	extends AbstractDecisionNeededValidatedCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -5721868302278165093L;
 

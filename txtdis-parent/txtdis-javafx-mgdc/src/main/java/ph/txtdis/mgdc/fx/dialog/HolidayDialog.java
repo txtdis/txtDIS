@@ -1,14 +1,8 @@
 package ph.txtdis.mgdc.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.Holiday;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledDatePicker;
@@ -17,9 +11,15 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.service.HolidayService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.TEXT;
+
 @Scope("prototype")
 @Component("holidayDialog")
-public class HolidayDialog extends AbstractFieldDialog<Holiday> {
+public class HolidayDialog
+	extends AbstractFieldDialog<Holiday> {
 
 	@Autowired
 	private HolidayService service;
@@ -29,6 +29,11 @@ public class HolidayDialog extends AbstractFieldDialog<Holiday> {
 
 	@Autowired
 	private LabeledField<String> nameField;
+
+	@Override
+	protected List<InputNode<?>> addNodes() {
+		return asList(datePicker(), nameField());
+	}
 
 	private LabeledDatePicker datePicker() {
 		datePicker.name("Date");
@@ -44,14 +49,9 @@ public class HolidayDialog extends AbstractFieldDialog<Holiday> {
 		try {
 			service.validateDate(datePicker.getValue());
 		} catch (Exception e) {
-			dialog.show(e).addParent(this).start();
+			messageDialog().show(e).addParent(this).start();
 			refresh();
 		}
-	}
-
-	@Override
-	protected List<InputNode<?>> addNodes() {
-		return asList(datePicker(), nameField());
 	}
 
 	@Override

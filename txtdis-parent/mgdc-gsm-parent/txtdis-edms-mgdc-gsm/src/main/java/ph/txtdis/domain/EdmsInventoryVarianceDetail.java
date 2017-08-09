@@ -14,7 +14,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "tr_dsmr_d")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsInventoryVarianceDetail extends EdmsAbstractReferencedItemCodeIdDetail implements Serializable {
+public class EdmsInventoryVarianceDetail
+	extends EdmsAbstractReferencedItemCodeIdDetail
+	implements Serializable {
 
 	private static final long serialVersionUID = -7812225856101060992L;
 

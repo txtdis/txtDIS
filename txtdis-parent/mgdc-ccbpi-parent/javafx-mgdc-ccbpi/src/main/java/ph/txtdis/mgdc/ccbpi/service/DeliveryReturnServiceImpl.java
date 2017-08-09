@@ -1,13 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.dto.PickList;
 import ph.txtdis.dto.PickListDetail;
@@ -15,18 +10,19 @@ import ph.txtdis.dto.ReceivingDetail;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.service.PickListService;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SpunKeyedService;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.util.ClientTypeMap;
+
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("deliveryReturnService")
 public class DeliveryReturnServiceImpl //
-		implements DeliveryReturnService {
-
-	@Autowired
-	private CredentialService credentialService;
+	implements DeliveryReturnService {
 
 	@Autowired
 	private BommedDiscountedPricedValidatedItemService itemService;
@@ -35,13 +31,7 @@ public class DeliveryReturnServiceImpl //
 	private PickListService pickListService;
 
 	@Autowired
-	private ReadOnlyService<PickList> readOnlyService;
-
-	@Autowired
-	private SavingService<PickList> savingService;
-
-	@Autowired
-	private SpunKeyedService<PickList, Long> spunService;
+	private RestClientService<PickList> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -58,6 +48,16 @@ public class DeliveryReturnServiceImpl //
 	private PickListDetail receivingDetail;
 
 	@Override
+	public String getAlternateName() {
+		return "Load Return";
+	}
+
+	@Override
+	public String getCreatedBy() {
+		return get().getReceivedBy();
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public PickList get() {
 		if (pickList == null)
@@ -66,13 +66,16 @@ public class DeliveryReturnServiceImpl //
 	}
 
 	@Override
-	public String getAlternateName() {
-		return "Load Return";
+	public void reset() {
+		set(new PickList());
+		setItem(null);
+		setReceivingDetail(null);
+		originalDetails = null;
 	}
 
 	@Override
-	public String getCreatedBy() {
-		return get().getReceivedBy();
+	public <T extends Keyed<Long>> void set(T t) {
+		pickList = (PickList) t;
 	}
 
 	@Override
@@ -86,18 +89,23 @@ public class DeliveryReturnServiceImpl //
 	}
 
 	@Override
-	public String getHeaderName() {
-		return "Load Return";
-	}
-
-	@Override
 	public Long getId() {
 		return get().getId();
 	}
 
 	@Override
+	public void setId(Long id) {
+		get().setId(id);
+	}
+
+	@Override
 	public Item getItem() {
 		return item;
+	}
+
+	@Override
+	public void setItem(Item item) {
+		this.item = item;
 	}
 
 	@Override
@@ -121,24 +129,29 @@ public class DeliveryReturnServiceImpl //
 	}
 
 	@Override
-	public ReadOnlyService<PickList> getReadOnlyService() {
-		return readOnlyService;
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
 	public PickListDetail getReceivingDetail() {
 		return receivingDetail;
 	}
 
 	@Override
-	public SpunKeyedService<PickList, Long> getSpunService() {
-		return spunService;
+	public void setReceivingDetail(ReceivingDetail detail) {
+		receivingDetail = (PickListDetail) detail;
 	}
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + (isNew() ? "New " + getHeaderName() : "P/L No. " + getModuleNo());
+		return username() + "@" + modulePrefix + " " + (isNew() ? "New " + getHeaderName() : "P/L No. " + getModuleNo());
+	}
+
+	@Override
+	public boolean isNew() {
+		return get().getReceivedOn() == null;
+	}
+
+	@Override
+	public String getHeaderName() {
+		return "Load Return";
 	}
 
 	@Override
@@ -149,39 +162,6 @@ public class DeliveryReturnServiceImpl //
 	@Override
 	public boolean isAppendable() {
 		return isNew();
-	}
-
-	@Override
-	public boolean isNew() {
-		return get().getReceivedOn() == null;
-	}
-
-	@Override
-	public void reset() {
-		set(new PickList());
-		setItem(null);
-		setReceivingDetail(null);
-		originalDetails = null;
-	}
-
-	@Override
-	public <T extends Keyed<Long>> void set(T t) {
-		pickList = (PickList) t;
-	}
-
-	@Override
-	public void setId(Long id) {
-		get().setId(id);
-	}
-
-	@Override
-	public void setItem(Item item) {
-		this.item = item;
-	}
-
-	@Override
-	public void setReceivingDetail(ReceivingDetail detail) {
-		receivingDetail = (PickListDetail) detail;
 	}
 
 	@Override
@@ -204,7 +184,7 @@ public class DeliveryReturnServiceImpl //
 	}
 
 	@Override
-	public SavingService<PickList> getSavingService() {
-		return savingService;
+	public RestClientService<PickList> getRestClientService() {
+		return restClientService;
 	}
 }

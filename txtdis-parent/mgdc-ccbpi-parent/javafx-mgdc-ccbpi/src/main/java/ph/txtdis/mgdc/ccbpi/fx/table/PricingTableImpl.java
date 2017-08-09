@@ -18,7 +18,7 @@ import ph.txtdis.fx.table.Column;
 @Scope("prototype")
 @Component("pricingTable")
 public class PricingTableImpl
-		extends AbstractPricingTable {
+	extends AbstractPricingTable {
 
 	@Autowired
 	private AppendContextMenu<Price> menu;

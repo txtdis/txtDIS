@@ -3,7 +3,8 @@ package ph.txtdis.converter;
 import javafx.util.StringConverter;
 import ph.txtdis.util.PhoneUtils;
 
-public class PhoneConverter extends StringConverter<String> {
+public class PhoneConverter
+	extends StringConverter<String> {
 
 	@Override
 	public String toString(String phone) {

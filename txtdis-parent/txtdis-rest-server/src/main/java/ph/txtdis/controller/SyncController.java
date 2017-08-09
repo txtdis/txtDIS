@@ -1,17 +1,16 @@
 package ph.txtdis.controller;
 
-import static org.springframework.http.HttpStatus.OK;
-
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import ph.txtdis.exception.FailedReplicationException;
 import ph.txtdis.service.SyncService;
+
+import java.time.LocalDate;
+
+import static org.springframework.http.HttpStatus.OK;
 
 @RequestMapping("/syncs")
 @RestController("syncController")

@@ -16,14 +16,14 @@ public class TextUtils {
 		return o == null ? "" : o.toString();
 	}
 
-	public static String blankIfNull(String s) {
-		return s == null ? "" : s;
-	}
-
 	public static String blankIfNullElseAddCarriageReturn(String s) {
 		if (s != null && !s.trim().isEmpty())
 			return s.trim() + "\n";
 		return blankIfNull(s);
+	}
+
+	public static String blankIfNull(String s) {
+		return s == null ? "" : s;
 	}
 
 	public static String capitalize(String uncapped) {
@@ -67,7 +67,7 @@ public class TextUtils {
 	}
 
 	private static String[] to3PartIdNo(String prefix, String[] numIdAndSuffix) {
-		return new String[] { prefix, numIdAndSuffix[0], numIdAndSuffix[1] };
+		return new String[]{prefix, numIdAndSuffix[0], numIdAndSuffix[1]};
 	}
 
 	private static String[] splitNumIdAndSuffix(String orderNoLessPrefix) {

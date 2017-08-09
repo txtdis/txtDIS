@@ -41,7 +41,7 @@ import ph.txtdis.excel.ExcelBillWriter;
 @Scope("prototype")
 @Component("excelBillWriter")
 public class ExcelBillWriterImpl //
-		implements ExcelBillWriter {
+	implements ExcelBillWriter {
 
 	private static final String CALIBRI = "Calibri";
 
@@ -226,8 +226,8 @@ public class ExcelBillWriterImpl //
 		cell.setCellStyle(signatureStyle());
 
 		File f = createTempFile(capitalizeFully( //
-				service.getCustomer()).replace(" ", ".").replace(",", "") + //
-				toHypenatedYearMonthDay(service.getBillDate()) + ".version.", ".xls");
+			service.getCustomer()).replace(" ", ".").replace(",", "") + //
+			toHypenatedYearMonthDay(service.getBillDate()) + ".version.", ".xls");
 		FileOutputStream os = new FileOutputStream(f);
 		workbook.write(os);
 		os.close();

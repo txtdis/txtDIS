@@ -1,10 +1,5 @@
 package ph.txtdis;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.PropertySource;
-
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -24,20 +19,20 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.PropertySource;
 import ph.txtdis.fx.dialog.LoginDialog;
 import ph.txtdis.util.FontIcon;
 
 @SpringBootApplication
 @PropertySource("server.properties")
 @PropertySource("application.properties")
-public class App //
-		extends Application {
+public class App
+	extends Application {
 
 	private HBox splash;
-
-	private interface Init {
-		void complete();
-	}
 
 	public static void main(String[] args) {
 		launch();
@@ -48,14 +43,6 @@ public class App //
 		createSplash();
 	}
 
-	@Override
-	public void start(Stage stage) throws Exception {
-		Task<ApplicationContext> task = initApp();
-		setSplashToFadeOnInitCompletion(stage, task, () -> showLoginDialog(task.getValue()));
-		showSplash(stage);
-		new Thread(task).start();
-	}
-
 	private void createSplash() {
 		splash = new HBox(phoneInsideSpinningBallLogo(), textPane());
 		splash.setAlignment(Pos.CENTER);
@@ -63,31 +50,16 @@ public class App //
 		splash.setStyle("-fx-base: slateblue; -fx-background-radius: 0.5em; ");
 	}
 
-	private void fadeSplash(Stage stage) {
-		FadeTransition ft = new FadeTransition(Duration.seconds(1.2), splash);
-		ft.setFromValue(1.0);
-		ft.setToValue(0.0);
-		ft.setOnFinished(e -> stage.hide());
-		ft.play();
-	}
-
-	private Task<ApplicationContext> initApp() {
-		return new Task<ApplicationContext>() {
-			@Override
-			protected ApplicationContext call() throws InterruptedException {
-				return SpringApplication.run(App.class);
-			}
-		};
-	}
-
-	private Node message() {
-		Label l = new Label("Please wait...");
-		l.setStyle("-fx-font: 12pt 'ubuntu'; ");
-		return l;
-	}
-
 	private Node phoneInsideSpinningBallLogo() {
 		return new StackPane(phoneLogo(), spinningBalls());
+	}
+
+	private Parent textPane() {
+		VBox hb = new VBox(trademark(), message());
+		hb.setAlignment(Pos.CENTER);
+		hb.setPadding(new Insets(0, 0, 0, 50));
+		hb.setStyle("-fx-background: transparent;");
+		return hb;
 	}
 
 	private Node phoneLogo() {
@@ -97,10 +69,43 @@ public class App //
 		return p;
 	}
 
-	private Scene scene() {
-		Scene s = new Scene(splash);
-		s.setFill(Color.TRANSPARENT);
-		return s;
+	private Node spinningBalls() {
+		ProgressIndicator pi = new ProgressIndicator();
+		pi.setScaleX(1.5);
+		pi.setScaleY(1.5);
+		pi.setStyle(" -fx-accent: white;");
+		return pi;
+	}
+
+	private Node trademark() {
+		Font.loadFont(this.getClass().getResourceAsStream("/font/Ubuntu-BI.ttf"), 24);
+		Label tm = new Label("txtDIS");
+		tm.setStyle("-fx-font: 48pt 'ubuntu'; -fx-text-fill: midnightblue;");
+		tm.setAlignment(Pos.TOP_CENTER);
+		return tm;
+	}
+
+	private Node message() {
+		Label l = new Label("Please wait...");
+		l.setStyle("-fx-font: 12pt 'ubuntu'; ");
+		return l;
+	}
+
+	@Override
+	public void start(Stage stage) throws Exception {
+		Task<ApplicationContext> task = initApp();
+		setSplashToFadeOnInitCompletion(stage, task, () -> showLoginDialog(task.getValue()));
+		showSplash(stage);
+		new Thread(task).start();
+	}
+
+	private Task<ApplicationContext> initApp() {
+		return new Task<ApplicationContext>() {
+			@Override
+			protected ApplicationContext call() throws InterruptedException {
+				return SpringApplication.run(App.class);
+			}
+		};
 	}
 
 	private void setSplashToFadeOnInitCompletion(Stage stage, Task<?> task, Init init) {
@@ -125,27 +130,21 @@ public class App //
 		stage.show();
 	}
 
-	private Node spinningBalls() {
-		ProgressIndicator pi = new ProgressIndicator();
-		pi.setScaleX(1.5);
-		pi.setScaleY(1.5);
-		pi.setStyle(" -fx-accent: white;");
-		return pi;
+	private void fadeSplash(Stage stage) {
+		FadeTransition ft = new FadeTransition(Duration.seconds(1.2), splash);
+		ft.setFromValue(1.0);
+		ft.setToValue(0.0);
+		ft.setOnFinished(e -> stage.hide());
+		ft.play();
 	}
 
-	private Parent textPane() {
-		VBox hb = new VBox(trademark(), message());
-		hb.setAlignment(Pos.CENTER);
-		hb.setPadding(new Insets(0, 0, 0, 50));
-		hb.setStyle("-fx-background: transparent;");
-		return hb;
+	private Scene scene() {
+		Scene s = new Scene(splash);
+		s.setFill(Color.TRANSPARENT);
+		return s;
 	}
 
-	private Node trademark() {
-		Font.loadFont(this.getClass().getResourceAsStream("/font/Ubuntu-BI.ttf"), 24);
-		Label tm = new Label("txtDIS");
-		tm.setStyle("-fx-font: 48pt 'ubuntu'; -fx-text-fill: midnightblue;");
-		tm.setAlignment(Pos.TOP_CENTER);
-		return tm;
+	private interface Init {
+		void complete();
 	}
 }

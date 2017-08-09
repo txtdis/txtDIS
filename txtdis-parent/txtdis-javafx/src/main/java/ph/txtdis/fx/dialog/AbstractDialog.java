@@ -16,38 +16,57 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import ph.txtdis.app.StartableApp;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.app.App;
+import ph.txtdis.fx.control.ButtonFactory;
+import ph.txtdis.fx.control.LabelFactory;
+import ph.txtdis.fx.pane.PaneFactory;
 
-public abstract class AbstractDialog //
-		extends Stage //
-		implements StartableApp {
+public abstract class AbstractDialog 
+	extends Stage 
+	implements App {
+
+	@Autowired
+	protected PaneFactory pane;
+
+	@Autowired
+	protected ButtonFactory button;
+
+	@Autowired
+	protected LabelFactory label;
 
 	private String style;
 
 	public AbstractDialog() {
-		style = "-fx-border-color: derive(-fx-base, -20%); " //
-				+ "-fx-border-radius: 0.5em; -fx-background-radius: 0.5em; ";
+		style = "-fx-border-color: derive(-fx-base, -20%); " 
+			+ "-fx-border-radius: 0.5em; -fx-background-radius: 0.5em; ";
 	}
 
-	public StartableApp addParent(Node node) {
+	public App addParent(Pane pane) {
+		Parent parent = pane.getParent();
+		return addParent(parent);
+	}
+
+	public App addParent(Node node) {
 		Scene scene = node.getScene();
 		Stage stage = (Stage) scene.getWindow();
 		return addParent(stage);
 	}
 
-	public StartableApp addParent(Pane pane) {
-		Parent parent = pane.getParent();
-		return addParent(parent);
-	}
-
 	@Override
-	public StartableApp addParent(Stage stage) {
+	public App addParent(Stage stage) {
 		if (stage != null && stage.getOwner() == null && getOwner() == null)
 			initialize(stage);
 		return this;
 	}
 
-	public StartableApp addParent(Tab tab) {
+	private void initialize(Stage stage) {
+		initOwner(stage);
+		initModality(WINDOW_MODAL);
+		initStyle(StageStyle.TRANSPARENT);
+	}
+
+	public App addParent(Tab tab) {
 		TabPane pane = tab.getTabPane();
 		return addParent(pane);
 	}
@@ -62,17 +81,6 @@ public abstract class AbstractDialog //
 	public void initialize() {
 		setScene(scene());
 		refresh();
-	}
-
-	public StartableApp updateStyle(String style) {
-		this.style += style;
-		return this;
-	}
-
-	private void initialize(Stage stage) {
-		initOwner(stage);
-		initModality(WINDOW_MODAL);
-		initStyle(StageStyle.TRANSPARENT);
 	}
 
 	private Scene scene() {
@@ -92,4 +100,9 @@ public abstract class AbstractDialog //
 	}
 
 	protected abstract List<Node> nodes();
+
+	App updateStyle(String style) {
+		this.style += style;
+		return this;
+	}
 }

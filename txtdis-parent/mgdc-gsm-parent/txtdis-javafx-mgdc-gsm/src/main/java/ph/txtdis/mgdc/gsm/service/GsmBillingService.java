@@ -1,11 +1,14 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.math.BigDecimal;
-
 import ph.txtdis.dto.Billable;
 
+import java.math.BigDecimal;
+
 public interface GsmBillingService //
-		extends AdjustableBillingService, BillingService, EditableBillingNoService, VerifiedLoadOrderService {
+	extends AdjustableBillingService,
+	BillingService,
+	EditableBillingNoService,
+	VerifiedLoadOrderService {
 
 	boolean findUncorrectedInvalidBilling();
 

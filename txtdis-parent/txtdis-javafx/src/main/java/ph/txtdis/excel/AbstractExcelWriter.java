@@ -1,22 +1,15 @@
 package ph.txtdis.excel;
 
-import static java.awt.Desktop.getDesktop;
-import static java.io.File.createTempFile;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.capitalize;
-import static org.apache.commons.lang3.StringUtils.endsWith;
-import static org.apache.poi.ss.usermodel.Sheet.BottomMargin;
-import static org.apache.poi.ss.usermodel.Sheet.FooterMargin;
-import static org.apache.poi.ss.usermodel.Sheet.HeaderMargin;
-import static org.apache.poi.ss.usermodel.Sheet.LeftMargin;
-import static org.apache.poi.ss.usermodel.Sheet.RightMargin;
-import static org.apache.poi.ss.usermodel.Sheet.TopMargin;
-import static ph.txtdis.util.DateTimeUtils.toUtilDate;
-import static ph.txtdis.util.ReflectionUtils.invokeMethod;
-import static ph.txtdis.util.TextUtils.HAS_OVERDUES;
-import static ph.txtdis.util.TextUtils.blankIfNull;
-import static ph.txtdis.util.TextUtils.toBoolSign;
+import org.apache.commons.lang3.math.Fraction;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.fx.table.AppTableColumn;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,33 +19,26 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.math.Fraction;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.util.CellRangeAddress;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.fx.table.AppTableColumn;
+import static java.awt.Desktop.getDesktop;
+import static java.io.File.createTempFile;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.capitalize;
+import static org.apache.commons.lang3.StringUtils.endsWith;
+import static org.apache.poi.ss.usermodel.Sheet.*;
+import static ph.txtdis.util.DateTimeUtils.toUtilDate;
+import static ph.txtdis.util.ReflectionUtils.invokeMethod;
+import static ph.txtdis.util.TextUtils.*;
 
 public abstract class AbstractExcelWriter //
-		implements ExcelWriter {
+	implements ExcelWriter {
 
 	@Autowired
 	protected ExcelStyle style;
 
 	protected AppTableColumn column;
 
-	private List<List<AppTable<?>>> tables;
-
 	protected List<String> getters;
-
-	private String filename;
-
-	private String[] sheetnames;
 
 	protected int colIdx;
 
@@ -61,6 +47,12 @@ public abstract class AbstractExcelWriter //
 	protected HSSFWorkbook workbook;
 
 	protected Sheet sheet;
+
+	private List<List<AppTable<?>>> tables;
+
+	private String filename;
+
+	private String[] sheetnames;
 
 	@Override
 	public ExcelWriter filename(String filename) {
@@ -161,8 +153,8 @@ public abstract class AbstractExcelWriter //
 
 	private List<?> filterVisibleColumns() {
 		return table.getColumns().stream()//
-				.filter(c -> ((AppTableColumn) c).isVisible())//
-				.collect(toList());
+			.filter(c -> ((AppTableColumn) c).isVisible())//
+			.collect(toList());
 	}
 
 	private int getWidth() {
@@ -232,7 +224,8 @@ public abstract class AbstractExcelWriter //
 			setFraction(cell, (Fraction) o);
 		else if (endsWith(getter, "Level"))
 			setRight(cell, (String) o);
-		else if (endsWith(getter, "Valid") || endsWith(getter, "Paid") || endsWith(getter, "Inactive") || endsWith(getter, "ed"))
+		else if (endsWith(getter, "Valid") || endsWith(getter, "Paid") || endsWith(getter, "Inactive") ||
+			endsWith(getter, "ed"))
 			setBoolean(cell, (Boolean) o);
 		else if (endsWith(getter, "Name"))
 			setName(cell, (String) o);
@@ -244,7 +237,8 @@ public abstract class AbstractExcelWriter //
 		if (l != null) {
 			c.setCellStyle(style.id());
 			c.setCellValue(l);
-		} else
+		}
+		else
 			setNullCell(c);
 	}
 
@@ -257,7 +251,8 @@ public abstract class AbstractExcelWriter //
 		if (i != null) {
 			c.setCellStyle(style.integer());
 			c.setCellValue(i);
-		} else
+		}
+		else
 			setNullCell(c);
 	}
 
@@ -316,7 +311,8 @@ public abstract class AbstractExcelWriter //
 		if (t != null) {
 			c.setCellStyle(t.endsWith(HAS_OVERDUES) ? style.strikeout() : style.left());
 			c.setCellValue(t.replace(HAS_OVERDUES, ""));
-		} else
+		}
+		else
 			setNullCell(c);
 	}
 
@@ -324,7 +320,8 @@ public abstract class AbstractExcelWriter //
 		if (t != null) {
 			c.setCellStyle(t.contains(">") ? style.red() : style.left());
 			c.setCellValue(t);
-		} else
+		}
+		else
 			setNullCell(c);
 	}
 

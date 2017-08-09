@@ -9,6 +9,6 @@ import ph.txtdis.mgdc.ccbpi.service.OrderReturnService;
 @Scope("prototype")
 @Component("orderReturnDialog")
 public class OrderReturnDialogImpl //
-		extends AbstractUpToReturnableQtyCasesAndBottlesReceivingDialog<OrderReturnService, BillableDetail> //
-		implements OrderReturnDialog {
+	extends AbstractUpToReturnableQtyCasesAndBottlesReceivingDialog<OrderReturnService, BillableDetail> //
+	implements OrderReturnDialog {
 }

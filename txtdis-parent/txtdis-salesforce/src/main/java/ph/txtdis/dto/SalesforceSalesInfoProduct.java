@@ -6,7 +6,10 @@ import lombok.Data;
 public class SalesforceSalesInfoProduct {
 
 	private String sku, //
-			uom, //
-			quantity, //
-			percentDiscount;
+
+		uom, //
+
+		quantity, //
+
+		percentDiscount;
 }

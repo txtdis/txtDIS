@@ -15,8 +15,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "master_itemlist")
 @EqualsAndHashCode(callSuper = true)
 public class EdmsItem //
-		extends EdmsAbstractMaster //
-		implements Serializable {
+	extends EdmsAbstractMaster //
+	implements Serializable {
 
 	private static final long serialVersionUID = -3563721761323835200L;
 

@@ -13,8 +13,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "ref_helper")
 @EqualsAndHashCode(callSuper = true)
 public class EdmsHelper //
-		extends EdmsAbstractContactInfoMaster //
-		implements Serializable {
+	extends EdmsAbstractContactInfoMaster //
+	implements Serializable {
 
 	private static final long serialVersionUID = 4552669971695960534L;
 }

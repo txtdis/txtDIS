@@ -9,6 +9,6 @@ import ph.txtdis.mgdc.ccbpi.service.LoadManifestService;
 @Scope("prototype")
 @Component("loadManifestDialog")
 public class LoadManifestDialogImpl //
-		extends AbstractAllItemInCasesAndBottlesInputDialog<LoadManifestService, BillableDetail> //
-		implements LoadManifestDialog {
+	extends AbstractAllItemInCasesAndBottlesInputDialog<LoadManifestService, BillableDetail> //
+	implements LoadManifestDialog {
 }

@@ -15,9 +15,9 @@ import ph.txtdis.mgdc.domain.AbstractQtyPerUomEntity;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "qty_per_uom", //
-		uniqueConstraints = @UniqueConstraint(columnNames = { "item_id", "uom" }))
+	uniqueConstraints = @UniqueConstraint(columnNames = {"item_id", "uom"}))
 public class QtyPerUomEntity //
-		extends AbstractQtyPerUomEntity {
+	extends AbstractQtyPerUomEntity {
 
 	private static final long serialVersionUID = 3802256527344044201L;
 
@@ -27,9 +27,9 @@ public class QtyPerUomEntity //
 	@Override
 	public String toString() {
 		return "QtyPerUom - " + getQty().setScale(4).toPlainString() + getUom() + " is " //
-				+ (getPurchased() ? "purchased" : "") //
-				+ (getSold() ? ", sold" : "") //
-				+ (getReported() ? ", reported" : "") //
-				+ "\n";
+			+ (getPurchased() ? "purchased" : "") //
+			+ (getSold() ? ", sold" : "") //
+			+ (getReported() ? ", reported" : "") //
+			+ "\n";
 	}
 }

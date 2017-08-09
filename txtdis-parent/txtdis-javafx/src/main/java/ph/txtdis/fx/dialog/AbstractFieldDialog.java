@@ -1,31 +1,27 @@
 package ph.txtdis.fx.dialog;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import ph.txtdis.fx.control.AppButtonImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.pane.AppGridPane;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
 public abstract class AbstractFieldDialog<T> //
-		extends AbstractInputDialog //
-		implements InputtedDialog<T> {
+	extends AbstractInputDialog //
+	implements InputtedDialog<T> {
 
 	@Autowired
 	protected AppGridPane grid;
 
-	@Autowired
-	protected AppButtonImpl addButton;
-
 	protected T entity;
 
-	protected List<InputNode<?>> inputNodes;
+	private List<InputNode<?>> inputNodes;
 
 	public AbstractFieldDialog() {
 		super();
@@ -33,12 +29,12 @@ public abstract class AbstractFieldDialog<T> //
 	}
 
 	@Override
-	protected Button[] buttons() {
-		return new Button[] { addButton(), closeButton() };
+	protected List<AppButton> buttons() {
+		return asList(addButton(), closeButton());
 	}
 
-	protected Button addButton() {
-		addButton.large("Add").build();
+	protected AppButton addButton() {
+		AppButton addButton = button.large("Add").build();
 		addButton.onAction(event -> addItem());
 		addButton.disableIf(getAddButtonDisableBindings());
 		return addButton;
@@ -50,8 +46,6 @@ public abstract class AbstractFieldDialog<T> //
 		close();
 	}
 
-	protected abstract T createEntity();
-
 	protected BooleanBinding getAddButtonDisableBindings() {
 		BooleanBinding binding = inputNodes.get(0).isEmpty();
 		for (int i = 1; i < inputNodes.size(); i++)
@@ -59,9 +53,17 @@ public abstract class AbstractFieldDialog<T> //
 		return binding;
 	}
 
+	protected abstract T createEntity();
+
+	@Override
+	public void refresh() {
+		inputNodes.forEach(InputNode::reset);
+		super.refresh();
+	}
+
 	@Override
 	public List<T> getAddedItems() {
-		return entity == null ? null : asList(entity);
+		return entity == null ? null : singletonList(entity);
 	}
 
 	@Override
@@ -105,15 +107,9 @@ public abstract class AbstractFieldDialog<T> //
 		entity = null;
 	}
 
-	@Override
-	public void refresh() {
-		inputNodes.forEach(inputNode -> inputNode.reset());
-		super.refresh();
-	}
-
 	protected void resetNodesOnError(Throwable e) {
 		e.printStackTrace();
-		dialog.show((Exception) e).addParent(this).start();
+		messageDialog().show((Exception) e).addParent(this).start();
 		refresh();
 	}
 

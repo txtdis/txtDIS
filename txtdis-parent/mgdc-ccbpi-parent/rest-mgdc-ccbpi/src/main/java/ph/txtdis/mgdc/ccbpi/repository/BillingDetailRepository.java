@@ -12,29 +12,51 @@ import ph.txtdis.mgdc.ccbpi.domain.BillableDetailEntity;
 
 @Repository("billingDetailRepository")
 public interface BillingDetailRepository //
-		extends CrudRepository<BillableDetailEntity, Long> {
+	extends CrudRepository<BillableDetailEntity, Long> {
 
 	List<BillableDetailEntity> findByBillingOrderDateGreaterThanEqualOrderByItemAsc( //
-			@Param("date") LocalDate d);
+	                                                                                 @Param("date") LocalDate d);
 
-	List<BillableDetailEntity> findByItemVendorIdAndBillingCustomerNullAndBillingSuffixNotNullAndBillingSuffixContainingAndBillingOrderDateBetween(
-			@Param("itemVendorNo") String id, //
-			@Param("route") String r, //`
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e);
+	List<BillableDetailEntity>
+	findByItemVendorIdAndBillingCustomerNullAndBillingSuffixNotNullAndBillingSuffixContainingAndBillingOrderDateBetween(
+		@Param("itemVendorNo") String id, //
+		@Param("route") String r, //`
+		@Param("start") LocalDate s, //
+		@Param("end") LocalDate e);
 
 	List<BillableDetailEntity> findByItemVendorIdAndBillingPrefixAndBillingSuffixContainingAndBillingDueDateBetween( //
-			@Param("itemVendorNo") String id, //
-			@Param("regularType") String t, //
-			@Param("route") String r, //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e);
+	                                                                                                                 @Param(
+		                                                                                                                 "itemVendorNo")
+		                                                                                                                 String id,
 
-	List<BillableDetailEntity> findByItemVendorIdAndReturnedQtyGreaterThanAndBillingPrefixNotNullAndBillingPrefixNotInAndBillingSuffixNotNullAndBillingSuffixContainingAndBillingDueDateBetween( //
-			@Param("itemVendorNo") String id, //
-			@Param("qtyNotZero") BigDecimal z, //
-			@Param("notOcsTypes") List<String> l, //
-			@Param("route") String r, //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e);
+	                                                                                                                 //
+	                                                                                                                 @Param(
+		                                                                                                                 "regularType")
+		                                                                                                                 String t,
+	                                                                                                                 //
+	                                                                                                                 @Param(
+		                                                                                                                 "route")
+		                                                                                                                 String r,
+	                                                                                                                 //
+	                                                                                                                 @Param(
+		                                                                                                                 "start")
+		                                                                                                                 LocalDate s,
+	                                                                                                                 //
+	                                                                                                                 @Param(
+		                                                                                                                 "end")
+		                                                                                                                 LocalDate e);
+
+	List<BillableDetailEntity> findByItemVendorIdAndReturnedQtyGreaterThanAndBillingPrefixNotNullAndBillingPrefixNotInAndBillingSuffixNotNullAndBillingSuffixContainingAndBillingDueDateBetween(
+		//
+		@Param("itemVendorNo") String id,
+		//
+		@Param("qtyNotZero") BigDecimal z,
+		//
+		@Param("notOcsTypes") List<String> l,
+		//
+		@Param("route") String r,
+		//
+		@Param("start") LocalDate s,
+		//
+		@Param("end") LocalDate e);
 }

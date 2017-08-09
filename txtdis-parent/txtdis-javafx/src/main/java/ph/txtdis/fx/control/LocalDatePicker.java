@@ -23,8 +23,9 @@ import ph.txtdis.fx.validator.DateInputValidator;
 @Scope("prototype")
 @SuppressWarnings("restriction")
 public class LocalDatePicker //
-		extends DatePicker //
-		implements FocusRequested, InputControl<LocalDate> {
+	extends DatePicker //
+	implements FocusRequested,
+	InputControl<LocalDate> {
 
 	public LocalDatePicker() {
 		setStyle(" -fx-opacity: 1.0;");

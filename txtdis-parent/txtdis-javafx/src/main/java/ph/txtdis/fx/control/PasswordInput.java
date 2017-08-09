@@ -17,7 +17,8 @@ import javafx.scene.input.KeyEvent;
 @Scope("prototype")
 @Component
 @SuppressWarnings("restriction")
-public class PasswordInput extends PasswordField {
+public class PasswordInput
+	extends PasswordField {
 
 	public PasswordInput() {
 		addEventFilter(KeyEvent.KEY_PRESSED, event -> {

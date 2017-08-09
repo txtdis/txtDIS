@@ -1,12 +1,21 @@
 package ph.txtdis.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.PaymentType.CASH;
-import static ph.txtdis.type.PaymentType.CHECK;
-import static ph.txtdis.type.PaymentType.values;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.OTHERS;
-import static ph.txtdis.type.Type.TIMESTAMP;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.Node;
+import javafx.scene.layout.HBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
+import ph.txtdis.dto.Remittance;
+import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.control.AppCombo;
+import ph.txtdis.fx.control.AppFieldImpl;
+import ph.txtdis.fx.dialog.CheckSearchDialog;
+import ph.txtdis.fx.dialog.DepositDialog;
+import ph.txtdis.fx.pane.AppGridPane;
+import ph.txtdis.service.RemittanceService;
+import ph.txtdis.type.PaymentType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,41 +23,16 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.PaymentType.CASH;
+import static ph.txtdis.type.PaymentType.CHECK;
+import static ph.txtdis.type.Type.*;
 
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.Node;
-import javafx.scene.layout.HBox;
-import ph.txtdis.dto.Remittance;
-import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.control.AppButtonImpl;
-import ph.txtdis.fx.control.AppCombo;
-import ph.txtdis.fx.control.AppFieldImpl;
-import ph.txtdis.fx.dialog.CheckSearchDialogImpl;
-import ph.txtdis.fx.dialog.DepositDialog;
-import ph.txtdis.fx.pane.AppGridPane;
-import ph.txtdis.service.RemittanceService;
-import ph.txtdis.type.PaymentType;
+public abstract class AbstractRemittanceApp<AS extends RemittanceService>
+	extends AbstractRemarkedKeyedApp<AS, Remittance, Long, Long>
+	implements RemittanceApp {
 
-public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
-		extends AbstractRemarkedKeyedApp<AS, Remittance, Long, Long> //
-		implements RemittanceApp {
-
-	protected static final String CANCELLED = "CANCELLED";
-
-	@Autowired
-	private AppButton checkSearchButton, depositButton;
-
-	@Autowired
-	private CheckListApp checkListApp;
-
-	@Autowired
-	private CheckSearchDialogImpl checkSearchDialog;
-
-	@Autowired
-	private DepositDialog depositDialog;
+	static final String CANCELLED = "CANCELLED";
 
 	@Autowired
 	protected AppCombo<String> draweeBankCombo, receivedFromCombo;
@@ -68,16 +52,16 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 	@Autowired
 	protected AppFieldImpl<ZonedDateTime> depositedOnDisplay, depositEncodedOnDisplay;
 
-	private BooleanProperty canDepositCash, canDepositCheck;
-
 	protected BooleanProperty canPostPaymentData;
 
+	private AppButton checkSearchButton, depositButton;
+
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = super.addButtons();
 		b.add(decisionButton = decisionNeededApp.addDecisionButton());
-		b.add(depositButton.icon("deposit").tooltip("Enter deposit\ndata").build());
-		b.add(checkSearchButton.icon("checkSearch").tooltip("Find a check").build());
+		b.add(depositButton = button.icon("deposit").tooltip("Enter deposit\ndata").build());
+		b.add(checkSearchButton = button.icon("checkSearch").tooltip("Find a check").build());
 		return b;
 	}
 
@@ -89,10 +73,10 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 	}
 
 	private Node depositGridNode() {
-		return box.forGridGroup(//
-				depositedToDisplay.readOnly().width(240).build(OTHERS), //
-				label.field("on"), //
-				depositedOnDisplay.readOnly().build(TIMESTAMP));
+		return pane.forGridGroup(
+			depositedToDisplay.readOnly().width(240).build(OTHERS),
+			label.field("on"),
+			depositedOnDisplay.readOnly().build(TIMESTAMP));
 	}
 
 	@Override
@@ -115,7 +99,7 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 		gridPane.add(receivedFromCombo.width(180).items(service.getReceivedFromList()), 5, 0);
 
 		labelGridNode("Type", 0, 1);
-		gridPane.add(paymentCombo.width(140).items(values()), 1, 1);
+		gridPane.add(paymentCombo.width(140).items(PaymentType.values()), 1, 1);
 		labelGridNode("Check No.", 2, 1);
 		gridPane.add(checkIdInput.width(120).build(ID), 3, 1);
 		labelGridNode("Drawn from", 4, 1);
@@ -124,7 +108,7 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 	}
 
 	private HBox depositPane() {
-		return box.forHorizontalPane(depositNodes());//
+		return pane.centeredHorizontal(depositNodes());
 	}
 
 	protected List<Node> depositNodes() {
@@ -145,7 +129,7 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 		decisionNeededApp.refresh(service);
 	}
 
-	protected void refreshPayment() {
+	private void refreshPayment() {
 		amountInput.setValue(service.getValue());
 	}
 
@@ -162,46 +146,46 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 
 	@Override
 	protected void setBindings() {
-		canDepositCash = new SimpleBooleanProperty(service.canDepositCash());
-		canDepositCheck = new SimpleBooleanProperty(service.canDepositCheck());
+		BooleanProperty canDepositCash = new SimpleBooleanProperty(service.canDepositCash());
+		BooleanProperty canDepositCheck = new SimpleBooleanProperty(service.canDepositCheck());
 		canPostPaymentData = new SimpleBooleanProperty(service.canPostPaymentData());
 		saveButton.disableIf(saveButtonDisableBindings());
-		depositButton.disableIf(isNew()//
-				.or(audited())//
-				.or(deposited())//
-				.or(paymentCombo.is(CASH).and(canDepositCash.not()))//
-				.or(paymentCombo.is(CHECK).and(canDepositCheck.not())));
+		depositButton.disableIf(isNew()
+			.or(audited())
+			.or(deposited())
+			.or(paymentCombo.is(CASH).and(canDepositCash.not()))
+			.or(paymentCombo.is(CHECK).and(canDepositCheck.not())));
 		decisionButton.disableIf(isNew());
-		amountInput.disableIf(noDate() //
-				.or(paymentCombo.isEmpty().not()));
+		amountInput.disableIf(noDate()
+			.or(paymentCombo.isEmpty().not()));
 		receivedFromComboBindings();
 		paymentCombo.disableIf(receivedFromCombo.disabledProperty());
 		checkIdInput.disableIf(cash());
-		draweeBankCombo.disableIf(cash()//
-				.or(checkIdInput.isEmpty()));
+		draweeBankCombo.disableIf(cash()
+			.or(checkIdInput.isEmpty()));
 		remarksDisplay.editableIf(isPosted().not());
 	}
 
 	protected BooleanBinding saveButtonDisableBindings() {
-		return isPosted()//
-				.or(remarksDisplay.doesNotContain(CANCELLED))//
-				.or(canPostPaymentData.not());
+		return isPosted()
+			.or(remarksDisplay.doesNotContain(CANCELLED))
+			.or(canPostPaymentData.not());
 	}
 
-	protected void receivedFromComboBindings() {
-		receivedFromCombo.disableIf(amountInput.isEmpty());
-	}
-
-	protected BooleanBinding audited() {
+	private BooleanBinding audited() {
 		return decisionNeededApp.isAudited();
 	}
 
-	protected BooleanBinding deposited() {
+	private BooleanBinding deposited() {
 		return depositedOnDisplay.isNotEmpty();
 	}
 
 	private BooleanBinding noDate() {
 		return orderDatePicker.isEmpty();
+	}
+
+	protected void receivedFromComboBindings() {
+		receivedFromCombo.disableIf(amountInput.isEmpty());
 	}
 
 	protected BooleanBinding cash() {
@@ -229,9 +213,10 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 	}
 
 	private void showCheckSearchDialog() {
-		checkSearchDialog.addParent(this).start();
-		String bank = checkSearchDialog.getBank();
-		Long checkId = checkSearchDialog.getCheckId();
+		CheckSearchDialog dialog = checkSearchDialog();
+		dialog.addParent(this).start();
+		String bank = dialog.getBank();
+		Long checkId = dialog.getCheckId();
 		if (bank != null) {
 			if (checkId == 0)
 				checkId = showCheckList(bank);
@@ -239,9 +224,22 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 		}
 	}
 
+	@Lookup
+	CheckSearchDialog checkSearchDialog() {
+		return null;
+	}
+
 	private Long showCheckList(String bank) {
-		checkListApp.bank(bank).addParent(this).start();
-		return checkListApp.getSelectedKey();
+		CheckListApp app = checkListApp();
+		if (app == null)
+			return null;
+		app.bank(bank).addParent(this).start();
+		return app.getSelectedKey();
+	}
+
+	@Lookup
+	private CheckListApp checkListApp() {
+		return null;
 	}
 
 	private void open(String bank, Long checkId) {
@@ -284,12 +282,18 @@ public abstract class AbstractRemittanceApp<AS extends RemittanceService> //
 	}
 
 	private void inputDepositData() {
-		depositDialog.addParent(this).start();
-		if (depositDialog.getTimestamp() != null)
-			setDepositData();
+		DepositDialog dialog = depositDialog();
+		dialog.addParent(this).start();
+		if (dialog.getTimestamp() != null)
+			setDepositData(dialog);
 	}
 
-	private void setDepositData() {
+	@Lookup
+	DepositDialog depositDialog() {
+		return null;
+	}
+
+	private void setDepositData(DepositDialog depositDialog) {
 		service.setDepositData(depositDialog.getBank(), depositDialog.getTimestamp());
 		save();
 	}

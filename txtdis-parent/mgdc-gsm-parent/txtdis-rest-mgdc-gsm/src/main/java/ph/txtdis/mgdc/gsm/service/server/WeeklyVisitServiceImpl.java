@@ -1,18 +1,17 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.WeeklyVisit;
 import ph.txtdis.mgdc.gsm.domain.WeeklyVisitEntity;
 import ph.txtdis.mgdc.gsm.repository.WeeklyVisitRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service("weeklyVisitService")
 public class WeeklyVisitServiceImpl
-		implements WeeklyVisitService {
+	implements WeeklyVisitService {
 
 	@Autowired
 	private WeeklyVisitRepository repository;

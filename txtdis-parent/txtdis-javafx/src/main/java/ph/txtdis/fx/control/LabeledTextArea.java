@@ -9,9 +9,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 
-public class LabeledTextArea implements InputNode<String> {
+public class LabeledTextArea
+	implements InputNode<String> {
 
 	private final List<Node> nodes;
+
 	private final TextArea textArea;
 
 	public LabeledTextArea(String name) {

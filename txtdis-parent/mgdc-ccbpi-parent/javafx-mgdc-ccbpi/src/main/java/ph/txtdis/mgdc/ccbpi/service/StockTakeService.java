@@ -8,14 +8,18 @@ import ph.txtdis.dto.StockTakeDetail;
 import ph.txtdis.service.ItemInputtedService;
 import ph.txtdis.service.QtyPerUomService;
 import ph.txtdis.service.QuantityValidated;
-import ph.txtdis.service.RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
+import ph.txtdis.service
+	.RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
 import ph.txtdis.service.ResettableService;
 import ph.txtdis.type.QualityType;
 
 public interface StockTakeService //
-		extends ItemBasedService<StockTakeDetail>, ResettableService,
-		RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long>,
-		ItemInputtedService<StockTakeDetail>, QtyPerUomService, QuantityValidated {
+	extends ItemBasedService<StockTakeDetail>,
+	ResettableService,
+	RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long>,
+	ItemInputtedService<StockTakeDetail>,
+	QtyPerUomService,
+	QuantityValidated {
 
 	StockTake getByBooking(Long id) throws Exception;
 
@@ -56,5 +60,6 @@ public interface StockTakeService //
 
 	void setTaker(String takerName);
 
-	void setWarehouseIfAllCountDateTransactionsAreCompleteAndNoStockTakeAlreadyMadeOnCountDate(String warehouse) throws Exception;
+	void setWarehouseIfAllCountDateTransactionsAreCompleteAndNoStockTakeAlreadyMadeOnCountDate(String warehouse)
+		throws Exception;
 }

@@ -1,15 +1,14 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.exception.AlreadyBilledBookingException;
 
+import static ph.txtdis.type.PartnerType.EX_TRUCK;
+
 @Service("receivingReportService")
 public class ReceivingReportServiceImpl //
-		extends AbstractReceivingReportService {
+	extends AbstractReceivingReportService {
 
 	@Override
 	protected String getReferencePrompt(Billable b) {

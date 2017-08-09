@@ -4,8 +4,10 @@ import static java.math.BigDecimal.ZERO;
 import static java.time.ZonedDateTime.now;
 import static java.util.Arrays.asList;
 import static org.apache.commons.lang3.StringUtils.capitalize;
+import static ph.txtdis.util.DateTimeUtils.*;
 import static ph.txtdis.util.DateTimeUtils.toTimestampFilename;
 import static ph.txtdis.util.DateTimeUtils.toTimestampText;
+import static ph.txtdis.util.UserUtils.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,19 +23,14 @@ import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.util.ClientTypeMap;
 
 @Service("inventoryService")
-public class InventoryServiceImpl implements InventoryService {
-
-	@Autowired
-	private CredentialService credentialService;
+public class InventoryServiceImpl
+	implements InventoryService {
 
 	@Autowired
 	private ExcelReportWriter excel;
 
 	@Autowired
-	private ReadOnlyService<Inventory> readOnlyService;
-
-	@Autowired
-	private SyncService syncService;
+	private RestClientService<Inventory> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -41,18 +38,23 @@ public class InventoryServiceImpl implements InventoryService {
 	@Value("${prefix.module}")
 	private String modulePrefix;
 
+	private LocalDate date;
+
 	@Override
 	public ClientTypeMap getTypeMap() {
 		return typeMap;
 	}
 
-	private LocalDate date;
-
 	@Override
 	public LocalDate getDate() {
 		if (date == null)
-			date = syncService.getServerDate();
+			date = getServerDate();
 		return date;
+	}
+
+	@Override
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 
 	@Override
@@ -62,7 +64,7 @@ public class InventoryServiceImpl implements InventoryService {
 
 	@Override
 	public Inventory getInventory(Long itemId) throws Exception {
-		return readOnlyService.module(getModuleName()).getOne("/item?id=" + itemId);
+		return restClientService.module(getModuleName()).getOne("/item?id=" + itemId);
 	}
 
 	@Override
@@ -71,8 +73,8 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public ReadOnlyService<Inventory> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<Inventory> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -81,13 +83,17 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + capitalize(getModuleName());
-	}
-
-	@Override
 	public List<BigDecimal> getTotals(List<Inventory> l) {
 		return asList(getTotalValue(l), getTotalObsolesenceValue(l));
+	}
+
+	private BigDecimal getTotalValue(List<Inventory> l) {
+		return l.stream().filter(v -> v.getValue() != null).map(v -> v.getValue()).reduce(ZERO, BigDecimal::add);
+	}
+
+	private BigDecimal getTotalObsolesenceValue(List<Inventory> l) {
+		return l.stream().filter(v -> v.getObsolesenceValue() != null).map(v -> v.getObsolesenceValue())
+			.reduce(ZERO, BigDecimal::add);
 	}
 
 	@Override
@@ -101,20 +107,12 @@ public class InventoryServiceImpl implements InventoryService {
 		excel.table(tables).filename(excelName()).sheetname(toTimestampFilename(now())).write();
 	}
 
-	@Override
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-
 	private String excelName() {
 		return getTitleName() + "." + toTimestampFilename(now());
 	}
 
-	private BigDecimal getTotalObsolesenceValue(List<Inventory> l) {
-		return l.stream().filter(v -> v.getObsolesenceValue() != null).map(v -> v.getObsolesenceValue()).reduce(ZERO, BigDecimal::add);
-	}
-
-	private BigDecimal getTotalValue(List<Inventory> l) {
-		return l.stream().filter(v -> v.getValue() != null).map(v -> v.getValue()).reduce(ZERO, BigDecimal::add);
+	@Override
+	public String getTitleName() {
+		return username() + "@" + modulePrefix + " " + capitalize(getModuleName());
 	}
 }

@@ -1,21 +1,22 @@
 package ph.txtdis.dto;
 
-import static ph.txtdis.type.ModuleType.DELIVERY_REPORT;
-import static ph.txtdis.type.ModuleType.INVOICE;
-import static ph.txtdis.util.NumberUtils.isNegative;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.type.ModuleType;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static ph.txtdis.type.ModuleType.DELIVERY_REPORT;
+import static ph.txtdis.type.ModuleType.INVOICE;
+import static ph.txtdis.util.NumberUtils.isNegative;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class RemittanceDetail //
-		extends AbstractKeyed<Long> //
-		implements Keyed<Long>, Typed {
+	extends AbstractKeyed<Long> //
+	implements Keyed<Long>,
+	Typed {
 
 	private boolean isSelected;
 

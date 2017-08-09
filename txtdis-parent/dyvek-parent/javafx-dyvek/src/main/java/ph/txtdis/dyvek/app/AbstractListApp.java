@@ -4,17 +4,17 @@ import ph.txtdis.app.AbstractTableApp;
 import ph.txtdis.app.KeySelectableListApp;
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 import ph.txtdis.service.ModuleAlternateNameAndNoPromptService;
 
 public abstract class AbstractListApp< //
-		OT extends AppTable<T>, //
-		OS extends ListedAndResetableService<T>, //
-		T extends Keyed<Long>> //
-		extends AbstractTableApp<OT, OS, T> //
-		implements KeySelectableListApp {
+	OT extends AppTable<T>, //
+	OS extends ListedAndResettableService<T>, //
+	T extends Keyed<Long>> //
+	extends AbstractTableApp<OT, OS, T> //
+	implements KeySelectableListApp {
 
-	protected static final String LIST = " List";
+	private static final String LIST = " List";
 
 	@Override
 	public Long getSelectedKey() {

@@ -17,14 +17,14 @@ import ph.txtdis.type.Type;
 @Scope("prototype")
 @Component("totaledVarianceTableApp")
 public class TotaledVarianceTableAppImpl<T> //
-		extends AbstractTotaledTableApp<T> {
+	extends AbstractTotaledTableApp<T> {
 
 	@Override
 	public HBox addTotalDisplays(int count) {
 		totalDisplays = new ArrayList<>();
 		for (int i = 1; i <= count; i++)
 			buildTotalDisplays(i == count);
-		return box.forTableTotals(totalDisplays);
+		return pane.forTableTotals(totalDisplays);
 	}
 
 	private void buildTotalDisplays(boolean isLast) {

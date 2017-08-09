@@ -1,7 +1,5 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.time.LocalDate;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.Route;
 import ph.txtdis.mgdc.gsm.dto.Customer;
@@ -9,8 +7,12 @@ import ph.txtdis.service.DateValidated;
 import ph.txtdis.service.SavableAsExcelService;
 import ph.txtdis.type.BillingType;
 
+import java.time.LocalDate;
+
 public interface ItemDeliveredCustomerService //
-		extends DateValidated, SavableAsExcelService<Customer>, ItemFamilyLimited {
+	extends DateValidated,
+	SavableAsExcelService<Customer>,
+	ItemFamilyLimited {
 
 	boolean areDeliveriesBooked(Customer c, LocalDate orderDate);
 

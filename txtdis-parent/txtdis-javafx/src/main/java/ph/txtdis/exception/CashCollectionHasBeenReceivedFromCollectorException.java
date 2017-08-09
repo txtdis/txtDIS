@@ -4,7 +4,8 @@ import java.time.LocalDate;
 
 import ph.txtdis.util.DateTimeUtils;
 
-public class CashCollectionHasBeenReceivedFromCollectorException extends Exception {
+public class CashCollectionHasBeenReceivedFromCollectorException
+	extends Exception {
 
 	private static final long serialVersionUID = -680021070658923416L;
 

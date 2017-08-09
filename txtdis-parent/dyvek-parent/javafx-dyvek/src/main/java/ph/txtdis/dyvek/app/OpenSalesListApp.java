@@ -1,5 +1,5 @@
 package ph.txtdis.dyvek.app;
 
-public interface OpenSalesListApp //
-		extends OpenOrderListApp {
+public interface OpenSalesListApp
+	extends OpenOrderListApp {
 }

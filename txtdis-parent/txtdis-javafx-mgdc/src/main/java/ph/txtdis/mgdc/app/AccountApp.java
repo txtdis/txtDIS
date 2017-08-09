@@ -2,7 +2,6 @@ package ph.txtdis.mgdc.app;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.app.AbstractTableApp;
 import ph.txtdis.app.LaunchableApp;
 import ph.txtdis.dto.Account;
@@ -11,15 +10,22 @@ import ph.txtdis.mgdc.service.AccountService;
 
 @Scope("prototype")
 @Component("accountApp")
-public class AccountApp extends AbstractTableApp<AccountTable, AccountService, Account> implements LaunchableApp {
+public class AccountApp
+	extends AbstractTableApp<AccountTable, AccountService, Account>
+	implements LaunchableApp {
 
 	@Override
 	public void actOn(String... ids) {
 		try {
 			open(ids);
 		} catch (Exception e) {
-			dialog.show(e).addParent(this).start();
+			messageDialog.show(e).addParent(this).start();
 		}
+	}
+
+	private void open(String[] ids) throws Exception {
+		service.find(ids);
+		refresh();
 	}
 
 	@Override
@@ -29,12 +35,7 @@ public class AccountApp extends AbstractTableApp<AccountTable, AccountService, A
 			refreshTitleAndHeader();
 			goToDefaultFocus();
 		} catch (Exception e) {
-			dialog.show(e).addParent(this).start();
+			messageDialog.show(e).addParent(this).start();
 		}
-	}
-
-	private void open(String[] ids) throws Exception {
-		service.find(ids);
-		refresh();
 	}
 }

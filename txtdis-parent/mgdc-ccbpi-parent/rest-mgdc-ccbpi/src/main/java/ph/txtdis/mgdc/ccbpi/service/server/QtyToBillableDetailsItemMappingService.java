@@ -33,16 +33,32 @@ public interface QtyToBillableDetailsItemMappingService {
 		return m;
 	}
 
+	default List<BillableDetailEntity> getEntityDetails(Map<Long, BillableDetailEntity> m) {
+		return m.entrySet().stream().map(s -> s.getValue()).collect(toList());
+	}
+
 	default List<BillableDetail> getBomExpandedDetails(Billable b) {
 		List<BillableDetail> l = b.getDetails();
 		l = l.stream().filter(d -> d != null).flatMap(d -> expandAllDetails(b, d).stream()).collect(toList());
 		return l;
 	}
 
+	default Map<Long, BillableDetailEntity> mapTheSumOfTheEntityDetailAndDetailItemQuantities(Map<Long,
+		BillableDetailEntity> m,
+	                                                                                          BillableDetail b) {
+		BillableDetailEntity e = m.get(b.getId());
+		if (e != null)
+			m.put(b.getId(), setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(e, b));
+		return m;
+	}
+
 	default List<BillableDetail> expandAllDetails(Billable b, BillableDetail d) {
 		List<Bom> l = extractAll(d.getId(), d.getItemName(), BigDecimal.ONE);
 		return toDetails(b, d, l);
 	}
+
+	BillableDetailEntity setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(BillableDetailEntity e,
+	                                                                               BillableDetail b);
 
 	List<Bom> extractAll(Long itemId, String itemName, BigDecimal qty);
 
@@ -58,17 +74,4 @@ public interface QtyToBillableDetailsItemMappingService {
 		d.setReturnedQty(bd.getReturnedQty().multiply(bom.getQty()));
 		return d;
 	}
-
-	default List<BillableDetailEntity> getEntityDetails(Map<Long, BillableDetailEntity> m) {
-		return m.entrySet().stream().map(s -> s.getValue()).collect(toList());
-	}
-
-	default Map<Long, BillableDetailEntity> mapTheSumOfTheEntityDetailAndDetailItemQuantities(Map<Long, BillableDetailEntity> m, BillableDetail b) {
-		BillableDetailEntity e = m.get(b.getId());
-		if (e != null)
-			m.put(b.getId(), setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(e, b));
-		return m;
-	}
-
-	BillableDetailEntity setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(BillableDetailEntity e, BillableDetail b);
 }

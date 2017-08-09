@@ -1,6 +1,10 @@
 package ph.txtdis.fx.dialog;
 
-import static ph.txtdis.type.Type.TIME;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.fx.control.*;
+import ph.txtdis.service.RemittanceService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -10,21 +14,12 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javafx.scene.control.Button;
-import ph.txtdis.fx.control.InputNode;
-import ph.txtdis.fx.control.LabeledCombo;
-import ph.txtdis.fx.control.LabeledDatePicker;
-import ph.txtdis.fx.control.LabeledField;
-import ph.txtdis.service.RemittanceService;
+import static ph.txtdis.type.Type.TIME;
 
 @Scope("prototype")
 @Component("depositDialog")
 public class DepositDialog //
-		extends AbstractFieldDialog<String> {
+	extends AbstractFieldDialog<String> {
 
 	@Autowired
 	private LabeledCombo<String> bankCombo;
@@ -50,8 +45,8 @@ public class DepositDialog //
 	}
 
 	@Override
-	protected Button addButton() {
-		Button b = super.addButton();
+	protected AppButton addButton() {
+		AppButton b = super.addButton();
 		b.setText("Save");
 		return b;
 	}
@@ -65,7 +60,7 @@ public class DepositDialog //
 			super.addItem();
 		} catch (DateTimeParseException e) {
 			String s = "Incorrect time format;\nmust be 0808 for 8:08AM,\nand 2008 for 8:08PM.";
-			dialog.showError(s).addParent(this).start();
+			messageDialog().showError(s).addParent(this).start();
 			timeInput.setValue(null);
 			timeInput.requestFocus();
 		}

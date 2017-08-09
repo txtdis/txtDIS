@@ -6,7 +6,8 @@ import java.util.List;
 import ph.txtdis.dto.RemittanceDetail;
 
 public interface PaymentDetailedRemittanceService //
-		extends AppendableDetailService, RemittanceService {
+	extends AppendableDetailService,
+	RemittanceService {
 
 	List<RemittanceDetail> getDetails();
 

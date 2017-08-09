@@ -1,18 +1,7 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.UserType.AUDITOR;
-import static ph.txtdis.type.UserType.MANAGER;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.dto.Booking;
@@ -22,53 +11,38 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.exception.UnpickedBookingException;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.service.HolidayService;
-import ph.txtdis.service.CredentialService;
 import ph.txtdis.service.CustomerSearchableService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SpunKeyedService;
-import ph.txtdis.service.SyncService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;
-import ph.txtdis.type.UserType;
 import ph.txtdis.util.ClientTypeMap;
 import ph.txtdis.util.DateTimeUtils;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.UserType.AUDITOR;
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.UserUtils.isUser;
+import static ph.txtdis.util.UserUtils.username;
+
 public abstract class AbstractBillableService //
-		implements BillableService, CustomerSearchableService {
-
-	@Autowired
-	private HolidayService holidayService;
-
-	@Autowired
-	private ReadOnlyService<Billable> billableReadOnlyService;
-
-	@Autowired
-	private SavingService<Billable> savingService;
-
-	@Autowired
-	private SpunKeyedService<Billable, Long> spunService;
-
-	@Autowired
-	private ClientTypeMap typeMap;
+	implements BillableService,
+	CustomerSearchableService {
 
 	@Autowired
 	protected ChannelService channelService;
-
-	@Autowired
-	protected CredentialService credentialService;
 
 	@Autowired
 	protected CustomerService customerService;
 
 	@Autowired
 	protected BommedDiscountedPricedValidatedItemService itemService;
-
-	@Autowired
-	protected SyncService syncService;
-
-	@Value("${go.live}")
-	private String goLive;
 
 	@Value("${prefix.module}")
 	protected String modulePrefix;
@@ -81,8 +55,28 @@ public abstract class AbstractBillableService //
 
 	protected UomType uom;
 
+	@Autowired
+	private HolidayService holidayService;
+
+	@Autowired
+	private RestClientService<Billable> restClientService;
+
+	@Autowired
+	private ClientTypeMap typeMap;
+
+	@Value("${go.live}")
+	private String goLive;
+
 	public AbstractBillableService() {
 		reset();
+	}
+
+	@Override
+	public void reset() {
+		billable = null;
+		item = null;
+		qty = null;
+		uom = null;
 	}
 
 	@Override
@@ -93,10 +87,6 @@ public abstract class AbstractBillableService //
 	@Override
 	public boolean isAuditor() {
 		return isUser(AUDITOR);
-	}
-
-	protected boolean isUser(UserType type) {
-		return credentialService.isUser(type);
 	}
 
 	@Override
@@ -131,9 +121,21 @@ public abstract class AbstractBillableService //
 	}
 
 	public Billable findBillable(String endPt) throws Exception {
-		return getReadOnlyService()//
-				.module("billable")//
-				.getOne(endPt);
+		return getBillable().getOne(endPt);
+	}
+
+	private RestClientService<Billable> getBillable() {
+		return getRestClientService().module("billable");
+	}
+
+	@SuppressWarnings("unchecked")
+	public RestClientService<Billable> getRestClientService() {
+		return restClientService;
+	}
+
+	@Override
+	public String getBilledBy() {
+		return get().getBilledBy();
 	}
 
 	@Override
@@ -145,8 +147,10 @@ public abstract class AbstractBillableService //
 	}
 
 	@Override
-	public String getBilledBy() {
-		return get().getBilledBy();
+	public <T extends Keyed<Long>> void set(T t) {
+		if (t == null)
+			return;
+		billable = (Billable) t;
 	}
 
 	@Override
@@ -157,6 +161,11 @@ public abstract class AbstractBillableService //
 	@Override
 	public Long getBookingId() {
 		return get().getBookingId();
+	}
+
+	@Override
+	public void setBookingId(Long id) {
+		get().setBookingId(id);
 	}
 
 	@Override
@@ -205,6 +214,13 @@ public abstract class AbstractBillableService //
 	}
 
 	@Override
+	public void setDetails(List<BillableDetail> l) {
+		if (l != null)
+			l = l.stream().filter(d -> d != null).collect(toList());
+		get().setDetails(l);
+	}
+
+	@Override
 	public List<String> getDiscounts() {
 		return get().getDiscounts();
 	}
@@ -225,23 +241,18 @@ public abstract class AbstractBillableService //
 	}
 
 	@Override
+	public void setId(Long id) {
+		get().setId(id);
+	}
+
+	@Override
 	public Boolean getIsValid() {
 		return get().getIsValid();
 	}
 
 	@Override
-	public Item getItem() {
-		return item;
-	}
-
-	@Override
 	public String getItemName() {
 		return item == null ? null : item.getDescription();
-	}
-
-	@Override
-	public BommedDiscountedPricedValidatedItemService getItemService() {
-		return itemService;
 	}
 
 	@Override
@@ -252,6 +263,11 @@ public abstract class AbstractBillableService //
 	@Override
 	public LocalDate getOrderDate() {
 		return get().getOrderDate();
+	}
+
+	@Override
+	public void setOrderDate(LocalDate d) {
+		get().setOrderDate(d);
 	}
 
 	@Override
@@ -275,9 +291,18 @@ public abstract class AbstractBillableService //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public ReadOnlyService<Billable> getReadOnlyService() {
-		return billableReadOnlyService;
+	public BommedDiscountedPricedValidatedItemService getItemService() {
+		return itemService;
+	}
+
+	@Override
+	public Item getItem() {
+		return item;
+	}
+
+	@Override
+	public void setItem(Item item) {
+		this.item = item;
 	}
 
 	@Override
@@ -305,24 +330,18 @@ public abstract class AbstractBillableService //
 		return get().getReceivingId();
 	}
 
-	protected String getReferencePrompt(Billable b) {
-		return getReferencePrompt();
-	}
-
 	@Override
 	public String getRemarks() {
 		return get().getRemarks();
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public SavingService<Billable> getSavingService() {
-		return savingService;
-	}
-
-	@Override
-	public SpunKeyedService<Billable, Long> getSpunService() {
-		return spunService;
+	public void setRemarks(String remarks) {
+		if (remarks == null || remarks.trim().isEmpty())
+			return;
+		if (getRemarks() != null)
+			remarks = getRemarks() + "\n" + remarks;
+		get().setRemarks(remarks);
 	}
 
 	@Override
@@ -336,7 +355,7 @@ public abstract class AbstractBillableService //
 
 	@Override
 	public String getUsername() {
-		return credentialService.username();
+		return username();
 	}
 
 	@Override
@@ -361,47 +380,15 @@ public abstract class AbstractBillableService //
 
 	protected List<Billable> findBillables(String endPt) {
 		try {
-			return billableReadOnlyService.module("billable").getList(endPt);
+			return getBillable().getList(endPt);
 		} catch (Exception e) {
 			return emptyList();
 		}
 	}
 
 	@Override
-	public void reset() {
-		billable = null;
-		item = null;
-		qty = null;
-		uom = null;
-	}
-
-	@Override
 	public void searchForCustomer(String name) throws Exception {
 		customerService.search(name);
-	}
-
-	@Override
-	public <T extends Keyed<Long>> void set(T t) {
-		if (t == null)
-			return;
-		billable = (Billable) t;
-	}
-
-	@Override
-	public void setBookingId(Long id) {
-		get().setBookingId(id);
-	}
-
-	@Override
-	public void setDetails(List<BillableDetail> l) {
-		if (l != null)
-			l = l.stream().filter(d -> d != null).collect(toList());
-		get().setDetails(l);
-	}
-
-	@Override
-	public void setId(Long id) {
-		get().setId(id);
 	}
 
 	protected void verifyNotInThePast(LocalDate d) throws Exception {
@@ -417,13 +404,13 @@ public abstract class AbstractBillableService //
 		return DateTimeUtils.toDate(goLive);
 	}
 
-	protected String getSeller() {
-		return getUsername();
+	@Override
+	public LocalDate today() {
+		return getServerDate();
 	}
 
-	@Override
-	public void setItem(Item item) {
-		this.item = item;
+	protected String getSeller() {
+		return getUsername();
 	}
 
 	@Override
@@ -435,23 +422,9 @@ public abstract class AbstractBillableService //
 	}
 
 	@Override
-	public void setOrderDate(LocalDate d) {
-		get().setOrderDate(d);
-	}
-
-	@Override
 	public void setQtyUponValidation(UomType uom, BigDecimal qty) throws Exception {
 		this.uom = uom;
 		this.qty = qty;
-	}
-
-	@Override
-	public void setRemarks(String remarks) {
-		if (remarks == null || remarks.trim().isEmpty())
-			return;
-		if (getRemarks() != null)
-			remarks = getRemarks() + "\n" + remarks;
-		get().setRemarks(remarks);
 	}
 
 	@Override
@@ -464,11 +437,6 @@ public abstract class AbstractBillableService //
 		setDetails(items);
 	}
 
-	@Override
-	public LocalDate today() {
-		return syncService.getServerDate();
-	}
-
 	protected void confirmBookingExists(String id, Billable b) throws NotFoundException {
 		if (b == null)
 			throw new NotFoundException("ID No. " + id);
@@ -477,6 +445,10 @@ public abstract class AbstractBillableService //
 	protected void confirmBookingHasBeenPicked(String id, Billable b) throws Exception {
 		if (b.getPickListId() == null)
 			throw new UnpickedBookingException(getReferencePrompt(b), id);
+	}
+
+	protected String getReferencePrompt(Billable b) {
+		return getReferencePrompt();
 	}
 
 	protected LocalDate nextWorkDay() {

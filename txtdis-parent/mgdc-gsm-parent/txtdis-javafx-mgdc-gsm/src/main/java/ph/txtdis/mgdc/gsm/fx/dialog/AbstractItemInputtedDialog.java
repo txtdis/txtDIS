@@ -1,15 +1,8 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.fx.dialog.AbstractInputDialog;
@@ -17,8 +10,14 @@ import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.gsm.service.BommedDiscountedPricedValidatedItemService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.ID;
+import static ph.txtdis.type.Type.TEXT;
+
 public abstract class AbstractItemInputtedDialog //
-		implements ItemInputtedDialog {
+	implements ItemInputtedDialog {
 
 	@Autowired
 	protected LabeledField<String> itemNameDisplay;
@@ -46,11 +45,6 @@ public abstract class AbstractItemInputtedDialog //
 
 	private LabeledField<String> itemNameDisplay() {
 		return itemNameDisplay.name("Description").readOnly().build(TEXT);
-	}
-
-	@Override
-	public Long getId() {
-		return itemIdField.getValue();
 	}
 
 	@Override
@@ -90,5 +84,10 @@ public abstract class AbstractItemInputtedDialog //
 		Item i = itemService.findById(getId());
 		itemNameDisplay.setValue(i.getName());
 		return i;
+	}
+
+	@Override
+	public Long getId() {
+		return itemIdField.getValue();
 	}
 }

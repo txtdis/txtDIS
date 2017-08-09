@@ -9,7 +9,7 @@ import ph.txtdis.type.ScriptType;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Script //
-		extends AbstractKeyed<Long> {
+	extends AbstractKeyed<Long> {
 
 	private ScriptType type;
 

@@ -2,7 +2,8 @@ package ph.txtdis.mgdc.service;
 
 import java.util.List;
 
-public interface SellerLessPickListService extends PickListService {
+public interface SellerLessPickListService
+	extends PickListService {
 
 	List<String> listCollectors();
 

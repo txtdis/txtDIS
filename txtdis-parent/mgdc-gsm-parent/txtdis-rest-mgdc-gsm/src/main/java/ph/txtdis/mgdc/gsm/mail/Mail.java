@@ -5,7 +5,9 @@ import java.time.ZonedDateTime;
 public class Mail {
 
 	private final String approver;
+
 	private final ZonedDateTime timestamp;
+
 	private final Boolean isApproved;
 
 	public Mail(String approver, ZonedDateTime timestamp, Boolean isApproved) {

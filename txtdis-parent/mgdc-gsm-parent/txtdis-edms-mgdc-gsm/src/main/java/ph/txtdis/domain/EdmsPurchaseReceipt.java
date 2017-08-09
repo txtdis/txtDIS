@@ -13,8 +13,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "tr_purchase_h")
 @EqualsAndHashCode(callSuper = true)
 public class EdmsPurchaseReceipt //
-		extends EdmsAbstractModifiedNotedWarehousedDatedRemarkedReferencedStatusCreatedId //
-		implements Serializable {
+	extends EdmsAbstractModifiedNotedWarehousedDatedRemarkedReferencedStatusCreatedId //
+	implements Serializable {
 
 	private static final long serialVersionUID = -1148761289889352509L;
 }

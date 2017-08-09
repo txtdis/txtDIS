@@ -12,7 +12,7 @@ import ph.txtdis.mgdc.repository.PriceRepository;
 import ph.txtdis.service.DecisionDataUpdate;
 
 public interface PriceService //
-		extends DecisionDataUpdate<PriceEntity, PriceRepository> {
+	extends DecisionDataUpdate<PriceEntity, PriceRepository> {
 
 	BigDecimal getCurrentValue(String pricingType, ItemEntity e);
 

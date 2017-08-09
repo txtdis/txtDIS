@@ -1,30 +1,30 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>ph.txtdis</groupId>
-		<artifactId>txtdis-parent</artifactId>
-		<version>1.0.1.5</version>
-	</parent>
+    <parent>
+        <groupId>ph.txtdis</groupId>
+        <artifactId>txtdis-parent</artifactId>
+        <version>1.0.1.6</version>
+    </parent>
 
-	<artifactId>txtdis-javafx</artifactId>
-	<name>Shared JavaFX Module</name>
+    <artifactId>txtdis-javafx</artifactId>
+    <name>Shared JavaFX Module</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-phone</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-rest-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ph.txtdis</groupId>
+            <artifactId>txtdis-phone</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ph.txtdis</groupId>
+            <artifactId>txtdis-rest-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 </project>

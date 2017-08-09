@@ -1,16 +1,8 @@
 package ph.txtdis.mgdc.gsm.util;
 
-import java.util.List;
-
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.CreditNote;
-import ph.txtdis.dto.Holiday;
-import ph.txtdis.dto.ItemTree;
-import ph.txtdis.dto.SalesRevenue;
-import ph.txtdis.dto.SalesVolume;
+import ph.txtdis.dto.*;
 import ph.txtdis.mgdc.gsm.dto.Channel;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.dto.Item;
@@ -18,9 +10,11 @@ import ph.txtdis.mgdc.gsm.dto.Vat;
 import ph.txtdis.mgdc.util.AbstractMgdcClientTypeMap;
 import ph.txtdis.util.TypeReference;
 
+import java.util.List;
+
 @Component("typeMap")
 public class GsmTypeMapImpl //
-		extends AbstractMgdcClientTypeMap {
+	extends AbstractMgdcClientTypeMap {
 
 	private static final long serialVersionUID = -1782679034968493608L;
 

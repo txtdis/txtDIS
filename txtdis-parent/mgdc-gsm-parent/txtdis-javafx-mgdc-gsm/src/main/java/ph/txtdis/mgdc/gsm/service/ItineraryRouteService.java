@@ -1,12 +1,12 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.Route;
 import ph.txtdis.mgdc.service.RouteService;
 
+import java.util.List;
+
 public interface ItineraryRouteService //
-		extends RouteService {
+	extends RouteService {
 
 	List<Route> listExTruckRoutes();
 

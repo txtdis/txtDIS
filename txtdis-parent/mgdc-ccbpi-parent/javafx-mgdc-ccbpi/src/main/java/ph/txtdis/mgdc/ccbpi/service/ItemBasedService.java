@@ -13,16 +13,6 @@ import ph.txtdis.type.UomType;
 
 public interface ItemBasedService<T extends Keyed<Long>> {
 
-	default Item confirmItemExistsAndIsNotDeactivated(Long id) throws Exception {
-		return getItemService().findById(id);
-	}
-
-	default void confirmItemIsNotOnList(Item i) throws DuplicateException {
-		if (getDetails() != null)
-			if (getDetails().stream().filter(d -> d != null).anyMatch(d -> areEqual(d.getId(), i.getId())))
-				throw new DuplicateException(i.getName());
-	}
-
 	default List<UomType> getBuyingUoms() {
 		try {
 			return getItemService().listBuyingUoms(getItem());
@@ -32,15 +22,13 @@ public interface ItemBasedService<T extends Keyed<Long>> {
 		}
 	}
 
-	List<T> getDetails();
+	BommedDiscountedPricedValidatedItemService getItemService();
 
 	Item getItem();
 
 	default String getItemName() {
 		return getItem() == null ? null : getItem().getDescription();
 	}
-
-	BommedDiscountedPricedValidatedItemService getItemService();
 
 	default List<UomType> getSellingUoms() {
 		try {
@@ -58,4 +46,16 @@ public interface ItemBasedService<T extends Keyed<Long>> {
 			throw new NotSellableItemException(i.getName());
 		return i;
 	}
+
+	default Item confirmItemExistsAndIsNotDeactivated(Long id) throws Exception {
+		return getItemService().findById(id);
+	}
+
+	default void confirmItemIsNotOnList(Item i) throws DuplicateException {
+		if (getDetails() != null)
+			if (getDetails().stream().filter(d -> d != null).anyMatch(d -> areEqual(d.getId(), i.getId())))
+				throw new DuplicateException(i.getName());
+	}
+
+	List<T> getDetails();
 }

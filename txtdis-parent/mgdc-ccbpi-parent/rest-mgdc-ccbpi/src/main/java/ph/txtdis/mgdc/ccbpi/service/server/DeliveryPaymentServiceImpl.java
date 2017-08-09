@@ -28,7 +28,7 @@ import ph.txtdis.type.QuantityType;
 
 @Service("paymentService")
 public class DeliveryPaymentServiceImpl //
-		implements DeliveryPaymentService {
+	implements DeliveryPaymentService {
 
 	@Autowired
 	private ItemService itemService;
@@ -102,11 +102,11 @@ public class DeliveryPaymentServiceImpl //
 
 	private List<BomEntity> toBomList(QuantityType type, List<BillableEntity> billables) {
 		return billables.stream().flatMap(entity -> entity.getDetails().stream()) //
-				.map(d -> toBom(type, d)) //
-				.collect(groupingBy(BomEntity::getPart, //
-						mapping(BomEntity::getQty, reducing(ZERO, BigDecimal::add)))) //
-				.entrySet().stream().map(e -> toBom(e.getKey(), e.getValue())) //
-				.collect(Collectors.toList());
+			.map(d -> toBom(type, d)) //
+			.collect(groupingBy(BomEntity::getPart, //
+				mapping(BomEntity::getQty, reducing(ZERO, BigDecimal::add)))) //
+			.entrySet().stream().map(e -> toBom(e.getKey(), e.getValue())) //
+			.collect(Collectors.toList());
 	}
 
 	private BomEntity toBom(QuantityType type, BillableDetailEntity d) {

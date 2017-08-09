@@ -1,11 +1,11 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.math.BigDecimal;
-
 import ph.txtdis.dto.BillableDetail;
 
+import java.math.BigDecimal;
+
 public interface ExpandedBommedDiscountedPricedValidatedItemService
-		extends BommedDiscountedPricedValidatedItemService {
+	extends BommedDiscountedPricedValidatedItemService {
 
 	BigDecimal getBomExpandedQtyInCases(BillableDetail d);
 }

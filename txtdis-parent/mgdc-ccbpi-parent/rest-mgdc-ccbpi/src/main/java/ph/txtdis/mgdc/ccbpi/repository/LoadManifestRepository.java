@@ -11,23 +11,28 @@ import ph.txtdis.mgdc.ccbpi.domain.BillableEntity;
 
 @Repository("loadManifestRepository")
 public interface LoadManifestRepository //
-		extends CrudRepository<BillableEntity, Long> {
+	extends CrudRepository<BillableEntity, Long> {
 
 	BillableEntity findByCustomerNullAndBookingIdAndSuffixNull( //
-			@Param("shipment") Long id);
+	                                                            @Param("shipment") Long id);
 
 	List<BillableEntity> findByCustomerNullAndBookingIdNotNullAndSuffixNullAndOrderDateBetween( //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e);
+	                                                                                            @Param("start")
+		                                                                                            LocalDate s, //
+	                                                                                            @Param("end")
+		                                                                                            LocalDate e);
 
 	BillableEntity findFirstByCustomerNullAndBookingIdNotNullAndSuffixNullAndIdGreaterThanOrderByIdAsc( //
-			@Param("id") Long id);
+	                                                                                                    @Param("id")
+		                                                                                                    Long id);
 
 	BillableEntity findFirstByCustomerNullAndBookingIdNotNullAndSuffixNullAndIdLessThanOrderByIdDesc( //
-			@Param("id") Long id);
+	                                                                                                  @Param("id")
+		                                                                                                  Long id);
 
 	BillableEntity findFirstByCustomerNullAndBookingIdNotNullAndSuffixNullAndOrderDateOrderByIdAsc( //
-			@Param("date") LocalDate d);
+	                                                                                                @Param("date")
+		                                                                                                LocalDate d);
 
 	BillableEntity findFirstByCustomerNullAndBookingIdNotNullAndSuffixNullOrderByIdAsc();
 

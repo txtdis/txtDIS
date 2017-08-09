@@ -9,9 +9,9 @@ import ph.txtdis.dyvek.service.ClientBillingService;
 
 @Scope("prototype")
 @Component("unbilledDeliveryListApp")
-public class UnbilledDeliveryListAppImpl //
-		extends AbstractListApp<UnbilledListTable, ClientBillingService, Billable> //
-		implements UnbilledDeliveryListApp {
+public class UnbilledDeliveryListAppImpl
+	extends AbstractListApp<UnbilledListTable, ClientBillingService, Billable>
+	implements UnbilledDeliveryListApp {
 
 	private static final String UNBILLED = "Unbilled";
 

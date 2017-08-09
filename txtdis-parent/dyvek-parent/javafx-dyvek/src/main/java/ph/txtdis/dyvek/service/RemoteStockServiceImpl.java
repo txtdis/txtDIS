@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 @Service("remoteStockService")
 public class RemoteStockServiceImpl //
-		implements RemoteStockService {
+	implements RemoteStockService {
 
 	@Override
 	public void reset() {

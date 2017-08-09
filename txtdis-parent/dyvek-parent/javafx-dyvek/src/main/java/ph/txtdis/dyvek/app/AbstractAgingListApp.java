@@ -2,12 +2,12 @@ package ph.txtdis.dyvek.app;
 
 import ph.txtdis.dyvek.model.Aging;
 import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 
 public abstract class AbstractAgingListApp< //
-		OT extends AppTable<Aging>, //
-		OS extends ListedAndResetableService<Aging>> //
-		extends AbstractListApp<OT, OS, Aging> {
+	OT extends AppTable<Aging>, //
+	OS extends ListedAndResettableService<Aging>> //
+	extends AbstractListApp<OT, OS, Aging> {
 
 	private static final String AGING = "Aging ";
 

@@ -2,6 +2,7 @@ package ph.txtdis.mgdc.ccbpi.service;
 
 import static ph.txtdis.type.DeliveryType.PICK_UP;
 import static ph.txtdis.type.RouteType.PRE_SELL;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
 import static ph.txtdis.util.DateTimeUtils.toHypenatedYearMonthDay;
 
 import java.time.LocalDate;
@@ -18,8 +19,8 @@ import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.service.SyncService;
 
 public abstract class AbstractItemDeliveredCustomerService //
-		extends AbstractCustomerService //
-		implements ItemDeliveredCustomerService {
+	extends AbstractCustomerService //
+	implements ItemDeliveredCustomerService {
 
 	@Autowired
 	private SyncService syncService;
@@ -31,6 +32,14 @@ public abstract class AbstractItemDeliveredCustomerService //
 	public boolean areDeliveriesBooked(Customer c, LocalDate d) {
 		Route r = getRoute(c, d);
 		return r == null ? true : r.getName().startsWith(PRE_SELL.toString());
+	}
+
+	@Override
+	public Route getRoute(Customer c, LocalDate date) {
+		return c.getRouteHistory().stream() //
+			.filter(p -> !p.getStartDate().isAfter(date)) //
+			.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())) //
+			.orElse(new Routing()).getRoute();
 	}
 
 	@Override
@@ -48,20 +57,12 @@ public abstract class AbstractItemDeliveredCustomerService //
 	}
 
 	protected Customer getOne(String endPt) throws Exception {
-		return getListedReadOnlyService().module(getModuleName()).getOne(endPt);
+		return getRestClientService().module(getModuleName()).getOne(endPt);
 	}
 
 	@Override
 	public Customer findByVendorId(Long id) throws Exception {
 		return getOne("/get?vendorId=" + id);
-	}
-
-	@Override
-	public Route getRoute(Customer c, LocalDate date) {
-		return c.getRouteHistory().stream() //
-				.filter(p -> !p.getStartDate().isAfter(date)) //
-				.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())) //
-				.orElse(new Routing()).getRoute();
 	}
 
 	@Override
@@ -88,16 +89,16 @@ public abstract class AbstractItemDeliveredCustomerService //
 	}
 
 	@Override
+	public LocalDate today() {
+		return getServerDate();
+	}
+
+	@Override
 	public void openByOpenDialogInputtedKey(String key) throws Exception {
 		try {
 			openByDoubleClickedTableCellId(Long.valueOf(key));
 		} catch (NumberFormatException e) {
 			throw new NotFoundException("Customer No. " + key);
 		}
-	}
-
-	@Override
-	public LocalDate today() {
-		return syncService.getServerDate();
 	}
 }

@@ -1,9 +1,5 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.Bom;
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.dto.Price;
@@ -18,29 +14,44 @@ import ph.txtdis.service.SavableAsExcelService;
 import ph.txtdis.type.ItemType;
 import ph.txtdis.type.UomType;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
 public interface BommedDiscountedPricedValidatedItemService //
-		extends DateValidated, DecisionNeededService, SavableAsExcelService<Item>, ItemBasedService<Bom>, ItemService, MasterService<Item>,
-		ValidatedUomService {
+	extends DateValidated,
+	DecisionNeededService,
+	SavableAsExcelService<Item>,
+	ItemBasedService<Bom>,
+	ItemService,
+	MasterService<Item>,
+	ValidatedUomService {
 
 	Bom createBom(BigDecimal qty);
 
 	Price createPricingUponValidation( //
-			PricingType type, //
-			BigDecimal price, //
-			LocalDate startDate//
+	                                   PricingType type, //
+	                                   BigDecimal price, //
+	                                   LocalDate startDate//
 	) throws Exception;
 
 	Item findByVendorNo(String id) throws Exception;
 
 	LocalDate getEndOfLife();
 
+	void setEndOfLife(LocalDate d);
+
 	List<Price> getPriceList();
 
+	void setPriceList(List<Price> items);
+
 	BigDecimal getQtyPerUom( //
-			Item item, //
-			UomType uom);
+	                         Item item, //
+	                         UomType uom);
 
 	ItemType getType();
+
+	void setType(ItemType t);
 
 	boolean hasReportUom();
 
@@ -52,6 +63,8 @@ public interface BommedDiscountedPricedValidatedItemService //
 	}
 
 	boolean isNotDiscounted();
+
+	void setNotDiscounted(boolean b);
 
 	List<Bom> listBoms();
 
@@ -73,15 +86,7 @@ public interface BommedDiscountedPricedValidatedItemService //
 
 	void setBoms(List<Bom> l);
 
-	void setEndOfLife(LocalDate d);
-
 	void setFamily(ItemFamily f);
 
-	void setNotDiscounted(boolean b);
-
 	void setPartUponValidation(Long id) throws Exception;
-
-	void setPriceList(List<Price> items);
-
-	void setType(ItemType t);
 }

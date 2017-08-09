@@ -1,29 +1,24 @@
 package ph.txtdis.dyvek.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractKeyedEntity;
 
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+
 @Data
 @Entity
-@Table(name = "delivery_detail", //
-		indexes = { //
-				@Index(name = "delivery_detail_assigned_to_purchase_on_idx", columnList = "assigned_to_purchase_on"), //
-				@Index(name = "delivery_detail_assigned_to_sales_on_idx", columnList = "assigned_to_sales_on"), //
-				@Index(name = "delivery_detail_recipient_id_idx", columnList = "recipient_id") })
+@Table(name = "delivery_detail",
+	indexes = {
+		@Index(name = "delivery_detail_assigned_to_purchase_on_idx", columnList = "assigned_to_purchase_on"),
+		@Index(name = "delivery_detail_assigned_to_sales_on_idx", columnList = "assigned_to_sales_on"),
+		@Index(name = "delivery_detail_recipient_id_idx", columnList = "recipient_id")})
 @EqualsAndHashCode(callSuper = true)
-public class DeliveryDetailEntity //
-		extends AbstractKeyedEntity<Long> {
+public class DeliveryDetailEntity
+	extends AbstractKeyedEntity<Long> {
 
 	private static final long serialVersionUID = 1759960406252010860L;
 
@@ -36,13 +31,13 @@ public class DeliveryDetailEntity //
 	@Column(name = "scale_no", nullable = false)
 	private String scaleNo;
 
+	@Column(name = "gross")
+	private BigDecimal grossWeight;
+
 	private String color;
 
 	@Column(precision = 5, scale = 2)
-	private BigDecimal iodine, lauric, oleic;
-
-	@Column(precision = 7, scale = 4)
-	private BigDecimal moisture, saponification;
+	private BigDecimal iodine, ffa;
 
 	@Column(name = "bill_adjustment_qty")
 	private BigDecimal billAdjustmentQty;

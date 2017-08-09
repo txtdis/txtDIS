@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 
 @Service("paymentService")
 public class PaymentServiceImpl //
-		extends AbstractSalesItemVarianceService //
-		implements PaymentService {
+	extends AbstractSalesItemVarianceService //
+	implements PaymentService {
 
 	@Override
 	public String getExpectedColumnName() {

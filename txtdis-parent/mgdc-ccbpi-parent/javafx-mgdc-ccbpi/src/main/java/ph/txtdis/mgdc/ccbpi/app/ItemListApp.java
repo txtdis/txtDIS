@@ -12,8 +12,8 @@ import ph.txtdis.mgdc.ccbpi.service.BommedDiscountedPricedValidatedItemService;
 @Scope("prototype")
 @Component("itemListApp")
 public class ItemListApp //
-		extends AbstractExcelApp<ItemListTable, BommedDiscountedPricedValidatedItemService, Item> //
-		implements SelectableListApp<Item> {
+	extends AbstractExcelApp<ItemListTable, BommedDiscountedPricedValidatedItemService, Item> //
+	implements SelectableListApp<Item> {
 
 	@Override
 	public Item getSelection() {
@@ -29,12 +29,12 @@ public class ItemListApp //
 	}
 
 	@Override
-	protected String getHeaderText() {
-		return "Item List";
+	protected String getTitleText() {
+		return getHeaderText();
 	}
 
 	@Override
-	protected String getTitleText() {
-		return getHeaderText();
+	protected String getHeaderText() {
+		return "Item List";
 	}
 }

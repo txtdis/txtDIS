@@ -3,7 +3,7 @@ package ph.txtdis.mgdc.gsm.service.server;
 import ph.txtdis.dto.Billable;
 
 public interface BadRmaService //
-		extends RmaService {
+	extends RmaService {
 
 	Billable findClosedRmaByCustomerToDetermineAllowanceBalance(Long customerId);
 }

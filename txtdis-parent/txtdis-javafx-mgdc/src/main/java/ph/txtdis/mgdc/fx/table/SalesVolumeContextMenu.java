@@ -1,19 +1,18 @@
 package ph.txtdis.mgdc.fx.table;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.mgdc.type.SalesVolumeReportType.values;
-
-import java.util.List;
-
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import ph.txtdis.mgdc.service.SalesVolumeService;
 import ph.txtdis.mgdc.type.SalesVolumeReportType;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.mgdc.type.SalesVolumeReportType.values;
 
 @Scope("prototype")
 @Component("salesVolumeContextMenu")
@@ -35,14 +34,14 @@ public class SalesVolumeContextMenu {
 		return m;
 	}
 
+	private List<MenuItem> menuItems() {
+		return asList(values()).stream().map(t -> menuItem(t)).collect(toList());
+	}
+
 	private MenuItem menuItem(SalesVolumeReportType t) {
 		MenuItem i = new MenuItem(t.toString());
 		i.setOnAction(e -> setTable(t));
 		return i;
-	}
-
-	private List<MenuItem> menuItems() {
-		return asList(values()).stream().map(t -> menuItem(t)).collect(toList());
 	}
 
 	private void setTable(SalesVolumeReportType t) {

@@ -9,8 +9,8 @@ import ph.txtdis.mgdc.ccbpi.service.OrderReturnListService;
 @Scope("prototype")
 @Component("orderReturnListApp")
 public class OrderReturnListAppImpl // 
-		extends AbstractTotaledListApp<OrderReturnListTable, OrderReturnListService> //
-		implements OrderReturnListApp {
+	extends AbstractTotaledListApp<OrderReturnListTable, OrderReturnListService> //
+	implements OrderReturnListApp {
 
 	@Override
 	protected void setList(String[] ids) throws Exception {

@@ -9,6 +9,6 @@ import ph.txtdis.mgdc.ccbpi.service.LoadReturnService;
 @Scope("prototype")
 @Component("loadReturnDialog")
 public class LoadReturnDialogImpl //
-		extends AbstractUpToReturnableQtyCasesAndBottlesReceivingDialog<LoadReturnService, PickListDetail> //
-		implements LoadReturnDialog {
+	extends AbstractUpToReturnableQtyCasesAndBottlesReceivingDialog<LoadReturnService, PickListDetail> //
+	implements LoadReturnDialog {
 }

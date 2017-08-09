@@ -1,22 +1,21 @@
 package ph.txtdis.mgdc.domain;
 
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-
-import java.time.LocalDate;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ph.txtdis.domain.AbstractCreatedKeyedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import java.time.LocalDate;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ph.txtdis.domain.AbstractCreatedKeyedEntity;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
 
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractRoutingEntity //
-		extends AbstractCreatedKeyedEntity<Long> {
+	extends AbstractCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -5435820150277484494L;
 

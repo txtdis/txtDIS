@@ -7,5 +7,7 @@ import ph.txtdis.mgdc.service.server.SpunSavedReferencedKeyedService;
 import ph.txtdis.service.DecisionDataUpdate;
 
 public interface ImportedBillingService //
-		extends DecisionDataUpdate<BillableEntity, BillableRepository>, Imported, SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
+	extends DecisionDataUpdate<BillableEntity, BillableRepository>,
+	Imported,
+	SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
 }

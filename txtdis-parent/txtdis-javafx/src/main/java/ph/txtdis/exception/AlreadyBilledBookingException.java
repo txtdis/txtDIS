@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class AlreadyBilledBookingException extends Exception {
+public class AlreadyBilledBookingException
+	extends Exception {
 
 	private static final long serialVersionUID = -8123802272614410524L;
 

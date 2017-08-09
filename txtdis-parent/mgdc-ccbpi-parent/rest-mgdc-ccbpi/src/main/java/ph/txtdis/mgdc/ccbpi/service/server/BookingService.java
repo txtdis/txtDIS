@@ -8,7 +8,7 @@ import ph.txtdis.mgdc.ccbpi.domain.BillableEntity;
 import ph.txtdis.mgdc.service.server.SpunSavedReferencedKeyedService;
 
 public interface BookingService //
-		extends SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
+	extends SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
 
 	BillableEntity findEntityByBookingNo(String key);
 

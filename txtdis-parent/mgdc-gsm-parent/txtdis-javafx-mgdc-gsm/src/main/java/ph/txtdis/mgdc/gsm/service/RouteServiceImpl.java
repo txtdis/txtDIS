@@ -1,30 +1,34 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Route;
+import ph.txtdis.service.RestClientService;
+
+import java.util.List;
 
 @Service("routeService")
 public class RouteServiceImpl //
-		extends AbstractRouteService //
-		implements ItineraryRouteService {
+	extends AbstractRouteService //
+	implements ItineraryRouteService {
 
 	@Override
 	public List<Route> listExTruckRoutes() {
 		try {
-			return readOnlyService.module(getModuleName()).getList("/extruck");
+			return getRouteService().getList("/extruck");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
+	private RestClientService<Route> getRouteService() {
+		return getRestClientService().module(getModuleName());
+	}
+
 	@Override
 	public List<Route> listPreSellRoutes() {
 		try {
-			return readOnlyService.module(getModuleName()).getList("/presell");
+			return getRouteService().getList("/presell");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

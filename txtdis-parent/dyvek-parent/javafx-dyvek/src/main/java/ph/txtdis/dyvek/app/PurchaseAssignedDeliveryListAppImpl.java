@@ -7,7 +7,7 @@ import ph.txtdis.dyvek.service.VendorBillingService;
 
 @Scope("prototype")
 @Component("purchaseAssignedDeliveryListApp")
-public class PurchaseAssignedDeliveryListAppImpl //
-		extends AbstractAssignedDeliveryListApp<VendorBillingService> //
-		implements PurchaseAssignedDeliveryListApp {
+public class PurchaseAssignedDeliveryListAppImpl
+	extends AbstractAssignedDeliveryListApp<VendorBillingService>
+	implements PurchaseAssignedDeliveryListApp {
 }

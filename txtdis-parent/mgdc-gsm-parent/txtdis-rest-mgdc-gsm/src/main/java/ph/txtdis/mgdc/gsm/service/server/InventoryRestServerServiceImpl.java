@@ -1,13 +1,19 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.Arrays;
-import java.util.List;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+import static java.util.Collections.singletonList;
+
+@Getter
+@Setter
 @Service("inventoryRestServerService")
-public class InventoryRestServerServiceImpl implements InventoryRestServerService {
+public class InventoryRestServerServiceImpl
+	implements InventoryRestServerService {
 
 	@Value("${inventory.server.address}")
 	private String address;
@@ -22,32 +28,7 @@ public class InventoryRestServerServiceImpl implements InventoryRestServerServic
 	private String port;
 
 	@Override
-	public String address() {
-		return address;
-	}
-
-	@Override
-	public String getKeystore() {
-		return keystore;
-	}
-
-	@Override
-	public String getLocation() {
-		return location;
-	}
-
-	@Override
-	public void setLocation(String location) {
-		this.location = location;
-	}
-
-	@Override
-	public String getPort() {
-		return port;
-	}
-
-	@Override
 	public List<String> getLocations() {
-		return Arrays.asList(getLocation());
+		return singletonList(getLocation());
 	}
 }

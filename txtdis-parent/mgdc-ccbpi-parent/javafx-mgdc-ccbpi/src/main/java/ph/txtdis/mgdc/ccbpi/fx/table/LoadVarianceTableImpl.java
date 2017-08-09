@@ -13,8 +13,8 @@ import ph.txtdis.mgdc.ccbpi.service.LoadVarianceService;
 @Scope("prototype")
 @Component("loadVarianceTable")
 public class LoadVarianceTableImpl //
-		extends AbstractVarianceTable<LoadVarianceService> //
-		implements LoadVarianceTable {
+	extends AbstractVarianceTable<LoadVarianceService> //
+	implements LoadVarianceTable {
 
 	@Override
 	protected List<TableColumn<SalesItemVariance, ?>> addColumns() {

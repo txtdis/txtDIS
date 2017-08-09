@@ -12,16 +12,17 @@ import ph.txtdis.type.PartnerType;
 
 @Repository("customerRepository")
 public interface CustomerRepository //
-		extends NameListRepository<CustomerEntity>, SpunRepository<CustomerEntity, Long> {
+	extends NameListRepository<CustomerEntity>,
+	SpunRepository<CustomerEntity, Long> {
 
 	List<CustomerEntity> findByDeactivatedOnNullAndTypeOrderByNameAsc( //
-			@Param("bank") PartnerType t);
+	                                                                   @Param("bank") PartnerType t);
 
 	List<CustomerEntity> findByNameContaining( //
-			@Param("name") String n);
+	                                           @Param("name") String n);
 
 	CustomerEntity findByVendorId( //
-			@Param("vendorId") Long id);
+	                               @Param("vendorId") Long id);
 
 	List<CustomerEntity> findByVendorIdNotNullAndRouteHistoryNull();
 }

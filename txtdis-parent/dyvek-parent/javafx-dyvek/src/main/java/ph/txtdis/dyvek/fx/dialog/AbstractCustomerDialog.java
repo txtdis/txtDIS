@@ -6,7 +6,7 @@ import ph.txtdis.fx.dialog.AbstractNameListDialog;
 import ph.txtdis.type.PartnerType;
 
 public abstract class AbstractCustomerDialog<CS extends CustomerService> //
-		extends AbstractNameListDialog<Customer, CS> {
+	extends AbstractNameListDialog<Customer, CS> {
 
 	@Override
 	protected Customer createEntity() {

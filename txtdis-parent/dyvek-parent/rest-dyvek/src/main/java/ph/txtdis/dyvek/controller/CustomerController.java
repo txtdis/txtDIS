@@ -1,25 +1,24 @@
 package ph.txtdis.dyvek.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ph.txtdis.controller.AbstractNameListController;
+import ph.txtdis.dyvek.model.Customer;
+import ph.txtdis.dyvek.service.server.CustomerService;
+
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
-import java.util.List;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import ph.txtdis.controller.AbstractNameListController;
-import ph.txtdis.dyvek.model.Customer;
-import ph.txtdis.dyvek.service.server.CustomerService;
-
 @RequestMapping("/customers")
 @RestController("customerController")
 public class CustomerController //
-		extends AbstractNameListController<CustomerService, Customer> {
+	extends AbstractNameListController<CustomerService, Customer> {
 
 	@RequestMapping(path = "/banks", method = GET)
 	public ResponseEntity<?> banks() {

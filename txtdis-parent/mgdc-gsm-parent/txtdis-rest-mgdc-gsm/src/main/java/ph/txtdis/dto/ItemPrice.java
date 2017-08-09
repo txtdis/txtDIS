@@ -1,11 +1,11 @@
 package ph.txtdis.dto;
 
-import static ph.txtdis.util.NumberUtils.zeroIfNull;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import static ph.txtdis.util.NumberUtils.zeroIfNull;
 
 @Data
 @EqualsAndHashCode

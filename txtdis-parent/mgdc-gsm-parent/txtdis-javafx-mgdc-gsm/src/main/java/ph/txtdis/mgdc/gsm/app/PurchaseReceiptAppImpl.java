@@ -1,34 +1,35 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.app.DeliveryReportApp;
 import ph.txtdis.mgdc.gsm.fx.table.PurchaseReceiptTable;
 import ph.txtdis.mgdc.gsm.service.NoPurchaseOrderReceiptService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Scope("prototype")
 @Component("purchaseReceiptApp")
 public class PurchaseReceiptAppImpl //
-		extends AbstractBillableApp<NoPurchaseOrderReceiptService, PurchaseReceiptTable, Long> //
-		implements DeliveryReportApp {
-
-	@Override
-	protected BooleanBinding isNew() {
-		return receivedOnDisplay.isEmpty();
-	}
+	extends AbstractBillableApp<NoPurchaseOrderReceiptService, PurchaseReceiptTable, Long> //
+	implements DeliveryReportApp {
 
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
 		List<Node> l = new ArrayList<>(super.mainVerticalPaneNodes());
 		l.add(trackedPane());
 		return l;
+	}
+
+	@Override
+	protected HBox trackedPane() {
+		List<Node> l = new ArrayList<>(receivingNodes());
+		l.addAll(decisionNodes());
+		return pane.centeredHorizontal(l);
 	}
 
 	@Override
@@ -61,9 +62,14 @@ public class PurchaseReceiptAppImpl //
 	protected void setInputFieldBindings() {
 		super.setInputFieldBindings();
 		referenceIdInput.disableIf(isPosted() //
-				.or(orderDateDisplay.isEmpty()));
+			.or(orderDateDisplay.isEmpty()));
 		remarksDisplay.editableIf(isNew() //
-				.and(referenceIdInput.isNotEmpty()));
+			.and(referenceIdInput.isNotEmpty()));
+	}
+
+	@Override
+	protected BooleanBinding isNew() {
+		return receivedOnDisplay.isEmpty();
 	}
 
 	@Override
@@ -71,11 +77,6 @@ public class PurchaseReceiptAppImpl //
 		super.setListeners();
 		referenceIdInput.onAction(e -> updateUponReferenceIdValidation());
 		orderDatePicker.onAction(e -> service.setOrderDate(orderDatePicker.getValue()));
-	}
-
-	@Override
-	protected void setTableBindings() {
-		table.disableIf(referenceIdInput.isEmpty());
 	}
 
 	private void updateUponReferenceIdValidation() {
@@ -89,16 +90,14 @@ public class PurchaseReceiptAppImpl //
 	}
 
 	@Override
+	protected void setTableBindings() {
+		table.disableIf(referenceIdInput.isEmpty());
+	}
+
+	@Override
 	protected void topGridLine() {
 		dateGridNodes();
 		referenceGridNodes(service.getReferencePrompt(), 3);
 		receivingGridNodes(service.getReceivingPrompt(), 5);
-	}
-
-	@Override
-	protected HBox trackedPane() {
-		List<Node> l = new ArrayList<>(receivingNodes());
-		l.addAll(decisionNodes());
-		return box.forHorizontalPane(l);
 	}
 }

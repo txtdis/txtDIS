@@ -4,7 +4,7 @@ import ph.txtdis.dto.Keyed;
 import ph.txtdis.exception.DuplicateCheckException;
 
 public interface BankDrawnCheckService<T extends Keyed<Long>> //
-		extends FinancialService {
+	extends FinancialService {
 
 	default void verifyCheck(String bank, Long checkId) throws Exception {
 		T t = findByCheck(bank, checkId);

@@ -11,5 +11,5 @@ import ph.txtdis.mgdc.controller.AbstractSpunSavedReferencedKeyedController;
 @RequestMapping("/loadReturns")
 @RestController("loadReturnController")
 public class LoadReturnController //
-		extends AbstractSpunSavedReferencedKeyedController<LoadReturnService, PickListEntity, PickList> {
+	extends AbstractSpunSavedReferencedKeyedController<LoadReturnService, PickListEntity, PickList> {
 }

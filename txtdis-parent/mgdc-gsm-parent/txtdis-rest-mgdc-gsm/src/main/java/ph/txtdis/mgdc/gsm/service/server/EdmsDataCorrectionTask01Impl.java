@@ -1,28 +1,12 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.time.ZonedDateTime.now;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.groupingBy;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.type.UserType.DRIVER;
-import static ph.txtdis.type.UserType.HELPER;
-import static ph.txtdis.util.DateTimeUtils.toTimestampText;
-import static ph.txtdis.util.DateTimeUtils.toUtilDate;
-
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import ph.txtdis.domain.SyncEntity;
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.PickList;
-import ph.txtdis.dto.Route;
-import ph.txtdis.dto.Truck;
-import ph.txtdis.dto.User;
+import ph.txtdis.dto.*;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.domain.PickListEntity;
 import ph.txtdis.mgdc.gsm.domain.RemittanceEntity;
@@ -32,9 +16,20 @@ import ph.txtdis.repository.SyncRepository;
 import ph.txtdis.service.SyncService;
 import ph.txtdis.type.SyncType;
 
+import java.util.List;
+
+import static java.time.ZonedDateTime.now;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.groupingBy;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.type.UserType.DRIVER;
+import static ph.txtdis.type.UserType.HELPER;
+import static ph.txtdis.util.DateTimeUtils.toTimestampText;
+import static ph.txtdis.util.DateTimeUtils.toUtilDate;
+
 @Component("edmsDataCorrectionTask01")
 public class EdmsDataCorrectionTask01Impl //
-		implements EdmsDataCorrectionTask01 {
+	implements EdmsDataCorrectionTask01 {
 
 	private static Logger logger = getLogger(EdmsDataCorrectionTask01Impl.class);
 
@@ -83,7 +78,8 @@ public class EdmsDataCorrectionTask01Impl //
 	public void update() {
 		if (syncService.getUpdateVersion().equalsIgnoreCase("0.0.0.0")) {
 			logger.info("\n    Started updates ");
-			//remittanceValidationService.voidAllUnvalidatedAfterPrescribedPeriodsSincePaymentAndCreationHaveBothExpired();
+			//remittanceValidationService
+			// .voidAllUnvalidatedAfterPrescribedPeriodsSincePaymentAndCreationHaveBothExpired();
 			logger.info("\n     rebuildPickings");
 			rebuildPicking();
 			logger.info("\n     voidAllPaidByCreditNotes");
@@ -114,11 +110,17 @@ public class EdmsDataCorrectionTask01Impl //
 		}
 	}
 
-	private SyncEntity edmsUpdateSync() {
-		SyncEntity s = new SyncEntity();
-		s.setLastSync(toUtilDate("2000-01-01"));
-		s.setType(SyncType.UPDATE);
-		return s;
+	private void rebuildPicking() {
+		List<Billable> l = billingService.findAllBilledButUnpicked();
+		if (l != null)
+			l.stream() //
+				.filter(b -> b.getRoute() != null && !b.getRoute().isEmpty())
+				.collect(groupingBy( //
+					Billable::getOrderDate, //
+					groupingBy(Billable::getRoute))) //
+				.entrySet() //
+				.forEach(s -> s.getValue().values() //
+					.forEach(b -> savePickListsAndBillables(b)));
 	}
 
 	private void voidAllPaidByCreditNotes() {
@@ -126,12 +128,12 @@ public class EdmsDataCorrectionTask01Impl //
 		if (l != null) {
 			for (RemittanceEntity r : l)
 				remitService.updatePaymentBasedOnValidation( //
-						"", //
-						r.getId().toString(), //
-						"false", //
-						"INVALID -- NO REFERENCE C/N#", // 
-						"SYSGEN", //
-						toTimestampText(now()));
+					"", //
+					r.getId().toString(), //
+					"false", //
+					"INVALID -- NO REFERENCE C/N#", //
+					"SYSGEN", //
+					toTimestampText(now()));
 		}
 	}
 
@@ -205,9 +207,47 @@ public class EdmsDataCorrectionTask01Impl //
 			}
 	}
 
+	private void correctPickings() {
+		List<PickList> l = pickingService.findAll();
+		savePickings(l);
+	}
+
 	private void correctBillings() {
 		List<Billable> l = billingService.findAllOutletBillings();
 		saveBillablesToEdms(l);
+	}
+
+	private void correctPurchaseReceipts() {
+		List<Billable> l = purchaseReceiptService.list();
+		if (l != null)
+			saveBillablesToEdms(l);
+	}
+
+	private void correctRRs() {
+		List<PickList> l = pickingService.findAllWithReturns();
+		savePickings(l);
+	}
+
+	private SyncEntity edmsUpdateSync() {
+		SyncEntity s = new SyncEntity();
+		s.setLastSync(toUtilDate("2000-01-01"));
+		s.setType(SyncType.UPDATE);
+		return s;
+	}
+
+	private void savePickListsAndBillables(List<Billable> l) {
+		PickListEntity p = savePickList(l.get(0));
+		l.forEach(b -> savePickedBillable(b, p));
+	}
+
+	private void savePickings(List<PickList> l) {
+		for (PickList p : l)
+			try {
+				pickingService.saveToEdms(p);
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException();
+			}
 	}
 
 	private void saveBillablesToEdms(List<Billable> l) {
@@ -218,30 +258,6 @@ public class EdmsDataCorrectionTask01Impl //
 				e.printStackTrace();
 				throw new RuntimeException();
 			}
-	}
-
-	private void correctPurchaseReceipts() {
-		List<Billable> l = purchaseReceiptService.list();
-		if (l != null)
-			saveBillablesToEdms(l);
-	}
-
-	private void rebuildPicking() {
-		List<Billable> l = billingService.findAllBilledButUnpicked();
-		if (l != null)
-			l.stream() //
-					.filter(b -> b.getRoute() != null && !b.getRoute().isEmpty())
-					.collect(groupingBy( //
-							Billable::getOrderDate, //
-							groupingBy(Billable::getRoute))) //
-					.entrySet() //
-					.forEach(s -> s.getValue().values() //
-							.forEach(b -> savePickListsAndBillables(b)));
-	}
-
-	private void savePickListsAndBillables(List<Billable> l) {
-		PickListEntity p = savePickList(l.get(0));
-		l.forEach(b -> savePickedBillable(b, p));
 	}
 
 	private PickListEntity savePickList(Billable b) {
@@ -255,25 +271,5 @@ public class EdmsDataCorrectionTask01Impl //
 		BillableEntity e = billingService.findEntityByPrimaryKey(b.getId());
 		e.setPicking(p);
 		billingService.post(e);
-	}
-
-	private void correctPickings() {
-		List<PickList> l = pickingService.findAll();
-		savePickings(l);
-	}
-
-	private void savePickings(List<PickList> l) {
-		for (PickList p : l)
-			try {
-				pickingService.saveToEdms(p);
-			} catch (Exception e) {
-				e.printStackTrace();
-				throw new RuntimeException();
-			}
-	}
-
-	private void correctRRs() {
-		List<PickList> l = pickingService.findAllWithReturns();
-		savePickings(l);
 	}
 }

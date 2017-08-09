@@ -1,25 +1,24 @@
 package ph.txtdis.mgdc.gsm.domain;
 
-import static javax.persistence.CascadeType.ALL;
-
-import java.math.BigDecimal;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ph.txtdis.domain.AbstractKeyedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ph.txtdis.domain.AbstractKeyedEntity;
+import static javax.persistence.CascadeType.ALL;
 
 @Data
 @Entity
 @Table(name = "picking_detail")
 @EqualsAndHashCode(callSuper = true)
 public class PickListDetailEntity //
-		extends AbstractKeyedEntity<Long> //
-		implements ItemQuantifiedEntityDetail {
+	extends AbstractKeyedEntity<Long> //
+	implements ItemQuantifiedEntityDetail {
 
 	private static final long serialVersionUID = -6364730743883822721L;
 

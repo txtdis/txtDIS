@@ -1,26 +1,26 @@
 package ph.txtdis.dyvek.service;
 
-import static java.util.stream.Collectors.toList;
+import ph.txtdis.dto.Named;
+import ph.txtdis.service.ListedAndResettableService;
 
 import java.util.List;
 
-import ph.txtdis.dto.Named;
-import ph.txtdis.service.ListedAndResetableService;
+import static java.util.stream.Collectors.toList;
 
 public interface MasterListedAndResetableService<T extends Named> //
-		extends ListedAndResetableService<T> {
+	extends ListedAndResettableService<T> {
 
-	default List<T> list(String endPt) {
+	default List<String> listNames(String endPt) {
 		try {
-			return getListedReadOnlyService().module(getModuleName()).getList("/" + endPt);
+			return list(endPt).stream().map(e -> e.getName()).collect(toList());
 		} catch (Exception e) {
 			return null;
 		}
 	}
 
-	default List<String> listNames(String endPt) {
+	default List<T> list(String endPt) {
 		try {
-			return list(endPt).stream().map(e -> e.getName()).collect(toList());
+			return getRestClientServiceForLists().module(getModuleName()).getList("/" + endPt);
 		} catch (Exception e) {
 			return null;
 		}

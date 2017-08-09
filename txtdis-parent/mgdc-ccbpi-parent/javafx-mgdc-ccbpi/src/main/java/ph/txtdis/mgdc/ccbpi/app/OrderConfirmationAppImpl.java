@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javafx.scene.Node;
-import ph.txtdis.app.StartableApp;
+import ph.txtdis.app.App;
 import ph.txtdis.app.TotaledTableApp;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.exception.NotFoundException;
@@ -30,8 +30,8 @@ import ph.txtdis.type.Type;
 @Scope("prototype")
 @Component("orderConfirmationApp")
 public class OrderConfirmationAppImpl //
-		extends AbstractBillableApp<OrderConfirmationService, OrderConfirmationTable, Long> //
-		implements OrderConfirmationApp {
+	extends AbstractBillableApp<OrderConfirmationService, OrderConfirmationTable, Long> //
+	implements OrderConfirmationApp {
 
 	@Autowired
 	private AppCombo<OrderConfirmationType> typeCombo;
@@ -58,14 +58,6 @@ public class OrderConfirmationAppImpl //
 	}
 
 	@Override
-	protected void buildFields() {
-		super.buildFields();
-		sequenceIdDisplay.readOnly().width(40).build(Type.ID);
-		routeDisplay.readOnly().width(60).build(Type.TEXT);
-		deliveryDisplay.readOnly().width(80).build(Type.TEXT);
-	}
-
-	@Override
 	protected Node dueDateNode() {
 		return stackPane(super.dueDateNode(), dueDatePicker);
 	}
@@ -73,10 +65,10 @@ public class OrderConfirmationAppImpl //
 	@Override
 	protected String getDialogInput() {
 		openByIdDialog //
-				.idPrompt(service.getOpenDialogKeyPrompt()) //
-				.header(service.getOpenDialogHeader()) //
-				.prompt(service.getOpenDialogPrompt()) //
-				.addParent(this).start();
+			.idPrompt(service.getOpenDialogKeyPrompt()) //
+			.header(service.getOpenDialogHeader()) //
+			.prompt(service.getOpenDialogPrompt()) //
+			.addParent(this).start();
 		return openByIdDialog.getKey();
 	}
 
@@ -89,9 +81,17 @@ public class OrderConfirmationAppImpl //
 	protected List<Node> mainVerticalPaneNodes() {
 		buildFields();
 		return Arrays.asList( //
-				gridPane(), //
-				totaledTableApp.addNoSubHeadTablePane(table), //
-				trackedPane());
+			gridPane(), //
+			totaledTableApp.addNoSubHeadTablePane(table), //
+			trackedPane());
+	}
+
+	@Override
+	protected void buildFields() {
+		super.buildFields();
+		sequenceIdDisplay.readOnly().width(40).build(Type.ID);
+		routeDisplay.readOnly().width(60).build(Type.TEXT);
+		deliveryDisplay.readOnly().width(80).build(Type.TEXT);
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public class OrderConfirmationAppImpl //
 
 	private void setCustomerBoxBindings() {
 		customerBox.disableIdInputIf(isPosted(). //
-				or(orderDatePicker.isEmpty()));
+			or(orderDatePicker.isEmpty()));
 		customerBox.setSearchButtonVisibleIfNot(isPosted());
 	}
 
@@ -266,14 +266,14 @@ public class OrderConfirmationAppImpl //
 	}
 
 	private void showCreateNewOutletOrExitDialog(Exception x, Long id) {
-		dialog.showOption(x.getMessage(), "Create", "Exit");
-		dialog.setOnOptionSelection(e -> openOutletDialog(null, id));
-		dialog.setOnDefaultSelection(e -> exitDialog());
-		dialog.addParent(this).start();
+		messageDialog.showOption(x.getMessage(), "Create", "Exit");
+		messageDialog.setOnOptionSelection(e -> openOutletDialog(null, id));
+		messageDialog.setOnDefaultSelection(e -> exitDialog());
+		messageDialog.addParent(this).start();
 	}
 
 	private void exitDialog() {
-		dialog.close();
+		messageDialog.close();
 		customerBox.refresh();
 	}
 
@@ -312,7 +312,7 @@ public class OrderConfirmationAppImpl //
 	}
 
 	@Override
-	public StartableApp type(ModuleType type) {
+	public App type(ModuleType type) {
 		return this;
 	}
 

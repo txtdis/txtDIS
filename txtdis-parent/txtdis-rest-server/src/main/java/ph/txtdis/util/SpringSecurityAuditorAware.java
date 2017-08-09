@@ -1,21 +1,19 @@
 package ph.txtdis.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
-import ph.txtdis.service.CredentialService;
+import static ph.txtdis.util.UserUtils.isAuthenticated;
+import static ph.txtdis.util.UserUtils.username;
 
 @Component("springSecurityAuditorAware")
-public class SpringSecurityAuditorAware implements AuditorAware<String> {
-
-	@Autowired
-	private CredentialService credentialService;
+public class SpringSecurityAuditorAware
+	implements AuditorAware<String> {
 
 	@Override
 	public String getCurrentAuditor() {
-		if (!credentialService.isAuthenticated())
+		if (!isAuthenticated())
 			return "SYSGEN";
-		return credentialService.username();
+		return username();
 	}
 }

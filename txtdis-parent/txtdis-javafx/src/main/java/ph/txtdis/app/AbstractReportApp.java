@@ -1,28 +1,28 @@
 package ph.txtdis.app;
 
-import static java.util.Arrays.asList;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.dialog.OpenByDateRangesDialog;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.service.ReportService;
 
-public abstract class AbstractReportApp<AT extends AppTable<T>, AS extends ReportService<T>, T> extends AbstractExcelApp<AT, AS, T> {
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
+public abstract class AbstractReportApp<AT extends AppTable<T>, AS extends ReportService<T>, T>
+	extends AbstractExcelApp<AT, AS, T> {
 
 	@Autowired
-	private AppButtonImpl backButton, openButton, nextButton;
+	private AppButton backButton, openButton, nextButton;
 
 	@Autowired
 	private OpenByDateRangesDialog openDialog;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> buttons = new ArrayList<>(asList(backButton, openButton, nextButton));
+	protected List<AppButton> addButtons() {
+		List<AppButton> buttons = new ArrayList<>(asList(backButton, openButton, nextButton));
 		buttons.addAll(super.addButtons());
 		return buttons;
 	}
@@ -70,22 +70,6 @@ public abstract class AbstractReportApp<AT extends AppTable<T>, AS extends Repor
 		}
 	}
 
-	private void showDataPerDate() throws Exception {
-		displayOpenByDateDialog();
-		setDates();
-		refresh();
-	}
-
-	protected void setDates() {
-		service.setStartDate(openDialog.getStartDate());
-		service.setEndDate(openDialog.getEndDate());
-	}
-
-	protected void displayOpenByDateDialog() {
-		openDialog.header("Enter Report Dates");
-		openDialog.addParent(this).start();
-	}
-
 	private void showNextDay() {
 		try {
 			service.next();
@@ -93,6 +77,22 @@ public abstract class AbstractReportApp<AT extends AppTable<T>, AS extends Repor
 		} catch (Exception e) {
 			showErrorDialog(e);
 		}
+	}
+
+	private void showDataPerDate() throws Exception {
+		displayOpenByDateDialog();
+		setDates();
+		refresh();
+	}
+
+	protected void displayOpenByDateDialog() {
+		openDialog.header("Enter Report Dates");
+		openDialog.addParent(this).start();
+	}
+
+	protected void setDates() {
+		service.setStartDate(openDialog.getStartDate());
+		service.setEndDate(openDialog.getEndDate());
 	}
 
 	@Override

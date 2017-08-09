@@ -7,16 +7,18 @@ import ph.txtdis.mgdc.service.LoadingService;
 import ph.txtdis.service.AppendableDetailService;
 
 public interface LoadReturnService //
-		extends AppendableDetailService, LoadingService, UpToReturnableQtyReceivingService {
+	extends AppendableDetailService,
+	LoadingService,
+	UpToReturnableQtyReceivingService {
 
 	@Override
 	List<PickListDetail> getDetails();
 
+	void setDetails(List<PickListDetail> items);
+
 	String getTruck();
 
 	void returnAllPickedItemsIfNoneOfItsOCSHasAnRR() throws Exception;
-
-	void setDetails(List<PickListDetail> items);
 
 	void updateUponPickListIdValidation(Long id) throws Exception;
 }

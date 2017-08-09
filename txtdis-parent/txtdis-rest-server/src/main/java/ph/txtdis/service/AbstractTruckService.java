@@ -5,8 +5,8 @@ import ph.txtdis.dto.Truck;
 import ph.txtdis.repository.TruckRepository;
 
 public abstract class AbstractTruckService //
-		extends AbstractCreateNameListService<TruckRepository, TruckEntity, Truck> //
-		implements ServerTruckService {
+	extends AbstractCreateNameListService<TruckRepository, TruckEntity, Truck> //
+	implements ServerTruckService {
 
 	@Override
 	public Truck toModel(TruckEntity e) {

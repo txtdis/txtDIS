@@ -1,30 +1,7 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-import static java.time.DayOfWeek.SATURDAY;
-import static java.time.DayOfWeek.SUNDAY;
-import static java.util.Collections.emptyList;
-import static ph.txtdis.type.PartnerType.OUTLET;
-import static ph.txtdis.type.PaymentType.CASH;
-import static ph.txtdis.type.PaymentType.CHECK;
-import static ph.txtdis.util.DateTimeUtils.toDate;
-import static ph.txtdis.util.DateTimeUtils.toZonedDateTime;
-import static ph.txtdis.util.DateTimeUtils.validateEndDate;
-import static ph.txtdis.util.DateTimeUtils.verifyDateIsOnOrAfterGoLive;
-import static ph.txtdis.util.NumberUtils.isZero;
-import static ph.txtdis.util.TextUtils.blankIfNull;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.Remittance;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
@@ -39,9 +16,28 @@ import ph.txtdis.type.PartnerType;
 import ph.txtdis.type.PaymentType;
 import ph.txtdis.util.DateTimeUtils;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.math.BigDecimal.ZERO;
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
+import static java.util.Collections.emptyList;
+import static ph.txtdis.type.PartnerType.OUTLET;
+import static ph.txtdis.type.PaymentType.CASH;
+import static ph.txtdis.type.PaymentType.CHECK;
+import static ph.txtdis.util.DateTimeUtils.*;
+import static ph.txtdis.util.NumberUtils.isZero;
+import static ph.txtdis.util.TextUtils.blankIfNull;
+
 public abstract class AbstractRemittanceService //
-		extends AbstractSpunSavedKeyedService<RemittanceRepository, RemittanceEntity, Remittance, Long> //
-		implements GsmRemittanceService {
+	extends AbstractSpunSavedKeyedService<RemittanceRepository, RemittanceEntity, Remittance, Long> //
+	implements GsmRemittanceService {
 
 	@Autowired
 	private CustomerService customerService;
@@ -62,14 +58,14 @@ public abstract class AbstractRemittanceService //
 	private String gracePeriodCheckDeposit;
 
 	@Override
-	public List<RemittanceEntity> findEntitiesByBillingId(Long id) {
-		return repository.findByDetailsBillingId(id);
-	}
-
-	@Override
 	public List<Remittance> findAll(Billable b) {
 		List<RemittanceEntity> l = findEntitiesByBillingId(b.getId());
 		return toRemittances(l);
+	}
+
+	@Override
+	public List<RemittanceEntity> findEntitiesByBillingId(Long id) {
+		return repository.findByDetailsBillingId(id);
 	}
 
 	private List<Remittance> toRemittances(List<RemittanceEntity> l) {
@@ -79,7 +75,7 @@ public abstract class AbstractRemittanceService //
 	protected Remittance newRemittance(RemittanceEntity e) {
 		Remittance r = toPaymentOnlyRemittance(e);
 		r.setRemarks(e.getRemarks());
-		r.setCollector(e.getCollector());
+		r.setReceivedFrom(e.getCollector());
 		r.setCreatedBy(e.getCreatedBy());
 		r.setCreatedOn(e.getCreatedOn());
 		if (e.getIsValid() != null)
@@ -89,6 +85,13 @@ public abstract class AbstractRemittanceService //
 		if (e.getReceivedOn() != null)
 			r = setTransferData(e, r);
 		return r;
+	}
+
+	private Remittance toPaymentOnlyRemittance(RemittanceEntity e) {
+		Remittance r = toIdOnlyRemittance(e);
+		r.setPaymentDate(e.getPaymentDate());
+		r.setValue(e.getValue());
+		return setCheckData(e, r);
 	}
 
 	private Remittance setAuditData(RemittanceEntity e, Remittance r) {
@@ -114,6 +117,18 @@ public abstract class AbstractRemittanceService //
 		return r;
 	}
 
+	private Remittance toIdOnlyRemittance(RemittanceEntity e) {
+		Remittance r = new Remittance();
+		r.setId(e.getId());
+		return r;
+	}
+
+	private Remittance setCheckData(RemittanceEntity e, Remittance r) {
+		r.setCheckId(e.getCheckId());
+		r.setDraweeBank(draweeBank(e));
+		return r;
+	}
+
 	private String draweeBank(RemittanceEntity e) {
 		CustomerEntity bank = e == null ? null : e.getDraweeBank();
 		return bank == null ? null : bank.getName();
@@ -122,8 +137,8 @@ public abstract class AbstractRemittanceService //
 	@Override
 	public List<Remittance> findAll(LocalDate startDate, LocalDate endDate) throws Exception {
 		List<RemittanceEntity> l = repository.findByPaymentDateBetweenOrderByPaymentDateAsc( //
-				verifyDateIsOnOrAfterGoLive(startDate, edmsGoLive()), //
-				validateEndDate(startDate, endDate, edmsGoLive()));
+			verifyDateIsOnOrAfterGoLive(startDate, edmsGoLive()), //
+			validateEndDate(startDate, endDate, edmsGoLive()));
 		return toModels(l);
 	}
 
@@ -134,17 +149,18 @@ public abstract class AbstractRemittanceService //
 	@Override
 	public List<Remittance> findAll(String collector, LocalDate start, LocalDate end) throws Exception {
 		List<RemittanceEntity> l = repository.findByCollectorContainingAndPaymentDateBetween( //
-				collector, //
-				verifyDateIsOnOrAfterGoLive(start, edmsGoLive()), //
-				validateEndDate(start, end, edmsGoLive()));
+			collector, //
+			verifyDateIsOnOrAfterGoLive(start, edmsGoLive()), //
+			validateEndDate(start, end, edmsGoLive()));
 		return toModels(l);
 	}
 
 	@Override
 	public List<RemittanceDetailEntity> findFullyPaidEntitiesForMaturedPostDatedChecks() {
 		List<RemittanceDetailEntity> l = remittanceDetailRepository
-				.findByRemittancePaymentDateLessThanEqualAndRemittanceCheckIdNotNullAndBillingFullyPaidFalseAndBillingUnpaidValue( //
-						LocalDate.now(), ZERO);
+			.findByRemittancePaymentDateLessThanEqualAndRemittanceCheckIdNotNullAndBillingFullyPaidFalseAndBillingUnpaidValue(
+				//
+				LocalDate.now(), ZERO);
 		return l != null ? l : emptyList();
 	}
 
@@ -158,38 +174,20 @@ public abstract class AbstractRemittanceService //
 
 	private List<RemittanceEntity> removeAdjustingRemittances(List<RemittanceEntity> l) {
 		return l == null ? null : l.stream() //
-				.filter(r -> r.getDraweeBank() == null || !adjustingAccounts().contains(r.getDraweeBank().getName())).collect(Collectors.toList());
-	}
-
-	protected List<String> adjustingAccounts() {
-		return Arrays.asList("");
+			.filter(r -> r.getDraweeBank() == null || !adjustingAccounts().contains(r.getDraweeBank().getName()))
+			.collect(Collectors.toList());
 	}
 
 	private List<Remittance> toRemittanceHistory(List<RemittanceEntity> l) {
 		return l.stream().map(e -> toRemittanceHistory(e)).collect(Collectors.toList());
 	}
 
+	protected List<String> adjustingAccounts() {
+		return Arrays.asList("");
+	}
+
 	private Remittance toRemittanceHistory(RemittanceEntity e) {
 		return toPaymentOnlyRemittance(e);
-	}
-
-	private Remittance toPaymentOnlyRemittance(RemittanceEntity e) {
-		Remittance r = toIdOnlyRemittance(e);
-		r.setPaymentDate(e.getPaymentDate());
-		r.setValue(e.getValue());
-		return setCheckData(e, r);
-	}
-
-	private Remittance toIdOnlyRemittance(RemittanceEntity e) {
-		Remittance r = new Remittance();
-		r.setId(e.getId());
-		return r;
-	}
-
-	private Remittance setCheckData(RemittanceEntity e, Remittance r) {
-		r.setCheckId(e.getCheckId());
-		r.setDraweeBank(draweeBank(e));
-		return r;
 	}
 
 	@Override
@@ -210,9 +208,28 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
+	protected Remittance toModel(RemittanceEntity e) {
+		return e == null ? null : newRemittance(e);
+	}
+
+	@Override
 	public Remittance findByCheck(String bank, Long checkId) {
 		RemittanceEntity e = findEntityByCheck(bank, checkId);
 		return toModel(e);
+	}
+
+	@Override
+	public RemittanceEntity findEntityByCheck(String bank, Long checkId) {
+		List<RemittanceEntity> l = repository.findByDraweeBankNameAndCheckId(bank, checkId);
+		return oneValid(l);
+	}
+
+	private RemittanceEntity oneValid(List<RemittanceEntity> l) {
+		try {
+			return l.stream().filter(notInvalid()).findFirst().get();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	private Predicate<RemittanceEntity> notInvalid() {
@@ -234,20 +251,6 @@ public abstract class AbstractRemittanceService //
 	@Override
 	public Remittance findByUndepositedPayments(PaymentType payType, String seller, LocalDate upToDate) {
 		return findUndepositedPayment(payType, seller, upToDate);
-	}
-
-	@Override
-	public RemittanceEntity findEntityByCheck(String bank, Long checkId) {
-		List<RemittanceEntity> l = repository.findByDraweeBankNameAndCheckId(bank, checkId);
-		return oneValid(l);
-	}
-
-	private RemittanceEntity oneValid(List<RemittanceEntity> l) {
-		try {
-			return l.stream().filter(notInvalid()).findFirst().get();
-		} catch (Exception e) {
-			return null;
-		}
 	}
 
 	@Override
@@ -276,26 +279,29 @@ public abstract class AbstractRemittanceService //
 	private RemittanceEntity findUnreceivedCheck() {
 		List<RemittanceEntity> l = repository.findByDecidedOnNullAndCheckIdNotNullAndReceivedOnNull();
 		return l == null ? null //
-				: l.stream() //
-						.filter(r -> collectedOrDatedInThePastCheck(r)) //
-						.findFirst().orElse(null);
-	}
-
-	private boolean collectedOrDatedInThePastCheck(RemittanceEntity r) {
-		return r.getCreatedOn().toLocalDate().isBefore(LocalDate.now()) //
-				|| r.getPaymentDate().isBefore(LocalDate.now());
+			: l.stream() //
+			.filter(r -> collectedOrDatedInThePastCheck(r)) //
+			.findFirst().orElse(null);
 	}
 
 	private RemittanceEntity findUndepositedCheck() {
-		return repository.findByDecidedOnNullAndCheckIdNotNullAndReceivedOnNotNullAndDepositedOnNullAndPaymentDateLessThan(LocalDate.now());
+		return repository
+			.findByDecidedOnNullAndCheckIdNotNullAndReceivedOnNotNullAndDepositedOnNullAndPaymentDateLessThan(
+				LocalDate.now());
 	}
 
 	private RemittanceEntity findUndepositedCash() {
-		return repository.findFirstByDecidedOnNullAndCheckIdNullAndDepositedOnNullAndPaymentDateLessThan(LocalDate.now());
+		return repository.findFirstByDecidedOnNullAndCheckIdNullAndDepositedOnNullAndPaymentDateLessThan(LocalDate.now
+			());
 	}
 
 	private RemittanceEntity findUnvalidated() {
 		return repository.findFirstByDecidedOnNullAndDepositedOnNotNull();
+	}
+
+	private boolean collectedOrDatedInThePastCheck(RemittanceEntity r) {
+		return r.getCreatedOn().toLocalDate().isBefore(LocalDate.now()) //
+			|| r.getPaymentDate().isBefore(LocalDate.now());
 	}
 
 	@Override
@@ -314,7 +320,7 @@ public abstract class AbstractRemittanceService //
 
 	private List<RemittanceEntity> undepositedCashPayments(LocalDate date) {
 		return repository.findByDetailsBillingCustomerTypeAndDepositedOnNullAndCheckIdNullAndPaymentDateBetween( //
-				OUTLET, edmsGoLive(), cutoff(CASH, date));
+			OUTLET, edmsGoLive(), cutoff(CASH, date));
 	}
 
 	private LocalDate cutoff(PaymentType payment, LocalDate date) {
@@ -333,20 +339,23 @@ public abstract class AbstractRemittanceService //
 	private boolean isAWeekendOrAHoliday(LocalDate date, long day) {
 		LocalDate newDate = date.minusDays(day);
 		return newDate.getDayOfWeek() == SATURDAY //
-				|| newDate.getDayOfWeek() == SUNDAY //
-				|| holidayRepository.findByDeclaredDate(newDate) != null;
+			|| newDate.getDayOfWeek() == SUNDAY //
+			|| holidayRepository.findByDeclaredDate(newDate) != null;
 	}
 
 	private List<RemittanceEntity> undepositedCheckPayments(LocalDate date) {
 		return repository.findByDetailsBillingCustomerTypeAndReceivedOnNullAndCheckIdNotNullAndPaymentDateBetween( //
-				PartnerType.OUTLET, edmsGoLive(), cutoff(CHECK, date));
+			PartnerType.OUTLET, edmsGoLive(), cutoff(CHECK, date));
 	}
 
-	private RemittanceEntity oneUndepositedPaymentOfACustomerOf(String seller, List<RemittanceEntity> remittancesWithUndepostedPayment) {
+	private RemittanceEntity oneUndepositedPaymentOfACustomerOf(String seller,
+	                                                            List<RemittanceEntity>
+		                                                            remittancesWithUndepostedPayment) {
 		Optional<RemittanceDetailEntity> o = remittancesWithUndepostedPayment.stream()//
-				.flatMap(e -> e.getDetails().stream())//
-				.filter(rd -> customerOf(rd, seller)).findFirst();
-		return !o.isPresent() ? null : remittancesWithUndepostedPayment.stream().filter(e -> e.getDetails().contains(o.get())).findFirst().get();
+			.flatMap(e -> e.getDetails().stream())//
+			.filter(rd -> customerOf(rd, seller)).findFirst();
+		return !o.isPresent() ? null :
+			remittancesWithUndepostedPayment.stream().filter(e -> e.getDetails().contains(o.get())).findFirst().get();
 	}
 
 	private boolean customerOf(RemittanceDetailEntity rd, String seller) {
@@ -366,11 +375,6 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	protected Remittance toModel(RemittanceEntity e) {
-		return e == null ? null : newRemittance(e);
-	}
-
-	@Override
 	public List<RemittanceEntity> toEntities(List<Remittance> l) {
 		return super.toEntities(l);
 	}
@@ -384,15 +388,9 @@ public abstract class AbstractRemittanceService //
 		RemittanceEntity e = new RemittanceEntity();
 		e.setPaymentDate(r.getPaymentDate());
 		e.setValue(r.getValue());
-		e.setCollector(r.getCollector());
+		e.setCollector(r.getReceivedFrom());
 		e.setRemarks(r.getRemarks());
 		return updateCheckData(e, r);
-	}
-
-	private RemittanceEntity updateCheckData(RemittanceEntity e, Remittance r) {
-		e.setCheckId(r.getCheckId());
-		e.setDraweeBank(bank(r.getDraweeBank()));
-		return e;
 	}
 
 	protected RemittanceEntity update(Remittance r) {
@@ -406,19 +404,18 @@ public abstract class AbstractRemittanceService //
 		return e;
 	}
 
+	private RemittanceEntity updateCheckData(RemittanceEntity e, Remittance r) {
+		e.setCheckId(r.getCheckId());
+		e.setDraweeBank(bank(r.getDraweeBank()));
+		return e;
+	}
+
 	private RemittanceEntity updateAuditData(Remittance r, RemittanceEntity e) {
 		boolean isValid = r.getIsValid();
 		if (!isValid)
 			e.setDetails(unpayBillings(e));
 		e.setRemarks(r.getRemarks());
 		return updateValidity(e, r, isValid, r.getDecidedBy());
-	}
-
-	protected RemittanceEntity updateValidity(RemittanceEntity e, Remittance r, boolean isValid, String user) {
-		e.setIsValid(isValid);
-		e.setDecidedBy(user);
-		e.setDecidedOn(ZonedDateTime.now());
-		return e;
 	}
 
 	private RemittanceEntity updateTransferData(Remittance r, RemittanceEntity e) {
@@ -437,6 +434,46 @@ public abstract class AbstractRemittanceService //
 
 	private CustomerEntity bank(String name) {
 		return customerService.findEntityByName(name);
+	}
+
+	private List<RemittanceDetailEntity> unpayBillings(RemittanceEntity e) {
+		return e.getDetails().stream().map(d -> unpayBilling(d)).collect(Collectors.toList());
+	}
+
+	protected RemittanceEntity updateValidity(RemittanceEntity e, Remittance r, boolean isValid, String user) {
+		e.setIsValid(isValid);
+		e.setDecidedBy(user);
+		e.setDecidedOn(ZonedDateTime.now());
+		return e;
+	}
+
+	private RemittanceDetailEntity unpayBilling(RemittanceDetailEntity d) {
+		d.setBilling(unpaidBilling(d));
+		d.setPaymentValue(ZERO);
+		return d;
+	}
+
+	private BillableEntity unpaidBilling(RemittanceDetailEntity rd) {
+		BillableEntity b = rd.getBilling();
+		b.setRemarks(addReasonForUnpayment(b, rd));
+		b.setFullyPaid(false);
+		return recomputeBillingUnpaidValue(b, rd);
+	}
+
+	private String addReasonForUnpayment(BillableEntity b, RemittanceDetailEntity rd) {
+		String originalRemarks = b.getRemarks();
+		String blankIfNullRemarks = blankIfNull(originalRemarks);
+		String unpaidRemarks = "UNPAID DUE TO INVALID REMITTANCE No. " + rd.getRemittance().getId();
+
+		if (blankIfNullRemarks.contains(unpaidRemarks))
+			return originalRemarks;
+		return unpaidRemarks + "\n" + blankIfNullRemarks;
+	}
+
+	private BillableEntity recomputeBillingUnpaidValue(BillableEntity b, RemittanceDetailEntity d) {
+		if (!isZero(d.getPaymentValue()))
+			b.setUnpaidValue(b.getUnpaidValue().add(d.getPaymentValue()));
+		return b;
 	}
 
 	@Override
@@ -472,38 +509,5 @@ public abstract class AbstractRemittanceService //
 			e.setDetails(unpayBillings(e));
 			post(e);
 		}
-	}
-
-	private List<RemittanceDetailEntity> unpayBillings(RemittanceEntity e) {
-		return e.getDetails().stream().map(d -> unpayBilling(d)).collect(Collectors.toList());
-	}
-
-	private RemittanceDetailEntity unpayBilling(RemittanceDetailEntity d) {
-		d.setBilling(unpaidBilling(d));
-		d.setPaymentValue(ZERO);
-		return d;
-	}
-
-	private BillableEntity unpaidBilling(RemittanceDetailEntity rd) {
-		BillableEntity b = rd.getBilling();
-		b.setRemarks(addReasonForUnpayment(b, rd));
-		b.setFullyPaid(false);
-		return recomputeBillingUnpaidValue(b, rd);
-	}
-
-	private String addReasonForUnpayment(BillableEntity b, RemittanceDetailEntity rd) {
-		String originalRemarks = b.getRemarks();
-		String blankIfNullRemarks = blankIfNull(originalRemarks);
-		String unpaidRemarks = "UNPAID DUE TO INVALID REMITTANCE No. " + rd.getRemittance().getId();
-
-		if (blankIfNullRemarks.contains(unpaidRemarks))
-			return originalRemarks;
-		return unpaidRemarks + "\n" + blankIfNullRemarks;
-	}
-
-	private BillableEntity recomputeBillingUnpaidValue(BillableEntity b, RemittanceDetailEntity d) {
-		if (!isZero(d.getPaymentValue()))
-			b.setUnpaidValue(b.getUnpaidValue().add(d.getPaymentValue()));
-		return b;
 	}
 }

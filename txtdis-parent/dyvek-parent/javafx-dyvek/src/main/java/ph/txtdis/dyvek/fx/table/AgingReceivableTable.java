@@ -4,5 +4,5 @@ import ph.txtdis.dyvek.model.Aging;
 import ph.txtdis.fx.table.AppTable;
 
 public interface AgingReceivableTable
-		extends AppTable<Aging> {
+	extends AppTable<Aging> {
 }

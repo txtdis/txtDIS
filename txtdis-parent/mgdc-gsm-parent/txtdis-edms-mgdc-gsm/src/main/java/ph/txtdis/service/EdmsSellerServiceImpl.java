@@ -1,18 +1,8 @@
 package ph.txtdis.service;
 
-import static java.util.stream.StreamSupport.stream;
-import static org.apache.commons.lang3.StringUtils.substringAfter;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
-import static ph.txtdis.type.DeliveryType.PICK_UP;
-import static ph.txtdis.util.DateTimeUtils.toTimestampWithSecondText;
-
-import java.util.stream.Stream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsSeller;
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.PickList;
@@ -20,9 +10,18 @@ import ph.txtdis.dto.Route;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.repository.EdmsSellerRepository;
 
+import java.util.stream.Stream;
+
+import static java.util.stream.StreamSupport.stream;
+import static org.apache.commons.lang3.StringUtils.substringAfter;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
+import static ph.txtdis.type.DeliveryType.PICK_UP;
+import static ph.txtdis.util.DateTimeUtils.toTimestampWithSecondText;
+
 @Service("sellerService")
 public class EdmsSellerServiceImpl //
-		implements EdmsSellerService {
+	implements EdmsSellerService {
 
 	@Autowired
 	private EdmsSellerRepository sellerRepository;
@@ -49,37 +48,21 @@ public class EdmsSellerServiceImpl //
 	private String username;
 
 	@Override
-	public EdmsSeller extractFrom(Billable b) {
-		return findByTruckPlateNo(b.getTruck());
-	}
-
-	@Override
-	public EdmsSeller extractFrom(PickList p) {
-		return findByTruckPlateNo(p.getTruck());
-	}
-
-	@Override
-	public EdmsSeller findByCode(String route) {
-		return route == null || route.isEmpty() ? null //
-				: sellerRepository.findByCodeIgnoreCase(route);
-	}
-
-	@Override
-	public EdmsSeller findByTruckPlateNo(String truck) {
-		return truck == null || truck.isEmpty() || truck.equals(PICK_UP.toString()) ? null //
-				: sellerRepository.findByPlateNo(truck);
-	}
-
-	@Override
 	public EdmsSeller findByUsername(String username) {
 		return username == null || username.isEmpty() ? null //
-				: sellerRepository.findFirstByNameEndingWithIgnoreCaseOrderByIdDesc(username);
+			: sellerRepository.findFirstByNameEndingWithIgnoreCaseOrderByIdDesc(username);
 	}
 
 	@Override
 	public String getCode(Customer c) {
 		EdmsSeller s = findByCode(getRouteName(c));
 		return s == null ? null : s.getCode();
+	}
+
+	@Override
+	public EdmsSeller findByCode(String route) {
+		return route == null || route.isEmpty() ? null //
+			: sellerRepository.findByCodeIgnoreCase(route);
 	}
 
 	private String getRouteName(Customer c) {
@@ -93,22 +76,31 @@ public class EdmsSellerServiceImpl //
 	}
 
 	@Override
+	public EdmsSeller extractFrom(PickList p) {
+		return findByTruckPlateNo(p.getTruck());
+	}
+
+	@Override
+	public EdmsSeller findByTruckPlateNo(String truck) {
+		return truck == null || truck.isEmpty() || truck.equals(PICK_UP.toString()) ? null //
+			: sellerRepository.findByPlateNo(truck);
+	}
+
+	@Override
 	public String getCode(Billable b) {
 		EdmsSeller s = extractFrom(b);
 		return s == null ? null : s.getCode();
 	}
 
 	@Override
-	public Stream<EdmsSeller> getAll() {
-		Iterable<EdmsSeller> i = sellerRepository.findAll();
-		return stream(i.spliterator(), false);
+	public EdmsSeller extractFrom(Billable b) {
+		return findByTruckPlateNo(b.getTruck());
 	}
 
 	@Override
-	public String getUsername(EdmsSeller s) {
-		String name = s.getName();
-		name = substringAfter(name, ",").trim();
-		return substringBefore(name, " ").toUpperCase().trim();
+	public Stream<EdmsSeller> getAll() {
+		Iterable<EdmsSeller> i = sellerRepository.findAll();
+		return stream(i.spliterator(), false);
 	}
 
 	@Override
@@ -124,6 +116,13 @@ public class EdmsSellerServiceImpl //
 	}
 
 	@Override
+	public String getUsername(EdmsSeller s) {
+		String name = s.getName();
+		name = substringAfter(name, ",").trim();
+		return substringBefore(name, " ").toUpperCase().trim();
+	}
+
+	@Override
 	public Route save(Route r) {
 		EdmsSeller s = findByCode(r.getName());
 		if (s == null)
@@ -132,11 +131,6 @@ public class EdmsSellerServiceImpl //
 		s.setTruckCode(truckService.getCode(r));
 		sellerRepository.save(s);
 		return r;
-	}
-
-	private String sellerFullName(Route r) {
-		String name = r.getSellerFullName();
-		return name == null ? "" : capitalizeFully(name);
 	}
 
 	private EdmsSeller newEdmsSeller(Route r) {
@@ -156,5 +150,10 @@ public class EdmsSellerServiceImpl //
 		s.setModifiedBy("");
 		s.setModifiedOn("");
 		return s;
+	}
+
+	private String sellerFullName(Route r) {
+		String name = r.getSellerFullName();
+		return name == null ? "" : capitalizeFully(name);
 	}
 }

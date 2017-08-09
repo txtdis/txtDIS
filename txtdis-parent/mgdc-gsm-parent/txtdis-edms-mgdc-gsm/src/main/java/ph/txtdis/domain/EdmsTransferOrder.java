@@ -12,8 +12,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "tr_stock_out_h")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsTransferOrder extends EdmsAbstractTransferredModifiedNotedWarehousedDatedRemarkedReferencedStatusCreatedId
-		implements Serializable {
+public class EdmsTransferOrder
+	extends EdmsAbstractTransferredModifiedNotedWarehousedDatedRemarkedReferencedStatusCreatedId
+	implements Serializable {
 
 	private static final long serialVersionUID = -1148761289889352509L;
 }

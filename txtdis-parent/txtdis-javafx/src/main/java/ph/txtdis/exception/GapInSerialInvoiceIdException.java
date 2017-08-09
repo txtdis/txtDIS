@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class GapInSerialInvoiceIdException extends Exception {
+public class GapInSerialInvoiceIdException
+	extends Exception {
 
 	private static final long serialVersionUID = 5553837883932799884L;
 

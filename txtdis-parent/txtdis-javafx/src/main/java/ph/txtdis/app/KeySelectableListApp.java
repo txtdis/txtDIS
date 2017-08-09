@@ -1,7 +1,7 @@
 package ph.txtdis.app;
 
 public interface KeySelectableListApp //
-		extends StartableApp {
+	extends App {
 
 	Long getSelectedKey();
 }

@@ -15,7 +15,7 @@ import ph.txtdis.mgdc.fx.table.AbstractPickListTableContextMenu;
 @Scope("prototype")
 @Component("pickListTableContextMenu")
 public class CokePickListTableContextMenuImpl //
-		extends AbstractPickListTableContextMenu {
+	extends AbstractPickListTableContextMenu {
 
 	@Autowired
 	private MessageDialog errorDialog;

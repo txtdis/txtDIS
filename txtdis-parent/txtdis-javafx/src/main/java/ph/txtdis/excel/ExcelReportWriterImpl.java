@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 @Component("excelReportWriter")
 public class ExcelReportWriterImpl //
-		extends AbstractExcelWriter //
-		implements ExcelReportWriter {
+	extends AbstractExcelWriter //
+	implements ExcelReportWriter {
 }

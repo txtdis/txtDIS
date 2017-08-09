@@ -8,8 +8,8 @@ import ph.txtdis.dto.Named;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Item //
-		extends AbstractCreationTracked<Long> //
-		implements Named {
+	extends AbstractCreationTracked<Long> //
+	implements Named {
 
 	private String name;
 

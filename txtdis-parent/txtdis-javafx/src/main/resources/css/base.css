@@ -1,6 +1,6 @@
 .root {
     -fx-font-size: 11pt;
-} 
+}
 
 .table-view .column-header .label {
     -fx-font-weight: normal;

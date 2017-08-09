@@ -1,9 +1,9 @@
 package ph.txtdis.service;
 
-import static java.io.File.separator;
-import static java.lang.System.getProperty;
-import static java.util.Arrays.asList;
-import static org.apache.log4j.Logger.getLogger;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.exception.FailedReplicationException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,22 +11,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.exception.FailedReplicationException;
+import static java.io.File.separator;
+import static java.lang.System.getProperty;
+import static java.util.Arrays.asList;
+import static org.apache.log4j.Logger.getLogger;
 
 @Service("restoreService")
-public class RestoreServiceImpl implements RestoreService {
+public class RestoreServiceImpl
+	implements RestoreService {
 
 	private static Logger logger = getLogger(RestoreServiceImpl.class);
-
-	@Value("${database.password}")
-	private String databasePassword;
-
-	@Value("${spring.datasource.password}")
-	private String password;
 
 	@Value("${database.name}")
 	protected String databaseName;
@@ -37,6 +31,12 @@ public class RestoreServiceImpl implements RestoreService {
 	@Value("${spring.datasource.username}")
 	protected String username;
 
+	@Value("${database.password}")
+	private String databasePassword;
+
+	@Value("${spring.datasource.password}")
+	private String password;
+
 	@Override
 	public void restoreFromDownloadedBackup() throws FailedReplicationException {
 		try {
@@ -44,6 +44,12 @@ public class RestoreServiceImpl implements RestoreService {
 		} catch (Exception e) {
 			throw new FailedReplicationException("Replication");
 		}
+	}
+
+	private void startRestoring() throws IOException, InterruptedException {
+		Process p = build().start();
+		logRestoreProcess(p);
+		p.waitFor();
 	}
 
 	private ProcessBuilder build() {
@@ -62,22 +68,16 @@ public class RestoreServiceImpl implements RestoreService {
 			logger.info(log);
 	}
 
-	private void startRestoring() throws IOException, InterruptedException {
-		Process p = build().start();
-		logRestoreProcess(p);
-		p.waitFor();
-	}
-
 	private List<String> restoreCommand() {
 		return asList(postgresRestoreAppPath(), //
-				"--host=localhost", //
-				"--port=5432", //
-				"--username=" + username, //
-				"--no-password", //
-				"--clean", //
-				"--verbose", //
-				"--dbname=" + databaseName, //
-				getProperty("user.home") + separator + databaseName + ".backup");
+			"--host=localhost", //
+			"--port=5432", //
+			"--username=" + username, //
+			"--no-password", //
+			"--clean", //
+			"--verbose", //
+			"--dbname=" + databaseName, //
+			getProperty("user.home") + separator + databaseName + ".backup");
 	}
 
 	private String postgresRestoreAppPath() {

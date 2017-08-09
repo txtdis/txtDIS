@@ -21,8 +21,8 @@ import ph.txtdis.dto.Remittance;
 @Scope("prototype")
 @Component("remittanceListTable")
 public class RemittanceListTableImpl //
-		extends AbstractTable<Remittance> //
-		implements RemittanceListTable {
+	extends AbstractTable<Remittance> //
+	implements RemittanceListTable {
 
 	@Autowired
 	private Column<Remittance, Long> id;
@@ -45,10 +45,10 @@ public class RemittanceListTableImpl //
 	@Override
 	protected List<TableColumn<Remittance, ?>> addColumns() {
 		return asList( //
-				id.ofType(ID).launches(app).build("Remit No.", "id"), //
-				orderDate.ofType(DATE).launches(app).build("Date", "paymentDate"), //
-				bank.ofType(TEXT).launches(app).build("Bank", "draweeBank"), //
-				check.ofType(ID).launches(app).width(90).build("Check No.", "checkId"), //
-				value.ofType(CURRENCY).launches(app).build("Amount", "value"));
+			id.ofType(ID).launches(app).build("Remit No.", "id"), //
+			orderDate.ofType(DATE).launches(app).build("Date", "paymentDate"), //
+			bank.ofType(TEXT).launches(app).build("Bank", "draweeBank"), //
+			check.ofType(ID).launches(app).width(90).build("Check No.", "checkId"), //
+			value.ofType(CURRENCY).launches(app).build("Amount", "value"));
 	}
 }

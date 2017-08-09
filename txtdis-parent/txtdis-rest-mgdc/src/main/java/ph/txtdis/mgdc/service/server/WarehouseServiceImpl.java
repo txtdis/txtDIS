@@ -1,7 +1,6 @@
 package ph.txtdis.mgdc.service.server;
 
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Warehouse;
 import ph.txtdis.mgdc.domain.WarehouseEntity;
 import ph.txtdis.mgdc.repository.WarehouseRepository;
@@ -9,8 +8,8 @@ import ph.txtdis.service.AbstractCreateNameListService;
 
 @Service("warehouseService")
 public class WarehouseServiceImpl //
-		extends AbstractCreateNameListService<WarehouseRepository, WarehouseEntity, Warehouse> //
-		implements WarehouseService {
+	extends AbstractCreateNameListService<WarehouseRepository, WarehouseEntity, Warehouse> //
+	implements WarehouseService {
 
 	@Override
 	protected Warehouse toModel(WarehouseEntity e) {

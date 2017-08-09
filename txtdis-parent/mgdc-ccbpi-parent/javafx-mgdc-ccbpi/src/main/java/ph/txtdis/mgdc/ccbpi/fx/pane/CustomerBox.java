@@ -14,12 +14,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.FocusRequested;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.fx.dialog.SearchDialog;
-import ph.txtdis.fx.pane.AppBoxPaneFactory;
+import ph.txtdis.fx.pane.PaneFactory;
 import ph.txtdis.mgdc.ccbpi.app.CustomerListAppImpl;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.service.CustomerIdAndNameService;
@@ -30,10 +30,10 @@ import ph.txtdis.service.CustomerSearchableService;
 public class CustomerBox {
 
 	@Autowired
-	private AppBoxPaneFactory box;
+	private PaneFactory pane;
 
 	@Autowired
-	private AppButtonImpl customerSearchButton;
+	private AppButton customerSearchButton;
 
 	@Autowired
 	private AppFieldImpl<Long> customerIdInput;
@@ -80,7 +80,7 @@ public class CustomerBox {
 		customerIdInput.width(140).build(ID);
 		customerNameDisplay.readOnly().width(420).build(TEXT);
 		buildSearchButton();
-		return hbox = box.forHorizontals(customerIdInput, customerNameDisplay, customerSearchButton);
+		return hbox = pane.horizontal(customerIdInput, customerNameDisplay, customerSearchButton);
 	}
 
 	private void buildSearchButton() {
@@ -118,6 +118,14 @@ public class CustomerBox {
 		customerIdInput.requestFocus();
 	}
 
+	public void handleError(Exception e) {
+		e.printStackTrace();
+		dialog.show(e).addParent(stage).start();
+		customerIdInput.setValue(null);
+		customerNameDisplay.setValue(null);
+		customerIdInput.requestFocus();
+	}
+
 	private Customer getSelectionFromSearchResults() {
 		customerListApp.addParent(stage).start();
 		return customerListApp.getSelection();
@@ -127,12 +135,8 @@ public class CustomerBox {
 		return customerIdInput.getValue();
 	}
 
-	public void handleError(Exception e) {
-		e.printStackTrace();
-		dialog.show(e).addParent(stage).start();
-		customerIdInput.setValue(null);
-		customerNameDisplay.setValue(null);
-		customerIdInput.requestFocus();
+	public void setId(Long id) {
+		customerIdInput.setValue(id);
 	}
 
 	public void hideSearchButton() {
@@ -162,10 +166,6 @@ public class CustomerBox {
 
 	public void onAction(EventHandler<ActionEvent> e) {
 		customerIdInput.onAction(e);
-	}
-
-	public void setId(Long id) {
-		customerIdInput.setValue(id);
 	}
 
 	public void setSearchButtonVisibleIfNot(BooleanBinding b) {

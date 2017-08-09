@@ -1,16 +1,7 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.util.DateTimeUtils.toTimestampText;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.CreditNote;
 import ph.txtdis.dto.CreditNotePayment;
 import ph.txtdis.mgdc.gsm.domain.CreditNoteEntity;
@@ -19,10 +10,18 @@ import ph.txtdis.mgdc.gsm.domain.RemittanceEntity;
 import ph.txtdis.mgdc.gsm.repository.CreditNoteRepository;
 import ph.txtdis.service.AbstractSpunSavedKeyedService;
 
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.util.DateTimeUtils.toTimestampText;
+
 @Service("creditNoteService")
 public class CreditNoteServiceImpl
-		extends AbstractSpunSavedKeyedService<CreditNoteRepository, CreditNoteEntity, CreditNote, Long> //
-		implements CreditNoteService {
+	extends AbstractSpunSavedKeyedService<CreditNoteRepository, CreditNoteEntity, CreditNote, Long> //
+	implements CreditNoteService {
 
 	@Autowired
 	private GsmRemittanceService remittanceService;
@@ -30,18 +29,6 @@ public class CreditNoteServiceImpl
 	@Override
 	public List<CreditNote> findAll() {
 		List<CreditNoteEntity> l = repository.findByOrderByIdAsc();
-		return toModels(l);
-	}
-
-	@Override
-	public List<CreditNote> findAllUnpaid() {
-		List<CreditNoteEntity> l = repository.findByBalanceValueGreaterThanOrderByIdAsc(BigDecimal.ZERO);
-		return toModels(l);
-	}
-
-	@Override
-	public List<CreditNote> findAllUnvalidated() {
-		List<CreditNoteEntity> l = repository.findByIsValidNullOrderByIdAsc();
 		return toModels(l);
 	}
 
@@ -91,6 +78,18 @@ public class CreditNoteServiceImpl
 	}
 
 	@Override
+	public List<CreditNote> findAllUnpaid() {
+		List<CreditNoteEntity> l = repository.findByBalanceValueGreaterThanOrderByIdAsc(BigDecimal.ZERO);
+		return toModels(l);
+	}
+
+	@Override
+	public List<CreditNote> findAllUnvalidated() {
+		List<CreditNoteEntity> l = repository.findByIsValidNullOrderByIdAsc();
+		return toModels(l);
+	}
+
+	@Override
 	protected CreditNoteEntity toEntity(CreditNote c) {
 		return c == null ? null : setEntity(c);
 	}
@@ -108,12 +107,6 @@ public class CreditNoteServiceImpl
 		return setRemarksAndBalance(e, c);
 	}
 
-	private CreditNoteEntity setRemarksAndBalance(CreditNoteEntity e, CreditNote c) {
-		e.setRemarks(c.getRemarks());
-		e.setBalanceValue(c.getBalanceValue());
-		return e;
-	}
-
 	private CreditNoteEntity update(CreditNote c) {
 		CreditNoteEntity e = repository.findOne(c.getId());
 		if (isDecisionToBeChanged(e, c))
@@ -121,6 +114,12 @@ public class CreditNoteServiceImpl
 		if (isNotInvalid(e))
 			return setPaymentsAndRemarksAndBalance(e, c);
 		return invalidateTheRemittanceFromTheInvalidCreditNoteUnpayingAffectedBillings(e);
+	}
+
+	private CreditNoteEntity setRemarksAndBalance(CreditNoteEntity e, CreditNote c) {
+		e.setRemarks(c.getRemarks());
+		e.setBalanceValue(c.getBalanceValue());
+		return e;
 	}
 
 	private boolean isDecisionToBeChanged(CreditNoteEntity e, CreditNote c) {
@@ -143,6 +142,20 @@ public class CreditNoteServiceImpl
 		return setRemarksAndBalance(e, c);
 	}
 
+	private CreditNoteEntity invalidateTheRemittanceFromTheInvalidCreditNoteUnpayingAffectedBillings(CreditNoteEntity
+		                                                                                                 e) {
+		RemittanceEntity r = remittanceService.findEntityByCheck("CREDIT MEMO", e.getId());
+		if (r != null)
+			remittanceService.updatePaymentBasedOnValidation( //
+				"", //
+				r.getId().toString(), //
+				"false", //
+				"INVALID C/N No. " + e.getId(), //
+				e.getDecidedBy(), //
+				toTimestampText(e.getDecidedOn()));
+		return e;
+	}
+
 	private List<CreditNotePaymentEntity> payments(CreditNote c) {
 		List<CreditNotePayment> l = c.getPayments();
 		return l == null ? null : l.stream().map(p -> toEntity(p)).collect(Collectors.toList());
@@ -155,19 +168,6 @@ public class CreditNoteServiceImpl
 		e.setPaymentRemarks(p.getPaymentRemarks());
 		e.setPaymentValue(p.getPaymentValue());
 		e.setReference(p.getReference());
-		return e;
-	}
-
-	private CreditNoteEntity invalidateTheRemittanceFromTheInvalidCreditNoteUnpayingAffectedBillings(CreditNoteEntity e) {
-		RemittanceEntity r = remittanceService.findEntityByCheck("CREDIT MEMO", e.getId());
-		if (r != null)
-			remittanceService.updatePaymentBasedOnValidation( //
-					"", //
-					r.getId().toString(), //
-					"false", //
-					"INVALID C/N No. " + e.getId(), // 
-					e.getDecidedBy(), //
-					toTimestampText(e.getDecidedOn()));
 		return e;
 	}
 }

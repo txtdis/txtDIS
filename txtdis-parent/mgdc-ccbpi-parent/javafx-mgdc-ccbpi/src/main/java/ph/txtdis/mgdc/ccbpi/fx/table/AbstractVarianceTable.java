@@ -20,8 +20,8 @@ import ph.txtdis.service.VarianceService;
 import ph.txtdis.type.Type;
 
 public abstract class AbstractVarianceTable<AS extends VarianceService<SalesItemVariance>> //
-		extends AbstractTable<SalesItemVariance> //
-		implements VarianceTable<SalesItemVariance> {
+	extends AbstractTable<SalesItemVariance> //
+	implements VarianceTable<SalesItemVariance> {
 
 	@Autowired
 	protected Column<SalesItemVariance, BigDecimal> value;
@@ -54,6 +54,10 @@ public abstract class AbstractVarianceTable<AS extends VarianceService<SalesItem
 		variance.ofType(FRACTION).build(varianceColumnName(), varianceQtyMethodName());
 		value.ofType(CURRENCY).build(valueColumnName(), valueMethodName());
 		buildLaunchableColumns();
+	}
+
+	protected List<TableColumn<SalesItemVariance, ?>> columns() {
+		return asList(seller, id, item, expected, actual, returned, variance, value);
 	}
 
 	private String varianceColumnName() {
@@ -109,9 +113,5 @@ public abstract class AbstractVarianceTable<AS extends VarianceService<SalesItem
 
 	protected String returnedQtyMethodName() {
 		return "returnedQtyInFractions";
-	}
-
-	protected List<TableColumn<SalesItemVariance, ?>> columns() {
-		return asList(seller, id, item, expected, actual, returned, variance, value);
 	}
 }

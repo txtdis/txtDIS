@@ -21,8 +21,8 @@ import ph.txtdis.mgdc.ccbpi.dto.Channel;
 import ph.txtdis.mgdc.ccbpi.fx.dialog.PricingDialog;
 
 public abstract class AbstractPricingTable //
-		extends AbstractTable<Price> //
-		implements PricingTable {
+	extends AbstractTable<Price> //
+	implements PricingTable {
 
 	@Autowired
 	protected Column<Price, BigDecimal> price;

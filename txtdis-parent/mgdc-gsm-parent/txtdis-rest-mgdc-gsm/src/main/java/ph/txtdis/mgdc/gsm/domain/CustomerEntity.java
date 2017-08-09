@@ -1,26 +1,6 @@
 package ph.txtdis.mgdc.gsm.domain;
 
-import static java.time.LocalDate.now;
-import static java.util.Collections.emptyList;
-import static java.util.Comparator.comparing;
-import static javax.persistence.CascadeType.ALL;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,30 +10,40 @@ import ph.txtdis.mgdc.domain.LocationEntity;
 import ph.txtdis.mgdc.domain.RouteEntity;
 import ph.txtdis.type.VisitFrequency;
 
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static java.time.LocalDate.now;
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
+import static javax.persistence.CascadeType.ALL;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "customer", //
-		indexes = { //
-				@Index(columnList = "name"), //
-				@Index(columnList = "type"), //
-				@Index(columnList = "contact_name"), //
-				@Index(columnList = "contact_surname"), //
-				@Index(columnList = "contact_title"), //
-				@Index(columnList = "mobile"), //
-				@Index(columnList = "deactivated_on"), //
-				@Index(columnList = "type"), //
-				@Index(columnList = "channel_id"), //
-				@Index(columnList = "visit_frequency"), //
-				@Index(columnList = "barangay_id"), //
-				@Index(columnList = "city_id"), //
-				@Index(columnList = "province_id"), //
-				@Index(columnList = "street") //
-		})
+	indexes = { //
+		@Index(columnList = "name"), //
+		@Index(columnList = "type"), //
+		@Index(columnList = "contact_name"), //
+		@Index(columnList = "contact_surname"), //
+		@Index(columnList = "contact_title"), //
+		@Index(columnList = "mobile"), //
+		@Index(columnList = "deactivated_on"), //
+		@Index(columnList = "type"), //
+		@Index(columnList = "channel_id"), //
+		@Index(columnList = "visit_frequency"), //
+		@Index(columnList = "barangay_id"), //
+		@Index(columnList = "city_id"), //
+		@Index(columnList = "province_id"), //
+		@Index(columnList = "street") //
+	})
 public class CustomerEntity //
-		extends AbstractCustomerEntity {
+	extends AbstractCustomerEntity {
 
 	private static final long serialVersionUID = 4005115994591616684L;
 
@@ -143,9 +133,9 @@ public class CustomerEntity //
 
 	public RouteEntity getRoute(LocalDate date) {
 		return getRouteHistory().stream() //
-				.filter(p -> !p.getStartDate().isAfter(date)) //
-				.max(comparing(RoutingEntity::getStartDate)) //
-				.orElse(new RoutingEntity()).getRoute();
+			.filter(p -> !p.getStartDate().isAfter(date)) //
+			.max(comparing(RoutingEntity::getStartDate)) //
+			.orElse(new RoutingEntity()).getRoute();
 	}
 
 	public List<RoutingEntity> getRouteHistory() {

@@ -1,36 +1,35 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.ID;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
-import ph.txtdis.fx.control.AppButtonImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.fx.table.BillableTable;
 import ph.txtdis.mgdc.gsm.service.RmaService;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.ID;
+
 public abstract class AbstractRmaApp<RS extends RmaService, BT extends BillableTable> //
-		extends AbstractBillableApp<RS, BT, Long> {
+	extends AbstractBillableApp<RS, BT, Long> {
 
 	protected static final int WIDTH = 120;
 
 	@Autowired
-	protected AppButtonImpl receiptButton;
+	protected AppButton receiptButton;
 
 	private BooleanProperty returnIsValid;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		b.addAll(asList(invalidateButton, receiptButton));
 		return b;
 	}
@@ -72,14 +71,15 @@ public abstract class AbstractRmaApp<RS extends RmaService, BT extends BillableT
 		return l;
 	}
 
-	protected HBox receivingPane() {
-		return box.forHorizontalPane(receivingNodes());
+	@Override
+	protected HBox trackedPane() {
+		List<Node> l = new ArrayList<>(super.trackedPane().getChildren());
+		l.addAll(decisionNeededApp.addApprovalNodes());
+		return pane.centeredHorizontal(l);
 	}
 
-	@Override
-	public void refresh() {
-		super.refresh();
-		returnIsValid.set(service.isReturnValid());
+	protected HBox receivingPane() {
+		return pane.centeredHorizontal(receivingNodes());
 	}
 
 	@Override
@@ -92,12 +92,16 @@ public abstract class AbstractRmaApp<RS extends RmaService, BT extends BillableT
 	protected void setButtonBindings() {
 		super.setButtonBindings();
 		saveButton.disableIf(isPosted() //
-				.or(table.isEmpty()));
+			.or(table.isEmpty()));
 		receiptButton.disableIf(notValidReturn() //
-				.or(receivedOnDisplay.isNotEmpty()) //
-				.or(decisionNeededApp.isAudited().not()));
+			.or(receivedOnDisplay.isNotEmpty()) //
+			.or(decisionNeededApp.isAudited().not()));
 		invalidateButton.disableIf(isNew() //
-				.or(notValidReturn()));
+			.or(notValidReturn()));
+	}
+
+	protected BooleanBinding notValidReturn() {
+		return returnIsValid.not();
 	}
 
 	@Override
@@ -111,10 +115,6 @@ public abstract class AbstractRmaApp<RS extends RmaService, BT extends BillableT
 		referenceIdInput.readOnly();
 		customerBox.disableIdInputIf(isPosted());
 		customerBox.setSearchButtonVisibleIfNot(isPosted());
-	}
-
-	protected BooleanBinding notValidReturn() {
-		return returnIsValid.not();
 	}
 
 	@Override
@@ -139,7 +139,7 @@ public abstract class AbstractRmaApp<RS extends RmaService, BT extends BillableT
 		try {
 			service.saveReturnReceiptData();
 		} catch (Information i) {
-			dialog.show(i).addParent(this).start();
+			messageDialog.show(i).addParent(this).start();
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {
@@ -160,18 +160,17 @@ public abstract class AbstractRmaApp<RS extends RmaService, BT extends BillableT
 			}
 	}
 
+	@Override
+	public void refresh() {
+		super.refresh();
+		returnIsValid.set(service.isReturnValid());
+	}
+
 	private void setFocusAfterCustomerValidation() {
 		if (customerBox.isEmpty().get())
 			customerBox.requestFocus();
 		else
 			table.requestFocus();
-	}
-
-	@Override
-	protected HBox trackedPane() {
-		List<Node> l = new ArrayList<>(super.trackedPane().getChildren());
-		l.addAll(decisionNeededApp.addApprovalNodes());
-		return box.forHorizontalPane(l);
 	}
 
 	@Override

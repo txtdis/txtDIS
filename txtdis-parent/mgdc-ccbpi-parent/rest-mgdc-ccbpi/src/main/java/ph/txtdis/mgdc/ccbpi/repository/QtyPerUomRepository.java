@@ -10,9 +10,9 @@ import ph.txtdis.type.UomType;
 
 @Repository("qtyPerUomRepository")
 public interface QtyPerUomRepository //
-		extends CrudRepository<QtyPerUomEntity, Long> {
+	extends CrudRepository<QtyPerUomEntity, Long> {
 
 	QtyPerUomEntity findByItemAndUom( //
-			@Param("item") ItemEntity i, //
-			@Param("uom") UomType u);
+	                                  @Param("item") ItemEntity i, //
+	                                  @Param("uom") UomType u);
 }

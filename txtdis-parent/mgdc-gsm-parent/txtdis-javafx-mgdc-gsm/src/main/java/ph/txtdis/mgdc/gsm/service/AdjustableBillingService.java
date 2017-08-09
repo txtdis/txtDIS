@@ -1,9 +1,9 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.math.BigDecimal;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.gsm.dto.Customer;
+
+import java.math.BigDecimal;
 
 public interface AdjustableBillingService {
 

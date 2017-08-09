@@ -12,7 +12,9 @@ import ph.txtdis.mgdc.ccbpi.service.DeliveryVarianceService;
 
 @Scope("prototype")
 @Component("deliveryVarianceTable")
-public class DeliveryVarianceTableImpl extends AbstractVarianceTable<DeliveryVarianceService> implements DeliveryVarianceTable {
+public class DeliveryVarianceTableImpl
+	extends AbstractVarianceTable<DeliveryVarianceService>
+	implements DeliveryVarianceTable {
 
 	@Override
 	protected List<TableColumn<SalesItemVariance, ?>> addColumns() {

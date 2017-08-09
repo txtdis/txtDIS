@@ -1,23 +1,22 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.math.BigDecimal.ZERO;
-import static org.apache.log4j.Logger.getLogger;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.Remittance;
 import ph.txtdis.exception.DuplicateCheckException;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.service.AdjustableInputtedPaymentDetailedRemittanceService;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static java.math.BigDecimal.ZERO;
+import static org.apache.log4j.Logger.getLogger;
+
 public abstract class AbstractRefundedRmaService //
-		extends AbstractRmaService //
-		implements RefundedRmaService {
+	extends AbstractRmaService //
+	implements RefundedRmaService {
 
 	private static Logger logger = getLogger(AbstractRefundedRmaService.class);
 
@@ -36,7 +35,7 @@ public abstract class AbstractRefundedRmaService //
 	@Override
 	public String[] getCheckDetails() {
 		Remittance r = remitService.findByBillable(get());
-		return r == null ? null : new String[] { r.getDraweeBank(), r.getCheckId().toString() };
+		return r == null ? null : new String[]{r.getDraweeBank(), r.getCheckId().toString()};
 	}
 
 	@Override
@@ -56,7 +55,7 @@ public abstract class AbstractRefundedRmaService //
 
 	@Override
 	public void print() throws Exception {
-		Billable b = getReadOnlyService().module(getModuleName()).getOne("/print?id=" + getId());
+		Billable b = getRestClientService().module(getModuleName()).getOne("/print?id=" + getId());
 		set(b);
 	}
 
@@ -121,7 +120,7 @@ public abstract class AbstractRefundedRmaService //
 
 	@Override
 	public void updateUponInvoiceNoValidation(String prefix, Long id, String suffix) throws Exception {
-		checkNoDuplicates(getReadOnlyService(), prefix, id, suffix);
+		checkNoDuplicates(getRestClientService(), prefix, id, suffix);
 		setThreePartId(prefix, id, suffix);
 	}
 }

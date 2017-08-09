@@ -7,5 +7,5 @@ import ph.txtdis.repository.NameListRepository;
 
 @Repository("channelRepository")
 public interface ChannelRepository //
-		extends NameListRepository<ChannelEntity> {
+	extends NameListRepository<ChannelEntity> {
 }

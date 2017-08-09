@@ -9,7 +9,7 @@ import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.type.OrderConfirmationType;
 
 public interface OrderConfirmationService //
-		extends ShippedBillableService {
+	extends ShippedBillableService {
 
 	BigDecimal getDeliveredValue(String collector, LocalDate start, LocalDate end);
 

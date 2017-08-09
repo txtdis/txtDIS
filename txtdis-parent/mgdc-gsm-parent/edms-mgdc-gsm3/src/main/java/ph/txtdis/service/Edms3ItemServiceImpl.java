@@ -19,7 +19,7 @@ import ph.txtdis.util.Code;
 
 @Service("itemService")
 public class Edms3ItemServiceImpl //
-		extends AbstractEdmsItemService {
+	extends AbstractEdmsItemService {
 
 	@Autowired
 	private EdmsInventoryRepository edmsInventoryRepository;

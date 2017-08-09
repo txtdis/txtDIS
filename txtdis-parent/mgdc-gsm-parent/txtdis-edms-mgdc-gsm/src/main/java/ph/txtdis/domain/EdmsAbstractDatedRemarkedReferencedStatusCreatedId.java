@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class EdmsAbstractDatedRemarkedReferencedStatusCreatedId //
-		extends EdmsAbstractReferencedStatusCreatedId {
+	extends EdmsAbstractReferencedStatusCreatedId {
 
 	@Column(name = "dateTrans")
 	private LocalDate orderDate;

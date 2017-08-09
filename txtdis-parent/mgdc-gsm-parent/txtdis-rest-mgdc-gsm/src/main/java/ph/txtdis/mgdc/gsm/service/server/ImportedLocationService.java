@@ -4,7 +4,8 @@ import ph.txtdis.mgdc.domain.LocationEntity;
 import ph.txtdis.mgdc.service.server.LocationService;
 
 public interface ImportedLocationService //
-		extends LocationService, Imported {
+	extends LocationService,
+	Imported {
 
 	LocationEntity getByName(String name);
 }

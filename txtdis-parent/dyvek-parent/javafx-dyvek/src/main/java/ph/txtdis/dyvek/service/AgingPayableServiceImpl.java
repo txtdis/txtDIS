@@ -1,13 +1,12 @@
 package ph.txtdis.dyvek.service;
 
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dyvek.model.Aging;
-import ph.txtdis.service.ReadOnlyService;
+import ph.txtdis.service.RestClientService;
 
 @Service("agingPayableService")
 public class AgingPayableServiceImpl //
-		implements AgingPayableService {
+	implements AgingPayableService {
 
 	@Override
 	public void reset() {
@@ -16,7 +15,7 @@ public class AgingPayableServiceImpl //
 	}
 
 	@Override
-	public ReadOnlyService<Aging> getListedReadOnlyService() {
+	public RestClientService<Aging> getRestClientServiceForLists() {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,22 +1,18 @@
 package ph.txtdis.mgdc.gsm.dto;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ph.txtdis.dto.*;
+import ph.txtdis.type.ItemType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ph.txtdis.dto.AbstractModificationTracked;
-import ph.txtdis.dto.Bom;
-import ph.txtdis.dto.ItemFamily;
-import ph.txtdis.dto.Price;
-import ph.txtdis.dto.QtyPerUom;
-import ph.txtdis.type.ItemType;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Item //
-		extends AbstractModificationTracked<Long> {
+	extends AbstractModificationTracked<Long> {
 
 	private boolean notDiscounted;
 

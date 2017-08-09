@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class PickedUpSalesOrderDateNotTodayException extends Exception {
+public class PickedUpSalesOrderDateNotTodayException
+	extends Exception {
 
 	private static final long serialVersionUID = 7152560141778263735L;
 

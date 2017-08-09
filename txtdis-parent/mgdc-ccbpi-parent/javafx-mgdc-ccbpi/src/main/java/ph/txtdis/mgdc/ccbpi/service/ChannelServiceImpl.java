@@ -1,33 +1,26 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.info.Information;
+import ph.txtdis.mgdc.ccbpi.dto.Channel;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.util.ClientTypeMap;
+
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.info.Information;
-import ph.txtdis.mgdc.ccbpi.dto.Channel;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.util.ClientTypeMap;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("channelService")
 public class ChannelServiceImpl //
-		implements ChannelService {
+	implements ChannelService {
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<Channel> readOnlyService;
-
-	@Autowired
-	private SavingService<Channel> savingService;
+	private RestClientService<Channel> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -36,18 +29,18 @@ public class ChannelServiceImpl //
 	private String modulePrefix;
 
 	@Override
-	public ReadOnlyService<Channel> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<Channel> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
-	public String getModuleName() {
-		return "channel";
+	public RestClientService<Channel> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + ChannelService.super.getTitleName();
+		return username() + "@" + modulePrefix + " " + ChannelService.super.getTitleName();
 	}
 
 	@Override
@@ -73,6 +66,11 @@ public class ChannelServiceImpl //
 		Channel c = new Channel();
 		c.setName(name);
 		c.setStartDate(start);
-		return savingService.module(getModuleName()).save(c);
+		return restClientService.module(getModuleName()).save(c);
+	}
+
+	@Override
+	public String getModuleName() {
+		return "channel";
 	}
 }

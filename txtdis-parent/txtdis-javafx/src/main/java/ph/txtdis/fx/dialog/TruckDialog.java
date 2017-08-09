@@ -8,7 +8,8 @@ import ph.txtdis.service.TruckService;
 
 @Scope("prototype")
 @Component("truckDialog")
-public class TruckDialog extends AbstractNameListDialog<Truck, TruckService> {
+public class TruckDialog
+	extends AbstractNameListDialog<Truck, TruckService> {
 
 	@Override
 	protected String headerText() {

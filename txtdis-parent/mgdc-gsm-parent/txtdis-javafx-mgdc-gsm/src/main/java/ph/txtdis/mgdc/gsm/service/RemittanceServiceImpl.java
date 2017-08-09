@@ -1,20 +1,8 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static ph.txtdis.type.BillingType.INVOICE;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.util.NumberUtils.isPositive;
-import static ph.txtdis.util.NumberUtils.isZero;
-import static ph.txtdis.util.NumberUtils.toCurrencyText;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.CreditNote;
 import ph.txtdis.dto.Remittance;
@@ -24,19 +12,25 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.mgdc.service.AdjustableInputtedPaymentDetailedRemittanceService;
 import ph.txtdis.mgdc.service.CreditNoteService;
 import ph.txtdis.service.AbstractPaymentDetailedRemittanceService;
-import ph.txtdis.service.CredentialService;
 import ph.txtdis.type.BillingType;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static ph.txtdis.type.BillingType.INVOICE;
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.NumberUtils.*;
+import static ph.txtdis.util.UserUtils.isUser;
 
 @Service("remittanceService")
 public class RemittanceServiceImpl //
-		extends AbstractPaymentDetailedRemittanceService //
-		implements AdjustableInputtedPaymentDetailedRemittanceService {
+	extends AbstractPaymentDetailedRemittanceService //
+	implements AdjustableInputtedPaymentDetailedRemittanceService {
 
 	@Autowired
 	private BillingService billingService;
-
-	@Autowired
-	private CredentialService credentialService;
 
 	@Autowired
 	private CreditNoteService creditNoteService;
@@ -79,6 +73,19 @@ public class RemittanceServiceImpl //
 		return addDetail(d);
 	}
 
+	private RemittanceDetail addDetail(RemittanceDetail d) {
+		List<RemittanceDetail> l = getDetails();
+		l.add(d);
+		get().setDetails(l);
+		return d;
+	}
+
+	@Override
+	public List<RemittanceDetail> getDetails() {
+		List<RemittanceDetail> l = get().getDetails();
+		return l == null ? new ArrayList<>() : new ArrayList<>(l);
+	}
+
 	@Override
 	public Remittance findByBillable(Billable b) {
 		try {
@@ -119,18 +126,9 @@ public class RemittanceServiceImpl //
 	}
 
 	@Override
-	public boolean isBillableOnThisPaymentList(Billable i) {
-		try {
-			return getDetails().stream().anyMatch(d -> d.getId().equals(i.getId()));
-		} catch (Exception e) {
-			return false;
-		}
-	}
-
-	@Override
 	public List<String> listBanks() {
 		List<String> l = new ArrayList<>(super.listBanks());
-		if (!credentialService.isUser(MANAGER))
+		if (!isUser(MANAGER))
 			l.removeAll(adjustingAccounts);
 		return l;
 	}
@@ -159,12 +157,21 @@ public class RemittanceServiceImpl //
 		if (isBillableOnThisPaymentList(b))
 			throw new Exception(billingNo + "\nis already on the list");
 		if (b.getOrderDate().isEqual(b.getDueDate()) //
-				&& isCashPayment() //
-				&& b.getDueDate().isAfter(goLiveDate()) //
-				&& getPaymentDate().isAfter(goLiveDate()) //
-				&& hasNeverBeenInValidated(b))
+			&& isCashPayment() //
+			&& b.getDueDate().isAfter(goLiveDate()) //
+			&& getPaymentDate().isAfter(goLiveDate()) //
+			&& hasNeverBeenInValidated(b))
 			validateCashCollection();
 		return b;
+	}
+
+	@Override
+	public boolean isBillableOnThisPaymentList(Billable i) {
+		try {
+			return getDetails().stream().anyMatch(d -> d.getId().equals(i.getId()));
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	private boolean hasNeverBeenInValidated(Billable i) {
@@ -173,19 +180,6 @@ public class RemittanceServiceImpl //
 		} catch (Exception e) {
 			return false;
 		}
-	}
-
-	private RemittanceDetail addDetail(RemittanceDetail d) {
-		List<RemittanceDetail> l = getDetails();
-		l.add(d);
-		get().setDetails(l);
-		return d;
-	}
-
-	@Override
-	public List<RemittanceDetail> getDetails() {
-		List<RemittanceDetail> l = get().getDetails();
-		return l == null ? new ArrayList<>() : new ArrayList<>(l);
 	}
 
 	@Override

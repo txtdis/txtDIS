@@ -1,20 +1,7 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toList;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import ph.txtdis.dto.SalesRevenue;
 import ph.txtdis.exception.DateBeforeGoLiveException;
 import ph.txtdis.exception.EndDateBeforeStartException;
@@ -24,8 +11,18 @@ import ph.txtdis.mgdc.gsm.repository.BillableRepository;
 import ph.txtdis.mgdc.service.server.SalesRevenueService;
 import ph.txtdis.util.DateTimeUtils;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
+import static java.math.BigDecimal.ZERO;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.*;
+
 public abstract class AbstractSalesRevenueService //
-		implements SalesRevenueService {
+	implements SalesRevenueService {
 
 	@Autowired
 	private BillableRepository billingRepository;
@@ -34,11 +31,13 @@ public abstract class AbstractSalesRevenueService //
 	private Long vendorId;
 
 	@Override
-	public List<SalesRevenue> list(LocalDate startDate, LocalDate endDate) throws DateBeforeGoLiveException, EndDateBeforeStartException {
+	public List<SalesRevenue> list(LocalDate startDate, LocalDate endDate)
+		throws DateBeforeGoLiveException, EndDateBeforeStartException {
 		List<BillableEntity> i = billingRepository
-				.findByNumIdNotNullAndRmaNullAndCustomerIdNotAndOrderDateBetweenOrderByOrderDateAscPrefixAscNumIdAscSuffixAsc(vendorId, //
-						DateTimeUtils.verifyDateIsOnOrAfterGoLive(startDate, edmsGoLive()), //
-						DateTimeUtils.validateEndDate(startDate, endDate, edmsGoLive()));
+			.findByNumIdNotNullAndRmaNullAndCustomerIdNotAndOrderDateBetweenOrderByOrderDateAscPrefixAscNumIdAscSuffixAsc(
+				vendorId, //
+				DateTimeUtils.verifyDateIsOnOrAfterGoLive(startDate, edmsGoLive()), //
+				DateTimeUtils.validateEndDate(startDate, endDate, edmsGoLive()));
 		return salesRevenues(i);
 	}
 
@@ -47,10 +46,10 @@ public abstract class AbstractSalesRevenueService //
 	private List<SalesRevenue> salesRevenues(List<BillableEntity> i) {
 		try {
 			return i.stream()//
-					.collect(Collectors.groupingBy(BillableEntity::getCustomer, //
-							mapping(BillableEntity::getTotalValue, reducing(ZERO, BigDecimal::add))))//
-					.entrySet().stream().map(d -> toSalesRevenue(d))//
-					.sorted().collect(toList());
+				.collect(Collectors.groupingBy(BillableEntity::getCustomer, //
+					mapping(BillableEntity::getTotalValue, reducing(ZERO, BigDecimal::add))))//
+				.entrySet().stream().map(d -> toSalesRevenue(d))//
+				.sorted().collect(toList());
 		} catch (Exception e) {
 			return emptyList();
 		}

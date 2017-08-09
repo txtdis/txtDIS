@@ -1,17 +1,22 @@
 package ph.txtdis.service;
 
-import static ph.txtdis.type.BillingType.INVOICE;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsOutletType;
 import ph.txtdis.mgdc.gsm.dto.Channel;
 import ph.txtdis.repository.EdmsChannelRepository;
 
+import static ph.txtdis.type.BillingType.INVOICE;
+
 @Service("channelService")
-public class EdmsChannelServiceImpl extends AbstractCreateNameListService<EdmsChannelRepository, EdmsOutletType, Channel> //
-		implements EdmsChannelService {
+public class EdmsChannelServiceImpl
+	extends AbstractCreateNameListService<EdmsChannelRepository, EdmsOutletType, Channel> //
+	implements EdmsChannelService {
+
+	@Override
+	protected Channel toModel(EdmsOutletType e) {
+		return e == null ? null : toDTO(e.getName());
+	}
 
 	@Override
 	public Channel toDTO(String name) {
@@ -26,11 +31,6 @@ public class EdmsChannelServiceImpl extends AbstractCreateNameListService<EdmsCh
 		c.setBillingType(INVOICE);
 		c.setVisited(true);
 		return c;
-	}
-
-	@Override
-	protected Channel toModel(EdmsOutletType e) {
-		return e == null ? null : toDTO(e.getName());
 	}
 
 	@Override

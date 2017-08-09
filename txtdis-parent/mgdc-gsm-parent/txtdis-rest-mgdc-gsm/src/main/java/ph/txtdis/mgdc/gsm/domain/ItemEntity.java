@@ -1,25 +1,24 @@
 package ph.txtdis.mgdc.gsm.domain;
 
-import static java.util.Collections.emptyList;
-import static javax.persistence.CascadeType.ALL;
-
-import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ph.txtdis.mgdc.domain.AbstractItemEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ph.txtdis.mgdc.domain.AbstractItemEntity;
+import static java.util.Collections.emptyList;
+import static javax.persistence.CascadeType.ALL;
 
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "item")
 public class ItemEntity //
-		extends AbstractItemEntity {
+	extends AbstractItemEntity {
 
 	private static final long serialVersionUID = -3012020260825126952L;
 

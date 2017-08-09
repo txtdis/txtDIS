@@ -1,7 +1,9 @@
 package ph.txtdis.service;
 
 import static java.util.Collections.emptyList;
+import static ph.txtdis.util.DateTimeUtils.*;
 import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.UserUtils.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -16,16 +18,10 @@ import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.util.ClientTypeMap;
 
 public abstract class AbstractVarianceService<T extends Keyed<Long>> //
-		implements VarianceService<T> {
+	implements VarianceService<T> {
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<T> readOnlyService;
-
-	@Autowired
-	private SyncService syncService;
+	private RestClientService<T> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -43,31 +39,24 @@ public abstract class AbstractVarianceService<T extends Keyed<Long>> //
 	}
 
 	@Override
-	public LocalDate getEndDate() {
-		if (end == null)
-			end = today();
-		return end;
+	public void reset() {
+		end = null;
+		start = null;
 	}
 
-	protected LocalDate today() {
-		return syncService.getServerDate();
+	@Override
+	public RestClientService<T> getRestClientServiceForLists() {
+		return restClientService;
+	}
+
+	@Override
+	public String getTitleName() {
+		return username() + "@" + modulePrefix + " " + getHeaderName() + " : " + getSubhead();
 	}
 
 	@Override
 	public String getHeaderName() {
 		return getActualColumnName() + " Variance";
-	}
-
-	@Override
-	public ReadOnlyService<T> getListedReadOnlyService() {
-		return readOnlyService;
-	}
-
-	@Override
-	public LocalDate getStartDate() {
-		if (start == null)
-			start = today();
-		return start;
 	}
 
 	@Override
@@ -79,8 +68,31 @@ public abstract class AbstractVarianceService<T extends Keyed<Long>> //
 	}
 
 	@Override
-	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + getHeaderName() + " : " + getSubhead();
+	public LocalDate getStartDate() {
+		if (start == null)
+			start = today();
+		return start;
+	}
+
+	@Override
+	public LocalDate getEndDate() {
+		if (end == null)
+			end = today();
+		return end;
+	}
+
+	protected LocalDate today() {
+		return getServerDate();
+	}
+
+	@Override
+	public void setEndDate(LocalDate d) {
+		end = d;
+	}
+
+	@Override
+	public void setStartDate(LocalDate d) {
+		start = d;
 	}
 
 	@Override
@@ -91,7 +103,8 @@ public abstract class AbstractVarianceService<T extends Keyed<Long>> //
 	@Override
 	public List<T> list() {
 		try {
-			return readOnlyService.module(getModuleName()).getList("/list?start=" + getStartDate() + "&end=" + getEndDate());
+			return restClientService.module(getModuleName())
+				.getList("/list?start=" + getStartDate() + "&end=" + getEndDate());
 		} catch (Exception e) {
 			e.printStackTrace();
 			return emptyList();
@@ -110,28 +123,13 @@ public abstract class AbstractVarianceService<T extends Keyed<Long>> //
 	}
 
 	@Override
-	public void reset() {
-		end = null;
-		start = null;
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
 	public void saveAsExcel(AppTable<T>... tables) throws IOException {
 		excel.table(tables).filename(excelName()).sheetname(getHeaderName()).write();
 	}
 
 	private String excelName() {
-		return getHeaderName().replace(" ", ".") + "." + getSubhead().replace(" ", "").replace(":", ".").replace(" - ", ".to.").replace("/", "-");
-	}
-
-	@Override
-	public void setEndDate(LocalDate d) {
-		end = d;
-	}
-
-	@Override
-	public void setStartDate(LocalDate d) {
-		start = d;
+		return getHeaderName().replace(" ", ".") + "." +
+			getSubhead().replace(" ", "").replace(":", ".").replace(" - ", ".to.").replace("/", "-");
 	}
 }

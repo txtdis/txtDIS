@@ -17,7 +17,7 @@ import ph.txtdis.util.TypeReference;
 
 @Component("typeMap")
 public class DyvekTypeMapImpl //
-		extends AbstractClientTypeMap {
+	extends AbstractClientTypeMap {
 
 	private static final long serialVersionUID = 1414651091475898263L;
 

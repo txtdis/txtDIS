@@ -1,6 +1,7 @@
 package ph.txtdis.mgdc.printer;
 
-public class NotPrintedException extends Exception {
+public class NotPrintedException
+	extends Exception {
 
 	private static final long serialVersionUID = 7010664033441991775L;
 

@@ -1,21 +1,20 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.scene.Node;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.app.AbstractExcelApp;
 import ph.txtdis.app.TotaledTableApp;
 import ph.txtdis.dto.AgingReceivable;
 import ph.txtdis.mgdc.gsm.fx.table.AgingReceivableTable;
 import ph.txtdis.service.AgingReceivableService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 public abstract class AbstractAgingReceivableApp<RS extends AgingReceivableService> //
-		extends AbstractExcelApp<AgingReceivableTable, RS, AgingReceivable> //
-		implements AgingReceivableApp {
+	extends AbstractExcelApp<AgingReceivableTable, RS, AgingReceivable> //
+	implements AgingReceivableApp {
 
 	@Autowired
 	private TotaledTableApp<AgingReceivable> totaledTableApp;

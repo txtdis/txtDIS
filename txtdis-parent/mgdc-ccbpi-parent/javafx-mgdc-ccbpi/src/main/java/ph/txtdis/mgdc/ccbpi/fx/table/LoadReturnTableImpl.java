@@ -26,8 +26,8 @@ import ph.txtdis.type.UomType;
 @Scope("prototype")
 @Component("loadReturnTable")
 public class LoadReturnTableImpl //
-		extends AbstractTable<PickListDetail> //
-		implements LoadReturnTable {
+	extends AbstractTable<PickListDetail> //
+	implements LoadReturnTable {
 
 	@Autowired
 	private AppendContextMenu<PickListDetail> append;
@@ -53,10 +53,10 @@ public class LoadReturnTableImpl //
 	@Override
 	protected List<TableColumn<PickListDetail, ?>> addColumns() {
 		return Arrays.asList(//
-				itemVendorId.ofType(CODE).build("ID No.", "itemVendorNo"), //
-				name.ofType(TEXT).width(180).build("Name", "itemName"), //
-				uom.ofType(ENUM).build("UOM", "uom"), //
-				returned.ofType(FRACTION).build("Quantity", "returnedQtyInFractions"));
+			itemVendorId.ofType(CODE).build("ID No.", "itemVendorNo"), //
+			name.ofType(TEXT).width(180).build("Name", "itemName"), //
+			uom.ofType(ENUM).build("UOM", "uom"), //
+			returned.ofType(FRACTION).build("Quantity", "returnedQtyInFractions"));
 	}
 
 	@Override

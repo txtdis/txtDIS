@@ -9,7 +9,8 @@ import ph.txtdis.mgdc.ccbpi.domain.BomEntity;
 import ph.txtdis.mgdc.service.server.SpunSavedReferencedKeyedService;
 
 public interface LoadManifestService //
-		extends QtyPerItemService, SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
+	extends QtyPerItemService,
+	SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
 
 	Billable find(Long shipment);
 

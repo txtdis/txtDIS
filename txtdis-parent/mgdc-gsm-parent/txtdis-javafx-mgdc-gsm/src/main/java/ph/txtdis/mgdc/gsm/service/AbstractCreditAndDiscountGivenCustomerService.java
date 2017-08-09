@@ -1,35 +1,10 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.type.DeliveryType.PICK_UP;
-import static ph.txtdis.type.PriceType.DEALER;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.SALES_ENCODER;
-import static ph.txtdis.type.UserType.SELLER;
-import static ph.txtdis.util.PhoneUtils.isPhone;
-import static ph.txtdis.util.PhoneUtils.persistPhone;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import javafx.collections.ObservableList;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
-import javafx.collections.ObservableList;
-import ph.txtdis.dto.CreditDetail;
-import ph.txtdis.dto.DecisionNeededValidatedCreatedKeyed;
-import ph.txtdis.dto.Location;
-import ph.txtdis.dto.Route;
-import ph.txtdis.dto.Routing;
-import ph.txtdis.dto.WeeklyVisit;
+import ph.txtdis.dto.*;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.InvalidPhoneException;
 import ph.txtdis.exception.UnauthorizedUserException;
@@ -45,15 +20,36 @@ import ph.txtdis.type.PartnerType;
 import ph.txtdis.type.VisitFrequency;
 import ph.txtdis.util.DateTimeUtils;
 
-public abstract class AbstractCreditAndDiscountGivenCustomerService //
-		extends AbstractItemDeliveredCustomerService //
-		implements CreditedAndDiscountedCustomerService {
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-	private static Logger logger = getLogger(AbstractCreditAndDiscountGivenCustomerService.class);
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.type.DeliveryType.PICK_UP;
+import static ph.txtdis.type.PriceType.DEALER;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.PhoneUtils.isPhone;
+import static ph.txtdis.util.PhoneUtils.persistPhone;
+import static ph.txtdis.util.UserUtils.isUser;
+
+public abstract class AbstractCreditAndDiscountGivenCustomerService //
+	extends AbstractItemDeliveredCustomerService //
+	implements CreditedAndDiscountedCustomerService {
 
 	private static final String DISCOUNT_TAB = "Customer Discount";
 
 	private static final String CREDIT_TAB = "Credit Details";
+
+	private static Logger logger = getLogger(AbstractCreditAndDiscountGivenCustomerService.class);
+
+	@Autowired
+	protected RouteService routeService;
 
 	@Autowired
 	private ChannelService channelService;
@@ -64,9 +60,6 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	@Autowired
 	private PricingTypeService pricingTypeService;
 
-	@Autowired
-	protected RouteService routeService;
-
 	@Value("${go.live}")
 	private String goLive;
 
@@ -76,9 +69,17 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	private String tab;
 
 	@Override
-	public CreditDetail createCreditLineUponValidation(int term, int gracePeriod, BigDecimal creditLimit, LocalDate startDate) throws Exception {
+	public CreditDetail createCreditLineUponValidation(int term,
+	                                                   int gracePeriod,
+	                                                   BigDecimal creditLimit,
+	                                                   LocalDate startDate) throws Exception {
 		validateStartDate(getCreditDetails(), startDate);
 		return createCreditLine(term, gracePeriod, creditLimit, startDate);
+	}
+
+	@Override
+	public List<CreditDetail> getCreditDetails() {
+		return get().getCreditDetails();
 	}
 
 	private CreditDetail createCreditLine(int term, int gracePeriod, BigDecimal creditLimit, LocalDate startDate) {
@@ -91,9 +92,19 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
+	public void setCreditDetails(ObservableList<CreditDetail> credits) {
+		get().setCreditDetails(credits);
+	}
+
+	@Override
 	public Routing createRouteAssignmentUponValidation(Route route, LocalDate startDate) throws Exception {
 		validateStartDate(getRouteHistory(), startDate);
 		return createRouteAssignment(route, startDate);
+	}
+
+	@Override
+	public List<Routing> getRouteHistory() {
+		return get().getRouteHistory();
 	}
 
 	protected Routing createRouteAssignment(Route route, LocalDate startDate) {
@@ -101,6 +112,11 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 		r.setRoute(route);
 		r.setStartDate(startDate);
 		return r;
+	}
+
+	@Override
+	public void setRouteHistory(List<Routing> routings) {
+		get().setRouteHistory(routings);
 	}
 
 	@Override
@@ -163,8 +179,18 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
+	public void setBarangay(Location barangay) {
+		get().setBarangay(barangay);
+	}
+
+	@Override
 	public Channel getChannel() {
 		return get().getChannel();
+	}
+
+	@Override
+	public void setChannel(Channel channel) {
+		get().setChannel(channel);
 	}
 
 	@Override
@@ -173,8 +199,18 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
+	public void setCity(Location city) {
+		get().setCity(city);
+	}
+
+	@Override
 	public String getContactName() {
 		return get().getContactName();
+	}
+
+	@Override
+	public void setContactName(String text) {
+		get().setContactName(text);
 	}
 
 	@Override
@@ -183,8 +219,18 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
+	public void setContactSurname(String text) {
+		get().setContactSurname(text);
+	}
+
+	@Override
 	public String getContactTitle() {
 		return get().getContactTitle();
+	}
+
+	@Override
+	public void setContactTitle(String text) {
+		get().setContactSurname(text);
 	}
 
 	@Override
@@ -194,14 +240,9 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 
 	protected CreditDetail getCredit(Customer c, LocalDate date) {
 		return c.getCreditDetails().stream() //
-				.filter(p -> !p.getStartDate().isAfter(date) && p.getIsValid() == true) //
-				.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())) //
-				.orElse(new CreditDetail());
-	}
-
-	@Override
-	public List<CreditDetail> getCreditDetails() {
-		return get().getCreditDetails();
+			.filter(p -> !p.getStartDate().isAfter(date) && p.getIsValid() == true) //
+			.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())) //
+			.orElse(new CreditDetail());
 	}
 
 	@Override
@@ -230,6 +271,11 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
+	public void setName(String name) {
+		get().setName(name);
+	}
+
+	@Override
 	public Long getParentId() {
 		return getParent() == null ? null : getParent().getId();
 	}
@@ -249,13 +295,18 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
-	public List<Routing> getRouteHistory() {
-		return get().getRouteHistory();
+	public void setProvince(Location value) {
+		get().setProvince(value);
 	}
 
 	@Override
 	public String getStreet() {
 		return get().getStreet();
+	}
+
+	@Override
+	public void setStreet(String text) {
+		get().setStreet(text);
 	}
 
 	@Override
@@ -274,6 +325,11 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
+	public void setVisitFrequency(VisitFrequency freq) {
+		get().setVisitFrequency(freq);
+	}
+
+	@Override
 	public List<WeeklyVisit> getVisitSchedule(Channel customer) {
 		return customer != null && isAVisitedChannel(customer) ? visitSchedule() : null;
 	}
@@ -285,6 +341,11 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	private List<WeeklyVisit> visitSchedule() {
 		List<WeeklyVisit> l = get().getVisitSchedule();
 		return l == null || l.isEmpty() ? blankSchedule() : l;
+	}
+
+	@Override
+	public List<Channel> listVisitedChannels() {
+		return channelService.listVisitedChannels();
 	}
 
 	private List<WeeklyVisit> blankSchedule() {
@@ -349,11 +410,6 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
-	public List<Channel> listVisitedChannels() {
-		return channelService.listVisitedChannels();
-	}
-
-	@Override
 	public boolean noChangesNeedingApproval(String tab) {
 		this.tab = tab;
 		if (tab.equals(CREDIT_TAB))
@@ -376,48 +432,8 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	@Override
 	public void save() throws Information, Exception {
 		get().setPrimaryPricingType(pricingTypeService.findByName(DEALER.toString()));
-		set(getSavingService().module(getModuleName()).save(get()));
+		set(getRestClientServiceForLists().module(getModuleName()).save(get()));
 		throw new SuccessfulSaveInfo(getAbbreviatedModuleNoPrompt() + getOrderNo());
-	}
-
-	@Override
-	public void setBarangay(Location barangay) {
-		get().setBarangay(barangay);
-	}
-
-	@Override
-	public void setChannel(Channel channel) {
-		get().setChannel(channel);
-	}
-
-	@Override
-	public void setCity(Location city) {
-		get().setCity(city);
-	}
-
-	@Override
-	public void setContactName(String text) {
-		get().setContactName(text);
-	}
-
-	@Override
-	public void setContactSurname(String text) {
-		get().setContactSurname(text);
-	}
-
-	@Override
-	public void setContactTitle(String text) {
-		get().setContactSurname(text);
-	}
-
-	@Override
-	public void setCreditDetails(ObservableList<CreditDetail> credits) {
-		get().setCreditDetails(credits);
-	}
-
-	@Override
-	public void setName(String name) {
-		get().setName(name);
 	}
 
 	@Override
@@ -435,11 +451,6 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 	}
 
 	@Override
-	public void setProvince(Location value) {
-		get().setProvince(value);
-	}
-
-	@Override
 	public void setRouteAsPickUpAndChannelAsWarehouseSales() throws Exception {
 		if (getRouteHistory().isEmpty())
 			setRouteAsPickUp();
@@ -453,21 +464,6 @@ public abstract class AbstractCreditAndDiscountGivenCustomerService //
 
 	protected LocalDate goLive() {
 		return DateTimeUtils.toDate(goLive);
-	}
-
-	@Override
-	public void setRouteHistory(List<Routing> routings) {
-		get().setRouteHistory(routings);
-	}
-
-	@Override
-	public void setStreet(String text) {
-		get().setStreet(text);
-	}
-
-	@Override
-	public void setVisitFrequency(VisitFrequency freq) {
-		get().setVisitFrequency(freq);
 	}
 
 	@Override

@@ -1,12 +1,12 @@
 package ph.txtdis.dyvek.service;
 
+import ph.txtdis.dyvek.model.Billable;
+import ph.txtdis.service.ListedAndResettableService;
+
 import java.util.List;
 
-import ph.txtdis.dyvek.model.Billable;
-import ph.txtdis.service.ListedAndResetableService;
-
 public interface ListedAndResetableAndSearchedBillableService //
-		extends ListedAndResetableService<Billable> {
+	extends ListedAndResettableService<Billable> {
 
 	List<Billable> listSearched();
 }

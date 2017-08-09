@@ -31,16 +31,19 @@ import ph.txtdis.type.TransactionDirectionType;
 
 @Service("orderReturnService")
 public class ServerOrderReturnServiceImpl //
-		extends AbstractSpunSavedBillableService //
-		implements OrderReturnService, ReceivableService, ReceivingService, QtyPerItemService {
-
-	private static Logger logger = getLogger(ServerOrderReturnServiceImpl.class);
+	extends AbstractSpunSavedBillableService //
+	implements OrderReturnService,
+	ReceivableService,
+	ReceivingService,
+	QtyPerItemService {
 
 	private static final String MANUAL = OrderConfirmationType.MANUAL.toString();
 
 	private static final String PARTIAL = OrderConfirmationType.PARTIAL.toString();
 
 	private static final String WAREHOUSE = OrderConfirmationType.WAREHOUSE.toString();
+
+	private static Logger logger = getLogger(ServerOrderReturnServiceImpl.class);
 
 	@Autowired
 	private BillingDetailRepository detailRepository;
@@ -92,15 +95,18 @@ public class ServerOrderReturnServiceImpl //
 	private BillableEntity findOrderReturn(LocalDate orderDate, Long customerVendorId, Long orderCount) {
 		if (orderCount == 0)
 			return ocsRepository.findFirstByCustomerVendorIdAndOrderDateOrderByBookingIdDesc( //
-					customerVendorId, orderDate);
+				customerVendorId, orderDate);
 		return ocsRepository.findByCustomerVendorIdAndOrderDateAndBookingId(customerVendorId, orderDate, orderCount);
 	}
 
 	@Override
-	public List<BillableDetailEntity> getDetailEntityList(String itemVendorNo, String route, LocalDate start, LocalDate end) {
+	public List<BillableDetailEntity> getDetailEntityList(String itemVendorNo,
+	                                                      String route,
+	                                                      LocalDate start,
+	                                                      LocalDate end) {
 		List<BillableDetailEntity> list = detailRepository
-				.findByItemVendorIdAndReturnedQtyGreaterThanAndBillingPrefixNotNullAndBillingPrefixNotInAndBillingSuffixNotNullAndBillingSuffixContainingAndBillingDueDateBetween(
-						itemVendorNo, ZERO, ocsTypes(start, end), routeName(route), start, end);
+			.findByItemVendorIdAndReturnedQtyGreaterThanAndBillingPrefixNotNullAndBillingPrefixNotInAndBillingSuffixNotNullAndBillingSuffixContainingAndBillingDueDateBetween(
+				itemVendorNo, ZERO, ocsTypes(start, end), routeName(route), start, end);
 		logger.info("\n    OrderReturnDetails = " + list);
 		return list == null ? emptyList() : list;
 	}
@@ -115,7 +121,8 @@ public class ServerOrderReturnServiceImpl //
 
 	@Override
 	public List<BomEntity> getOrderNoAndCustomerAndRouteGroupedBomList() {
-		List<BillableEntity> l = orderReturnRepository.findByCustomerNotNullAndPrefixAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNull(PARTIAL);
+		List<BillableEntity> l = orderReturnRepository
+			.findByCustomerNotNullAndPrefixAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNull(PARTIAL);
 		logger.info("\n    OrderConfirmations = " + l);
 		return l == null ? Collections.emptyList() : toReturnedOrderNoAndCustomerAndRouteGroupedBomList(l);
 	}
@@ -123,20 +130,22 @@ public class ServerOrderReturnServiceImpl //
 	@Override
 	public List<BomEntity> getBomList(LocalDate start, LocalDate end) {
 		List<BillableEntity> l = orderReturnRepository
-				.findByCustomerNotNullAndPrefixNotNullAndPrefixNotInAndSuffixNotNullAndBookingIdNotNullAndDueDateBetweenAndReceivedOnNotNull(
-						Arrays.asList(WAREHOUSE, PARTIAL), start, end);
+			.findByCustomerNotNullAndPrefixNotNullAndPrefixNotInAndSuffixNotNullAndBookingIdNotNullAndDueDateBetweenAndReceivedOnNotNull(
+				Arrays.asList(WAREHOUSE, PARTIAL), start, end);
 		logger.info("\n    OrderConfirmations = " + l);
 		return l == null ? Collections.emptyList() : toReturnedBomList(l);
 	}
 
 	@Override
 	protected BillableEntity firstEntity() {
-		return orderReturnRepository.findFirstByCustomerNotNullAndPrefixNotNullAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNullOrderByIdAsc();
+		return orderReturnRepository
+			.findFirstByCustomerNotNullAndPrefixNotNullAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNullOrderByIdAsc();
 	}
 
 	@Override
 	protected BillableEntity lastEntity() {
-		return orderReturnRepository.findFirstByCustomerNotNullAndPrefixNotNullAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNullOrderByIdDesc();
+		return orderReturnRepository
+			.findFirstByCustomerNotNullAndPrefixNotNullAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNullOrderByIdDesc();
 	}
 
 	@Override
@@ -186,17 +195,20 @@ public class ServerOrderReturnServiceImpl //
 	@Override
 	protected BillableEntity nextEntity(Long id) {
 		return orderReturnRepository
-				.findFirstByCustomerNotNullAndPrefixNotNullAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNullAndIdGreaterThanOrderByIdAsc(id);
+			.findFirstByCustomerNotNullAndPrefixNotNullAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNullAndIdGreaterThanOrderByIdAsc(
+				id);
 	}
 
 	@Override
 	protected BillableEntity previousEntity(Long id) {
 		return orderReturnRepository
-				.findFirstByCustomerNotNullAndPrefixNotNullAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNullAndIdLessThanOrderByIdDesc(id);
+			.findFirstByCustomerNotNullAndPrefixNotNullAndSuffixNotNullAndBookingIdNotNullAndReceivedOnNotNullAndIdLessThanOrderByIdDesc(
+				id);
 	}
 
 	@Override
-	public BillableDetailEntity setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(BillableDetailEntity e, BillableDetail b) {
+	public BillableDetailEntity setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(BillableDetailEntity e,
+	                                                                                      BillableDetail b) {
 		BigDecimal total = b.getReturnedQty().add(b.getReturnedQty());
 		e.setReturnedQty(total);
 		return e;

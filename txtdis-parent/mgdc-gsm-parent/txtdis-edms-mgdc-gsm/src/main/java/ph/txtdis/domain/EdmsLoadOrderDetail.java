@@ -13,8 +13,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "tr_logp_details")
 @EqualsAndHashCode(callSuper = true)
 public class EdmsLoadOrderDetail
-		extends EdmsAbstractVolumeDiscountTotalTransactionCodeItemNameCostPriceUomQtyReferenceItemCodeIdDetail
-		implements Serializable {
+	extends EdmsAbstractVolumeDiscountTotalTransactionCodeItemNameCostPriceUomQtyReferenceItemCodeIdDetail
+	implements Serializable {
 
 	private static final long serialVersionUID = -5481002788965164842L;
 }

@@ -18,19 +18,19 @@ import ph.txtdis.service.QuantityValidated;
 import ph.txtdis.type.UomType;
 
 public abstract class AbstractAllItemInCasesAndBottlesInputDialog<AS extends ItemInputtedService<T>, T> //
-		extends AbstractFieldDialog<T> //
-		implements InputtedDialog<T> {
+	extends AbstractFieldDialog<T> //
+	implements InputtedDialog<T> {
 
 	private static Logger logger = getLogger(AbstractAllItemInCasesAndBottlesInputDialog.class);
-
-	@Autowired
-	private QuantitiesInCasesAndBottlesDialogImpl quantitiesInCasesAndBottlesDialog;
 
 	@Autowired
 	protected ItemInputtedDialog itemInputtedDialog;
 
 	@Autowired
 	protected AS service;
+
+	@Autowired
+	private QuantitiesInCasesAndBottlesDialogImpl quantitiesInCasesAndBottlesDialog;
 
 	@Override
 	protected String headerText() {
@@ -51,6 +51,14 @@ public abstract class AbstractAllItemInCasesAndBottlesInputDialog<AS extends Ite
 		return l;
 	}
 
+	private void setUomAndQtyUponValidation() {
+		try {
+			verifyQty();
+		} catch (Exception e) {
+			resetNodesOnError(e);
+		}
+	}
+
 	private void updateUponItemIdVerification() {
 		try {
 			updateIfItemIdIsValid();
@@ -58,6 +66,12 @@ public abstract class AbstractAllItemInCasesAndBottlesInputDialog<AS extends Ite
 			e.printStackTrace();
 			resetNodesOnError(e);
 		}
+	}
+
+	private void verifyQty() throws Exception {
+		logger.info("\n    verifyQty()(");
+		((QuantityValidated) service)
+			.setQtyUponValidation(UomType.CS, quantitiesInCasesAndBottlesDialog.totalQtyInPieces());
 	}
 
 	private void updateIfItemIdIsValid() throws Exception {
@@ -68,18 +82,5 @@ public abstract class AbstractAllItemInCasesAndBottlesInputDialog<AS extends Ite
 	@Override
 	protected T createEntity() {
 		return service.createDetail();
-	}
-
-	private void setUomAndQtyUponValidation() {
-		try {
-			verifyQty();
-		} catch (Exception e) {
-			resetNodesOnError(e);
-		}
-	}
-
-	private void verifyQty() throws Exception {
-		logger.info("\n    verifyQty()(");
-		((QuantityValidated) service).setQtyUponValidation(UomType.CS, quantitiesInCasesAndBottlesDialog.totalQtyInPieces());
 	}
 }

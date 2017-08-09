@@ -1,12 +1,13 @@
 package ph.txtdis.dto;
 
-import java.time.ZonedDateTime;
-
 import lombok.Data;
+
+import java.time.ZonedDateTime;
 
 @Data
 public abstract class AbstractCreationTracked<PK> //
-		implements CreationLogged, Keyed<PK> {
+	implements CreationLogged,
+	Keyed<PK> {
 
 	private PK id;
 

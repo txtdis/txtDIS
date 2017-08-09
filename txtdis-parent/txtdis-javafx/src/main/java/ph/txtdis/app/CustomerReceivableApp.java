@@ -1,4 +1,5 @@
 package ph.txtdis.app;
 
-public interface CustomerReceivableApp extends LaunchableApp {
+public interface CustomerReceivableApp
+	extends LaunchableApp {
 }

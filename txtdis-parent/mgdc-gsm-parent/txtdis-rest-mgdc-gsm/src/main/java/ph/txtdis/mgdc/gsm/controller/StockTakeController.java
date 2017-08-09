@@ -1,26 +1,21 @@
 package ph.txtdis.mgdc.gsm.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+import ph.txtdis.dto.StockTake;
+import ph.txtdis.mgdc.gsm.service.server.StockTakeService;
+
+import java.net.URI;
+import java.sql.Date;
+
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath;
-
-import java.net.URI;
-import java.sql.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import ph.txtdis.dto.StockTake;
-import ph.txtdis.mgdc.gsm.service.server.StockTakeService;
 
 @RestController("StockTakingController")
 @RequestMapping("/stockTakes")

@@ -1,13 +1,18 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-import static java.time.DayOfWeek.SATURDAY;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.DeliveryType.PICK_UP;
-import static ph.txtdis.util.NumberUtils.nullIfZero;
-import static ph.txtdis.util.NumberUtils.toCurrencyText;
-import static ph.txtdis.util.NumberUtils.toPercentRate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import ph.txtdis.domain.TruckEntity;
+import ph.txtdis.domain.UserEntity;
+import ph.txtdis.dto.Billable;
+import ph.txtdis.dto.BillableDetail;
+import ph.txtdis.mgdc.domain.RouteEntity;
+import ph.txtdis.mgdc.gsm.domain.*;
+import ph.txtdis.mgdc.gsm.repository.BillableRepository;
+import ph.txtdis.mgdc.service.server.AbstractServerSpunSavedSearchedEntityService;
+import ph.txtdis.service.ServerUserService;
+import ph.txtdis.type.UomType;
+import ph.txtdis.util.DateTimeUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,29 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import ph.txtdis.domain.TruckEntity;
-import ph.txtdis.domain.UserEntity;
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.BillableDetail;
-import ph.txtdis.mgdc.domain.RouteEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableEntity;
-import ph.txtdis.mgdc.gsm.domain.CustomerDiscountEntity;
-import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
-import ph.txtdis.mgdc.gsm.domain.ItemEntity;
-import ph.txtdis.mgdc.gsm.domain.PickListEntity;
-import ph.txtdis.mgdc.gsm.repository.BillableRepository;
-import ph.txtdis.mgdc.service.server.AbstractServerSpunSavedSearchedEntityService;
-import ph.txtdis.service.ServerUserService;
-import ph.txtdis.type.UomType;
-import ph.txtdis.util.DateTimeUtils;
+import static java.math.BigDecimal.ZERO;
+import static java.time.DayOfWeek.SATURDAY;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.DeliveryType.PICK_UP;
+import static ph.txtdis.util.NumberUtils.*;
 
 public abstract class AbstractSpunSavedBillableService //
-		extends AbstractServerSpunSavedSearchedEntityService<BillableRepository, BillableEntity, Billable, Long> //
-		implements BillingDataService, SpunSavedBillableService {
+	extends AbstractServerSpunSavedSearchedEntityService<BillableRepository, BillableEntity, Billable, Long> //
+	implements BillingDataService,
+	SpunSavedBillableService {
 
 	protected static final String CANCELLED = "CANCELLED";
 
@@ -101,6 +94,11 @@ public abstract class AbstractSpunSavedBillableService //
 		return setPickingData(b, e.getPicking());
 	}
 
+	@Override
+	public Billable toOrderNoOnlyBillable(BillableEntity e) {
+		return e == null ? null : setOrderNo(new Billable(), e);
+	}
+
 	protected Billable customerOnlyBillable(Billable b, BillableEntity e) {
 		if (b == null)
 			b = new Billable();
@@ -116,17 +114,9 @@ public abstract class AbstractSpunSavedBillableService //
 		return b;
 	}
 
-	private String routeName(BillableEntity e, CustomerEntity c) {
-		RouteEntity route = c.getRoute(e.getOrderDate());
-		return route == null ? null : route.getName();
-	}
-
-	private String seller(BillableEntity e, CustomerEntity c) {
-		String seller = c.getSeller(e.getOrderDate());
-		if (seller == null)
-			return null;
-		UserEntity u = userService.findEntityByPrimaryKey(seller);
-		return u.getSurname() + ", " + u.getName();
+	private Long bookingId(BillableEntity e) {
+		Long id = e.getBookingId();
+		return id == null && e.getCreatedOn() != null ? e.getId() : id;
 	}
 
 	private String alias(BillableEntity e) {
@@ -137,36 +127,9 @@ public abstract class AbstractSpunSavedBillableService //
 		return c == null ? null : c.getName();
 	}
 
-	private Long bookingId(BillableEntity e) {
-		Long id = e.getBookingId();
-		return id == null && e.getCreatedOn() != null ? e.getId() : id;
-	}
-
 	private List<BillableDetail> details(BillableEntity e) {
 		List<BillableDetailEntity> details = e.getDetails();
 		return details.stream().map(d -> toBillableDetail(d)).collect(Collectors.toList());
-	}
-
-	private BillableDetail toBillableDetail(BillableDetailEntity e) {
-		ItemEntity item = e.getItem();
-		BillableDetail d = new BillableDetail();
-		d.setId(item.getId());
-		d.setItemName(item.getName());
-		d.setItemVendorNo(item.getVendorId());
-		d.setUom(e.getUom());
-		d.setInitialQty(e.getInitialQty());
-		d.setSoldQty(e.getSoldQty());
-		d.setReturnedQty(e.getReturnedQty());
-		d.setQuality(e.getQuality());
-		d.setPriceValue(e.getPriceValue());
-		d.setQtyPerCase(getQtyPerCase(e, item));
-		return d;
-	}
-
-	private int getQtyPerCase(BillableDetailEntity e, ItemEntity item) {
-		if (pricingUom != UomType.CS)
-			return 0;
-		return itemService.getCountPerCase(item);
 	}
 
 	private List<String> discounts(BillableEntity b) {
@@ -175,38 +138,6 @@ public abstract class AbstractSpunSavedBillableService //
 		} catch (Exception e) {
 			return emptyList();
 		}
-	}
-
-	private List<String> listDiscounts(BillableEntity e) throws Exception {
-		ArrayList<String> list = new ArrayList<>();
-		if (e.getCustomerDiscounts().size() > 1)
-			list.add(getTotalInText(discountValue(e)));
-		return getEachLevelDiscountTextList(e, list);
-	}
-
-	protected String getTotalInText(BigDecimal t) {
-		return "[TOTAL] " + toCurrencyText(t);
-	}
-
-	private BigDecimal discountValue(BillableEntity b) {
-		try {
-			return b.getGrossValue().subtract(b.getTotalValue());
-		} catch (Exception e) {
-			return ZERO;
-		}
-	}
-
-	private List<String> getEachLevelDiscountTextList(BillableEntity b, List<String> list) {
-		BigDecimal net = b.getGrossValue();
-		b.getCustomerDiscounts().forEach(d -> list.add(createEachLevelDiscountText(d, ZERO, net)));
-		return list;
-	}
-
-	private String createEachLevelDiscountText(CustomerDiscountEntity d, BigDecimal total, BigDecimal net) {
-		BigDecimal perLevel = net.multiply(toPercentRate(d.getValue()));
-		total = total.add(perLevel);
-		net = net.subtract(total);
-		return "[" + d.getValue() + "%] " + toCurrencyText(perLevel);
 	}
 
 	private Billable setReceivingData(Billable b, BillableEntity e) {
@@ -232,6 +163,49 @@ public abstract class AbstractSpunSavedBillableService //
 		return b;
 	}
 
+	protected Billable setOrderNo(Billable b, BillableEntity e) {
+		b.setPrefix(e.getPrefix());
+		b.setNumId(e.getNumId());
+		b.setSuffix(e.getSuffix());
+		return b;
+	}
+
+	private String routeName(BillableEntity e, CustomerEntity c) {
+		RouteEntity route = c.getRoute(e.getOrderDate());
+		return route == null ? null : route.getName();
+	}
+
+	private String seller(BillableEntity e, CustomerEntity c) {
+		String seller = c.getSeller(e.getOrderDate());
+		if (seller == null)
+			return null;
+		UserEntity u = userService.findEntityByPrimaryKey(seller);
+		return u.getSurname() + ", " + u.getName();
+	}
+
+	private BillableDetail toBillableDetail(BillableDetailEntity e) {
+		ItemEntity item = e.getItem();
+		BillableDetail d = new BillableDetail();
+		d.setId(item.getId());
+		d.setItemName(item.getName());
+		d.setItemVendorNo(item.getVendorId());
+		d.setUom(e.getUom());
+		d.setInitialQty(e.getInitialQty());
+		d.setSoldQty(e.getSoldQty());
+		d.setReturnedQty(e.getReturnedQty());
+		d.setQuality(e.getQuality());
+		d.setPriceValue(e.getPriceValue());
+		d.setQtyPerCase(getQtyPerCase(e, item));
+		return d;
+	}
+
+	private List<String> listDiscounts(BillableEntity e) throws Exception {
+		ArrayList<String> list = new ArrayList<>();
+		if (e.getCustomerDiscounts().size() > 1)
+			list.add(getTotalInText(discountValue(e)));
+		return getEachLevelDiscountTextList(e, list);
+	}
+
 	private String truck(PickListEntity p) {
 		TruckEntity t = p.getTruck();
 		return t == null ? PICK_UP.toString() : t.getName();
@@ -242,13 +216,44 @@ public abstract class AbstractSpunSavedBillableService //
 		return fullName(u);
 	}
 
+	private String helper(PickListEntity p) {
+		UserEntity u = p.getAssistant();
+		return fullName(u);
+	}
+
+	private int getQtyPerCase(BillableDetailEntity e, ItemEntity item) {
+		if (pricingUom != UomType.CS)
+			return 0;
+		return itemService.getCountPerCase(item);
+	}
+
+	protected String getTotalInText(BigDecimal t) {
+		return "[TOTAL] " + toCurrencyText(t);
+	}
+
+	private BigDecimal discountValue(BillableEntity b) {
+		try {
+			return b.getGrossValue().subtract(b.getTotalValue());
+		} catch (Exception e) {
+			return ZERO;
+		}
+	}
+
+	private List<String> getEachLevelDiscountTextList(BillableEntity b, List<String> list) {
+		BigDecimal net = b.getGrossValue();
+		b.getCustomerDiscounts().forEach(d -> list.add(createEachLevelDiscountText(d, ZERO, net)));
+		return list;
+	}
+
 	private String fullName(UserEntity u) {
 		return u == null ? null : u.getName() + " " + u.getSurname();
 	}
 
-	private String helper(PickListEntity p) {
-		UserEntity u = p.getAssistant();
-		return fullName(u);
+	private String createEachLevelDiscountText(CustomerDiscountEntity d, BigDecimal total, BigDecimal net) {
+		BigDecimal perLevel = net.multiply(toPercentRate(d.getValue()));
+		total = total.add(perLevel);
+		net = net.subtract(total);
+		return "[" + d.getValue() + "%] " + toCurrencyText(perLevel);
 	}
 
 	@Override
@@ -273,6 +278,11 @@ public abstract class AbstractSpunSavedBillableService //
 		return updateTotals(e, b);
 	}
 
+	protected BillableEntity update(Billable b) {
+		BillableEntity e = repository.findOne(b.getId());
+		return update(e, b);
+	}
+
 	protected BillableEntity orderNoOnlyEntity(Billable b) {
 		BillableEntity e = new BillableEntity();
 		return setThreePartOrderNo(e, b);
@@ -287,9 +297,13 @@ public abstract class AbstractSpunSavedBillableService //
 		return id != null ? id : incrementBookingId();
 	}
 
-	private Long incrementBookingId() {
-		BillableEntity b = repository.findFirstByBookingIdNotNullOrderByBookingIdDesc();
-		return b == null || b.getBookingId() == null ? 1L : b.getBookingId() + 1;
+	protected List<BillableDetailEntity> entityDetails(BillableEntity e, Billable b) {
+		List<BillableDetail> l = b.getDetails();
+		return l == null ? null
+			: l.stream() //
+			.filter(d -> d != null) //
+			.map(d -> detail(e, d)) //
+			.collect(toList());
 	}
 
 	protected BillableEntity updateTotals(BillableEntity e, Billable b) {
@@ -299,13 +313,14 @@ public abstract class AbstractSpunSavedBillableService //
 		return e;
 	}
 
-	protected List<BillableDetailEntity> entityDetails(BillableEntity e, Billable b) {
-		List<BillableDetail> l = b.getDetails();
-		return l == null ? null
-				: l.stream() //
-						.filter(d -> d != null) //
-						.map(d -> detail(e, d)) //
-						.collect(toList());
+	protected BillableEntity update(BillableEntity e, Billable b) {
+		e.setRemarks(b.getRemarks());
+		return e;
+	}
+
+	private Long incrementBookingId() {
+		BillableEntity b = repository.findFirstByBookingIdNotNullOrderByBookingIdDesc();
+		return b == null || b.getBookingId() == null ? 1L : b.getBookingId() + 1;
 	}
 
 	private BillableDetailEntity detail(BillableEntity e, BillableDetail bd) {
@@ -318,28 +333,6 @@ public abstract class AbstractSpunSavedBillableService //
 		ed.setReturnedQty(nullIfZero(bd.getReturnedQty()));
 		ed.setPriceValue(nullIfZero(bd.getPriceValue()));
 		return ed;
-	}
-
-	protected BillableEntity update(Billable b) {
-		BillableEntity e = repository.findOne(b.getId());
-		return update(e, b);
-	}
-
-	protected BillableEntity update(BillableEntity e, Billable b) {
-		e.setRemarks(b.getRemarks());
-		return e;
-	}
-
-	@Override
-	public Billable toOrderNoOnlyBillable(BillableEntity e) {
-		return e == null ? null : setOrderNo(new Billable(), e);
-	}
-
-	protected Billable setOrderNo(Billable b, BillableEntity e) {
-		b.setPrefix(e.getPrefix());
-		b.setNumId(e.getNumId());
-		b.setSuffix(e.getSuffix());
-		return b;
 	}
 
 	@Override

@@ -1,12 +1,8 @@
 package ph.txtdis.mgdc.fx.dialog;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.Account;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCombo;
@@ -15,10 +11,13 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.service.RouteService;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Scope("prototype")
 @Component("accountDialog")
 public class AccountDialog //
-		extends AbstractFieldDialog<Account> {
+	extends AbstractFieldDialog<Account> {
 
 	@Autowired
 	private LabeledCombo<String> sellerCombo;
@@ -28,6 +27,13 @@ public class AccountDialog //
 
 	@Autowired
 	private RouteService service;
+
+	@Override
+	protected List<InputNode<?>> addNodes() {
+		sellerCombo.name("Seller").items(getSellers()).build();
+		startDatePicker.name("Start Date");
+		return Arrays.asList(sellerCombo, startDatePicker);
+	}
 
 	private List<String> getSellers() {
 		try {
@@ -39,6 +45,11 @@ public class AccountDialog //
 		}
 	}
 
+	@Override
+	protected Account createEntity() {
+		return save(new Account());
+	}
+
 	private Account save(Account ib) {
 		try {
 			return service.save(sellerCombo.getValue(), startDatePicker.getValue());
@@ -47,18 +58,6 @@ public class AccountDialog //
 			resetNodesOnError(e);
 			return null;
 		}
-	}
-
-	@Override
-	protected List<InputNode<?>> addNodes() {
-		sellerCombo.name("Seller").items(getSellers()).build();
-		startDatePicker.name("Start Date");
-		return Arrays.asList(sellerCombo, startDatePicker);
-	}
-
-	@Override
-	protected Account createEntity() {
-		return save(new Account());
 	}
 
 	@Override

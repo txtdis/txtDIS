@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public interface CokeRemittanceService //
-		extends PaymentOnlyRemittanceService {
+	extends PaymentOnlyRemittanceService {
 
 	BigDecimal getTotalValue(String collector, LocalDate start, LocalDate end);
 }

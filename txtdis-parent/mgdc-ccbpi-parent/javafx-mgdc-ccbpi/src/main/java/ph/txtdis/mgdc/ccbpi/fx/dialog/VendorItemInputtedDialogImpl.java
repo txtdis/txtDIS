@@ -8,7 +8,7 @@ import ph.txtdis.mgdc.ccbpi.dto.Item;
 @Scope("prototype")
 @Component("itemInputtedDialog")
 public class VendorItemInputtedDialogImpl //
-		extends AbstractItemInputtedDialog {
+	extends AbstractItemInputtedDialog {
 
 	@Override
 	public Item validateItemExists() throws Exception {

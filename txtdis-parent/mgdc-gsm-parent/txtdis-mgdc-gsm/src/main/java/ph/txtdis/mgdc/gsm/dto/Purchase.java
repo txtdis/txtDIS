@@ -1,19 +1,19 @@
 package ph.txtdis.mgdc.gsm.dto;
 
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.dto.AbstractCreationTracked;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.dto.User;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Purchase //
-		extends AbstractCreationTracked<Long> {
+	extends AbstractCreationTracked<Long> {
 
 	private Customer customer;
 

@@ -16,10 +16,10 @@ import ph.txtdis.mgdc.domain.AbstractCustomerDiscountEntity;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "customer_discount", //
-		indexes = { @Index(columnList = "customer_id, start_date") }, //
-		uniqueConstraints = { @UniqueConstraint(columnNames = { "customer_id", "start_date" }) })
+	indexes = {@Index(columnList = "customer_id, start_date")}, //
+	uniqueConstraints = {@UniqueConstraint(columnNames = {"customer_id", "start_date"})})
 public class CustomerDiscountEntity //
-		extends AbstractCustomerDiscountEntity {
+	extends AbstractCustomerDiscountEntity {
 
 	private static final long serialVersionUID = -455882680349394952L;
 

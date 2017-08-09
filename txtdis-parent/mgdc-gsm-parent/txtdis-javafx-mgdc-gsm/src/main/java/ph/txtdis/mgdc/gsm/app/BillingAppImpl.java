@@ -1,25 +1,15 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CODE;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.ID;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
-import ph.txtdis.app.StartableApp;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.app.App;
 import ph.txtdis.dto.Billable;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.mgdc.app.MultiTypeBillingApp;
 import ph.txtdis.mgdc.fx.table.BeverageBillingTable;
@@ -28,14 +18,21 @@ import ph.txtdis.mgdc.gsm.fx.dialog.InvoiceValueAdjustmentDialog;
 import ph.txtdis.mgdc.gsm.service.GsmBillingService;
 import ph.txtdis.type.ModuleType;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
+
 @Scope("prototype")
 @Component("billingApp")
 public class BillingAppImpl //
-		extends AbstractBillableApp<GsmBillingService, BeverageBillingTable, String> //
-		implements MultiTypeBillingApp {
+	extends AbstractBillableApp<GsmBillingService, BeverageBillingTable, String> //
+	implements MultiTypeBillingApp {
 
 	@Autowired
-	private AppButtonImpl adjustButton, editButton;
+	private AppButton adjustButton, editButton;
 
 	@Autowired
 	private AppFieldImpl<BigDecimal> grossDisplay, adjustmentDisplay;
@@ -57,8 +54,8 @@ public class BillingAppImpl //
 	private ModuleType type;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		b.add(4, adjustButton);
 		if (service.isAnInvoice())
 			b.add(6, editButton);
@@ -90,11 +87,6 @@ public class BillingAppImpl //
 	}
 
 	@Override
-	protected BooleanBinding isNew() {
-		return billedOnDisplay.isEmpty();
-	}
-
-	@Override
 	protected List<Node> mainVerticalPaneNodes() {
 		List<Node> l = new ArrayList<>(super.mainVerticalPaneNodes());
 		l.add(totalPane());
@@ -108,46 +100,43 @@ public class BillingAppImpl //
 		return service.isAnInvoice() ? vatAndTotalPane() : totalOnlyPane();
 	}
 
-	private Node totalOnlyPane() {
-		List<Node> l = new ArrayList<>(adjustmentNodes());
-		l.addAll(totalNodes());
-		return box.forHorizontalPane(l);
-	}
-
-	private List<Node> paymentAndBalanceNodes() {
-		return asList( //
-				label.name("Payment"), paymentCombo, //
-				label.name("Balance"), balanceDisplay);
-	}
-
 	private Node paymentPane() {
-		return box.forHorizontalPane(paymentAndBalanceNodes());
+		return pane.centeredHorizontal(paymentAndBalanceNodes());
 	}
 
 	private Node bookingAndReceivingPane() {
 		List<Node> l = new ArrayList<>(creationNodes());
 		l.addAll(receivingNodes());
-		return box.forHorizontalPane(l);
+		return pane.centeredHorizontal(l);
 	}
 
 	private Node billingAndDecisionPane() {
 		List<Node> l = new ArrayList<>(billingNodes(service.getBillingPrompt()));
 		l.addAll(decisionNodes());
-		return box.forHorizontalPane(l);
+		return pane.centeredHorizontal(l);
+	}
+
+	private Node totalOnlyPane() {
+		List<Node> l = new ArrayList<>(adjustmentNodes());
+		l.addAll(totalNodes());
+		return pane.centeredHorizontal(l);
+	}
+
+	private List<Node> paymentAndBalanceNodes() {
+		return asList( //
+			label.name("Payment"), paymentCombo, //
+			label.name("Balance"), balanceDisplay);
+	}
+
+	private List<Node> adjustmentNodes() {
+		return asList( //
+			label.name("Gross"), grossDisplay, //
+			label.name("Adjustment"), adjustmentDisplay);
 	}
 
 	@Override
 	protected Node orderDateNode() {
 		return orderDateDisplayOnly();
-	}
-
-	@Override
-	public void refresh() {
-		super.refresh();
-		idNoInput.setValue(service.getNumId());
-		idPrefixInput.setValue(service.getPrefix());
-		idSuffixInput.setValue(service.getSuffix());
-		canEditInvoiceNo.set(service.canEditInvoiceNo());
 	}
 
 	@Override
@@ -173,20 +162,31 @@ public class BillingAppImpl //
 	protected void renew() {
 		super.renew();
 		if (service.findUncorrectedInvalidBilling()) {
-			dialog.showError("Correct invalid S/I & D/R's first").addParent(this).start();
+			messageDialog.showError("Correct invalid S/I & D/R's first").addParent(this).start();
 			refresh();
 			table.requestFocus();
-		} else if (service.isAnInvoice()) {
+		}
+		else if (service.isAnInvoice()) {
 			idPrefixInput.enable();
 			idPrefixInput.requestFocus();
-		} else
+		}
+		else
 			referenceIdInput.requestFocus();
+	}
+
+	@Override
+	public void refresh() {
+		super.refresh();
+		idNoInput.setValue(service.getNumId());
+		idPrefixInput.setValue(service.getPrefix());
+		idSuffixInput.setValue(service.getSuffix());
+		canEditInvoiceNo.set(service.canEditInvoiceNo());
 	}
 
 	@Override
 	protected BooleanBinding saveButtonDisableBinding() {
 		BooleanBinding b = isPosted() //
-				.or(table.isEmpty());
+			.or(table.isEmpty());
 		return !service.isAnInvoice() ? b : b.or(idNoInput.isEmpty());
 	}
 
@@ -199,9 +199,14 @@ public class BillingAppImpl //
 	protected void setButtonBindings() {
 		super.setButtonBindings();
 		adjustButton.disableIf(isPosted() //
-				.or(table.isEmpty()));
+			.or(table.isEmpty()));
 		editButton.disableIf(isNew() //
-				.or(canEditInvoiceNo.not()));
+			.or(canEditInvoiceNo.not()));
+	}
+
+	@Override
+	protected BooleanBinding isNew() {
+		return billedOnDisplay.isEmpty();
 	}
 
 	@Override
@@ -227,7 +232,7 @@ public class BillingAppImpl //
 
 	private void setIdSuffixInputBindings() {
 		idSuffixInput.disableIf(isPosted() //
-				.or(idNoInput.isEmpty()));
+			.or(idNoInput.isEmpty()));
 	}
 
 	private void setCustomerBoxBindings() {
@@ -239,7 +244,8 @@ public class BillingAppImpl //
 	@Override
 	protected void setListeners() {
 		super.setListeners();
-		idSuffixInput.onAction(e -> updateUponOrderNoValidation(idPrefixInput.getValue(), idNoInput.getValue(), idSuffixInput.getValue()));
+		idSuffixInput.onAction(
+			e -> updateUponOrderNoValidation(idPrefixInput.getValue(), idNoInput.getValue(), idSuffixInput.getValue()));
 		referenceIdInput.onAction(e -> updateUponReferenceIdValidation(referenceIdInput.getValue()));
 		customerBox.onAction(e -> updateUponCustomerValidation(customerBox.getId()));
 		adjustButton.onAction(e -> adjustTotalValue());
@@ -266,15 +272,6 @@ public class BillingAppImpl //
 			}
 	}
 
-	private void setFocusAfterReferenceIdValidation() {
-		if (referenceIdInput.isEmpty().get())
-			referenceIdInput.requestFocus();
-		else if (service.isAppendable())
-			customerBox.requestFocus();
-		else
-			saveButton.requestFocus();
-	}
-
 	private void updateUponCustomerValidation(Long id) {
 		if (service.isNew() && id != null && id != 0)
 			try {
@@ -297,11 +294,20 @@ public class BillingAppImpl //
 		refresh();
 	}
 
+	private void setFocusAfterReferenceIdValidation() {
+		if (referenceIdInput.isEmpty().get())
+			referenceIdInput.requestFocus();
+		else if (service.isAppendable())
+			customerBox.requestFocus();
+		else
+			saveButton.requestFocus();
+	}
+
 	@Override
 	protected void setReferenceIdBindings() {
 		if (service.isAnInvoice())
 			referenceIdInput.disableIf(isPosted() //
-					.or(idSuffixInput.disabledProperty()));
+				.or(idSuffixInput.disabledProperty()));
 		else
 			super.setReferenceIdBindings();
 	}
@@ -328,13 +334,7 @@ public class BillingAppImpl //
 
 	private void showCorrectedBillingMustBeValidatedFirstMessage(String orderNo) {
 		String msg = "Validate corrected\nS/I/(D/R) No. " + orderNo + "\nfirst, to proceed.";
-		dialog.showError(msg).addParent(this).start();
-	}
-
-	private List<Node> adjustmentNodes() {
-		return asList( //
-				label.name("Gross"), grossDisplay, //
-				label.name("Adjustment"), adjustmentDisplay);
+		messageDialog.showError(msg).addParent(this).start();
 	}
 
 	@Override
@@ -358,8 +358,8 @@ public class BillingAppImpl //
 
 	private Node idBox() {
 		if (!service.isAnInvoice())
-			return box.forHorizontals(idNoInput);
-		return box.forHorizontals(idPrefixInput, idNoInput, idSuffixInput);
+			return pane.horizontal(idNoInput);
+		return pane.horizontal(idPrefixInput, idNoInput, idSuffixInput);
 	}
 
 	@Override
@@ -368,7 +368,7 @@ public class BillingAppImpl //
 	}
 
 	@Override
-	public StartableApp type(ModuleType type) {
+	public App type(ModuleType type) {
 		this.type = type;
 		return this;
 	}

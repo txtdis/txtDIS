@@ -8,18 +8,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ph.txtdis.dto.Warehouse;
-import ph.txtdis.service.ReadOnlyService;
+import ph.txtdis.service.RestClientService;
 
 @Service("warehouseService")
 public class WarehouseServiceImpl //
-		implements WarehouseService {
+	implements WarehouseService {
 
 	@Autowired
-	private ReadOnlyService<Warehouse> readOnlyService;
+	private RestClientService<Warehouse> restClientService;
 
 	@Override
-	public ReadOnlyService<Warehouse> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<Warehouse> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override

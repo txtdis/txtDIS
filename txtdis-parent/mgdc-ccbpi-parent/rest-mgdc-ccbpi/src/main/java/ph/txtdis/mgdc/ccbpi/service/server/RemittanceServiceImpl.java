@@ -16,8 +16,8 @@ import ph.txtdis.service.AbstractSpunSavedKeyedService;
 
 @Service("remittanceService")
 public class RemittanceServiceImpl //
-		extends AbstractSpunSavedKeyedService<RemittanceRepository, RemittanceEntity, Remittance, Long> //
-		implements NoDetailRemittanceService {
+	extends AbstractSpunSavedKeyedService<RemittanceRepository, RemittanceEntity, Remittance, Long> //
+	implements NoDetailRemittanceService {
 
 	@Autowired
 	private CustomerService customerService;
@@ -40,6 +40,11 @@ public class RemittanceServiceImpl //
 		return oneValid(l);
 	}
 
+	@Override
+	protected Remittance toModel(RemittanceEntity e) {
+		return e == null ? null : newRemittance(e);
+	}
+
 	private RemittanceEntity oneValid(List<RemittanceEntity> l) {
 		try {
 			return l.stream().filter(notInvalid()).findFirst().get();
@@ -48,24 +53,10 @@ public class RemittanceServiceImpl //
 		}
 	}
 
-	private Predicate<RemittanceEntity> notInvalid() {
-		return r -> r.getIsValid() == null || r.getIsValid();
-	}
-
-	@Override
-	public List<Remittance> save(List<Remittance> l) {
-		return super.save(l);
-	}
-
-	@Override
-	protected Remittance toModel(RemittanceEntity e) {
-		return e == null ? null : newRemittance(e);
-	}
-
 	private Remittance newRemittance(RemittanceEntity e) {
 		Remittance r = toPaymentOnlyRemittance(e);
 		r.setRemarks(e.getRemarks());
-		r.setCollector(e.getCollector());
+		r.setReceivedFrom(e.getCollector());
 		r.setCreatedBy(e.getCreatedBy());
 		r.setCreatedOn(e.getCreatedOn());
 		if (e.getIsValid() != null)
@@ -77,17 +68,15 @@ public class RemittanceServiceImpl //
 		return r;
 	}
 
+	private Predicate<RemittanceEntity> notInvalid() {
+		return r -> r.getIsValid() == null || r.getIsValid();
+	}
+
 	private Remittance toPaymentOnlyRemittance(RemittanceEntity e) {
 		Remittance r = toIdOnlyRemittance(e);
 		r.setPaymentDate(e.getPaymentDate());
 		r.setValue(e.getValue());
 		return setCheckData(e, r);
-	}
-
-	private Remittance toIdOnlyRemittance(RemittanceEntity e) {
-		Remittance r = new Remittance();
-		r.setId(e.getId());
-		return r;
 	}
 
 	private Remittance setAuditData(RemittanceEntity e, Remittance r) {
@@ -113,15 +102,26 @@ public class RemittanceServiceImpl //
 		return r;
 	}
 
-	private String draweeBank(RemittanceEntity e) {
-		CustomerEntity bank = e == null ? null : e.getDraweeBank();
-		return bank == null ? null : bank.getName();
+	private Remittance toIdOnlyRemittance(RemittanceEntity e) {
+		Remittance r = new Remittance();
+		r.setId(e.getId());
+		return r;
 	}
 
 	private Remittance setCheckData(RemittanceEntity e, Remittance r) {
 		r.setCheckId(e.getCheckId());
 		r.setDraweeBank(draweeBank(e));
 		return r;
+	}
+
+	private String draweeBank(RemittanceEntity e) {
+		CustomerEntity bank = e == null ? null : e.getDraweeBank();
+		return bank == null ? null : bank.getName();
+	}
+
+	@Override
+	public List<Remittance> save(List<Remittance> l) {
+		return super.save(l);
 	}
 
 	@Override
@@ -133,19 +133,9 @@ public class RemittanceServiceImpl //
 		RemittanceEntity e = new RemittanceEntity();
 		e.setPaymentDate(r.getPaymentDate());
 		e.setValue(r.getValue());
-		e.setCollector(r.getCollector());
+		e.setCollector(r.getReceivedFrom());
 		e.setRemarks(r.getRemarks());
 		return updateCheckData(e, r);
-	}
-
-	private RemittanceEntity updateCheckData(RemittanceEntity e, Remittance r) {
-		e.setCheckId(r.getCheckId());
-		e.setDraweeBank(bank(r.getDraweeBank()));
-		return e;
-	}
-
-	private CustomerEntity bank(String name) {
-		return customerService.findEntityByName(name);
 	}
 
 	private RemittanceEntity update(Remittance r) {
@@ -154,6 +144,12 @@ public class RemittanceServiceImpl //
 			e = updateTransferData(r, e);
 		if (r.getDepositorOn() != null && e.getDepositorOn() == null)
 			e = updateDepositData(r, e);
+		return e;
+	}
+
+	private RemittanceEntity updateCheckData(RemittanceEntity e, Remittance r) {
+		e.setCheckId(r.getCheckId());
+		e.setDraweeBank(bank(r.getDraweeBank()));
 		return e;
 	}
 
@@ -169,5 +165,9 @@ public class RemittanceServiceImpl //
 		e.setDepositorBank(bank(r.getDepositorBank()));
 		e.setDepositorOn(ZonedDateTime.now());
 		return e;
+	}
+
+	private CustomerEntity bank(String name) {
+		return customerService.findEntityByName(name);
 	}
 }

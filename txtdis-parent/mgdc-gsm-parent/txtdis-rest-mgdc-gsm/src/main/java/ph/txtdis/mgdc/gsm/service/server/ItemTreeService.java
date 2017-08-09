@@ -1,14 +1,14 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.dto.ItemTree;
 import ph.txtdis.mgdc.gsm.domain.ItemTreeEntity;
 import ph.txtdis.service.SavedKeyedService;
 
+import java.util.List;
+
 public interface ItemTreeService //
-		extends SavedKeyedService<ItemTreeEntity, ItemTree, Long> {
+	extends SavedKeyedService<ItemTreeEntity, ItemTree, Long> {
 
 	ItemTree find(ItemFamily family, ItemFamily parent);
 

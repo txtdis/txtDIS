@@ -1,16 +1,6 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.UomType.CS;
-import static ph.txtdis.util.TextUtils.nullIfEmpty;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.mgdc.gsm.domain.ItemEntity;
 import ph.txtdis.mgdc.gsm.domain.QtyPerUomEntity;
@@ -18,9 +8,18 @@ import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.gsm.repository.ItemRepository;
 import ph.txtdis.service.AbstractSpunSavedKeyedService;
 
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.UomType.CS;
+import static ph.txtdis.util.TextUtils.nullIfEmpty;
+
 public abstract class AbstractItemService //
-		extends AbstractSpunSavedKeyedService<ItemRepository, ItemEntity, Item, Long> //
-		implements BillableDetailedItemService {
+	extends AbstractSpunSavedKeyedService<ItemRepository, ItemEntity, Item, Long> //
+	implements BillableDetailedItemService {
 
 	@Autowired
 	private QtyPerUomService qtyPerUomService;
@@ -34,6 +33,45 @@ public abstract class AbstractItemService //
 	public Item findByName(String name) {
 		ItemEntity e = findEntityByName(name);
 		return e == null ? null : toModel(e);
+	}
+
+	@Override
+	public ItemEntity findEntityByName(String name) {
+		return repository.findByName(name);
+	}
+
+	@Override
+	public Item toModel(ItemEntity e) {
+		Item i = idAndNameOnly(e);
+		if (i == null)
+			return null;
+		i.setEndOfLife(e.getEndOfLife());
+		i.setNotDiscounted(isNotDiscounted(e));
+		i.setQtyPerUomList(qtyPerUomService.toList(e.getQtyPerUomList()));
+		i.setType(e.getType());
+		i.setVendorNo(e.getVendorId());
+		i.setCreatedBy(e.getCreatedBy());
+		i.setCreatedOn(e.getCreatedOn());
+		i.setDeactivatedBy(e.getDeactivatedBy());
+		i.setDeactivatedOn(e.getDeactivatedOn());
+		i.setLastModifiedBy(e.getLastModifiedBy());
+		i.setLastModifiedOn(e.getLastModifiedOn());
+		return i;
+	}
+
+	private Item idAndNameOnly(ItemEntity e) {
+		if (e == null)
+			return null;
+		Item i = new Item();
+		i.setId(e.getId());
+		i.setName(e.getName());
+		i.setDescription(e.getDescription());
+		i.setVendorNo(e.getVendorId());
+		return i;
+	}
+
+	private boolean isNotDiscounted(ItemEntity e) {
+		return e.getNotDiscounted() != null && e.getNotDiscounted() == true;
 	}
 
 	@Override
@@ -53,13 +91,12 @@ public abstract class AbstractItemService //
 	}
 
 	@Override
-	public ItemEntity findEntityByName(String name) {
-		return repository.findByName(name);
-	}
-
-	@Override
 	public List<Item> list() {
 		return toIdAndNameOnlyList(listEntities());
+	}
+
+	protected List<Item> toIdAndNameOnlyList(List<ItemEntity> l) {
+		return l == null ? null : l.stream().map(i -> idAndNameOnly(i)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -77,21 +114,6 @@ public abstract class AbstractItemService //
 	public List<Item> searchByDescription(String description) {
 		List<ItemEntity> l = repository.findByDescriptionContaining(description);
 		return toIdAndNameOnlyList(l);
-	}
-
-	protected List<Item> toIdAndNameOnlyList(List<ItemEntity> l) {
-		return l == null ? null : l.stream().map(i -> idAndNameOnly(i)).collect(Collectors.toList());
-	}
-
-	private Item idAndNameOnly(ItemEntity e) {
-		if (e == null)
-			return null;
-		Item i = new Item();
-		i.setId(e.getId());
-		i.setName(e.getName());
-		i.setDescription(e.getDescription());
-		i.setVendorNo(e.getVendorId());
-		return i;
 	}
 
 	@Override
@@ -125,37 +147,14 @@ public abstract class AbstractItemService //
 		return e;
 	}
 
-	private List<QtyPerUomEntity> getQtyPerUomList(ItemEntity e, Item i) {
-		return qtyPerUomService.toEntities(e, i);
-	}
-
 	private ItemEntity deactivate(ItemEntity i, Item t) {
 		i.setDeactivatedBy(t.getDeactivatedBy());
 		i.setDeactivatedOn(ZonedDateTime.now());
 		return i;
 	}
 
-	@Override
-	public Item toModel(ItemEntity e) {
-		Item i = idAndNameOnly(e);
-		if (i == null)
-			return null;
-		i.setEndOfLife(e.getEndOfLife());
-		i.setNotDiscounted(isNotDiscounted(e));
-		i.setQtyPerUomList(qtyPerUomService.toList(e.getQtyPerUomList()));
-		i.setType(e.getType());
-		i.setVendorNo(e.getVendorId());
-		i.setCreatedBy(e.getCreatedBy());
-		i.setCreatedOn(e.getCreatedOn());
-		i.setDeactivatedBy(e.getDeactivatedBy());
-		i.setDeactivatedOn(e.getDeactivatedOn());
-		i.setLastModifiedBy(e.getLastModifiedBy());
-		i.setLastModifiedOn(e.getLastModifiedOn());
-		return i;
-	}
-
-	private boolean isNotDiscounted(ItemEntity e) {
-		return e.getNotDiscounted() != null && e.getNotDiscounted() == true;
+	private List<QtyPerUomEntity> getQtyPerUomList(ItemEntity e, Item i) {
+		return qtyPerUomService.toEntities(e, i);
 	}
 
 	@Override

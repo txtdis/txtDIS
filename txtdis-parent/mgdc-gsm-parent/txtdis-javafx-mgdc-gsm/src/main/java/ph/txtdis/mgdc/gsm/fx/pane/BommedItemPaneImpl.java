@@ -1,28 +1,14 @@
 package ph.txtdis.mgdc.gsm.fx.pane;
 
-import static javafx.beans.binding.Bindings.when;
-import static ph.txtdis.type.ItemType.BUNDLED;
-import static ph.txtdis.type.ItemType.FREE;
-import static ph.txtdis.type.ItemType.PROMO;
-import static ph.txtdis.type.ItemType.PURCHASED;
-import static ph.txtdis.type.ItemType.REPACKED;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.fx.control.AppCheckBox;
 import ph.txtdis.fx.control.AppCombo;
@@ -33,11 +19,20 @@ import ph.txtdis.mgdc.gsm.fx.table.BomTable;
 import ph.txtdis.mgdc.gsm.service.BommedDiscountedPricedValidatedItemService;
 import ph.txtdis.type.ItemType;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+import static javafx.beans.binding.Bindings.when;
+import static ph.txtdis.type.ItemType.*;
+import static ph.txtdis.type.Type.ID;
+import static ph.txtdis.type.Type.TEXT;
+
 @Scope("prototype")
 @Component("bommedItemPane")
 public class BommedItemPaneImpl //
-		extends AbstractItemPane<BommedDiscountedPricedValidatedItemService> //
-		implements BommedItemPane {
+	extends AbstractItemPane<BommedDiscountedPricedValidatedItemService> //
+	implements BommedItemPane {
 
 	@Autowired
 	private AppCombo<ItemType> typeCombo;
@@ -85,13 +80,13 @@ public class BommedItemPaneImpl //
 	@Override
 	public BooleanBinding hasIncompleteData() {
 		return doesNotHaveNeededUoms() //
-				.or(bomTable.isEmpty()//
-						.and(typeCombo.are(BUNDLED, FREE, PROMO, REPACKED)));
+			.or(bomTable.isEmpty()//
+				.and(typeCombo.are(BUNDLED, FREE, PROMO, REPACKED)));
 	}
 
 	private BooleanBinding doesNotHaveNeededUoms() {
 		return hasNeededReportUom.not()//
-				.or(isPurchased().and(hasNeededPurchaseUom.not()));
+			.or(isPurchased().and(hasNeededPurchaseUom.not()));
 	}
 
 	private BooleanBinding isPurchased() {
@@ -147,17 +142,17 @@ public class BommedItemPaneImpl //
 		super.setBindings();
 		hasNeededReportUom = new SimpleBooleanProperty(false);
 		vendorIdField.disableIf(isNew() //
-				.and(familyCombo.isEmpty() //
-						.or(isPurchased().not()))); //
+			.and(familyCombo.isEmpty() //
+				.or(isPurchased().not()))); //
 		endOfLifePicker.disableIf(isPurchased() //
-				.and(vendorIdField.isEmpty()));
+			.and(vendorIdField.isEmpty()));
 		notDiscountedCheckbox.disableIf(endOfLifePicker.disabledProperty()//
-				.or(isFree()));
+			.or(isFree()));
 		qtyPerUomTable.disableIf(when(isFree()) //
-				.then(endOfLifePicker.disabledProperty()) //
-				.otherwise(notDiscountedCheckbox.disabledProperty()));
+			.then(endOfLifePicker.disabledProperty()) //
+			.otherwise(notDiscountedCheckbox.disabledProperty()));
 		bomTable.disableIf(doesNotHaveNeededUoms() //
-				.or(isPurchased()));
+			.or(isPurchased()));
 	}
 
 	private BooleanBinding isFree() {
@@ -187,7 +182,7 @@ public class BommedItemPaneImpl //
 	}
 
 	private VBox bomTablePane() {
-		return box.forVerticals(label.group("Bill of Materials"), bomTable.build());
+		return pane.vertical(label.group("Bill of Materials"), bomTable.build());
 	}
 
 	@Override

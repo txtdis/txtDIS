@@ -19,6 +19,11 @@ public class BinaryUtils {
 		}
 	}
 
+	public static byte[] toBytes(String name) {
+		File file = new File(name);
+		return toBytes(file);
+	}
+
 	public static byte[] toBytes(File file) {
 		try {
 			return Files.readAllBytes(file.toPath());
@@ -26,11 +31,6 @@ public class BinaryUtils {
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	public static byte[] toBytes(String name) {
-		File file = new File(name);
-		return toBytes(file);
 	}
 
 	public static Path toPath(String name) {

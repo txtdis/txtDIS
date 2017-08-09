@@ -20,7 +20,7 @@ import ph.txtdis.type.ModuleType;
 
 @Service("reminderService")
 public class ReminderServiceImpl //
-		implements ReminderService {
+	implements ReminderService {
 
 	@Autowired
 	private ClientBillAssignmentService clientBillAssignmentService;
@@ -68,10 +68,6 @@ public class ReminderServiceImpl //
 				addToThingsToDo(DELIVERY_TO_SALES_ORDER, b);
 	}
 
-	private void addToThingsToDo(ModuleType module, Billable b) {
-		toDoList.add(asList(module.toString(), b.getId().toString()));
-	}
-
 	private void checkForUnbilledClientDeliveries() {
 		List<Billable> l = clientBillService.list();
 		if (l != null && !l.isEmpty())
@@ -91,5 +87,9 @@ public class ReminderServiceImpl //
 		if (l != null && !l.isEmpty())
 			for (Billable b : l)
 				addToThingsToDo(DELIVERY_TO_PURCHASE_ORDER, b);
+	}
+
+	private void addToThingsToDo(ModuleType module, Billable b) {
+		toDoList.add(asList(module.toString(), b.getId().toString()));
 	}
 }

@@ -6,5 +6,7 @@ import ph.txtdis.service.TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService
 import ph.txtdis.service.TotaledService;
 
 public interface ListService //
-		extends Spreadsheet<SalesItemVariance>, TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService, TotaledService<SalesItemVariance> {
+	extends Spreadsheet<SalesItemVariance>,
+	TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService,
+	TotaledService<SalesItemVariance> {
 }

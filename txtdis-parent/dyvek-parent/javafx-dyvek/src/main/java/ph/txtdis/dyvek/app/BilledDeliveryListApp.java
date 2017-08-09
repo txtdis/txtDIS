@@ -1,5 +1,5 @@
 package ph.txtdis.dyvek.app;
 
-public interface BilledDeliveryListApp //
-		extends OrderListApp {
+public interface BilledDeliveryListApp
+	extends OrderListApp {
 }

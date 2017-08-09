@@ -8,12 +8,14 @@ import java.util.List;
 import ph.txtdis.dyvek.model.Billable;
 import ph.txtdis.dyvek.model.BillableDetail;
 import ph.txtdis.info.Information;
-import ph.txtdis.service.RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
+import ph.txtdis.service
+	.RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
 import ph.txtdis.service.SearchedByNameService;
 
 public interface OrderService //
-		extends ListedAndResetableAndSearchedBillableService, SearchedByNameService<Billable>,
-		RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long> {
+	extends ListedAndResetableAndSearchedBillableService,
+	SearchedByNameService<Billable>,
+	RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long> {
 
 	void close() throws Information, Exception;
 
@@ -25,15 +27,23 @@ public interface OrderService //
 
 	String getCustomer();
 
+	void setCustomer(String name);
+
 	List<BillableDetail> getDetails();
 
 	String getItem();
 
+	void setItem(String name);
+
 	LocalDate getOrderDate();
+
+	void setOrderDate(LocalDate d);
 
 	BigDecimal getPriceValue();
 
 	BigDecimal getQty();
+
+	void setQty(BigDecimal qty);
 
 	String getRecipient();
 
@@ -43,15 +53,7 @@ public interface OrderService //
 
 	List<String> listItems();
 
-	void setCustomer(String name);
-
-	void setItem(String name);
-
-	void setOrderDate(LocalDate d);
-
 	void setOrderNoUponValidation(String no) throws Exception;
 
 	void setPriceAndTotalValue(BigDecimal amt);
-
-	void setQty(BigDecimal qty);
 }

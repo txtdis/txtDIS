@@ -1,25 +1,8 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.lang.Integer.MAX_VALUE;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.ItemType.BUNDLED;
-import static ph.txtdis.type.ModuleType.SALES_ORDER;
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-import static ph.txtdis.type.UserType.SALES_ENCODER;
-import static ph.txtdis.type.UserType.SELLER;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.dto.Booking;
@@ -29,14 +12,31 @@ import ph.txtdis.exception.UnauthorizedUserException;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.dto.Item;
-import ph.txtdis.service.ReadOnlyService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.BillingType;
 import ph.txtdis.type.ModuleType;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.lang.Integer.MAX_VALUE;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.ItemType.BUNDLED;
+import static ph.txtdis.type.ModuleType.SALES_ORDER;
+import static ph.txtdis.type.PartnerType.EX_TRUCK;
+import static ph.txtdis.type.UserType.SALES_ENCODER;
+import static ph.txtdis.type.UserType.SELLER;
+import static ph.txtdis.util.UserUtils.isUser;
+
 @Service("bookingService")
 public class BookingServiceImpl //
-		extends AbstractBookingService //
-		implements GsmBookingService {
+	extends AbstractBookingService //
+	implements GsmBookingService {
 
 	@Autowired
 	private CustomerService customerService;
@@ -49,6 +49,9 @@ public class BookingServiceImpl //
 
 	@Autowired
 	private PricedBillableService priceService;
+
+	@Autowired
+	private RestClientService<Customer> customerClientService;
 
 	@Value("${min.qty.to.avail.discount}")
 	private BigDecimal minQtyToAvailDiscount;
@@ -85,13 +88,8 @@ public class BookingServiceImpl //
 		canAvailDiscount = true;
 		if (!getDetails().isEmpty())
 			setDetails(getDetails().stream() //
-					.map(bd -> addPriceToDetail(bd)) //
-					.collect(toList()));
-	}
-
-	@Override
-	public boolean canChangeDetails() {
-		return get().isCanChangeDetails();
+				.map(bd -> addPriceToDetail(bd)) //
+				.collect(toList()));
 	}
 
 	@Override
@@ -110,25 +108,13 @@ public class BookingServiceImpl //
 	}
 
 	@Override
-	public String getAlternateName() {
-		if (isLoadOrder())
-			return "L/O";
-		return super.getAlternateName();
-	}
-
-	@Override
 	public String getIdPrompt() {
 		return isLoadOrder() ? "Route" : super.getIdPrompt();
 	}
 
 	@Override
-	public ReadOnlyService<Customer> getListedReadOnlyService() {
-		return null;
-	}
-
-	@Override
-	public String getModuleName() {
-		return isLoadOrder() ? "loadOrder" : "salesOrder";
+	public boolean isLoadOrder() {
+		return type == ModuleType.EX_TRUCK;
 	}
 
 	@Override
@@ -137,13 +123,14 @@ public class BookingServiceImpl //
 	}
 
 	@Override
-	public String getOrderNo() {
-		return get().getOrderNo();
+
+	public String getReferencePrompt() {
+		return getHeaderName() + " No.";
 	}
 
 	@Override
-	public String getReferencePrompt() {
-		return getHeaderName() + " No.";
+	public RestClientService<Customer> getRestClientServiceForLists() {
+		return customerClientService;
 	}
 
 	@Override
@@ -151,6 +138,18 @@ public class BookingServiceImpl //
 		if (getOrderNo().equals("0"))
 			return getAlternateName() + " invalidation";
 		return getAbbreviatedModuleNoPrompt() + getBookingId();
+	}
+
+	@Override
+	public String getOrderNo() {
+		return get().getOrderNo();
+	}
+
+	@Override
+	public String getAlternateName() {
+		if (isLoadOrder())
+			return "L/O";
+		return super.getAlternateName();
 	}
 
 	@Override
@@ -166,12 +165,17 @@ public class BookingServiceImpl //
 	@Override
 	public boolean isAppendable() {
 		return isNew() //
-				? getDetails() == null || getDetails().size() < linesPerPage()//
-				: canChangeDetails();
+			? getDetails() == null || getDetails().size() < linesPerPage()//
+			: canChangeDetails();
 	}
 
 	private int linesPerPage() {
 		return isForDR() || isLoadOrder() ? MAX_VALUE : invoiceLinesPerPage;
+	}
+
+	@Override
+	public boolean canChangeDetails() {
+		return get().isCanChangeDetails();
 	}
 
 	private boolean isForDR() {
@@ -183,17 +187,8 @@ public class BookingServiceImpl //
 	}
 
 	@Override
-	public boolean isLoadOrder() {
-		return type == ModuleType.EX_TRUCK;
-	}
-
-	@Override
 	public List<Customer> listCustomersByScheduledRouteAndGoodCreditStanding(Route r) {
 		return itineraryService.listCustomersByScheduledRouteAndGoodCreditStanding(r);
-	}
-
-	private ReadOnlyService<Billable> findBooking() {
-		return getReadOnlyService().module(getModuleName());
 	}
 
 	@Override
@@ -213,12 +208,21 @@ public class BookingServiceImpl //
 	private List<String> listBooked() {
 		try {
 			return findBooking() //
-					.getList("/booked?on=" + getOrderDate()) //
-					.stream().map(b -> b.getCustomerName()) //
-					.collect(toList());
+				.getList("/booked?on=" + getOrderDate()) //
+				.stream().map(b -> b.getCustomerName()) //
+				.collect(toList());
 		} catch (Exception e) {
 			return emptyList();
 		}
+	}
+
+	private RestClientService<Billable> findBooking() {
+		return getRestClientService().module(getModuleName());
+	}
+
+	@Override
+	public String getModuleName() {
+		return isLoadOrder() ? "loadOrder" : "salesOrder";
 	}
 
 	@Override
@@ -261,6 +265,19 @@ public class BookingServiceImpl //
 	}
 
 	@Override
+	public void setExTruckAsCustomerIfExTruckPreviousTransactionsAreComplete(String exTruck) throws Exception {
+		setExTruckAsCustomer(exTruck);
+		verifyAllCODsHaveBeenFullyPaid();
+		verifyAllLoadOrdersHaveBeenPicked(getRestClientService(), getOrderDate());
+		verifyAllPickedLoadOrdersHaveNoItemQuantityVariances(getRestClientService(), getOrderDate());
+	}
+
+	private void setExTruckAsCustomer(String t) throws Exception {
+		customer = customerService.findByName(t);
+		setCustomerRelatedData();
+	}
+
+	@Override
 	public void setCustomerRelatedData() {
 		get().setCustomerId(customer.getId());
 		get().setCustomerName(customerName());
@@ -269,19 +286,6 @@ public class BookingServiceImpl //
 
 	private String customerName() {
 		return customer.getName();
-	}
-
-	@Override
-	public void setExTruckAsCustomerIfExTruckPreviousTransactionsAreComplete(String exTruck) throws Exception {
-		setExTruckAsCustomer(exTruck);
-		verifyAllCODsHaveBeenFullyPaid();
-		verifyAllLoadOrdersHaveBeenPicked(getReadOnlyService(), getOrderDate());
-		verifyAllPickedLoadOrdersHaveNoItemQuantityVariances(getReadOnlyService(), getOrderDate());
-	}
-
-	private void setExTruckAsCustomer(String t) throws Exception {
-		customer = customerService.findByName(t);
-		setCustomerRelatedData();
 	}
 
 	@Override
@@ -323,7 +327,8 @@ public class BookingServiceImpl //
 
 	private void verifyExTruckLoadOrderExistsBeforeUnscheduledDeliveriesAreBooked() throws Exception {
 		if (isAnExTruckRoute() && !loadOrderExists())
-			throw new InvalidException(getExTruckName() + " must have a Load Order\nbefore additional orders can be placed.");
+			throw new InvalidException(
+				getExTruckName() + " must have a Load Order\nbefore additional orders can be placed.");
 	}
 
 	private boolean loadOrderExists() {

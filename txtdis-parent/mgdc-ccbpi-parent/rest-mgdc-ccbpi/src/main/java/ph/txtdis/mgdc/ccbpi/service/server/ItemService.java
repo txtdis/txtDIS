@@ -9,7 +9,7 @@ import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.service.SpunSavedKeyedService;
 
 public interface ItemService
-		extends SpunSavedKeyedService<ItemEntity, Item, Long> {
+	extends SpunSavedKeyedService<ItemEntity, Item, Long> {
 
 	void delete(Long id);
 
@@ -19,15 +19,15 @@ public interface ItemService
 
 	ItemEntity findEntity(BillableDetail billableDetail);
 
-	ItemEntity findEntityByName(String text);
-
 	int getCountPerCase(ItemEntity e);
-
-	BigDecimal getQtyPerCase(ItemEntity e);
 
 	default BigDecimal getQtyPerCase(String name) {
 		return getQtyPerCase(findEntityByName(name));
 	}
+
+	BigDecimal getQtyPerCase(ItemEntity e);
+
+	ItemEntity findEntityByName(String text);
 
 	List<Item> list();
 

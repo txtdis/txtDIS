@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class InvalidPhoneException extends Exception {
+public class InvalidPhoneException
+	extends Exception {
 
 	private static final long serialVersionUID = -2191487596665917920L;
 

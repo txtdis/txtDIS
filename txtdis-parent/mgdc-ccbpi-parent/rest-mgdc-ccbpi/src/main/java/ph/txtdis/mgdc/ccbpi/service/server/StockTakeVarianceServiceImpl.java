@@ -30,11 +30,13 @@ import ph.txtdis.util.NumberUtils;
 
 @Service("stockTakeVarianceService")
 public class StockTakeVarianceServiceImpl //
-		implements StockTakeVarianceService {
+	implements StockTakeVarianceService {
 
 	private static final long LATEST = 0;
 
 	private static final long PREVIOUS = 1;
+
+	protected LocalDate startDate, latestCountDate;
 
 	@Autowired
 	private ReceivingService receivingService;
@@ -51,8 +53,6 @@ public class StockTakeVarianceServiceImpl //
 	private LocalDate previousCountDate;
 
 	private Map<ItemEntity, StockTakeVarianceEntity> goodStockEntityMap, badStockEntityMap;
-
-	protected LocalDate startDate, latestCountDate;
 
 	@Override
 	public List<StockTakeVariance> list(LocalDate countDate) {
@@ -104,8 +104,8 @@ public class StockTakeVarianceServiceImpl //
 
 	private List<StockTakeVarianceEntity> itemAndQualityOnlyStockTakeVarianceEntity(ItemEntity i) {
 		return asList( //
-				goodItemOnlyStockTakeVarianceEntity(i), //
-				badItemOnlyStockTakeVarianceEntity(i));
+			goodItemOnlyStockTakeVarianceEntity(i), //
+			badItemOnlyStockTakeVarianceEntity(i));
 	}
 
 	private StockTakeVarianceEntity goodItemOnlyStockTakeVarianceEntity(ItemEntity i) {
@@ -157,7 +157,9 @@ public class StockTakeVarianceServiceImpl //
 		variance = goodStockEntityMap.get(item);
 	}
 
-	private StockTakeVarianceEntity setCountQty(StockTakeDetailEntity detail, StockTakeVarianceEntity variance, long cutoff) {
+	private StockTakeVarianceEntity setCountQty(StockTakeDetailEntity detail,
+	                                            StockTakeVarianceEntity variance,
+	                                            long cutoff) {
 		if (cutoff == LATEST)
 			variance.setActualQty(detail.getQty());
 		else
@@ -192,7 +194,9 @@ public class StockTakeVarianceServiceImpl //
 		goodStockEntityMap.put(item, variance);
 	}
 
-	private StockTakeVarianceEntity setTransactionQty(BomEntity bom, StockTakeVarianceEntity variance, TransactionDirectionType direction) {
+	private StockTakeVarianceEntity setTransactionQty(BomEntity bom,
+	                                                  StockTakeVarianceEntity variance,
+	                                                  TransactionDirectionType direction) {
 		if (direction == INCOMING)
 			variance.setInQty(bom.getQty());
 		else
@@ -257,7 +261,8 @@ public class StockTakeVarianceServiceImpl //
 	}
 
 	protected boolean areStartOrInOrOutOrFinalQtyPositive(StockTakeVariance e) {
-		return NumberUtils.isPositive(e.getStartQty()) || NumberUtils.isPositive(e.getInQty()) || NumberUtils.isPositive(e.getOutQty())
-				|| NumberUtils.isPositive(e.getActualQty()) || NumberUtils.isPositive(e.getFinalQty());
+		return NumberUtils.isPositive(e.getStartQty()) || NumberUtils.isPositive(e.getInQty()) ||
+			NumberUtils.isPositive(e.getOutQty())
+			|| NumberUtils.isPositive(e.getActualQty()) || NumberUtils.isPositive(e.getFinalQty());
 	}
 }

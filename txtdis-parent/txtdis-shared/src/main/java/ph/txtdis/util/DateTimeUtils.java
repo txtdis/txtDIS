@@ -21,6 +21,8 @@ public class DateTimeUtils {
 
 	private static final ZoneId MANILA_TIME = ZoneId.of("Asia/Manila");
 
+	private static LocalDate serverDate;
+
 	public static ZonedDateTime endOfDay(Date d) {
 		return d == null ? null : endOfDay(toLocalDate(d));
 	}
@@ -29,12 +31,28 @@ public class DateTimeUtils {
 		return d == null ? null : startOfDay(d.plusDays(1L));
 	}
 
+	public static LocalDate toLocalDate(Date d) {
+		return d.toInstant().atZone(MANILA_TIME).toLocalDate();
+	}
+
+	public static ZonedDateTime startOfDay(LocalDate d) {
+		return d == null ? null : d.atStartOfDay(MANILA_TIME);
+	}
+
 	public static LocalDate endOfMonth(LocalDate d) {
 		return startOfMonth(d).plusMonths(1L).minusDays(1L);
 	}
 
+	public static LocalDate startOfMonth(LocalDate d) {
+		return d == null ? LocalDate.now() : LocalDate.of(d.getYear(), d.getMonthValue(), 1);
+	}
+
 	public static Date epochDate() {
 		return toUtilDate(LocalDate.of(1970, 1, 1));
+	}
+
+	public static Date toUtilDate(LocalDate d) {
+		return d == null ? null : Date.from(startOfDay(d).toInstant());
 	}
 
 	public static LocalDate fromVersionToDate(String version) {
@@ -43,52 +61,24 @@ public class DateTimeUtils {
 		return LocalDate.parse(date);
 	}
 
-	public static DateTimeFormatter orderConfirmationFormat() {
-		return DateTimeFormatter.ofPattern("yyyyMMdd");
+	public static LocalDate getServerDate() {
+		return serverDate;
 	}
 
-	private static LocalDate parseDate(String date) {
-		try {
-			return LocalDate.parse(date, shortDateFormat());
-		} catch (Exception e) {
-			return LocalDate.parse(date);
-		}
-	}
-
-	public static DateTimeFormatter shortDateFormat() {
-		return DateTimeFormatter.ofPattern("M/d/yyyy");
+	public static void setServerDate(LocalDate date) {
+		serverDate = date;
 	}
 
 	public static ZonedDateTime startOfDay(Date d) {
 		return d == null ? null : startOfDay(toLocalDate(d));
 	}
 
-	public static ZonedDateTime startOfDay(LocalDate d) {
-		return d == null ? null : d.atStartOfDay(MANILA_TIME);
-	}
-
-	public static LocalDate startOfMonth(LocalDate d) {
-		return d == null ? LocalDate.now() : LocalDate.of(d.getYear(), d.getMonthValue(), 1);
-	}
-
-	public static DateTimeFormatter timestampFormat() {
-		return ofPattern("M/d/yyyy h:mma");
-	}
-
-	public static DateTimeFormatter timestampOf24HourFormat() {
-		return ofPattern("M/d/yyyy HH:mm");
-	}
-
-	public static DateTimeFormatter timestampWithSecondFormat() {
-		return ofPattern("M/d/yyyy h:mm:ss a");
-	}
-
-	public static LocalDate toDate(String date) {
-		return date == null || date.isEmpty() ? null : parseDate(date);
-	}
-
 	public static String toDateDisplay(LocalDate d) {
 		return d == null ? "" : d.format(shortDateFormat());
+	}
+
+	public static DateTimeFormatter shortDateFormat() {
+		return DateTimeFormatter.ofPattern("M/d/yyyy");
 	}
 
 	public static String toDottedYearMonth(LocalDate d) {
@@ -103,16 +93,16 @@ public class DateTimeUtils {
 		return d == null ? "" : d.format(ofPattern("yyyy-MM-dd"));
 	}
 
-	public static LocalDate toLocalDate(Date d) {
-		return d.toInstant().atZone(MANILA_TIME).toLocalDate();
-	}
-
 	public static LocalDate toLocalDateFromOrderConfirmationFormat(String ocsDate) {
 		try {
 			return LocalDate.parse(ocsDate, orderConfirmationFormat());
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public static DateTimeFormatter orderConfirmationFormat() {
+		return DateTimeFormatter.ofPattern("yyyyMMdd");
 	}
 
 	public static String toLongMonthYear(LocalDate d) {
@@ -143,16 +133,32 @@ public class DateTimeUtils {
 		return zdt == null ? "" : zdt.withZoneSameInstant(MANILA_TIME).format(timestampFormat());
 	}
 
+	public static ZonedDateTime toZonedDateTime(Date d) {
+		return d == null ? null : toZonedDateTime(toLocalDate(d));
+	}
+
+	public static DateTimeFormatter timestampFormat() {
+		return ofPattern("M/d/yyyy h:mma");
+	}
+
+	public static ZonedDateTime toZonedDateTime(LocalDate d) {
+		return d == null ? null : startOfDay(d);
+	}
+
 	public static String to24HourTimestampText(ZonedDateTime zdt) {
 		return zdt == null ? "" : zdt.withZoneSameInstant(MANILA_TIME).format(timestampOf24HourFormat());
+	}
+
+	public static DateTimeFormatter timestampOf24HourFormat() {
+		return ofPattern("M/d/yyyy HH:mm");
 	}
 
 	public static String toTimestampWithSecondText(ZonedDateTime zdt) {
 		return zdt == null ? "" : zdt.withZoneSameInstant(MANILA_TIME).format(timestampWithSecondFormat());
 	}
 
-	public static Date toUtilDate(LocalDate d) {
-		return d == null ? null : Date.from(startOfDay(d).toInstant());
+	public static DateTimeFormatter timestampWithSecondFormat() {
+		return ofPattern("M/d/yyyy h:mm:ss a");
 	}
 
 	public static Date toUtilDate(String date) {
@@ -160,12 +166,24 @@ public class DateTimeUtils {
 		return toUtilDate(d);
 	}
 
-	public static ZonedDateTime toZonedDateTime(Date d) {
-		return d == null ? null : toZonedDateTime(toLocalDate(d));
+	public static LocalDate toDate(String date) {
+		return date == null || date.isEmpty() ? null : parseDate(date);
 	}
 
-	public static ZonedDateTime toZonedDateTime(LocalDate d) {
-		return d == null ? null : startOfDay(d);
+	private static LocalDate parseDate(String date) {
+		try {
+			return LocalDate.parse(date, shortDateFormat());
+		} catch (Exception e) {
+			return LocalDate.parse(date);
+		}
+	}
+
+	public static ZonedDateTime toZonedDateTimeFromDate(String date) {
+		return date == null || date.isEmpty() ? null : startOfDay(parseDate(date));
+	}
+
+	public static ZonedDateTime toZonedDateTimeFromTimestamp(String zdt) {
+		return zdt == null || zdt.isEmpty() ? null : toZonedDateTime(zdt);
 	}
 
 	public static ZonedDateTime toZonedDateTime(String zdt) {
@@ -177,14 +195,6 @@ public class DateTimeUtils {
 		return ZonedDateTime.of(ldt, MANILA_TIME);
 	}
 
-	public static ZonedDateTime toZonedDateTimeFromDate(String date) {
-		return date == null || date.isEmpty() ? null : startOfDay(parseDate(date));
-	}
-
-	public static ZonedDateTime toZonedDateTimeFromTimestamp(String zdt) {
-		return zdt == null || zdt.isEmpty() ? null : toZonedDateTime(zdt);
-	}
-
 	public static ZonedDateTime toZonedDateTimeFromTimestampWithSeconds(String zdt) {
 		return zdt == null || zdt.isEmpty() ? null : toZonedDateTime(zdt, timestampWithSecondFormat());
 	}
@@ -194,14 +204,15 @@ public class DateTimeUtils {
 	}
 
 	public static LocalDate validateEndDate(LocalDate startDate, LocalDate endDate, LocalDate goLive)
-			throws DateBeforeGoLiveException, EndDateBeforeStartException {
+		throws DateBeforeGoLiveException, EndDateBeforeStartException {
 		verifyDateIsOnOrAfterGoLive(endDate, goLive);
 		if (endDate.isBefore(startDate))
 			throw new EndDateBeforeStartException();
 		return endDate;
 	}
 
-	public static LocalDate verifyDateIsOnOrAfterGoLive(LocalDate date, LocalDate goLive) throws DateBeforeGoLiveException {
+	public static LocalDate verifyDateIsOnOrAfterGoLive(LocalDate date, LocalDate goLive)
+		throws DateBeforeGoLiveException {
 		if (date.isBefore(goLive))
 			throw new DateBeforeGoLiveException();
 		return date;

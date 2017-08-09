@@ -1,15 +1,19 @@
 package ph.txtdis.mgdc.service;
 
+import ph.txtdis.dto.BillableDetail;
+import ph.txtdis.service.CustomerSearchableService;
+import ph.txtdis.service.DecisionNeededService;
+import ph.txtdis.service
+	.SpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
+
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import ph.txtdis.dto.BillableDetail;
-import ph.txtdis.service.CustomerSearchableService;
-import ph.txtdis.service.DecisionNeededService;
-import ph.txtdis.service.SpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
-
-public interface ItemReplacementService extends CustomerSearchableService, DecisionNeededService, SpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long> {
+public interface ItemReplacementService
+	extends CustomerSearchableService,
+	DecisionNeededService,
+	SpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long> {
 
 	Long getBookingId();
 

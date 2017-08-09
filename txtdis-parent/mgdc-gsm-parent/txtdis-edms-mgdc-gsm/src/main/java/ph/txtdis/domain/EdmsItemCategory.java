@@ -12,7 +12,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "ref_category")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsItemCategory extends EdmsAbstractMaster implements Serializable {
+public class EdmsItemCategory
+	extends EdmsAbstractMaster
+	implements Serializable {
 
 	private static final long serialVersionUID = 961493564811905729L;
 }

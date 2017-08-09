@@ -1,25 +1,24 @@
 package ph.txtdis.mgdc.gsm.controller;
 
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import ph.txtdis.controller.AbstractSpunSavedKeyedController;
 import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.service.server.CreditedAndDiscountedCustomerService;
 
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 @RequestMapping("/customers")
 @RestController("customerController")
 public class CustomerController //
-		extends AbstractSpunSavedKeyedController<CreditedAndDiscountedCustomerService, CustomerEntity, Customer> {
+	extends AbstractSpunSavedKeyedController<CreditedAndDiscountedCustomerService, CustomerEntity, Customer> {
 
 	@RequestMapping(path = "/banks", method = GET)
 	public ResponseEntity<?> banks() {

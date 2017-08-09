@@ -18,7 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
-import ph.txtdis.app.StartableApp;
+import ph.txtdis.app.App;
 import ph.txtdis.fx.dialog.InputtedDialog;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.service.AppendableDetailService;
@@ -26,7 +26,7 @@ import ph.txtdis.service.AppendableDetailService;
 @Scope("prototype")
 @Component("appendContextMenu")
 public final class AppendContextMenuImpl<S> //
-		implements AppendContextMenu<S> {
+	implements AppendContextMenu<S> {
 
 	private static Logger logger = getLogger(AppendContextMenuImpl.class);
 
@@ -119,6 +119,6 @@ public final class AppendContextMenuImpl<S> //
 	}
 
 	private void showAddItemDialog() {
-		((StartableApp) inputDialog).addParent(getStage()).start();
+		((App) inputDialog).addParent(getStage()).start();
 	}
 }

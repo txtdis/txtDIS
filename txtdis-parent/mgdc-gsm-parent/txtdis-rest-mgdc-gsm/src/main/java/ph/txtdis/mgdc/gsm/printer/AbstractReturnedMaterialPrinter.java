@@ -1,46 +1,20 @@
 package ph.txtdis.mgdc.gsm.printer;
 
-import static org.apache.commons.lang3.StringUtils.center;
-import static org.apache.commons.lang3.StringUtils.rightPad;
-import static ph.txtdis.util.NumberUtils.toQuantityText;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-
 import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.printer.AbstractPrinter;
 import ph.txtdis.mgdc.printer.NotPrintedException;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+
+import static org.apache.commons.lang3.StringUtils.center;
+import static org.apache.commons.lang3.StringUtils.rightPad;
+import static ph.txtdis.util.NumberUtils.toQuantityText;
+
 public abstract class AbstractReturnedMaterialPrinter //
-		extends AbstractPrinter<BillableEntity> //
-		implements ReturnedMaterialPrinter {
-
-	protected abstract BigDecimal initialQty(BillableDetailEntity d);
-
-	private String itemName(BillableDetailEntity d) {
-		return d.getItem().getName();
-	}
-
-	private String itemQty(BillableDetailEntity d) {
-		return toQuantityText(initialQty(d));
-	}
-
-	private void print(String s) {
-		printer.print(s);
-	}
-
-	private String printItemQty(BillableDetailEntity d) {
-		return rightPad(itemQty(d) + uom(d) + itemName(d), 30);
-	}
-
-	private void println(String s) {
-		printer.println(s);
-	}
-
-	private String uom(BillableDetailEntity d) {
-		return d.getUom() + " ";
-	}
+	extends AbstractPrinter<BillableEntity> //
+	implements ReturnedMaterialPrinter {
 
 	@Override
 	protected void print() throws Exception {
@@ -52,6 +26,17 @@ public abstract class AbstractReturnedMaterialPrinter //
 			e.printStackTrace();
 			throw new NotPrintedException();
 		}
+	}
+
+	@Override
+	protected void printSubheader() throws IOException {
+		printLarge();
+		println(center("RETURN MATERIAL AUTHORIZATION", LARGE_FONT_PAPER_WIDTH));
+		print(center("RMA #" + entity.getBookingId() + " - " + entity.getCustomer().getName(), LARGE_FONT_PAPER_WIDTH));
+		printNormal();
+		println("");
+		println(entity.getCustomer().getAddress());
+		printDashes();
 	}
 
 	@Override
@@ -73,14 +58,29 @@ public abstract class AbstractReturnedMaterialPrinter //
 		printEndOfPage();
 	}
 
-	@Override
-	protected void printSubheader() throws IOException {
-		printLarge();
-		println(center("RETURN MATERIAL AUTHORIZATION", LARGE_FONT_PAPER_WIDTH));
-		print(center("RMA #" + entity.getBookingId() + " - " + entity.getCustomer().getName(), LARGE_FONT_PAPER_WIDTH));
-		printNormal();
-		println("");
-		println(entity.getCustomer().getAddress());
-		printDashes();
+	private void println(String s) {
+		printer.println(s);
 	}
+
+	private void print(String s) {
+		printer.print(s);
+	}
+
+	private String printItemQty(BillableDetailEntity d) {
+		return rightPad(itemQty(d) + uom(d) + itemName(d), 30);
+	}
+
+	private String itemQty(BillableDetailEntity d) {
+		return toQuantityText(initialQty(d));
+	}
+
+	private String uom(BillableDetailEntity d) {
+		return d.getUom() + " ";
+	}
+
+	private String itemName(BillableDetailEntity d) {
+		return d.getItem().getName();
+	}
+
+	protected abstract BigDecimal initialQty(BillableDetailEntity d);
 }

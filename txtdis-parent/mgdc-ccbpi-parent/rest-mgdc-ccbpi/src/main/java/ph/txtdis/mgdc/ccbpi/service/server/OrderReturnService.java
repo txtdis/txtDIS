@@ -8,7 +8,9 @@ import ph.txtdis.mgdc.ccbpi.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.ccbpi.domain.BomEntity;
 
 public interface OrderReturnService
-		extends QtyPerItemService, QtyToBillableDetailsItemMappingService, SpunSavedBillableService {
+	extends QtyPerItemService,
+	QtyToBillableDetailsItemMappingService,
+	SpunSavedBillableService {
 
 	Billable find(LocalDate date, Long customerVendorId, Long count);
 

@@ -2,7 +2,6 @@ package ph.txtdis.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsAutoNumber;
 import ph.txtdis.domain.EdmsMasterAutoNumber;
 import ph.txtdis.repository.EdmsAutoNumberRepository;
@@ -11,7 +10,7 @@ import ph.txtdis.util.Code;
 
 @Service("autoNumberService")
 public class AutoNumberServiceImpl //
-		implements AutoNumberService {
+	implements AutoNumberService {
 
 	private static final String LATEST_UPDATE = "01";
 
@@ -37,12 +36,6 @@ public class AutoNumberServiceImpl //
 		EdmsMasterAutoNumber e = edmsMasterAutoNumberRepository.findByName(getAutoNoName(prefix));
 		e.setLastNo(autoNo);
 		edmsMasterAutoNumberRepository.save(e);
-	}
-
-	private String getAutoNoName(String prefix) {
-		if (prefix.equals(Code.CUSTOMER_PREFIX))
-			return Code.CUSTOMER_AUTO_NO;
-		return prefix;
 	}
 
 	private void saveTransactionAutoNo(String prefix, String autoNo) {
@@ -74,5 +67,11 @@ public class AutoNumberServiceImpl //
 		else if (prefix.equals(Code.PURCHASE_RECEIPT_PREFIX))
 			e.setPurchaseReceiptNo(autoNo);
 		edmsAutoNumberRepository.save(e);
+	}
+
+	private String getAutoNoName(String prefix) {
+		if (prefix.equals(Code.CUSTOMER_PREFIX))
+			return Code.CUSTOMER_AUTO_NO;
+		return prefix;
 	}
 }

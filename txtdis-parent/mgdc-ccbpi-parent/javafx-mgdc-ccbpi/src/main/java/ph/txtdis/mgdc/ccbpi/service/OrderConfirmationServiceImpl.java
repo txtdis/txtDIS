@@ -15,7 +15,9 @@ import static ph.txtdis.type.OrderConfirmationType.STOCK_OUT;
 import static ph.txtdis.type.OrderConfirmationType.UNDELIVERED;
 import static ph.txtdis.type.UserType.MANAGER;
 import static ph.txtdis.type.UserType.SALES_ENCODER;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
 import static ph.txtdis.util.NumberUtils.isPositive;
+import static ph.txtdis.util.UserUtils.isUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -44,8 +46,8 @@ import ph.txtdis.type.OrderConfirmationType;
 
 @Service("orderConfirmationService")
 public class OrderConfirmationServiceImpl //
-		extends AbstractOrderConfirmationService //
-		implements OrderConfirmationService {
+	extends AbstractOrderConfirmationService //
+	implements OrderConfirmationService {
 
 	private static Logger logger = getLogger(OrderConfirmationServiceImpl.class);
 
@@ -54,11 +56,6 @@ public class OrderConfirmationServiceImpl //
 
 	@Autowired
 	private RouteService routeService;
-
-	@Override
-	protected Billable findByOrderDateAndOutletIdAndSequenceId(LocalDate orderDate, Long outletId, Long sequenceId) throws Exception {
-		return orderService().getOne("/ocs?date=" + orderDate + "&outletId=" + outletId + "&count=" + sequenceId);
-	}
 
 	@Override
 	public String getAlternateName() {
@@ -73,7 +70,8 @@ public class OrderConfirmationServiceImpl //
 	@Override
 	public BigDecimal getDeliveredValue(String collector, LocalDate start, LocalDate end) {
 		try {
-			Billable b = orderService().getOne("/deliveredValue?collector=" + collector + "&start=" + start + "&end=" + end);
+			Billable b =
+				orderService().getOne("/deliveredValue?receivedFrom=" + collector + "&start=" + start + "&end=" + end);
 			return b.getTotalValue();
 		} catch (Exception e) {
 			return BigDecimal.ZERO;
@@ -91,39 +89,15 @@ public class OrderConfirmationServiceImpl //
 	}
 
 	@Override
-	public LocalDate getOrderDate() {
-		if (get().getOrderDate() == null)
-			setOrderDate(syncService.getServerDate());
-		return get().getOrderDate();
-	}
-
-	@Override
-	public LocalDate getDeliveryDate() {
-		if (getDueDate() == null)
-			setRecommendedDeliveryDate(getOrderDate());
-		return getDueDate();
-	}
-
-	@Override
-	public String getSavingInfo() {
-		return getAbbreviatedModuleNoPrompt() + getModuleNo();
-	}
-
-	@Override
-	public Long getSequenceId() {
-		return getBookingId();
-	}
-
-	@Override
 	public List<BigDecimal> getTotals(List<BillableDetail> l) {
 		return asList(totalQty(l), totalValue(l));
 	}
 
 	private BigDecimal totalQty(List<BillableDetail> l) {
 		return l.stream() //
-				.filter(d -> d != null) //
-				.map(BillableDetail::getInitialQtyInCases) //
-				.reduce(ZERO, BigDecimal::add);
+			.filter(d -> d != null) //
+			.map(BillableDetail::getInitialQtyInCases) //
+			.reduce(ZERO, BigDecimal::add);
 	}
 
 	private BigDecimal totalValue(List<BillableDetail> l) {
@@ -133,9 +107,9 @@ public class OrderConfirmationServiceImpl //
 
 	private BigDecimal total(List<BillableDetail> l) {
 		return l.stream() //
-				.filter(d -> d != null) //
-				.map(BillableDetail::getInitialSubtotalValue) //
-				.reduce(ZERO, BigDecimal::add);
+			.filter(d -> d != null) //
+			.map(BillableDetail::getInitialSubtotalValue) //
+			.reduce(ZERO, BigDecimal::add);
 	}
 
 	@Override
@@ -143,6 +117,15 @@ public class OrderConfirmationServiceImpl //
 		boolean b = !isUndeliveredOrStockOut(get());
 		logger.info("\n    NotUndeliveredOrStockOut@isAppendable = " + b);
 		return b && super.isAppendable();
+	}
+
+	private boolean isUndeliveredOrStockOut(Billable b) {
+		return isDelivery(b, UNDELIVERED) || isDelivery(b, STOCK_OUT);
+	}
+
+	private boolean isDelivery(Billable b, OrderConfirmationType type) {
+		String p = b.getPrefix();
+		return p == null ? false : p.equalsIgnoreCase(type.toString());
 	}
 
 	@Override
@@ -166,10 +149,15 @@ public class OrderConfirmationServiceImpl //
 		else
 			types.removeAll(asList(BLANKET, BUFFER));
 		if (isDeliveryMoreThanTwoDaysFromOrderDate(getOrderDate(), getDeliveryDate()) //
-				|| (isDeliveryTwoDaysFromOrderDate(getOrderDate(), getDeliveryDate()) //
-						&& !isPreviousDayASundayOrHoliday(getDeliveryDate())))
+			|| (isDeliveryTwoDaysFromOrderDate(getOrderDate(), getDeliveryDate()) //
+			&& !isPreviousDayASundayOrHoliday(getDeliveryDate())))
 			types.removeAll(asList(MANUAL, REGULAR));
 		return types;
+	}
+
+	@Override
+	public Long getSequenceId() {
+		return getBookingId();
 	}
 
 	private boolean openBlanketExists() {
@@ -177,18 +165,22 @@ public class OrderConfirmationServiceImpl //
 		return b == null ? false : isDelivery(b, BLANKET) && isPositive(balanceQty(b));
 	}
 
-	private BigDecimal balanceQty(Billable b) {
-		return b.getDetails().stream() //
-				.map(d -> d.getFinalQty()) //
-				.reduce(ZERO, BigDecimal::add);
-	}
-
 	private boolean isDeliveryMoreThanTwoDaysFromOrderDate(LocalDate order, LocalDate due) {
 		return noOfDays(order, due) > 2;
 	}
 
-	private long noOfDays(LocalDate order, LocalDate due) {
-		return order.until(due, DAYS);
+	@Override
+	public LocalDate getOrderDate() {
+		if (get().getOrderDate() == null)
+			setOrderDate(getServerDate());
+		return get().getOrderDate();
+	}
+
+	@Override
+	public LocalDate getDeliveryDate() {
+		if (getDueDate() == null)
+			setRecommendedDeliveryDate(getOrderDate());
+		return getDueDate();
 	}
 
 	private boolean isDeliveryTwoDaysFromOrderDate(LocalDate order, LocalDate due) {
@@ -200,12 +192,51 @@ public class OrderConfirmationServiceImpl //
 		return isSunday(previous) || isAHoliday(previous);
 	}
 
+	private Billable previousOrder(long currentId) {
+		try {
+			logger.info("\n    OrderDate@previousOrder = " + getOrderDate());
+			logger.info("\n    CustomerId@previousOrder = " + getCustomerId());
+			logger.info("\n    SequenceId@previousOrder = " + currentId);
+			return findByOrderDateAndOutletIdAndSequenceId(getOrderDate(), getCustomerId(), currentId - 1);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private BigDecimal balanceQty(Billable b) {
+		return b.getDetails().stream() //
+			.map(d -> d.getFinalQty()) //
+			.reduce(ZERO, BigDecimal::add);
+	}
+
+	private long noOfDays(LocalDate order, LocalDate due) {
+		return order.until(due, DAYS);
+	}
+
+	private void setRecommendedDeliveryDate(LocalDate orderDate) {
+		LocalDate d = holidayService.nextWorkDay(orderDate);
+		get().setDueDate(d);
+	}
+
 	private boolean isSunday(LocalDate d) {
 		return d.getDayOfWeek() == SUNDAY;
 	}
 
 	private boolean isAHoliday(LocalDate yesterday) {
 		return holidayService.isAHoliday(yesterday);
+	}
+
+	@Override
+	protected Billable findByOrderDateAndOutletIdAndSequenceId(LocalDate orderDate, Long outletId, Long sequenceId)
+		throws Exception {
+		return orderService().getOne("/ocs?date=" + orderDate + "&outletId=" + outletId + "&count=" + sequenceId);
+	}
+
+	private void setSequenceId(Billable b) {
+		Long id = 1L;
+		if (b != null)
+			id = id + b.getBookingId();
+		get().setBookingId(id);
 	}
 
 	@Override
@@ -216,6 +247,18 @@ public class OrderConfirmationServiceImpl //
 		} catch (Exception e) {
 			return Collections.emptyList();
 		}
+	}
+
+	@Override
+	protected Booking toBooking(Billable t) {
+		Booking b = new Booking();
+		b.setId(t.getId());
+		b.setBookingId(t.getBookingId());
+		b.setCustomer(t.getCustomerName());
+		b.setLocation(orderConfirmationNo(t));
+		b.setRoute(t.getSuffix());
+		b.setDeliveryRoute(t.getRoute());
+		return b;
 	}
 
 	@Override
@@ -244,30 +287,8 @@ public class OrderConfirmationServiceImpl //
 	}
 
 	@Override
-	public void setCustomer(Customer c) throws Exception {
-		setCustomerId(c.getId());
-		get().setCustomerName(c.getName());
-		get().setCustomerVendorId(c.getVendorId());
-		get().setSuffix(channel(c));
-		get().setRoute(route(c));
-	}
-
-	private String channel(Customer c) {
-		Channel r = c.getChannel();
-		return r == null ? null : r.getName();
-	}
-
-	private String route(Customer c) throws Exception {
-		try {
-			return customerService.getRoute(c, getDeliveryDate()).getName();
-		} catch (NullPointerException e) {
-			throw new NoDeliveryRouteException(c.getName());
-		}
-	}
-
-	@Override
-	public void setCustomerId(Long id) {
-		get().setCustomerId(id);
+	public String getSavingInfo() {
+		return getAbbreviatedModuleNoPrompt() + getModuleNo();
 	}
 
 	@Override
@@ -284,18 +305,6 @@ public class OrderConfirmationServiceImpl //
 	}
 
 	@Override
-	protected Booking toBooking(Billable t) {
-		Booking b = new Booking();
-		b.setId(t.getId());
-		b.setBookingId(t.getBookingId());
-		b.setCustomer(t.getCustomerName());
-		b.setLocation(orderConfirmationNo(t));
-		b.setRoute(t.getSuffix());
-		b.setDeliveryRoute(t.getRoute());
-		return b;
-	}
-
-	@Override
 	public void updateUponCustomerVendorIdValidation(Long id) throws Exception {
 		validateUser();
 		setCustomerUponVendorIdValidation(id);
@@ -308,6 +317,13 @@ public class OrderConfirmationServiceImpl //
 			throw new UnauthorizedUserException("Sales Encoders Only");
 	}
 
+	private void setCustomerUponVendorIdValidation(Long id) throws Exception {
+		Customer c = customerService.findByVendorId(id);
+		if (c == null)
+			throw new NotFoundException(CUSTOMER_NO + id);
+		setCustomer(c);
+	}
+
 	private void getPreviousOrderToSetDeliveryDateAndSequenceIdAndTypeList() {
 		Billable b = previousOrder(1);
 		logger.info("\n    PreviousOrder@getPreviousOrderToSetDeliveryDateAndSequenceIdAndTypeList = " + b);
@@ -315,38 +331,35 @@ public class OrderConfirmationServiceImpl //
 		setRecommendedDeliveryDate(orderDate(b));
 	}
 
+	@Override
+	public void setCustomer(Customer c) throws Exception {
+		setCustomerId(c.getId());
+		get().setCustomerName(c.getName());
+		get().setCustomerVendorId(c.getVendorId());
+		get().setSuffix(channel(c));
+		get().setRoute(route(c));
+	}
+
 	private LocalDate orderDate(Billable b) {
 		return b == null ? getOrderDate() : b.getOrderDate();
 	}
 
-	private Billable previousOrder(long currentId) {
+	@Override
+	public void setCustomerId(Long id) {
+		get().setCustomerId(id);
+	}
+
+	private String channel(Customer c) {
+		Channel r = c.getChannel();
+		return r == null ? null : r.getName();
+	}
+
+	private String route(Customer c) throws Exception {
 		try {
-			logger.info("\n    OrderDate@previousOrder = " + getOrderDate());
-			logger.info("\n    CustomerId@previousOrder = " + getCustomerId());
-			logger.info("\n    SequenceId@previousOrder = " + currentId);
-			return findByOrderDateAndOutletIdAndSequenceId(getOrderDate(), getCustomerId(), currentId - 1);
-		} catch (Exception e) {
-			return null;
+			return customerService.getRoute(c, getDeliveryDate()).getName();
+		} catch (NullPointerException e) {
+			throw new NoDeliveryRouteException(c.getName());
 		}
-	}
-
-	private void setSequenceId(Billable b) {
-		Long id = 1L;
-		if (b != null)
-			id = id + b.getBookingId();
-		get().setBookingId(id);
-	}
-
-	private void setRecommendedDeliveryDate(LocalDate orderDate) {
-		LocalDate d = holidayService.nextWorkDay(orderDate);
-		get().setDueDate(d);
-	}
-
-	private void setCustomerUponVendorIdValidation(Long id) throws Exception {
-		Customer c = customerService.findByVendorId(id);
-		if (c == null)
-			throw new NotFoundException(CUSTOMER_NO + id);
-		setCustomer(c);
 	}
 
 	@Override
@@ -371,6 +384,10 @@ public class OrderConfirmationServiceImpl //
 		setDetails(details);
 	}
 
+	private void setType(String type) {
+		get().setPrefix(type.toString());
+	}
+
 	private List<BillableDetail> details(List<BillableDetail> details, Billable b, Long i) {
 		do {
 			b = previousOrder(i--);
@@ -381,18 +398,5 @@ public class OrderConfirmationServiceImpl //
 			details.addAll(b.getDetails());
 		} while (i > 1 && !isUndeliveredOrStockOut(b));
 		return details;
-	}
-
-	private boolean isUndeliveredOrStockOut(Billable b) {
-		return isDelivery(b, UNDELIVERED) || isDelivery(b, STOCK_OUT);
-	}
-
-	private boolean isDelivery(Billable b, OrderConfirmationType type) {
-		String p = b.getPrefix();
-		return p == null ? false : p.equalsIgnoreCase(type.toString());
-	}
-
-	private void setType(String type) {
-		get().setPrefix(type.toString());
 	}
 }

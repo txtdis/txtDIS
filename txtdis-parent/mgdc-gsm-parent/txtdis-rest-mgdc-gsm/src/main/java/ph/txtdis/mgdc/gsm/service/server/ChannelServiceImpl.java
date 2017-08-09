@@ -1,24 +1,23 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.mgdc.gsm.domain.ChannelEntity;
 import ph.txtdis.mgdc.gsm.dto.Channel;
 import ph.txtdis.mgdc.gsm.repository.ChannelRepository;
 import ph.txtdis.service.AbstractCreateNameListService;
-import ph.txtdis.service.ReadOnlyService;
+import ph.txtdis.service.RestClientService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service("channelService")
 public class ChannelServiceImpl //
-		extends AbstractCreateNameListService<ChannelRepository, ChannelEntity, Channel> //
-		implements ImportedChannelService {
+	extends AbstractCreateNameListService<ChannelRepository, ChannelEntity, Channel> //
+	implements ImportedChannelService {
 
 	@Autowired
-	private ReadOnlyService<Channel> readOnlyService;
+	private RestClientService<Channel> restClientService;
 
 	@Override
 	public List<Channel> findVisited() {
@@ -28,7 +27,7 @@ public class ChannelServiceImpl //
 
 	@Override
 	public void importAll() throws Exception {
-		List<Channel> l = new ArrayList<>(readOnlyService.module("channel").getList());
+		List<Channel> l = new ArrayList<>(restClientService.module("channel").getList());
 		l.add(newChannel("OTHERS"));
 		repository.save(toEntities(l));
 	}

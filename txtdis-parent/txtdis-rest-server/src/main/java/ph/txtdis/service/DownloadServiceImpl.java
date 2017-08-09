@@ -1,5 +1,25 @@
 package ph.txtdis.service;
 
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.exception.FailedReplicationException;
+import ph.txtdis.exception.NoNewerFileException;
+import ph.txtdis.type.SyncType;
+
+import javax.mail.*;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.search.AndTerm;
+import javax.mail.search.DateTerm;
+import javax.mail.search.SearchTerm;
+import javax.mail.search.SubjectTerm;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Properties;
+
 import static java.io.File.separator;
 import static java.lang.System.getProperty;
 import static java.nio.file.Files.newBufferedWriter;
@@ -9,35 +29,9 @@ import static java.util.stream.Collectors.joining;
 import static javax.mail.Folder.READ_ONLY;
 import static ph.txtdis.util.DateTimeUtils.epochDate;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.Properties;
-
-import javax.mail.Folder;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Store;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.search.AndTerm;
-import javax.mail.search.DateTerm;
-import javax.mail.search.SearchTerm;
-import javax.mail.search.SubjectTerm;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.exception.FailedReplicationException;
-import ph.txtdis.exception.NoNewerFileException;
-import ph.txtdis.type.SyncType;
-
 @Service("downloadService")
-public class DownloadServiceImpl implements DownloadService {
+public class DownloadServiceImpl
+	implements DownloadService {
 
 	private static final String BACKUP_DOWNLOAD = "Backup download";
 
@@ -142,9 +136,9 @@ public class DownloadServiceImpl implements DownloadService {
 	private Date saveScripts(SyncType type, Message[] messages) throws FailedReplicationException {
 		try (BufferedWriter writer = newBufferedWriter(get(path(type)))) {
 			String s = asList(messages).stream()//
-					.sorted(compareReceivedDates())//
-					.map(m -> getScripts(m))//
-					.collect(joining());
+				.sorted(compareReceivedDates())//
+				.map(m -> getScripts(m))//
+				.collect(joining());
 			writer.write(s);
 			return getReceivedDate(messages);
 		} catch (Exception e) {
@@ -158,7 +152,7 @@ public class DownloadServiceImpl implements DownloadService {
 	}
 
 	private SearchTerm[] searchTerms(String ext, Date latest) {
-		return new SearchTerm[] { sentLaterThan(latest), subjectHasFileExtensionOf(ext) };
+		return new SearchTerm[]{sentLaterThan(latest), subjectHasFileExtensionOf(ext)};
 	}
 
 	private SearchTerm sentLaterThan(Date latest) {

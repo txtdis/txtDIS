@@ -1,6 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.exception;
 
-public class NoDeliveryRouteException extends Exception {
+public class NoDeliveryRouteException
+	extends Exception {
 
 	private static final long serialVersionUID = -959354899344338479L;
 

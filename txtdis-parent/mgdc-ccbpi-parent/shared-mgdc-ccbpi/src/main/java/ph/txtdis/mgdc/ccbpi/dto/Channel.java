@@ -11,8 +11,9 @@ import ph.txtdis.dto.StartDated;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Channel //
-		extends AbstractCreationTracked<Long> //
-		implements Named, StartDated {
+	extends AbstractCreationTracked<Long> //
+	implements Named,
+	StartDated {
 
 	private String name;
 

@@ -1,11 +1,5 @@
 package ph.txtdis.mgdc.service;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import ph.txtdis.dto.CreditNote;
 import ph.txtdis.dto.CreditNoteDump;
 import ph.txtdis.dto.CreditNotePayment;
@@ -13,12 +7,21 @@ import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.fx.table.CreditNoteListTable;
 import ph.txtdis.service.AppendableDetailService;
 import ph.txtdis.service.DecisionNeededService;
-import ph.txtdis.service.RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
+import ph.txtdis.service
+	.RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
 import ph.txtdis.service.SavableAsExcelService;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
 public interface CreditNoteService //
-		extends AppendableDetailService, DecisionNeededService, SavableAsExcelService<CreditNote>,
-		RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long> {
+	extends AppendableDetailService,
+	DecisionNeededService,
+	SavableAsExcelService<CreditNote>,
+	RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long> {
 
 	void createAndWriteAnExcelDataDumpFile(AppTable<CreditNoteDump> t) throws IOException;
 
@@ -32,6 +35,8 @@ public interface CreditNoteService //
 
 	String getDescription();
 
+	void setDescription(String text);
+
 	String getLastModifiedBy();
 
 	ZonedDateTime getLastModifiedOn();
@@ -41,6 +46,8 @@ public interface CreditNoteService //
 	List<CreditNotePayment> getPayments();
 
 	String getReference();
+
+	void setReference(String text);
 
 	@Override
 	String getRemarks();
@@ -56,10 +63,6 @@ public interface CreditNoteService //
 	List<CreditNote> listUnvalidated();
 
 	void setCreditDateUponUserValidation(LocalDate value) throws Exception;
-
-	void setDescription(String text);
-
-	void setReference(String text);
 
 	void updatePayments(List<CreditNotePayment> l);
 

@@ -1,16 +1,6 @@
 package ph.txtdis.dyvek.service.server;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.util.NumberUtils.isZero;
-import static ph.txtdis.util.NumberUtils.zeroIfNull;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dyvek.domain.BillableEntity;
 import ph.txtdis.dyvek.domain.CustomerEntity;
 import ph.txtdis.dyvek.domain.ItemEntity;
@@ -19,14 +9,19 @@ import ph.txtdis.dyvek.model.Billable;
 import ph.txtdis.dyvek.model.BillableDetail;
 import ph.txtdis.repository.SpunRepository;
 import ph.txtdis.service.AbstractSpunSavedKeyedService;
-import ph.txtdis.service.CredentialService;
 import ph.txtdis.service.ServerUserService;
 
-public abstract class AbstractSpunSavedBillableService<R extends SpunRepository<BillableEntity, Long>> //
-		extends AbstractSpunSavedKeyedService<R, BillableEntity, Billable, Long> {
+import java.math.BigDecimal;
+import java.util.List;
 
-	@Autowired
-	private CredentialService credentialService;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.util.NumberUtils.isZero;
+import static ph.txtdis.util.NumberUtils.zeroIfNull;
+
+public abstract class AbstractSpunSavedBillableService<R extends SpunRepository<BillableEntity, Long>> //
+	extends AbstractSpunSavedKeyedService<R, BillableEntity, Billable, Long> {
 
 	@Autowired
 	protected CustomerService customerService;
@@ -59,16 +54,6 @@ public abstract class AbstractSpunSavedBillableService<R extends SpunRepository<
 		return b;
 	}
 
-	protected String customer(BillableEntity e) {
-		CustomerEntity c = e.getCustomer();
-		return c == null ? null : c.getName();
-	}
-
-	protected String item(BillableEntity e) {
-		ItemEntity i = e.getItem();
-		return i == null ? null : i.getName();
-	}
-
 	private BigDecimal totalQty(BillableEntity e) {
 		BigDecimal qty = e.getTotalQty();
 		return qty == null ? ZERO : qty;
@@ -91,6 +76,22 @@ public abstract class AbstractSpunSavedBillableService<R extends SpunRepository<
 		return l == null ? emptyList() : l.stream().map(b -> toDetail(b)).collect(toList());
 	}
 
+	protected Billable setCreationData(Billable b, BillableEntity e) {
+		b.setCreatedBy(e.getCreatedBy());
+		b.setCreatedOn(e.getCreatedOn());
+		return b;
+	}
+
+	protected String customer(BillableEntity e) {
+		CustomerEntity c = e.getCustomer();
+		return c == null ? null : c.getName();
+	}
+
+	protected String item(BillableEntity e) {
+		ItemEntity i = e.getItem();
+		return i == null ? null : i.getName();
+	}
+
 	protected abstract List<BillableEntity> deliveries(BillableEntity e);
 
 	protected BillableDetail toDetail(BillableEntity e) {
@@ -110,12 +111,6 @@ public abstract class AbstractSpunSavedBillableService<R extends SpunRepository<
 		return d;
 	}
 
-	protected Billable setCreationData(Billable b, BillableEntity e) {
-		b.setCreatedBy(e.getCreatedBy());
-		b.setCreatedOn(e.getCreatedOn());
-		return b;
-	}
-
 	@Override
 	public BillableEntity toEntity(Billable b) {
 		if (b == null)
@@ -133,6 +128,12 @@ public abstract class AbstractSpunSavedBillableService<R extends SpunRepository<
 		return e;
 	}
 
+	protected BillableEntity update(Billable b) {
+		BillableEntity e = repository.findOne(b.getId());
+		e.setRemarks(b.getRemarks());
+		return e;
+	}
+
 	protected OrderDetailEntity order(Billable b) {
 		BigDecimal price = b.getPriceValue();
 		if (isZero(price))
@@ -143,23 +144,13 @@ public abstract class AbstractSpunSavedBillableService<R extends SpunRepository<
 		return e;
 	}
 
-	protected CustomerEntity customer(String name) {
-		return customerService.findEntityByName(name);
-	}
-
 	protected ItemEntity item(Billable b) {
 		String name = b.getItem();
 		return itemService.findEntityByName(name);
 	}
 
-	protected BillableEntity update(Billable b) {
-		BillableEntity e = repository.findOne(b.getId());
-		e.setRemarks(b.getRemarks());
-		return e;
-	}
-
-	protected String username() {
-		return credentialService.username();
+	protected CustomerEntity customer(String name) {
+		return customerService.findEntityByName(name);
 	}
 
 	protected BigDecimal balanceQty(BillableEntity b) {
@@ -169,10 +160,11 @@ public abstract class AbstractSpunSavedBillableService<R extends SpunRepository<
 	protected BigDecimal deliveredQty(BillableEntity b) {
 		try {
 			return deliveries(b).stream() //
-					.flatMap(d -> d.getReferences().stream()) //
-					.filter(d -> d.getReference().getCustomer().equals(b.getCustomer()) && d.getReference().getOrderNo().equals(b.getOrderNo()))
-					.map(d -> d.getQty()) //
-					.reduce(ZERO, BigDecimal::add);
+				.flatMap(d -> d.getReferences().stream()) //
+				.filter(d -> d.getReference().getCustomer().equals(b.getCustomer()) &&
+					d.getReference().getOrderNo().equals(b.getOrderNo()))
+				.map(d -> d.getQty()) //
+				.reduce(ZERO, BigDecimal::add);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ZERO;

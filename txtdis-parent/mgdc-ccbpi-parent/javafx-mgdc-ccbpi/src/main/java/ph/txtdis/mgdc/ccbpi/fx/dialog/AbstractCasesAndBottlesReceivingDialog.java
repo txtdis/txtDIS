@@ -18,10 +18,10 @@ import ph.txtdis.mgdc.fx.dialog.QuantitiesInCasesAndBottlesDialogImpl;
 import ph.txtdis.mgdc.fx.dialog.ReceivingDialog;
 
 public abstract class AbstractCasesAndBottlesReceivingDialog< //
-		AS extends ReceivingService, //
-		T extends ReceivingDetail> //
-		extends AbstractFieldDialog<T> //
-		implements ReceivingDialog<T> {
+	AS extends ReceivingService, //
+	T extends ReceivingDetail> //
+	extends AbstractFieldDialog<T> //
+	implements ReceivingDialog<T> {
 
 	private static Logger logger = getLogger(AbstractCasesAndBottlesReceivingDialog.class);
 
@@ -41,8 +41,22 @@ public abstract class AbstractCasesAndBottlesReceivingDialog< //
 		return l;
 	}
 
+	protected LabeledCombo<String> itemCombo() {
+		itemCombo.name("Item").build();
+		itemCombo.onAction(e -> setReceivingDetailAndItsItem());
+		return itemCombo;
+	}
+
 	protected List<InputNode<?>> quantitiesInCasesAndBottlesInputs() {
 		return quantitiesInCasesAndBottlesDialog.addNodes(service, "");
+	}
+
+	private void setReceivingDetailAndItsItem() {
+		try {
+			service.setReceivingDetailAndItsItem(itemCombo.getValue());
+		} catch (Exception e) {
+			resetNodesOnError(e);
+		}
 	}
 
 	@Override
@@ -60,19 +74,5 @@ public abstract class AbstractCasesAndBottlesReceivingDialog< //
 	public void refresh() {
 		super.refresh();
 		itemCombo.items(service.listReceivableItemNames());
-	}
-
-	protected LabeledCombo<String> itemCombo() {
-		itemCombo.name("Item").build();
-		itemCombo.onAction(e -> setReceivingDetailAndItsItem());
-		return itemCombo;
-	}
-
-	private void setReceivingDetailAndItsItem() {
-		try {
-			service.setReceivingDetailAndItsItem(itemCombo.getValue());
-		} catch (Exception e) {
-			resetNodesOnError(e);
-		}
 	}
 }

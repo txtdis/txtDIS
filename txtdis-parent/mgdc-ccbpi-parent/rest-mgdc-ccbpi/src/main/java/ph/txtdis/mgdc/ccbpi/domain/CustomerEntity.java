@@ -29,13 +29,13 @@ import ph.txtdis.mgdc.domain.RouteEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "customer", //
-		indexes = { //
-				@Index(columnList = "name"), //
-				@Index(columnList = "type"), //
-				@Index(columnList = "vendor_id") //
-		})
+	indexes = { //
+		@Index(columnList = "name"), //
+		@Index(columnList = "type"), //
+		@Index(columnList = "vendor_id") //
+	})
 public class CustomerEntity //
-		extends AbstractCustomerEntity {
+	extends AbstractCustomerEntity {
 
 	private static final long serialVersionUID = 4005115994591616684L;
 
@@ -59,9 +59,9 @@ public class CustomerEntity //
 
 	public RouteEntity getRoute(LocalDate date) {
 		return getRouteHistory().stream() //
-				.filter(p -> !p.getStartDate().isAfter(date)) //
-				.max(comparing(RoutingEntity::getStartDate)) //
-				.orElse(new RoutingEntity()).getRoute();
+			.filter(p -> !p.getStartDate().isAfter(date)) //
+			.max(comparing(RoutingEntity::getStartDate)) //
+			.orElse(new RoutingEntity()).getRoute();
 	}
 
 	public List<RoutingEntity> getRouteHistory() {

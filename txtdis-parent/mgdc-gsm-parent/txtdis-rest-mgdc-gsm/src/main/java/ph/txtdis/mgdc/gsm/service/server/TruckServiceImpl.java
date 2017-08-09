@@ -1,36 +1,31 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import ph.txtdis.domain.TruckEntity;
 import ph.txtdis.dto.Truck;
 import ph.txtdis.service.AbstractTruckService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
+import ph.txtdis.service.RestClientService;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 @Service("truckService")
 public class TruckServiceImpl
-		extends AbstractTruckService //
-		implements ImportedTruckService {
+	extends AbstractTruckService //
+	implements ImportedTruckService {
 
 	private static final String TRUCK = "truck";
 
 	@Autowired
-	private SavingService<Truck> savingService;
-
-	@Autowired
-	private ReadOnlyService<Truck> readOnlyService;
+	private RestClientService<Truck> restClientService;
 
 	@Override
 	public void importAll() throws Exception {
-		List<Truck> l = readOnlyService.module(TRUCK).getList();
+		List<Truck> l = restClientService.module(TRUCK).getList();
 		repository.save(toEntities(l));
 	}
 
@@ -53,7 +48,7 @@ public class TruckServiceImpl
 
 	@Override
 	public Truck saveToEdms(Truck t) throws Exception {
-		savingService.module(TRUCK).save(t);
+		restClientService.module(TRUCK).save(t);
 		return t;
 	}
 }

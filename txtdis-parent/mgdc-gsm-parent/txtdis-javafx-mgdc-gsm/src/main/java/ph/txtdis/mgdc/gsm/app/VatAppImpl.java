@@ -3,7 +3,6 @@ package ph.txtdis.mgdc.gsm.app;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.app.AbstractTotaledReportApp;
 import ph.txtdis.fx.dialog.OpenByDateDialog;
 import ph.txtdis.mgdc.gsm.dto.Vat;
@@ -13,8 +12,8 @@ import ph.txtdis.mgdc.gsm.service.VatService;
 @Scope("prototype")
 @Component("vatApp")
 public class VatAppImpl //
-		extends AbstractTotaledReportApp<VatTable, VatService, Vat> //
-		implements VatApp {
+	extends AbstractTotaledReportApp<VatTable, VatService, Vat> //
+	implements VatApp {
 
 	@Autowired
 	private OpenByDateDialog openDialog;

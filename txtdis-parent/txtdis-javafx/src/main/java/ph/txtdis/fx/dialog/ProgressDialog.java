@@ -22,17 +22,13 @@ import javafx.stage.StageStyle;
 
 @Scope("prototype")
 @Component("progressDialog")
-public class ProgressDialog extends Stage {
+public class ProgressDialog
+	extends Stage {
 
 	public ProgressDialog addParent(Stage stage) {
 		if (getOwner() == null)
 			initialize(stage);
 		return this;
-	}
-
-	public void start() {
-		setScene(scene());
-		show();
 	}
 
 	private void initialize(Stage stage) {
@@ -41,21 +37,9 @@ public class ProgressDialog extends Stage {
 		initStyle(StageStyle.TRANSPARENT);
 	}
 
-	private Node message() {
-		Label l = new Label("Please wait...");
-		l.setStyle("-fx-font: 12pt 'ubuntu'; ");
-		return l;
-	}
-
-	private Node phoneInsideSpinningBallLogo() {
-		return new StackPane(phoneLogo(), spinningBalls());
-	}
-
-	private Node phoneLogo() {
-		Label p = new Label("\ue945");
-		p.setStyle("-fx-font: 72 'txtdis'; -fx-text-fill: midnightblue;");
-		p.setPadding(new Insets(10));
-		return p;
+	public void start() {
+		setScene(scene());
+		show();
 	}
 
 	private Scene scene() {
@@ -63,14 +47,6 @@ public class ProgressDialog extends Stage {
 		s.getStylesheets().addAll("/css/base.css");
 		s.setFill(Color.TRANSPARENT);
 		return s;
-	}
-
-	private Node spinningBalls() {
-		ProgressIndicator pi = new ProgressIndicator();
-		pi.setScaleX(1.5);
-		pi.setScaleY(1.5);
-		pi.setStyle(" -fx-accent: white;");
-		return pi;
 	}
 
 	private HBox splash() {
@@ -82,6 +58,10 @@ public class ProgressDialog extends Stage {
 
 	}
 
+	private Node phoneInsideSpinningBallLogo() {
+		return new StackPane(phoneLogo(), spinningBalls());
+	}
+
 	private Parent textPane() {
 		VBox b = new VBox(trademark(), message());
 		b.setAlignment(Pos.CENTER);
@@ -90,11 +70,32 @@ public class ProgressDialog extends Stage {
 		return b;
 	}
 
+	private Node phoneLogo() {
+		Label p = new Label("\ue945");
+		p.setStyle("-fx-font: 72 'txtdis'; -fx-text-fill: midnightblue;");
+		p.setPadding(new Insets(10));
+		return p;
+	}
+
+	private Node spinningBalls() {
+		ProgressIndicator pi = new ProgressIndicator();
+		pi.setScaleX(1.5);
+		pi.setScaleY(1.5);
+		pi.setStyle(" -fx-accent: white;");
+		return pi;
+	}
+
 	private Node trademark() {
 		Font.loadFont(this.getClass().getResourceAsStream("/font/Ubuntu-BI.ttf"), 24);
 		Label tm = new Label("txtDIS");
 		tm.setStyle("-fx-font: 48pt 'ubuntu'; -fx-text-fill: midnightblue;");
 		tm.setAlignment(Pos.TOP_CENTER);
 		return tm;
+	}
+
+	private Node message() {
+		Label l = new Label("Please wait...");
+		l.setStyle("-fx-font: 12pt 'ubuntu'; ");
+		return l;
 	}
 }

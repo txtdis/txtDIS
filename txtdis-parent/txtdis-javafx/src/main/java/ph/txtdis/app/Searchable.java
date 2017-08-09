@@ -7,42 +7,32 @@ import ph.txtdis.service.SearchedByNameService;
 
 public interface Searchable<T> {
 
-	SelectableListApp<T> getListApp();
-
-	SearchedByNameService<T> getSearchableByNameService();
-
-	default T getSelectionFromSearchResults(Stage s) {
-		getListApp().addParent(s).start();
-		return getListApp().getSelection();
+	default void openSearchDialog(SearchedByNameService<T> service,
+	                              Stage stage,
+	                              SelectableListApp<T> app,
+	                              MessageDialog messageDialog,
+	                              SearchDialog searchDialog) {
+		searchDialog.criteria("name").addParent(stage).start();
+		String name = searchDialog.getText();
+		if (name != null)
+			try {
+				search(service, stage, app, name);
+			} catch (Exception e) {
+				messageDialog.show(e).addParent(stage).start();
+			}
 	}
 
-	void nextFocus();
-
-	default void openSearchDialog(Stage s, MessageDialog md, SearchDialog sd) {
-		refresh();
-		sd.criteria("name").addParent(s).start();
-		String t = sd.getText();
-		if (t != null)
-			search(t, s, md);
-	}
-
-	void refresh();
-
-	default void search(String name, Stage s, MessageDialog d) {
-		try {
-			getSearchableByNameService().search(name);
-			validateSelectionFromSearchList(s);
-			nextFocus();
-		} catch (Exception e) {
-			d.show(e).addParent(s).start();
-		}
-	}
-
-	void updateUponVerification(T t);
-
-	default void validateSelectionFromSearchList(Stage s) {
-		T t = getSelectionFromSearchResults(s);
+	default void search(SearchedByNameService<T> service, Stage stage, SelectableListApp<T> app, String name) throws
+		Exception {
+		service.search(name);
+		app.addParent(stage).start();
+		T t = app.getSelection();
 		if (t != null)
 			updateUponVerification(t);
+		nextFocus();
 	}
+
+	void updateUponVerification(T t) throws Exception;
+
+	void nextFocus();
 }

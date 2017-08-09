@@ -9,5 +9,5 @@ import ph.txtdis.mgdc.service.server.ItemFamilyService;
 @RequestMapping("/itemFamilies")
 @RestController("itemFamilyController")
 public class ItemFamilyController //
-		extends AbstractItemFamilyController<ItemFamilyService> {
+	extends AbstractItemFamilyController<ItemFamilyService> {
 }

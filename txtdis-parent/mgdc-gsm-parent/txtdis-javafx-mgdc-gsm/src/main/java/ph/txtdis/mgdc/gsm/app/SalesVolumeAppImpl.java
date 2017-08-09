@@ -1,33 +1,32 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import static java.util.Arrays.asList;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.app.AbstractExcelApp;
 import ph.txtdis.dto.SalesVolume;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.dialog.OpenByDateRangesDialog;
 import ph.txtdis.mgdc.fx.table.SalesVolumeDataDumpTableImpl;
 import ph.txtdis.mgdc.fx.table.SalesVolumeTable;
 import ph.txtdis.mgdc.gsm.fx.dialog.FilterByCustomerDialog;
 import ph.txtdis.mgdc.service.SalesVolumeService;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Scope("prototype")
 @Component("salesVolumeApp")
 public class SalesVolumeAppImpl
-		extends AbstractExcelApp<SalesVolumeTable, SalesVolumeService, SalesVolume> {
+	extends AbstractExcelApp<SalesVolumeTable, SalesVolumeService, SalesVolume> {
 
 	@Autowired
-	private AppButtonImpl backButton, openButton, nextButton, customerButton, dataDumpButton;
+	private AppButton backButton, openButton, nextButton, customerButton, dataDumpButton;
 
 	@Autowired
 	private SalesVolumeDataDumpTableImpl dataDumpTable;
@@ -56,6 +55,15 @@ public class SalesVolumeAppImpl
 	public void start() {
 		super.start();
 		verifyAllPickedSalesOrderHaveBeenBilled();
+	}
+
+	private void verifyAllPickedSalesOrderHaveBeenBilled() {
+		try {
+			// service.verifyAllPickedSalesOrderHaveBeenBilled();
+		} catch (Exception e) {
+			showErrorDialog(e);
+			close();
+		}
 	}
 
 	private void displayOpenByDateDialog() {
@@ -117,23 +125,9 @@ public class SalesVolumeAppImpl
 		}
 	}
 
-	private HBox subheadPane() {
-		subhead = label.subheader("");
-		return box.forSubheader(subhead);
-	}
-
-	private void verifyAllPickedSalesOrderHaveBeenBilled() {
-		try {
-			// service.verifyAllPickedSalesOrderHaveBeenBilled();
-		} catch (Exception e) {
-			showErrorDialog(e);
-			close();
-		}
-	}
-
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> list = new ArrayList<>(asList(backButton, openButton, nextButton));
+	protected List<AppButton> addButtons() {
+		List<AppButton> list = new ArrayList<>(asList(backButton, openButton, nextButton));
 		list.add(customerButton);
 		list.addAll(super.addButtons());
 		list.add(dataDumpButton);
@@ -163,6 +157,11 @@ public class SalesVolumeAppImpl
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
 		return asList(subheadPane(), tablePane());
+	}
+
+	private HBox subheadPane() {
+		subhead = label.subheader("");
+		return pane.forSubheader(subhead);
 	}
 
 	@Override

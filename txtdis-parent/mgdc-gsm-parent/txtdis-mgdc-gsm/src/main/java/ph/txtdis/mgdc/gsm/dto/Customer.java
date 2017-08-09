@@ -1,28 +1,22 @@
 package ph.txtdis.mgdc.gsm.dto;
 
-import static java.util.Collections.emptyList;
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.maxBy;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ph.txtdis.dto.*;
+import ph.txtdis.type.PartnerType;
+import ph.txtdis.type.VisitFrequency;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ph.txtdis.dto.AbstractModificationTracked;
-import ph.txtdis.dto.CreditDetail;
-import ph.txtdis.dto.Location;
-import ph.txtdis.dto.PricingType;
-import ph.txtdis.dto.Route;
-import ph.txtdis.dto.Routing;
-import ph.txtdis.dto.WeeklyVisit;
-import ph.txtdis.type.PartnerType;
-import ph.txtdis.type.VisitFrequency;
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.maxBy;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Customer //
-		extends AbstractModificationTracked<Long> {
+	extends AbstractModificationTracked<Long> {
 
 	private Channel channel;
 
@@ -68,32 +62,32 @@ public class Customer //
 		return city == null ? "" : (!barangay().isEmpty() || !street().isEmpty() ? ", " : "") + city;
 	}
 
+	public Integer getCreditTermInDays() {
+		return getCreditDetails().isEmpty() ? null //
+			: getCreditDetails().stream() //
+			.max(comparing(CreditDetail::getStartDate)) //
+			.get().getTermInDays();
+	}
+
 	public List<CreditDetail> getCreditDetails() {
 		return creditDetails == null ? emptyList() : creditDetails;
 	}
 
-	public Integer getCreditTermInDays() {
-		return getCreditDetails().isEmpty() ? null //
-				: getCreditDetails().stream() //
-						.max(comparing(CreditDetail::getStartDate)) //
-						.get().getTermInDays();
+	public Boolean getDiscounted() {
+		return getDiscounts().stream() //
+			.anyMatch(d -> d.getIsValid() != null && d.getIsValid() == true);
 	}
 
 	public List<CustomerDiscount> getDiscounts() {
 		return discounts == null ? emptyList() : discounts;
 	}
 
-	public Boolean getDiscounted() {
-		return getDiscounts().stream() //
-				.anyMatch(d -> d.getIsValid() != null && d.getIsValid() == true);
-	}
-
 	public Integer getGracePeriodInDays() {
 		return getCreditDetails().isEmpty() ? null //
-				: getCreditDetails().stream() //
-						.filter(c -> c.getIsValid() != null && c.getIsValid() == true && c.getGracePeriodInDays() > 0)
-						.max(comparing(CreditDetail::getStartDate)) //
-						.orElse(new CreditDetail()).getGracePeriodInDays();
+			: getCreditDetails().stream() //
+			.filter(c -> c.getIsValid() != null && c.getIsValid() == true && c.getGracePeriodInDays() > 0)
+			.max(comparing(CreditDetail::getStartDate)) //
+			.orElse(new CreditDetail()).getGracePeriodInDays();
 	}
 
 	public Route getRoute() {
@@ -102,9 +96,9 @@ public class Customer //
 
 	public Route getRoute(LocalDate date) {
 		return getRouteHistory().stream() //
-				.filter(p -> !p.getStartDate().isAfter(date)) //
-				.collect(maxBy(comparing(Routing::getStartDate)))//
-				.orElse(new Routing()).getRoute();
+			.filter(p -> !p.getStartDate().isAfter(date)) //
+			.collect(maxBy(comparing(Routing::getStartDate)))//
+			.orElse(new Routing()).getRoute();
 	}
 
 	public List<Routing> getRouteHistory() {

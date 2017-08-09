@@ -1,23 +1,22 @@
 package ph.txtdis.mgdc.gsm.printer;
 
-import static ph.txtdis.util.NumberUtils.divide;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.domain.BomEntity;
 import ph.txtdis.mgdc.gsm.service.server.ItemService;
 import ph.txtdis.type.PartnerType;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+
+import static ph.txtdis.util.NumberUtils.divide;
+
 @Component("pickListPrinter")
 public class PickListPrinterImpl //
-		extends AbstractPickListPrinter //
-		implements QtyInFraction {
+	extends AbstractPickListPrinter //
+	implements QtyInFraction {
 
 	@Autowired
 	private ItemService itemService;

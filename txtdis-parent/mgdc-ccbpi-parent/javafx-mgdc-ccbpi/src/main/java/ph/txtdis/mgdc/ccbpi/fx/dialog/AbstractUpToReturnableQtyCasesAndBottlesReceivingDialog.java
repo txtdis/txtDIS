@@ -7,9 +7,9 @@ import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.mgdc.ccbpi.service.UpToReturnableQtyReceivingService;
 
 public abstract class AbstractUpToReturnableQtyCasesAndBottlesReceivingDialog<//
-		AS extends UpToReturnableQtyReceivingService, //
-		T extends ReceivingDetail> //
-		extends AbstractCasesAndBottlesReceivingDialog<AS, T> {
+	AS extends UpToReturnableQtyReceivingService, //
+	T extends ReceivingDetail> //
+	extends AbstractCasesAndBottlesReceivingDialog<AS, T> {
 
 	@Override
 	protected List<InputNode<?>> quantitiesInCasesAndBottlesInputs() {

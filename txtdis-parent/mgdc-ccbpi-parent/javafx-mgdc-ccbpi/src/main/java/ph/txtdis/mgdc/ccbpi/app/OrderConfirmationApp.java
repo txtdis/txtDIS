@@ -1,8 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
 import ph.txtdis.app.BookingApp;
-import ph.txtdis.app.StartableApp;
+import ph.txtdis.app.App;
 
 public interface OrderConfirmationApp //
-		extends BookingApp, StartableApp {
+	extends BookingApp,
+	App {
 }

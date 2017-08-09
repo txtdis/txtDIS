@@ -1,20 +1,19 @@
 package ph.txtdis.mgdc.gsm.fx.table;
 
-import static java.util.Arrays.asList;
+import javafx.scene.control.TableColumn;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.dto.Price;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
-import ph.txtdis.dto.Price;
+import static java.util.Arrays.asList;
 
 @Scope("prototype")
 @Component("pricingTable")
 public class PricingTableImpl //
-		extends AbstractPricingTable {
+	extends AbstractPricingTable {
 
 	@Override
 	protected List<TableColumn<Price, ?>> columns() {

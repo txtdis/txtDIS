@@ -15,7 +15,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "tr_payment")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsRemittance extends EdmsAbstractId implements Serializable {
+public class EdmsRemittance
+	extends EdmsAbstractId
+	implements Serializable {
 
 	private static final long serialVersionUID = -6829171934110917887L;
 

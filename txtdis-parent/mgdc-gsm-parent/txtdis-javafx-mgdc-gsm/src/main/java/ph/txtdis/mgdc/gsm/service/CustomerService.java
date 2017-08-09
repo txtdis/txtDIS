@@ -1,18 +1,22 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.util.List;
-
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.service.FinancialService;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 import ph.txtdis.service.MasterService;
 import ph.txtdis.service.ResettableService;
 import ph.txtdis.type.PartnerType;
 
+import java.util.List;
+
 public interface CustomerService //
-		extends FinancialService, ItemDeliveredCustomerService, ListedAndResetableService<Customer>, MasterService<Customer>,
-		Qualified_CreditAndDiscountGivenCustomerService, ResettableService {
+	extends FinancialService,
+	ItemDeliveredCustomerService,
+	ListedAndResettableService<Customer>,
+	MasterService<Customer>,
+	QualifiedCreditAndDiscountGivenCustomerService,
+	ResettableService {
 
 	boolean cannotReactivate();
 

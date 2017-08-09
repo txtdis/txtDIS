@@ -22,7 +22,7 @@ import ph.txtdis.mgdc.service.server.AbstractInventoryService;
 
 @Service("inventoryService")
 public class InventoryServiceImpl //
-		extends AbstractInventoryService {
+	extends AbstractInventoryService {
 
 	@Autowired
 	private BillingDetailRepository detail;
@@ -33,17 +33,17 @@ public class InventoryServiceImpl //
 		return i == null ? null : stream(i.spliterator(), false).map(e -> convert(e)).collect(Collectors.toList());
 	}
 
-	private Map<Long, BigDecimal> toItemSoldQtyMap(List<BillableDetailEntity> b) {
-		return b.stream().collect(//
-				groupingBy(BillableDetailEntity::getItemId, //
-						mapping(BillableDetailEntity::getInitialQty, //
-								reducing(ZERO, BigDecimal::add))));
-	}
-
 	private List<StockEntity> updatedStock() {
 		List<BillableDetailEntity> b = detail.findByBillingOrderDateGreaterThanEqualOrderByItemAsc(sixtyDaysAgo());
 		Map<Long, BigDecimal> m = toItemSoldQtyMap(b);
 		List<StockEntity> s = (List<StockEntity>) stockRepository.findAll();
 		return updateStock(s, m);
+	}
+
+	private Map<Long, BigDecimal> toItemSoldQtyMap(List<BillableDetailEntity> b) {
+		return b.stream().collect(//
+			groupingBy(BillableDetailEntity::getItemId, //
+				mapping(BillableDetailEntity::getInitialQty, //
+					reducing(ZERO, BigDecimal::add))));
 	}
 }

@@ -5,9 +5,9 @@ import ph.txtdis.dyvek.service.OrderService;
 import ph.txtdis.fx.table.AppTable;
 
 public abstract class AbstractOpenOrderListApp< //
-		OT extends AppTable<Billable>, //
-		OS extends OrderService> //
-		extends AbstractListApp<OT, OS, Billable> {
+	OT extends AppTable<Billable>, //
+	OS extends OrderService> //
+	extends AbstractListApp<OT, OS, Billable> {
 
 	private static final String OPEN = "Open ";
 

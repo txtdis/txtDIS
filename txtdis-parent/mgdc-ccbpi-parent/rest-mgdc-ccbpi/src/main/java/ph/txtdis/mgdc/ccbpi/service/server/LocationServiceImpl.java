@@ -6,5 +6,5 @@ import ph.txtdis.mgdc.service.server.AbstractLocationService;
 
 @Service("locationService")
 public class LocationServiceImpl
-		extends AbstractLocationService {
+	extends AbstractLocationService {
 }

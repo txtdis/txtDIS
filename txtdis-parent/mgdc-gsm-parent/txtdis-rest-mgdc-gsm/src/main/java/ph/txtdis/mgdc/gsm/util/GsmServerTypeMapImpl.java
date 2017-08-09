@@ -1,10 +1,6 @@
 package ph.txtdis.mgdc.gsm.util;
 
-import java.util.List;
-
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.PickList;
 import ph.txtdis.dto.Route;
 import ph.txtdis.dto.User;
@@ -13,9 +9,10 @@ import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.util.AbstractTypeMap;
 import ph.txtdis.util.TypeReference;
 
-@Component("typeMap")
+import java.util.List;
+
 public class GsmServerTypeMapImpl //
-		extends AbstractTypeMap {
+	extends AbstractTypeMap {
 
 	private static final long serialVersionUID = -5360838591923833592L;
 

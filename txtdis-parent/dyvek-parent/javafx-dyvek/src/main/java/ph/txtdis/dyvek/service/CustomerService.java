@@ -8,7 +8,9 @@ import ph.txtdis.service.UniqueNamedService;
 import ph.txtdis.type.PartnerType;
 
 public interface CustomerService //
-		extends MasterListedAndResetableService<Customer>, TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService, UniqueNamedService<Customer> {
+	extends MasterListedAndResetableService<Customer>,
+	TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService,
+	UniqueNamedService<Customer> {
 
 	List<String> listClients();
 

@@ -1,28 +1,27 @@
 package ph.txtdis.dyvek.fx.table;
 
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.QUANTITY;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.scene.control.TableColumn;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.dyvek.fx.dialog.AssignmentDialog;
+import ph.txtdis.dyvek.model.BillableDetail;
+import ph.txtdis.fx.table.Column;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.scene.control.TableColumn;
-import ph.txtdis.dyvek.fx.dialog.AssignmentDialog;
-import ph.txtdis.dyvek.model.BillableDetail;
-import ph.txtdis.fx.table.Column;
+import static ph.txtdis.type.Type.CURRENCY;
+import static ph.txtdis.type.Type.QUANTITY;
 
 @Scope("prototype")
 @Component("assignmentTable")
 public class AssignmentTableImpl //
-		extends AbstractBillableDetailTable //
-		implements AssignmentTable {
+	extends AbstractBillableDetailTable //
+	implements AssignmentTable {
 
 	@Autowired
 	private Column<BillableDetail, BigDecimal> price, qtyAssigned;
@@ -33,9 +32,9 @@ public class AssignmentTableImpl //
 	@Autowired
 	private AssignmentDialog dialog;
 
-	private ChangeListener<? super Boolean> editabilityListener;
+	private ChangeListener<? super Boolean> changeListener;
 
-	private BooleanProperty editability;
+	private BooleanProperty editableProperty;
 
 	@Override
 	protected List<TableColumn<BillableDetail, ?>> addColumns() {
@@ -52,8 +51,8 @@ public class AssignmentTableImpl //
 	}
 
 	private void setQtyColumnVisibility() {
-		editability = editableProperty();
-		editability.addListener(editabilityListener = (e, old, now) -> setQtyColumnVisibility(now));
+		editableProperty = editableProperty();
+		editableProperty.addListener(changeListener = (e, old, now) -> setQtyColumnVisibility(now));
 	}
 
 	private void setQtyColumnVisibility(Boolean isEditable) {
@@ -75,6 +74,6 @@ public class AssignmentTableImpl //
 	@Override
 	public void removeListener() {
 		super.removeListener();
-		editability.removeListener(editabilityListener);
+		editableProperty.removeListener(changeListener);
 	}
 }

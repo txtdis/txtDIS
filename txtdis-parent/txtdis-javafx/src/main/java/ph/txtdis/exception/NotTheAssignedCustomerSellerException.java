@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class NotTheAssignedCustomerSellerException extends Exception {
+public class NotTheAssignedCustomerSellerException
+	extends Exception {
 
 	private static final long serialVersionUID = 7399769514410624900L;
 

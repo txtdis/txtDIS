@@ -1,22 +1,21 @@
 package ph.txtdis.mgdc.fx.tab;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.Node;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.fx.pane.CustomerPane;
 import ph.txtdis.fx.tab.AbstractTab;
+
+import java.util.List;
 
 @Scope("prototype")
 @Component("customerTab")
 public class CustomerTabImpl //
-		extends AbstractTab //
-		implements CustomerTab {
+	extends AbstractTab //
+	implements CustomerTab {
 
 	@Autowired
 	private CustomerPane customerPane;

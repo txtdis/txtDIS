@@ -5,18 +5,9 @@ import ph.txtdis.info.Information;
 import ph.txtdis.info.SuccessfulSaveInfo;
 
 public interface SavedService<PK> //
-		extends ModuleAlternateNameAndNoPromptService, GetterAndSetterService<PK>, ModuleNamedService {
-
-	default String getOrderNo() {
-		PK id = get().getId();
-		return id == null ? "" : id.toString();
-	}
-
-	default String getSavingInfo() {
-		return getAbbreviatedModuleNoPrompt() + getOrderNo();
-	}
-
-	<T extends Keyed<PK>> SavingService<T> getSavingService();
+	extends ModuleAlternateNameAndNoPromptService,
+	GetterAndSetterService<PK>,
+	ModuleNamedService {
 
 	default void save() throws Information, Exception {
 		set(save(get()));
@@ -25,6 +16,17 @@ public interface SavedService<PK> //
 
 	@SuppressWarnings("unchecked")
 	default <T extends Keyed<PK>> T save(T t) throws Exception {
-		return (T) getSavingService().module(getModuleName()).save(t);
+		return (T) getRestClientService().module(getModuleName()).save(t);
+	}
+
+	default String getSavingInfo() {
+		return getAbbreviatedModuleNoPrompt() + getOrderNo();
+	}
+
+	<T extends Keyed<PK>> RestClientService<T> getRestClientService();
+
+	default String getOrderNo() {
+		PK id = get().getId();
+		return id == null ? "" : id.toString();
 	}
 }

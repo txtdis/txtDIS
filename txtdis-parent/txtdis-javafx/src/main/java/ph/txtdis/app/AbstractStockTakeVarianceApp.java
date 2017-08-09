@@ -1,35 +1,36 @@
 package ph.txtdis.app;
 
-import static javafx.collections.FXCollections.observableArrayList;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.dto.StockTakeVariance;
-import ph.txtdis.fx.control.AppButtonImpl;
-import ph.txtdis.fx.dialog.AuditDialogImpl;
+import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.dialog.AuditDialog;
 import ph.txtdis.fx.dialog.OpenByDateDialog;
 import ph.txtdis.fx.table.StockTakeVarianceTable;
 import ph.txtdis.info.Information;
 import ph.txtdis.service.StockTakeVarianceService;
 import ph.txtdis.util.TextUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static javafx.collections.FXCollections.observableArrayList;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+
 public abstract class AbstractStockTakeVarianceApp //
-		extends AbstractReportApp<StockTakeVarianceTable, StockTakeVarianceService, StockTakeVariance> //
-		implements StockTakeVarianceApp {
+	extends AbstractReportApp<StockTakeVarianceTable, StockTakeVarianceService, StockTakeVariance> //
+	implements StockTakeVarianceApp {
 
 	@Autowired
-	private AppButtonImpl decisionButton, saveButton;
+	private AppButton decisionButton, saveButton;
 
 	@Autowired
-	private AuditDialogImpl decisionDialog;
+	private AuditDialog decisionDialog;
 
 	@Autowired
 	private OpenByDateDialog openDialog;
@@ -39,11 +40,11 @@ public abstract class AbstractStockTakeVarianceApp //
 	private BooleanProperty canBeRejected = new SimpleBooleanProperty(false);
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		b.addAll(Arrays.asList( //
-				saveButton.icon("save").tooltip("Save...").build(), //
-				decisionButton.icon("decision").tooltip("Decide...").build()));
+			saveButton.icon("save").tooltip("Save...").build(), //
+			decisionButton.icon("decision").tooltip("Decide...").build()));
 		return b;
 	}
 
@@ -75,7 +76,7 @@ public abstract class AbstractStockTakeVarianceApp //
 		try {
 			service.saveUponValidation(table.getItems());
 		} catch (Information i) {
-			dialog.show(i).addParent(this).start();
+			messageDialog.show(i).addParent(this).start();
 		} catch (Exception e) {
 			showErrorDialog(e);
 		}
@@ -85,17 +86,16 @@ public abstract class AbstractStockTakeVarianceApp //
 		canBeApproved.set(service.canApprove());
 		canBeRejected.set(service.canReject());
 		decisionDialog//
-				.disableApprovalButtonIf(canBeApproved.not())//
-				.disableRejectionButtonIf(canBeRejected.not())//
-				.addParent(this).start();
+			.disableApprovalButtonIf(canBeApproved.not())//
+			.disableRejectionButtonIf(canBeRejected.not())//
+			.addParent(this).start();
 		if (decisionDialog.isValid() != null)
 			updateTableOnDecision();
 	}
 
 	private void updateTableOnDecision() {
 		ObservableList<StockTakeVariance> l = observableArrayList(table.getItems());
-		l.stream().map(v -> validate(v));
-		table.items(l);
+		table.items(l.stream().map(this::validate).collect(toList()));
 	}
 
 	private StockTakeVariance validate(StockTakeVariance v) {
@@ -114,7 +114,7 @@ public abstract class AbstractStockTakeVarianceApp //
 		String prefix = "";
 		if (!decisionDialog.isValid())
 			prefix = "DIS";
-		return "[" + prefix + "APPROVED: " + service.getUsername() + " - " + toDateDisplay(service.getServerDate()) + "] "
-				+ TextUtils.blankIfNull(decisionDialog.getFindings());
+		return "[" + prefix + "APPROVED: " + service.getUsername() + " - " + toDateDisplay(getServerDate()) + "] "
+			+ TextUtils.blankIfNull(decisionDialog.getFindings());
 	}
 }

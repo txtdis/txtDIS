@@ -24,7 +24,7 @@ import ph.txtdis.type.ItemType;
 
 @Service("priceService")
 public class PriceServiceImpl //
-		implements PriceService {
+	implements PriceService {
 
 	@Autowired
 	private PriceRepository repository;
@@ -48,9 +48,10 @@ public class PriceServiceImpl //
 			return null;
 		List<PriceEntity> prices = i.getPriceList();
 		return prices.stream() //
-				.filter(p -> p.getType().toString().equals(pricingType) && p.getIsValid() == true && !p.getStartDate().isAfter(d))
-				.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())) //
-				.orElse(null);
+			.filter(
+				p -> p.getType().toString().equals(pricingType) && p.getIsValid() == true && !p.getStartDate().isAfter(d))
+			.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())) //
+			.orElse(null);
 	}
 
 	@Override
@@ -61,30 +62,55 @@ public class PriceServiceImpl //
 		return getNewAndOldPriceEntities(priceEntities, prices, dates);
 	}
 
-	private List<LocalDate> startAndEndDatesOfTheNewPrice(List<Price> prices) {
-		return prices == null ? emptyList()
-				: prices.stream() //
-						.filter(p -> p.getType().getName().equalsIgnoreCase(DEALER.toString()))//
-						.map(p -> p.getStartDate()) //
-						.sorted() //
-						.collect(Collectors.toList());
+	@Override
+	public List<Price> getNewPricesNeedingApproval(Item i) {
+		return i.getPriceList().stream().filter(p -> p.getIsValid() == null).collect(Collectors.toList());
 	}
 
-	private List<PriceEntity> getNewAndOldPriceEntities(List<PriceEntity> priceEntities, List<Price> prices, List<LocalDate> dates) {
+	private List<LocalDate> startAndEndDatesOfTheNewPrice(List<Price> prices) {
+		return prices == null ? emptyList()
+			: prices.stream() //
+			.filter(p -> p.getType().getName().equalsIgnoreCase(DEALER.toString()))//
+			.map(p -> p.getStartDate()) //
+			.sorted() //
+			.collect(Collectors.toList());
+	}
+
+	private List<PriceEntity> getNewAndOldPriceEntities(List<PriceEntity> priceEntities,
+	                                                    List<Price> prices,
+	                                                    List<LocalDate> dates) {
 		if (!dates.isEmpty() && dates.size() == 2)
 			priceEntities = deletedPricesInBetweenTheStartAndEndDatesOfTheNewPrice(priceEntities, dates);
 		priceEntities.addAll(toEntities(prices));
 		return priceEntities.stream().distinct().collect(Collectors.toList());
 	}
 
-	private List<PriceEntity> deletedPricesInBetweenTheStartAndEndDatesOfTheNewPrice(List<PriceEntity> priceEntities, List<LocalDate> dates) {
-		return priceEntities.stream().filter(p -> !p.getStartDate().isBefore(dates.get(0)) && !p.getStartDate().isAfter(dates.get(1)))
-				.collect(Collectors.toList());
+	private List<PriceEntity> deletedPricesInBetweenTheStartAndEndDatesOfTheNewPrice(List<PriceEntity> priceEntities,
+	                                                                                 List<LocalDate> dates) {
+		return priceEntities.stream()
+			.filter(p -> !p.getStartDate().isBefore(dates.get(0)) && !p.getStartDate().isAfter(dates.get(1)))
+			.collect(Collectors.toList());
 	}
 
 	@Override
-	public List<Price> getNewPricesNeedingApproval(Item i) {
-		return i.getPriceList().stream().filter(p -> p.getIsValid() == null).collect(Collectors.toList());
+	public List<PriceEntity> toEntities(List<Price> l) {
+		return l == null ? null : l.stream().map(p -> toEntity(p)).collect(Collectors.toList());
+	}
+
+	private PriceEntity toEntity(Price p) {
+		PriceEntity e = new PriceEntity();
+		e.setPriceValue(p.getPriceValue());
+		e.setStartDate(p.getStartDate());
+		e.setType(pricingService.toEntity(p.getType()));
+		return setDecisionData(e, p);
+	}
+
+	private PriceEntity setDecisionData(PriceEntity e, Price p) {
+		e.setRemarks(p.getRemarks());
+		e.setIsValid(true);
+		e.setDecidedBy("SYSGEN");
+		e.setDecidedOn(ZonedDateTime.now());
+		return e;
 	}
 
 	@Override
@@ -108,27 +134,6 @@ public class PriceServiceImpl //
 
 	private boolean hasDecisionOnANewPriceBeenMade(Item i) {
 		return getNewPricesNeedingApproval(i).isEmpty();
-	}
-
-	@Override
-	public List<PriceEntity> toEntities(List<Price> l) {
-		return l == null ? null : l.stream().map(p -> toEntity(p)).collect(Collectors.toList());
-	}
-
-	private PriceEntity toEntity(Price p) {
-		PriceEntity e = new PriceEntity();
-		e.setPriceValue(p.getPriceValue());
-		e.setStartDate(p.getStartDate());
-		e.setType(pricingService.toEntity(p.getType()));
-		return setDecisionData(e, p);
-	}
-
-	private PriceEntity setDecisionData(PriceEntity e, Price p) {
-		e.setRemarks(p.getRemarks());
-		e.setIsValid(true);
-		e.setDecidedBy("SYSGEN");
-		e.setDecidedOn(ZonedDateTime.now());
-		return e;
 	}
 
 	public ZonedDateTime decidedOn(PriceEntity e, Price p) {
@@ -168,13 +173,13 @@ public class PriceServiceImpl //
 
 	private PriceEntity updateNewPricingDecisions(PriceEntity e, Item i) {
 		Optional<Price> o = i.getPriceList().stream() //
-				.filter(t -> areStartDatesAndPricingTypesAndChannelLimitsAllTheSame(e, t)) //
-				.findAny();
+			.filter(t -> areStartDatesAndPricingTypesAndChannelLimitsAllTheSame(e, t)) //
+			.findAny();
 		return o.isPresent() && e.getIsValid() == null ? setDecisionData(e, o.get()) : e;
 	}
 
 	private boolean areStartDatesAndPricingTypesAndChannelLimitsAllTheSame(PriceEntity e, Price i) {
 		return i.getStartDate().isEqual(e.getStartDate()) //
-				&& i.getType().getName().equals(e.getType().getName());
+			&& i.getType().getName().equals(e.getType().getName());
 	}
 }

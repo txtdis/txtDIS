@@ -1,52 +1,40 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import ph.txtdis.dto.Account;
 import ph.txtdis.dto.Route;
 import ph.txtdis.dto.Truck;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.mgdc.service.RouteService;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SyncService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.service.TruckService;
 import ph.txtdis.service.UserService;
 import ph.txtdis.util.ClientTypeMap;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.UserUtils.username;
+
 public abstract class AbstractRouteService //
-		implements RouteService {
-
-	private static final String AGING_RECEIVABLE = "agingReceivable";
-
-	@Autowired
-	private CredentialService credentialService;
+	implements RouteService {
 
 	@Autowired
 	private CustomerService customerService;
 
 	@Autowired
-	private SavingService<Route> savingService;
-
-	@Autowired
-	private SyncService syncService;
+	private RestClientService<Route> restClientService;
 
 	@Autowired
 	private TruckService truckService;
 
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	protected ReadOnlyService<Route> readOnlyService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -57,26 +45,30 @@ public abstract class AbstractRouteService //
 	private Route route;
 
 	@Override
-	public Route findById(String id) throws Exception {
-		return set(readOnlyService.module(getModuleName()).getOne("/find?id=" + id));
-	}
-
-	@Override
 	public Route findByIds(String[] ids) throws Exception {
 		return launcedFromAgingReceivable(ids) ? viaCustomer(ids) : findById(routeId(ids));
 	}
 
 	private boolean launcedFromAgingReceivable(String[] ids) {
-		return ids[2] == null ? false : ids[2].equals(AGING_RECEIVABLE);
+		return ids[2] != null && ids[2].equals("agingReceivable");
 	}
 
 	private Route viaCustomer(String[] ids) throws Exception {
 		Customer customer = customerService.findByOrderNo(ids[0]);
-		return route = customerService.getRoute(customer, syncService.getServerDate());
+		return route = customerService.getRoute(customer, getServerDate());
+	}
+
+	@Override
+	public Route findById(String id) throws Exception {
+		return set(restClientService.module(getModuleName()).getOne("/find?id=" + id));
 	}
 
 	private String routeId(String[] ids) {
 		return ids[0];
+	}
+
+	private Route set(Route r) {
+		return route = r;
 	}
 
 	@Override
@@ -85,8 +77,13 @@ public abstract class AbstractRouteService //
 	}
 
 	@Override
-	public ReadOnlyService<Route> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<Route> getRestClientService() {
+		return restClientService;
+	}
+
+	@Override
+	public RestClientService<Route> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -94,15 +91,9 @@ public abstract class AbstractRouteService //
 		return get().getSellerHistory() == null ? Collections.emptyList() : get().getSellerHistory();
 	}
 
-	private Route get() {
-		if (route == null)
-			route = new Route();
-		return route;
-	}
-
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + RouteService.super.getTitleName();
+		return username() + "@" + modulePrefix + " " + RouteService.super.getTitleName();
 	}
 
 	@Override
@@ -141,19 +132,22 @@ public abstract class AbstractRouteService //
 		return save(r);
 	}
 
-	private Route save(Route r) throws Exception {
-		return set(savingService.module(getModuleName()).save(r));
+	private Route get() {
+		if (route == null)
+			route = new Route();
+		return route;
 	}
 
-	private Route set(Route r) {
-		return route = r;
+	private Route save(Route r) throws Exception {
+		return set(restClientService.module(getModuleName()).save(r));
 	}
 
 	@Override
 	public Account save(String seller, LocalDate date) throws Information, Exception {
 		updateSellerHistory(seller, date);
 		save(get());
-		return getSellerHistory().stream().filter(s -> s.getSeller().equals(seller) && s.getStartDate().equals(date)).findAny().get();
+		return getSellerHistory().stream().filter(s -> s.getSeller().equals(seller) && s.getStartDate().equals(date))
+			.findAny().get();
 	}
 
 	private List<Account> updateSellerHistory(String seller, LocalDate startDate) {

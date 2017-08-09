@@ -5,7 +5,7 @@ import ph.txtdis.dto.PickList;
 import ph.txtdis.dto.User;
 
 public interface HelperService //
-		extends SavedService<User> {
+	extends SavedService<User> {
 
 	String getCode(PickList p);
 

@@ -10,8 +10,8 @@ import ph.txtdis.dyvek.model.Customer;
 
 @Service("vendorService")
 public class VendorServiceImpl //
-		extends AbstractCustomerService //
-		implements VendorService {
+	extends AbstractCustomerService //
+	implements VendorService {
 
 	private static final String VENDOR = "vendor";
 

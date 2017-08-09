@@ -1,41 +1,29 @@
 package ph.txtdis.dyvek.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.PERCENT;
-import static ph.txtdis.type.Type.QUANTITY;
-import static ph.txtdis.type.Type.TEXT;
-import static ph.txtdis.type.Type.TIMESTAMP;
+import javafx.scene.Node;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
+import ph.txtdis.app.AbstractRemarkedKeyedApp;
+import ph.txtdis.dyvek.model.Billable;
+import ph.txtdis.dyvek.service.OrderService;
+import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.control.AppCombo;
+import ph.txtdis.fx.control.AppField;
+import ph.txtdis.fx.dialog.SearchDialog;
+import ph.txtdis.fx.pane.AppGridPane;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
 
-import javafx.scene.Node;
-import ph.txtdis.app.AbstractRemarkedKeyedApp;
-import ph.txtdis.dyvek.model.Billable;
-import ph.txtdis.dyvek.service.OrderService;
-import ph.txtdis.fx.control.AppButtonImpl;
-import ph.txtdis.fx.control.AppCombo;
-import ph.txtdis.fx.control.AppField;
-import ph.txtdis.fx.dialog.SearchDialog;
-import ph.txtdis.fx.pane.AppGridPane;
-
-public abstract class AbstractOrderApp< //
-		LA extends OrderListApp, //
-		S extends OrderService> //
-		extends AbstractRemarkedKeyedApp<S, Billable, Long, Long> {
-
-	@Autowired
-	private LA orderListApp;
-
-	@Autowired
-	private SearchDialog searchDialog;
-
-	@Autowired
-	protected AppButtonImpl openOrderButton, searchButton;
+public abstract class AbstractOrderApp<
+	LA extends OrderListApp,
+	S extends OrderService>
+	extends AbstractRemarkedKeyedApp<S, Billable, Long, Long> {
 
 	@Autowired
 	protected AppCombo<String> customerCombo, itemCombo;
@@ -50,22 +38,28 @@ public abstract class AbstractOrderApp< //
 	protected AppField<ZonedDateTime> closedOnDisplay;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		b.remove(openByIdButton);
-		b.add(2, searchButton.icon("search").tooltip("Search...").build());
+		b.add(2, searchButton());
 		return b;
 	}
 
-	@Override
-	protected void buttonListeners() {
-		super.buttonListeners();
-		searchButton.onAction(e -> openSearchDialog());
+	private AppButton searchButton() {
+		AppButton b = button.icon("search").tooltip("Search...").build();
+		b.onAction(e -> openSearchDialog());
+		return b;
 	}
 
 	private void openSearchDialog() {
-		searchDialog.criteria(service.getAlternateName() + " No.").start();
-		search(searchDialog.getText());
+		SearchDialog dialog = searchDialog();
+		dialog.criteria(service.getAlternateName() + " No.").start();
+		search(dialog.getText());
+	}
+
+	@Lookup
+	SearchDialog searchDialog() {
+		return null;
 	}
 
 	private void search(String name) {
@@ -79,38 +73,15 @@ public abstract class AbstractOrderApp< //
 			}
 	}
 
-	protected void listSearchResults() throws Exception {
-		orderListApp.addParent(this).start();
-		Long id = orderListApp.getSelectedKey();
+	private void listSearchResults() throws Exception {
+		LA app = orderListApp();
+		app.addParent(this).start();
+		Long id = app.getSelectedKey();
 		if (id != null)
 			actOn(id.toString(), "");
 	}
 
-	@Override
-	public void goToDefaultFocus() {
-		newButton.requestFocus();
-	}
-
-	@Override
-	protected List<Node> mainVerticalPaneNodes() {
-		return asList(gridPane(), trackedPane());
-	}
-
-	protected AppGridPane gridPane() {
-		gridPane.getChildren().clear();
-		firstGridLine();
-		secondGridLine();
-		thirdGridLine();
-		return gridPane;
-	}
-
-	protected abstract void firstGridLine();
-
-	protected abstract void secondGridLine();
-
-	protected void thirdGridLine() {
-		remarksGridNodes(2, 11);
-	}
+	protected abstract LA orderListApp();
 
 	@Override
 	public void refresh() {
@@ -154,16 +125,35 @@ public abstract class AbstractOrderApp< //
 	}
 
 	@Override
-	protected void renew() {
-		super.renew();
-		customerCombo.requestFocus();
+	public void goToDefaultFocus() {
+		newButton.requestFocus();
 	}
 
 	@Override
-	protected void save() {
-		if (remarksDisplay != null)
-			service.setRemarks(remarksDisplay.getValue());
-		super.save();
+	protected List<Node> mainVerticalPaneNodes() {
+		return asList(gridPane(), trackedPane());
+	}
+
+	AppGridPane gridPane() {
+		gridPane.getChildren().clear();
+		firstGridLine();
+		secondGridLine();
+		thirdGridLine();
+		return gridPane;
+	}
+
+	protected abstract void firstGridLine();
+
+	protected abstract void secondGridLine();
+
+	protected void thirdGridLine() {
+		remarksGridNodes(2, 11);
+	}
+
+	@Override
+	protected void renew() {
+		super.renew();
+		customerCombo.requestFocus();
 	}
 
 	@Override
@@ -175,12 +165,8 @@ public abstract class AbstractOrderApp< //
 
 	protected void orderNoBinding() {
 		if (orderNoInput != null && customerCombo != null)
-			orderNoInput.disableIf(isPosted() //
-					.or(customerCombo.isEmpty()));
-	}
-
-	private void itemBinding() {
-		itemCombo.disableIf(orderDatePicker.disabledProperty());
+			orderNoInput.disableIf(isPosted()
+				.or(customerCombo.isEmpty()));
 	}
 
 	@Override
@@ -190,6 +176,10 @@ public abstract class AbstractOrderApp< //
 		orderDatePicker.disableIf(orderNoInput.isEmpty());
 		orderDatePicker.showIf(isNew());
 		orderDateDisplay.showIf(orderDatePicker.isNotVisible());
+	}
+
+	private void itemBinding() {
+		itemCombo.disableIf(orderDatePicker.disabledProperty());
 	}
 
 	@Override
@@ -228,10 +218,6 @@ public abstract class AbstractOrderApp< //
 			qtyInput.onAction(e -> setQty());
 	}
 
-	protected void setQty() {
-		service.setQty(qtyInput.getValue());
-	}
-
 	private void remarksListener() {
 		if (remarksDisplay != null && service.isNew())
 			remarksDisplay.onAction(e -> service.setRemarks(remarksDisplay.getValue()));
@@ -246,18 +232,21 @@ public abstract class AbstractOrderApp< //
 			}
 	}
 
-	protected List<Node> closureNodes() {
-		return asList(//
-				label.name("Closed by"), closedByDisplay.readOnly().width(110).build(TEXT), //
-				label.name("on"), closedOnDisplay.readOnly().build(TIMESTAMP));
+	protected void setQty() {
+		service.setQty(qtyInput.getValue());
 	}
 
-	protected void qtyInKgDisplayGridNodes( //
-			String name, //
-			AppField<BigDecimal> displayField, //
-			int column, //
-			int row, //
-			int labelColumnSpan) {
+	List<Node> closureNodes() {
+		return asList(
+			label.name("Closed by"), closedByDisplay.readOnly().width(110).build(TEXT),
+			label.name("on"), closedOnDisplay.readOnly().build(TIMESTAMP));
+	}
+
+	void qtyInKgDisplayGridNodes(String name,
+	                             AppField<BigDecimal> displayField,
+	                             int column,
+	                             int row,
+	                             int labelColumnSpan) {
 		qtyDisplayGridNodes(name, displayField, column, row, labelColumnSpan);
 		kgLabelGridNode(++column + labelColumnSpan, row);
 	}
@@ -266,29 +255,35 @@ public abstract class AbstractOrderApp< //
 		labelGridNode("kg", column, row);
 	}
 
-	protected void percentInputGridNodes( //
-			String name, //
-			AppField<BigDecimal> inputField, //
-			int column, //
-			int row) {
+	void percentDisplayGridNodes(String name, AppField<BigDecimal> inputField, int column, int row) {
+		labelGridNode(name, column, row);
+		gridPane.add(inputField.readOnly().width(110).build(PERCENT), ++column, row);
+	}
+
+	void percentInputGridNodes(String name, AppField<BigDecimal> inputField, int column, int row) {
 		labelGridNode(name, column, row);
 		gridPane.add(inputField.width(110).build(PERCENT), ++column, row);
 	}
 
-	protected void qtyInKgInputGridNodes( //
-			String name, //
-			int column, //
-			int row) {
-		labelGridNode(name, column, row);
-		qtyInKgInputGridNode(++column, row);
+	void qtyInKgInputGridNodes(String name, int column, int row) {
+		qtyInKgInputGridNodes(name, qtyInput, column, row);
 	}
 
-	protected void qtyInKgInputGridNode(int column, int row) {
-		gridPane.add(qtyInput.width(110).build(QUANTITY), column, row);
+	void qtyInKgInputGridNodes(String name, AppField<BigDecimal> inputField, int column, int row) {
+		labelGridNode(name, column, row);
+		qtyInKgInputGridNode(inputField, ++column, row);
+	}
+
+	private void qtyInKgInputGridNode(AppField<BigDecimal> inputField, int column, int row) {
+		gridPane.add(inputField.width(110).build(QUANTITY), column, row);
 		kgLabelGridNode(++column, row);
 	}
 
-	protected void refreshClosureNodes() {
+	void qtyInKgInputGridNode(int column, int row) {
+		qtyInKgInputGridNode(qtyInput, column, row);
+	}
+
+	void refreshClosureNodes() {
 		if (closedByDisplay != null) {
 			closedByDisplay.setValue(service.getClosedBy());
 			closedOnDisplay.setValue(service.getClosedOn());

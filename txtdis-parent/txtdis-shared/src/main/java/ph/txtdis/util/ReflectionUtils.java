@@ -15,8 +15,9 @@ public class ReflectionUtils {
 		try {
 			Constructor<?> constructor = cls.getConstructor(parameterTypes);
 			return (T) constructor.newInstance(parameters);
-		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException | IllegalArgumentException
-				| InvocationTargetException e) {
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | SecurityException |
+			IllegalArgumentException
+			| InvocationTargetException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -52,15 +53,15 @@ public class ReflectionUtils {
 		}
 	}
 
-	public static <T> T invokeOneParameterMethod(Object object, String name, Object parameter, Class<?> parameterType) {
-		return invokeMethod(object, name, new Object[] { parameter }, new Class<?>[] { parameterType });
-	}
-
 	@SuppressWarnings("unchecked")
 	private static <T> T invoke(Object object, String name, Object[] parameters, Class<?>[] parameterTypes)
-			throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+		throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		Class<?> cls = object.getClass();
 		Method method = cls.getMethod(name, parameterTypes);
 		return (T) method.invoke(object, parameters);
+	}
+
+	public static <T> T invokeOneParameterMethod(Object object, String name, Object parameter, Class<?> parameterType) {
+		return invokeMethod(object, name, new Object[]{parameter}, new Class<?>[]{parameterType});
 	}
 }

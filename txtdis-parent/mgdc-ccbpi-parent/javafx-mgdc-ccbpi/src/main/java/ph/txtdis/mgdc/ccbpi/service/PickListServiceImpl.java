@@ -16,8 +16,8 @@ import ph.txtdis.type.UserType;
 
 @Service("pickListService")
 public class PickListServiceImpl //
-		extends AbstractPickListService //
-		implements CokePickListService {
+	extends AbstractPickListService //
+	implements CokePickListService {
 
 	private static Logger logger = getLogger(PickListServiceImpl.class);
 

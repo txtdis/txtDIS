@@ -1,36 +1,35 @@
 package ph.txtdis.mgdc.fx.table;
 
-import static java.util.stream.Collectors.toList;
-import static javafx.beans.binding.Bindings.when;
-import static javafx.collections.FXCollections.observableArrayList;
-import static org.apache.log4j.Logger.getLogger;
-
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.dto.Booking;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.mgdc.service.PickListService;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static javafx.beans.binding.Bindings.when;
+import static javafx.collections.FXCollections.observableArrayList;
+import static org.apache.log4j.Logger.getLogger;
+
 public abstract class AbstractPickListTableContextMenu //
-		implements PickListTableContextMenu {
+	implements PickListTableContextMenu {
 
 	private static Logger logger = getLogger(AbstractPickListTableContextMenu.class);
-
-	@Autowired
-	private MessageDialog dialog;
 
 	@Autowired
 	protected PickListService service;
 
 	protected TableView<Booking> table;
+
+	@Autowired
+	private MessageDialog dialog;
 
 	protected abstract ObservableList<Booking> addBookings(ObservableList<Booking> bookings, String route);
 
@@ -79,9 +78,9 @@ public abstract class AbstractPickListTableContextMenu //
 	private TableRow<Booking> row(TableView<Booking> t) {
 		TableRow<Booking> r = new TableRow<>();
 		r.contextMenuProperty()
-				.bind(when(r.itemProperty().isNotNull())//
-						.then(rowMenu(t, r))//
-						.otherwise((ContextMenu) null));
+			.bind(when(r.itemProperty().isNotNull())//
+				.then(rowMenu(t, r))//
+				.otherwise((ContextMenu) null));
 		return r;
 	}
 

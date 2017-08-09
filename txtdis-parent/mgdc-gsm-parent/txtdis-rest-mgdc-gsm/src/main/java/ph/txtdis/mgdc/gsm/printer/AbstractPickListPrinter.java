@@ -1,39 +1,32 @@
 package ph.txtdis.mgdc.gsm.printer;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import ph.txtdis.domain.TruckEntity;
+import ph.txtdis.mgdc.gsm.domain.*;
+import ph.txtdis.mgdc.gsm.repository.BillableRepository;
+import ph.txtdis.mgdc.gsm.service.server.PickListService;
+import ph.txtdis.mgdc.printer.AbstractPrinter;
+import ph.txtdis.mgdc.printer.NotPrintedException;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.List;
+
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.center;
-import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.apache.commons.lang3.StringUtils.rightPad;
+import static org.apache.commons.lang3.StringUtils.*;
 import static org.apache.log4j.Logger.getLogger;
 import static ph.txtdis.type.DeliveryType.PICK_UP;
 import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
 import static ph.txtdis.util.NumberUtils.divide;
 import static ph.txtdis.util.NumberUtils.printDecimal;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import ph.txtdis.domain.TruckEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableEntity;
-import ph.txtdis.mgdc.gsm.domain.BomEntity;
-import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
-import ph.txtdis.mgdc.gsm.domain.PickListEntity;
-import ph.txtdis.mgdc.gsm.repository.BillableRepository;
-import ph.txtdis.mgdc.gsm.service.server.PickListService;
-import ph.txtdis.mgdc.printer.AbstractPrinter;
-import ph.txtdis.mgdc.printer.NotPrintedException;
-
 public abstract class AbstractPickListPrinter //
-		extends AbstractPrinter<PickListEntity> //
-		implements PickListPrinter {
+	extends AbstractPrinter<PickListEntity> //
+	implements PickListPrinter {
 
 	private static Logger logger = getLogger(AbstractPickListPrinter.class);
 
@@ -113,8 +106,10 @@ public abstract class AbstractPickListPrinter //
 	}
 
 	private List<BillableEntity> returnOrders() {
-		List<CustomerEntity> customers = entity.getBillings().stream().map(BillableEntity::getCustomer).distinct().collect(toList());
-		List<BillableEntity> billings = repository.findByPickingPrintedOnNullAndRmaNotNullAndIsValidTrueAndOrderDateNullAndCustomerIn(customers);
+		List<CustomerEntity> customers =
+			entity.getBillings().stream().map(BillableEntity::getCustomer).distinct().collect(toList());
+		List<BillableEntity> billings =
+			repository.findByPickingPrintedOnNullAndRmaNotNullAndIsValidTrueAndOrderDateNullAndCustomerIn(customers);
 		return billings != null ? billings : emptyList();
 	}
 

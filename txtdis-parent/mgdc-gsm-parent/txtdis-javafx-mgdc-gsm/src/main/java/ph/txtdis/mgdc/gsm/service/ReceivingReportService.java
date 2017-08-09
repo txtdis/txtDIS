@@ -1,6 +1,8 @@
 package ph.txtdis.mgdc.gsm.service;
 
-public interface ReceivingReportService extends BillableService, ReceivingService {
+public interface ReceivingReportService
+	extends BillableService,
+	ReceivingService {
 
 	boolean isReceivingReportModifiable();
 

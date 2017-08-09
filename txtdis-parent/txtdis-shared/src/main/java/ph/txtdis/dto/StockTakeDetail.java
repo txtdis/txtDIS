@@ -1,20 +1,18 @@
 package ph.txtdis.dto;
 
-import java.math.BigDecimal;
-
-import org.apache.commons.lang3.math.Fraction;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.math.Fraction;
 import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;
+
+import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class StockTakeDetail //
-		extends AbstractKeyed<Long> {
+	extends AbstractKeyed<Long> {
 
 	private String name;
 
@@ -26,12 +24,12 @@ public class StockTakeDetail //
 
 	private int qtyPerCase;
 
-	public BigDecimal getQty() {
-		return qty == null ? BigDecimal.ZERO : qty;
-	}
-
 	@JsonIgnore
 	public Fraction getQtyInFractions() {
 		return Fraction.getFraction(getQty().intValue(), qtyPerCase);
+	}
+
+	public BigDecimal getQty() {
+		return qty == null ? BigDecimal.ZERO : qty;
 	}
 }

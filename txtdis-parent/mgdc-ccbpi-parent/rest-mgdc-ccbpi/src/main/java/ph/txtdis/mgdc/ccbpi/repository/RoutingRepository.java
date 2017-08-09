@@ -11,8 +11,8 @@ import ph.txtdis.mgdc.ccbpi.domain.RoutingEntity;
 
 @Repository("routingRepository")
 public interface RoutingRepository //
-		extends CrudRepository<RoutingEntity, Long> {
+	extends CrudRepository<RoutingEntity, Long> {
 
 	List<RoutingEntity> findByCustomerOrderByStartDateDesc( //
-			@Param("customer") CustomerEntity c);
+	                                                        @Param("customer") CustomerEntity c);
 }

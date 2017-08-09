@@ -1,9 +1,22 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.STOCK_CHECKER;
-import static ph.txtdis.type.UserType.STOCK_TAKER;
-import static ph.txtdis.type.UserType.STORE_KEEPER;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.Keyed;
+import ph.txtdis.dto.StockTake;
+import ph.txtdis.dto.StockTakeDetail;
+import ph.txtdis.exception.DuplicateException;
+import ph.txtdis.mgdc.ccbpi.dto.Item;
+import ph.txtdis.mgdc.service.HolidayService;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.service.SyncService;
+import ph.txtdis.service.UserService;
+import ph.txtdis.type.QualityType;
+import ph.txtdis.type.UomType;
+import ph.txtdis.util.ClientTypeMap;
+import ph.txtdis.util.DateTimeUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,33 +25,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.Keyed;
-import ph.txtdis.dto.StockTake;
-import ph.txtdis.dto.StockTakeDetail;
-import ph.txtdis.exception.DuplicateException;
-import ph.txtdis.mgdc.ccbpi.dto.Item;
-import ph.txtdis.mgdc.service.HolidayService;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SpunKeyedService;
-import ph.txtdis.service.SyncService;
-import ph.txtdis.service.UserService;
-import ph.txtdis.type.QualityType;
-import ph.txtdis.type.UomType;
-import ph.txtdis.util.ClientTypeMap;
-import ph.txtdis.util.DateTimeUtils;
+import static java.util.Collections.singletonList;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.UserUtils.isUser;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("stockTakeService")
 public class StockTakeServiceImpl //
-		implements StockTakeService {
-
-	@Autowired
-	private CredentialService credentialService;
+	implements StockTakeService {
 
 	@Autowired
 	private HolidayService holidayService;
@@ -47,22 +42,13 @@ public class StockTakeServiceImpl //
 	private BommedDiscountedPricedValidatedItemService itemService;
 
 	@Autowired
-	private SavingService<StockTake> savingService;
-
-	@Autowired
-	private SpunKeyedService<StockTake, Long> spunService;
-
-	@Autowired
-	private SyncService syncService;
+	private RestClientService<StockTake> restClientService;
 
 	@Autowired
 	private UserService userService;
 
 	@Autowired
 	private WarehouseService warehouseService;
-
-	@Autowired
-	private ReadOnlyService<StockTake> stockTakeReadOnlyService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -87,8 +73,15 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
-	public Item confirmItemExistsAndIsNotDeactivated(Long id) throws Exception {
-		return getItemService().findByVendorNo(id.toString());
+	public void reset() {
+		checkers = null;
+		item = null;
+		quality = null;
+		quantity = null;
+		stockTake = null;
+		takers = null;
+		warehouses = null;
+		uom = null;
 	}
 
 	@Override
@@ -106,7 +99,22 @@ public class StockTakeServiceImpl //
 	@Override
 	public StockTake openByDate(String dateText) throws Exception {
 		LocalDate date = DateTimeUtils.toDate(dateText);
-		return stockTakeReadOnlyService.module(getModuleName()).getOne("/date?on=" + date);
+		return restClientService.module(getModuleName()).getOne("/date?on=" + date);
+	}
+
+	@Override
+	public String getModuleName() {
+		return "stockTake";
+	}
+
+	@Override
+	public StockTake getByBooking(Long id) throws Exception {
+		return restClientService.module(getModuleName()).getOne("/booking?id=" + id);
+	}
+
+	@Override
+	public String getCreatedBy() {
+		return get().getCreatedBy();
 	}
 
 	@Override
@@ -118,25 +126,8 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
-	public String getAlternateName() {
-		return "Stock Take";
-	}
-
-	@Override
-	public StockTake getByBooking(Long id) throws Exception {
-		return stockTakeReadOnlyService.module(getModuleName()).getOne("/booking?id=" + id);
-	}
-
-	@Override
-	public LocalDate getCountDate() {
-		if (get().getCountDate() == null)
-			get().setCountDate(syncService.getServerDate());
-		return get().getCountDate();
-	}
-
-	@Override
-	public String getCreatedBy() {
-		return get().getCreatedBy();
+	public <T extends Keyed<Long>> void set(T t) {
+		stockTake = (StockTake) t;
 	}
 
 	@Override
@@ -150,8 +141,18 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
+	public void setDetails(List<StockTakeDetail> details) {
+		get().setDetails(details);
+	}
+
+	@Override
 	public String getHeaderName() {
 		return getAlternateName();
+	}
+
+	@Override
+	public String getAlternateName() {
+		return "Stock Take";
 	}
 
 	@Override
@@ -160,19 +161,29 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
+	public void setId(Long id) {
+		get().setId(id);
+	}
+
+	@Override
 	public Item getItem() {
 		return item;
 	}
 
 	@Override
-	public BommedDiscountedPricedValidatedItemService getItemService() {
-		return itemService;
+	public LocalDate getPreviousCountDate() {
+		try {
+			return getPreviousCount().getCountDate();
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	@Override
-	public StockTake getLatestCount() {
+	public StockTake getPreviousCount() {
 		try {
-			return stockTakeReadOnlyService.module(getModuleName()).getOne("/count?warehouse=all&date=" + syncService.getServerDate());
+			return restClientService.module(getModuleName())
+				.getOne("/count?warehouse=all&date=" + holidayService.previousWorkDay(getLatestCountDate()));
 		} catch (Exception e) {
 			return null;
 		}
@@ -188,33 +199,13 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
-	public String getModuleName() {
-		return "stockTake";
-	}
-
-	@Override
-	public StockTake getPreviousCount() {
+	public StockTake getLatestCount() {
 		try {
-			return stockTakeReadOnlyService.module(getModuleName())
-					.getOne("/count?warehouse=all&date=" + holidayService.previousWorkDay(getLatestCountDate()));
+			return restClientService.module(getModuleName()).getOne("/count?warehouse=all&date=" + getServerDate
+				());
 		} catch (Exception e) {
 			return null;
 		}
-	}
-
-	@Override
-	public LocalDate getPreviousCountDate() {
-		try {
-			return getPreviousCount().getCountDate();
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public ReadOnlyService<StockTake> getReadOnlyService() {
-		return stockTakeReadOnlyService;
 	}
 
 	@Override
@@ -223,19 +214,19 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public SavingService<StockTake> getSavingService() {
-		return savingService;
+	public void setRemarks(String text) {
+		get().setRemarks(text);
 	}
 
 	@Override
-	public SpunKeyedService<StockTake, Long> getSpunService() {
-		return spunService;
+	@SuppressWarnings("unchecked")
+	public RestClientService<StockTake> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + StockTakeService.super.getTitleName();
+		return username() + "@" + modulePrefix + " " + StockTakeService.super.getTitleName();
 	}
 
 	@Override
@@ -245,12 +236,19 @@ public class StockTakeServiceImpl //
 
 	@Override
 	public boolean isUserAStockTaker() {
-		return credentialService.isUser(STOCK_TAKER) || credentialService.isUser(MANAGER);
+		return isUser(STOCK_TAKER) || isUser(MANAGER);
 	}
 
 	@Override
 	public boolean isCountToday() {
-		return getCountDate().equals(syncService.getServerDate());
+		return getCountDate().equals(getServerDate());
+	}
+
+	@Override
+	public LocalDate getCountDate() {
+		if (get().getCountDate() == null)
+			get().setCountDate(getServerDate());
+		return get().getCountDate();
 	}
 
 	@Override
@@ -298,24 +296,7 @@ public class StockTakeServiceImpl //
 
 	private List<String> getWarehouseAsList() {
 		String s = get().getWarehouse();
-		return s == null ? null : Arrays.asList(s);
-	}
-
-	@Override
-	public void reset() {
-		checkers = null;
-		item = null;
-		quality = null;
-		quantity = null;
-		stockTake = null;
-		takers = null;
-		warehouses = null;
-		uom = null;
-	}
-
-	@Override
-	public <T extends Keyed<Long>> void set(T t) {
-		stockTake = (StockTake) t;
+		return s == null ? null : singletonList(s);
 	}
 
 	@Override
@@ -324,14 +305,19 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
-	public void setDetails(List<StockTakeDetail> details) {
-		get().setDetails(details);
-	}
-
-	@Override
 	public void setItemUponValidation(long id) throws Exception {
 		item = null;
 		item = confirmItemExistsAndIsNotDeactivated(id);
+	}
+
+	@Override
+	public Item confirmItemExistsAndIsNotDeactivated(Long id) throws Exception {
+		return getItemService().findByVendorNo(id.toString());
+	}
+
+	@Override
+	public BommedDiscountedPricedValidatedItemService getItemService() {
+		return itemService;
 	}
 
 	@Override
@@ -346,15 +332,15 @@ public class StockTakeServiceImpl //
 
 	@Override
 	public List<String> listItemsOnStock() throws Exception {
-		StockTake t = spunService.module(getModuleName()).previous(0L);
+		StockTake t = (StockTake) previous(0L);
 		return t == null ? null //
-				: t.getDetails().stream() //
-						.map(d -> toItem(d)) //
-						.filter(i -> i != null) //
-						.distinct() //
-						.sorted((a, b) -> a.getId().compareTo(b.getId())) //
-						.map(i -> i.getName())//
-						.collect(Collectors.toList());
+			: t.getDetails().stream() //
+			.map(d -> toItem(d)) //
+			.filter(i -> i != null) //
+			.distinct() //
+			.sorted((a, b) -> a.getId().compareTo(b.getId())) //
+			.map(i -> i.getName())//
+			.collect(Collectors.toList());
 	}
 
 	private Item toItem(StockTakeDetail d) {
@@ -363,11 +349,6 @@ public class StockTakeServiceImpl //
 		} catch (Exception e) {
 			return null;
 		}
-	}
-
-	@Override
-	public void setId(Long id) {
-		get().setId(id);
 	}
 
 	@Override
@@ -387,12 +368,8 @@ public class StockTakeServiceImpl //
 	}
 
 	@Override
-	public void setRemarks(String text) {
-		get().setRemarks(text);
-	}
-
-	@Override
-	public void setWarehouseIfAllCountDateTransactionsAreCompleteAndNoStockTakeAlreadyMadeOnCountDate(String warehouse) throws Exception {
+	public void setWarehouseIfAllCountDateTransactionsAreCompleteAndNoStockTakeAlreadyMadeOnCountDate(String warehouse)
+		throws Exception {
 		if (!isNew() || getCountDate() == null)
 			return;
 		verifyNoStockTakeMadeOnWarehouse(warehouse);
@@ -406,7 +383,8 @@ public class StockTakeServiceImpl //
 	}
 
 	private void verifyNoStockTakeMadeOnWarehouse(String warehouse) throws Exception {
-		StockTake s = stockTakeReadOnlyService.module(getModuleName()).getOne("/count?warehouse=" + warehouse + "&date=" + getCountDate());
+		StockTake s = restClientService.module(getModuleName())
+			.getOne("/count?warehouse=" + warehouse + "&date=" + getCountDate());
 		if (s != null)
 			throw new DuplicateException(warehouse + " stock take on\n" + getCountDate());
 	}

@@ -5,15 +5,16 @@ import java.math.BigDecimal;
 import javafx.util.StringConverter;
 import ph.txtdis.util.NumberUtils;
 
-public class CurrencyConverter extends StringConverter<BigDecimal> {
+public class CurrencyConverter
+	extends StringConverter<BigDecimal> {
 
-    @Override
-    public String toString(BigDecimal number) {
-        return NumberUtils.toCurrencyText(number);
-    }
+	@Override
+	public String toString(BigDecimal number) {
+		return NumberUtils.toCurrencyText(number);
+	}
 
-    @Override
-    public BigDecimal fromString(String text) {
-        return NumberUtils.toBigDecimal(text);
-    }
+	@Override
+	public BigDecimal fromString(String text) {
+		return NumberUtils.toBigDecimal(text);
+	}
 }

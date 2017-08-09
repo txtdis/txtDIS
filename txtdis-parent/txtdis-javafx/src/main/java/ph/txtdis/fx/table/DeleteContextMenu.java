@@ -27,9 +27,9 @@ public class DeleteContextMenu<S> {
 	private TableRow<S> createRowMenu(TableView<S> t) {
 		TableRow<S> r = new TableRow<>();
 		r.contextMenuProperty()
-				.bind(when(r.itemProperty().isNotNull())//
-						.then(createRowMenu(t, r))//
-						.otherwise((ContextMenu) null));
+			.bind(when(r.itemProperty().isNotNull())//
+				.then(createRowMenu(t, r))//
+				.otherwise((ContextMenu) null));
 		return r;
 	}
 
@@ -45,17 +45,17 @@ public class DeleteContextMenu<S> {
 			t.getContextMenu().getItems().forEach(i -> addRowMenuItem(cm, i));
 	}
 
+	private MenuItem createDeleteRowMenuItem(TableRow<S> row) {
+		MenuItem mi = new MenuItem("Remove");
+		mi.setOnAction(e -> deleteSelectedItem(row));
+		return mi;
+	}
+
 	private void addRowMenuItem(ContextMenu cm, MenuItem tableItem) {
 		MenuItem rowItem = new MenuItem(tableItem.getText());
 		rowItem.setGraphic(tableItem.getGraphic());
 		rowItem.setOnAction(tableItem.getOnAction());
 		cm.getItems().add(rowItem);
-	}
-
-	private MenuItem createDeleteRowMenuItem(TableRow<S> row) {
-		MenuItem mi = new MenuItem("Remove");
-		mi.setOnAction(e -> deleteSelectedItem(row));
-		return mi;
 	}
 
 	private void deleteSelectedItem(TableRow<S> r) {

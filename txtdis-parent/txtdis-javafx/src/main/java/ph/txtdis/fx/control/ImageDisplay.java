@@ -12,28 +12,16 @@ import javafx.scene.input.MouseEvent;
 import ph.txtdis.util.BinaryUtils;
 import ph.txtdis.util.ImageUtil;
 
-public class ImageDisplay extends Label {
+public class ImageDisplay
+	extends Label {
 
 	private static byte[] imagebytes;
+
 	private String image;
 
 	public ImageDisplay(String image) {
 		this.image = image;
 		init();
-	}
-
-	public byte[] getImage() {
-		return imagebytes;
-	}
-
-	public void setImage(byte[] bytes) {
-		imagebytes = bytes;
-		InputStream is = useDefaultForNull(imagebytes);
-		setImage(is);
-	}
-
-	public void setPadding(double top, double right, double bottom, double left) {
-		setPadding(new Insets(top, right, bottom, left));
 	}
 
 	private void init() {
@@ -42,10 +30,9 @@ public class ImageDisplay extends Label {
 		addEventFilter(MouseEvent.MOUSE_CLICKED, event -> loadImageIfDoubleClick(event));
 	}
 
-	private void loadImageFile() {
-		File file = ImageUtil.selectImageFile(this);
-		if (file != null)
-			setImage(file);
+	private void setDefaultImage() {
+		InputStream is = ImageUtil.defaultImageStream(image);
+		setImage(is);
 	}
 
 	private void loadImageIfDoubleClick(MouseEvent event) {
@@ -54,9 +41,10 @@ public class ImageDisplay extends Label {
 		event.consume();
 	}
 
-	private void setDefaultImage() {
-		InputStream is = ImageUtil.defaultImageStream(image);
-		setImage(is);
+	private void loadImageFile() {
+		File file = ImageUtil.selectImageFile(this);
+		if (file != null)
+			setImage(file);
 	}
 
 	private void setImage(File file) {
@@ -65,14 +53,28 @@ public class ImageDisplay extends Label {
 		setImage(is);
 	}
 
+	public byte[] getImage() {
+		return imagebytes;
+	}
+
 	private void setImage(InputStream is) {
 		ImageView iv = ImageUtil.toImageView(is);
 		setGraphic(iv);
+	}
+
+	public void setImage(byte[] bytes) {
+		imagebytes = bytes;
+		InputStream is = useDefaultForNull(imagebytes);
+		setImage(is);
 	}
 
 	private InputStream useDefaultForNull(byte[] bytes) {
 		if (bytes == null)
 			return ImageUtil.defaultImageStream(image);
 		return new ByteArrayInputStream(bytes);
+	}
+
+	public void setPadding(double top, double right, double bottom, double left) {
+		setPadding(new Insets(top, right, bottom, left));
 	}
 }

@@ -18,8 +18,8 @@ import ph.txtdis.mgdc.ccbpi.service.RemittanceVarianceService;
 @Scope("prototype")
 @Component("remittanceVarianceTable")
 public class RemittanceVarianceTableImpl //
-		extends AbstractVarianceTable<RemittanceVarianceService> //
-		implements RemittanceVarianceTable {
+	extends AbstractVarianceTable<RemittanceVarianceService> //
+	implements RemittanceVarianceTable {
 
 	@Autowired
 	private OrderConfirmationListApp app;

@@ -1,11 +1,11 @@
 package ph.txtdis.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.Role;
 import ph.txtdis.dto.User;
 import ph.txtdis.info.Information;
 import ph.txtdis.type.UserType;
+
+import java.util.List;
 
 public interface UserService {
 
@@ -17,9 +17,13 @@ public interface UserService {
 
 	String getSurname();
 
+	void setSurname(String surname);
+
 	String getUsername();
 
 	boolean isEnabled();
+
+	void setEnabled(boolean b);
 
 	List<User> list() throws Exception;
 
@@ -33,11 +37,7 @@ public interface UserService {
 
 	User save(User entity) throws Exception;
 
-	void setEnabled(boolean b);
-
 	void setRoles(List<Role> items);
-
-	void setSurname(String surname);
 
 	void validateUsername(String username) throws Exception;
 }

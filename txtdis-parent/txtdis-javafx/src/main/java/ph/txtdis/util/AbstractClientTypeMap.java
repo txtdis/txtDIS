@@ -1,13 +1,12 @@
 package ph.txtdis.util;
 
 import org.springframework.core.ParameterizedTypeReference;
-
 import ph.txtdis.dto.AgingReceivableReport;
 import ph.txtdis.dto.CustomerReceivableReport;
 
 public abstract class AbstractClientTypeMap //
-		extends AbstractTypeMap //
-		implements ClientTypeMap {
+	extends AbstractTypeMap //
+	implements ClientTypeMap {
 
 	private static final long serialVersionUID = -1782679034968493608L;
 
@@ -17,7 +16,8 @@ public abstract class AbstractClientTypeMap //
 		}));
 		put("back", new TypeReference("\ue902", null));
 		put("credit", new TypeReference("\ue91b", null));
-		put("customerReceivable", new TypeReference("\ue900", new ParameterizedTypeReference<CustomerReceivableReport>() {
+		put("customerReceivable", new TypeReference("\ue900", new ParameterizedTypeReference<CustomerReceivableReport>
+			() {
 		}));
 	}
 

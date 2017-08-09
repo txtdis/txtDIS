@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class EdmsAbstractContactInfoMaster //
-		extends EdmsAbstractMaster {
+	extends EdmsAbstractMaster {
 
 	@Column(name = "contactNo")
 	private String phone;

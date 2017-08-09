@@ -11,8 +11,8 @@ import ph.txtdis.mgdc.ccbpi.service.PaymentService;
 @Scope("prototype")
 @Component("paymentApp")
 public class PaymentAppImpl //
-		extends AbstractTotaledReportApp<PaymentVarianceTable, PaymentService, SalesItemVariance> //
-		implements PaymentApp {
+	extends AbstractTotaledReportApp<PaymentVarianceTable, PaymentService, SalesItemVariance> //
+	implements PaymentApp {
 
 	@Override
 	protected int noOfTotalDisplays() {

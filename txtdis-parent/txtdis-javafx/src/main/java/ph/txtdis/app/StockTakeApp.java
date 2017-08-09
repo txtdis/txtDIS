@@ -1,4 +1,5 @@
 package ph.txtdis.app;
 
-public interface StockTakeApp extends LaunchableApp {
+public interface StockTakeApp
+	extends LaunchableApp {
 }

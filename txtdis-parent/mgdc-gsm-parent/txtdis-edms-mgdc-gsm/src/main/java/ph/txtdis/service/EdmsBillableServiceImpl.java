@@ -1,36 +1,20 @@
 package ph.txtdis.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
-import static ph.txtdis.util.Code.BAD_ORDER;
-import static ph.txtdis.util.Code.BOOKING_PREFIX;
-import static ph.txtdis.util.Code.CASH;
-import static ph.txtdis.util.Code.CLOSED;
-import static ph.txtdis.util.Code.COD;
-import static ph.txtdis.util.Code.CREDIT;
-import static ph.txtdis.util.Code.CREDIT_MEMO_PREFIX;
-import static ph.txtdis.util.Code.DELIVERY_PREFIX;
-import static ph.txtdis.util.Code.GOOD_RETURNS;
-import static ph.txtdis.util.Code.INVOICE_PREFIX;
-import static ph.txtdis.util.Code.PROMO;
-import static ph.txtdis.util.Code.PURCHASE_RECEIPT_PREFIX;
-import static ph.txtdis.util.Code.SALES;
-import static ph.txtdis.util.Code.TRUE;
-import static ph.txtdis.util.Code.VOID;
-import static ph.txtdis.util.DateTimeUtils.toTimestampWithSecondText;
-import static ph.txtdis.util.NumberUtils.divide;
-import static ph.txtdis.util.NumberUtils.isPositive;
-import static ph.txtdis.util.NumberUtils.isZero;
-import static ph.txtdis.util.NumberUtils.remainder;
-import static ph.txtdis.util.NumberUtils.toDecimal;
-import static ph.txtdis.util.NumberUtils.toIdText;
-import static ph.txtdis.util.TextUtils.blankIfNull;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ph.txtdis.domain.*;
+import ph.txtdis.dto.Billable;
+import ph.txtdis.dto.BillableDetail;
+import ph.txtdis.repository.*;
+import ph.txtdis.type.QualityType;
+import ph.txtdis.type.UomType;
+import ph.txtdis.util.Code;
+import ph.txtdis.util.DateTimeUtils;
+import ph.txtdis.util.NumberUtils;
+import ph.txtdis.util.TextUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -43,49 +27,20 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import ph.txtdis.domain.EdmsCreditMemo;
-import ph.txtdis.domain.EdmsCreditMemoDetail;
-import ph.txtdis.domain.EdmsDelivery;
-import ph.txtdis.domain.EdmsDeliveryDetail;
-import ph.txtdis.domain.EdmsInvoice;
-import ph.txtdis.domain.EdmsInvoiceDetail;
-import ph.txtdis.domain.EdmsItem;
-import ph.txtdis.domain.EdmsLoadOrder;
-import ph.txtdis.domain.EdmsPurchaseReceipt;
-import ph.txtdis.domain.EdmsPurchaseReceiptDetail;
-import ph.txtdis.domain.EdmsSalesOrder;
-import ph.txtdis.domain.EdmsSalesOrderDetail;
-import ph.txtdis.domain.EdmsSeller;
-import ph.txtdis.domain.EdmsTruck;
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.BillableDetail;
-import ph.txtdis.repository.EdmsCreditMemoDetailRepository;
-import ph.txtdis.repository.EdmsCreditMemoRepository;
-import ph.txtdis.repository.EdmsDeliveryDetailRepository;
-import ph.txtdis.repository.EdmsDeliveryRepository;
-import ph.txtdis.repository.EdmsInvoiceDetailRepository;
-import ph.txtdis.repository.EdmsInvoiceRepository;
-import ph.txtdis.repository.EdmsPurchaseReceiptDetailRepository;
-import ph.txtdis.repository.EdmsPurchaseReceiptRepository;
-import ph.txtdis.repository.EdmsSalesOrderDetailRepository;
-import ph.txtdis.repository.EdmsSalesOrderRepository;
-import ph.txtdis.type.QualityType;
-import ph.txtdis.type.UomType;
-import ph.txtdis.util.Code;
-import ph.txtdis.util.DateTimeUtils;
-import ph.txtdis.util.NumberUtils;
-import ph.txtdis.util.TextUtils;
+import static java.math.BigDecimal.ZERO;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.stream.Collectors.*;
+import static org.apache.commons.lang3.StringUtils.leftPad;
+import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
+import static ph.txtdis.util.Code.*;
+import static ph.txtdis.util.DateTimeUtils.toTimestampWithSecondText;
+import static ph.txtdis.util.NumberUtils.*;
+import static ph.txtdis.util.TextUtils.blankIfNull;
 
 @Transactional
 @Service("billableService")
 public class EdmsBillableServiceImpl //
-		implements EdmsBillableService {
+	implements EdmsBillableService {
 
 	@Autowired
 	private EdmsCreditMemoRepository creditMemoRepository;
@@ -243,9 +198,9 @@ public class EdmsBillableServiceImpl //
 
 	private void createSalesOrderAndDeliveryReceiptAndSalesInvoice(Billable b) {
 		List<EdmsSalesOrderDetail> details = b.getDetails().stream() //
-				.flatMap(d -> createBookingDetails(b, d).stream()) //
-				.filter(d -> isPositive(d.getQty())) //
-				.collect(toList());
+			.flatMap(d -> createBookingDetails(b, d).stream()) //
+			.filter(d -> isPositive(d.getQty())) //
+			.collect(toList());
 		EdmsSalesOrder e = createSalesOrder(b, details);
 		saveAutoNo(b, BOOKING_PREFIX);
 		createDeliveryReceiptAndSalesInvoice(b, e, details);
@@ -350,8 +305,8 @@ public class EdmsBillableServiceImpl //
 	private BigDecimal sumVolumeDiscounts(List<EdmsSalesOrderDetail> details) {
 		try {
 			return details.stream()//
-					.map(d -> computeVolumeDiscountPerLineItem(d))//
-					.reduce(ZERO, BigDecimal::add);
+				.map(d -> computeVolumeDiscountPerLineItem(d))//
+				.reduce(ZERO, BigDecimal::add);
 		} catch (Exception e) {
 			return ZERO;
 		}
@@ -376,8 +331,8 @@ public class EdmsBillableServiceImpl //
 
 	private String warehouseCode(Billable b) {
 		return b.getIsRma() == null || b.getIsRma() //
-				? warehouseService.getMainCode() //
-				: warehouseService.getBoCode();
+			? warehouseService.getMainCode() //
+			: warehouseService.getBoCode();
 	}
 
 	private void createDeliveryReceiptAndSalesInvoice(Billable b, EdmsSalesOrder so, List<EdmsSalesOrderDetail> sod) {
@@ -679,7 +634,7 @@ public class EdmsBillableServiceImpl //
 	public List<Billable> list() {
 		Iterable<EdmsInvoice> i = invoiceRepository.findAll();
 		return StreamSupport.stream(i.spliterator(), false).map(e -> toBillable(e)).filter(p -> p != null).distinct()
-				.collect(Collectors.toCollection(ArrayList::new));
+			.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	private Billable toBillable(EdmsInvoice i) {
@@ -708,21 +663,30 @@ public class EdmsBillableServiceImpl //
 		return b;
 	}
 
+	private ZonedDateTime getBilledOn(EdmsInvoice i) {
+		String billedOn = i.getCreatedOn();
+		if (billedOn != null && !billedOn.isEmpty())
+			return toTimeStamp(billedOn);
+		return DateTimeUtils.toZonedDateTime(i.getOrderDate());
+	}
+
+	private List<BillableDetail> getDetails(Billable b, String code) {
+		List<EdmsInvoiceDetail> l = invoiceDetailRepository.findByReferenceNoAndSalesOrderDetailIdNotNull(code);
+		return l == null ? null
+			: l.stream() //
+			.map(i -> toDetailWithVendorNoAsConcatOfItemCodeAndQtyPerCaseAndPrice(i)).distinct()//
+			.collect(groupingBy(BillableDetail::getItemVendorNo, //
+				mapping(BillableDetail::getInitialQty, //
+					reducing(ZERO, BigDecimal::add)))) //
+			.entrySet().stream().map(e -> toBillableDetail(e)) //
+			.collect(Collectors.toList());
+	}
+
 	private long getNumIdPrefixedIfOnNewEdmsVersionAndDR(String refNo) {
 		long id = getNumId(refNo);
 		if (id < 0 && StringUtils.contains(refNo, "MAG"))
 			id = id - 100_000;
 		return id;
-	}
-
-	private Long getNumId(String refNo) {
-		String code = StringUtils.substringAfterLast(refNo, "-");
-		long id = Long.valueOf(Code.numbersOnly(code));
-		return id < Long.valueOf(invoiceStartId) ? toDeliveryId(id) : id;
-	}
-
-	private long toDeliveryId(long id) {
-		return id < 0 ? id : -id;
 	}
 
 	private String getSuffix(String referenceNo) {
@@ -734,11 +698,81 @@ public class EdmsBillableServiceImpl //
 		return DateTimeUtils.toZonedDateTimeFromTimestampWithSeconds(ts);
 	}
 
-	private ZonedDateTime getBilledOn(EdmsInvoice i) {
-		String billedOn = i.getCreatedOn();
-		if (billedOn != null && !billedOn.isEmpty())
-			return toTimeStamp(billedOn);
-		return DateTimeUtils.toZonedDateTime(i.getOrderDate());
+	private BillableDetail toDetailWithVendorNoAsConcatOfItemCodeAndQtyPerCaseAndPrice(EdmsInvoiceDetail id) {
+		BillableDetail d = new BillableDetail();
+		d.setQtyPerCase(getBottlesPerCase(id).intValue());
+		d.setItemVendorNo(id.getItemCode() + "," + d.getQtyPerCase() + "," + getPrice(id));
+		d.setInitialQty(getQtyInBottles(id, d));
+		return d;
+	}
+
+	private BillableDetail toBillableDetail(Entry<String, BigDecimal> e) {
+		String[] data = e.getKey().split(",");
+		BillableDetail d = new BillableDetail();
+		d.setItemVendorNo(data[0]);
+		d.setQtyPerCase(Integer.valueOf(data[1]));
+		d.setPriceValue(new BigDecimal(data[2]));
+		d.setQuality(QualityType.GOOD);
+		d.setUom(UomType.CS);
+		d.setInitialQty(e.getValue());
+		return d;
+	}
+
+	private Long getNumId(String refNo) {
+		String code = StringUtils.substringAfterLast(refNo, "-");
+		long id = Long.valueOf(Code.numbersOnly(code));
+		return id < Long.valueOf(invoiceStartId) ? toDeliveryId(id) : id;
+	}
+
+	private BigDecimal getBottlesPerCase(EdmsInvoiceDetail id) {
+		return itemService.getBottlesPerCase(id);
+	}
+
+	private BigDecimal getPrice(EdmsInvoiceDetail id) {
+		return isPromo(id) ? BigDecimal.ZERO : getDiscountedPrice(id);
+	}
+
+	private BigDecimal getQtyInBottles(EdmsInvoiceDetail id, BillableDetail bd) {
+		BigDecimal qty = id.getQty();
+		if (isPerCase(id))
+			qty = qty.multiply(new BigDecimal(bd.getQtyPerCase()));
+		return qty;
+	}
+
+	private long toDeliveryId(long id) {
+		return id < 0 ? id : -id;
+	}
+
+	private boolean isPromo(EdmsInvoiceDetail id) {
+		return id.getTransactionCode().equals(Code.PROMO);
+	}
+
+	private BigDecimal getDiscountedPrice(EdmsInvoiceDetail id) {
+		return getInitialPrice(id).subtract(getDiscount(id)).setScale(2, RoundingMode.HALF_EVEN);
+	}
+
+	private boolean isPerCase(EdmsInvoiceDetail id) {
+		return id.getUomCode().equals(Code.CS);
+	}
+
+	private BigDecimal getInitialPrice(EdmsInvoiceDetail id) {
+		return isPerCase(id) ? id.getPriceValue() : itemService.getPricePerCase(id);
+	}
+
+	private BigDecimal getDiscount(EdmsInvoiceDetail id) {
+		return isPerCase(id) ? dividePerCase(id) : dividePerBottleThenConvertPerCase(id);
+	}
+
+	private BigDecimal dividePerCase(EdmsInvoiceDetail id) {
+		return divideByQty(id);
+	}
+
+	private BigDecimal dividePerBottleThenConvertPerCase(EdmsInvoiceDetail id) {
+		return divideByQty(id).multiply(getBottlesPerCase(id));
+	}
+
+	private BigDecimal divideByQty(EdmsInvoiceDetail id) {
+		return id.getTotalDiscountValue().divide(id.getQty(), 4, RoundingMode.HALF_EVEN);
 	}
 
 	@Override
@@ -765,85 +799,6 @@ public class EdmsBillableServiceImpl //
 		return StringUtils.contains(orderNo, "MAG");
 	}
 
-	private List<BillableDetail> getDetails(Billable b, String code) {
-		List<EdmsInvoiceDetail> l = invoiceDetailRepository.findByReferenceNoAndSalesOrderDetailIdNotNull(code);
-		return l == null ? null
-				: l.stream() //
-						.map(i -> toDetailWithVendorNoAsConcatOfItemCodeAndQtyPerCaseAndPrice(i)).distinct()//
-						.collect(groupingBy(BillableDetail::getItemVendorNo, //
-								mapping(BillableDetail::getInitialQty, //
-										reducing(ZERO, BigDecimal::add)))) //
-						.entrySet().stream().map(e -> toBillableDetail(e)) //
-						.collect(Collectors.toList());
-	}
-
-	private BillableDetail toDetailWithVendorNoAsConcatOfItemCodeAndQtyPerCaseAndPrice(EdmsInvoiceDetail id) {
-		BillableDetail d = new BillableDetail();
-		d.setQtyPerCase(getBottlesPerCase(id).intValue());
-		d.setItemVendorNo(id.getItemCode() + "," + d.getQtyPerCase() + "," + getPrice(id));
-		d.setInitialQty(getQtyInBottles(id, d));
-		return d;
-	}
-
-	private BillableDetail toBillableDetail(Entry<String, BigDecimal> e) {
-		String[] data = e.getKey().split(",");
-		BillableDetail d = new BillableDetail();
-		d.setItemVendorNo(data[0]);
-		d.setQtyPerCase(Integer.valueOf(data[1]));
-		d.setPriceValue(new BigDecimal(data[2]));
-		d.setQuality(QualityType.GOOD);
-		d.setUom(UomType.CS);
-		d.setInitialQty(e.getValue());
-		return d;
-	}
-
-	private BigDecimal getQtyInBottles(EdmsInvoiceDetail id, BillableDetail bd) {
-		BigDecimal qty = id.getQty();
-		if (isPerCase(id))
-			qty = qty.multiply(new BigDecimal(bd.getQtyPerCase()));
-		return qty;
-	}
-
-	private BigDecimal getPrice(EdmsInvoiceDetail id) {
-		return isPromo(id) ? BigDecimal.ZERO : getDiscountedPrice(id);
-	}
-
-	private boolean isPromo(EdmsInvoiceDetail id) {
-		return id.getTransactionCode().equals(Code.PROMO);
-	}
-
-	private BigDecimal getDiscountedPrice(EdmsInvoiceDetail id) {
-		return getInitialPrice(id).subtract(getDiscount(id)).setScale(2, RoundingMode.HALF_EVEN);
-	}
-
-	private BigDecimal getInitialPrice(EdmsInvoiceDetail id) {
-		return isPerCase(id) ? id.getPriceValue() : itemService.getPricePerCase(id);
-	}
-
-	private boolean isPerCase(EdmsInvoiceDetail id) {
-		return id.getUomCode().equals(Code.CS);
-	}
-
-	private BigDecimal getDiscount(EdmsInvoiceDetail id) {
-		return isPerCase(id) ? dividePerCase(id) : dividePerBottleThenConvertPerCase(id);
-	}
-
-	private BigDecimal dividePerCase(EdmsInvoiceDetail id) {
-		return divideByQty(id);
-	}
-
-	private BigDecimal divideByQty(EdmsInvoiceDetail id) {
-		return id.getTotalDiscountValue().divide(id.getQty(), 4, RoundingMode.HALF_EVEN);
-	}
-
-	private BigDecimal dividePerBottleThenConvertPerCase(EdmsInvoiceDetail id) {
-		return divideByQty(id).multiply(getBottlesPerCase(id));
-	}
-
-	private BigDecimal getBottlesPerCase(EdmsInvoiceDetail id) {
-		return itemService.getBottlesPerCase(id);
-	}
-
 	@Override
 	public String getOrderNoFromBillingNo(String no) {
 		return toIdText(getNumIdPrefixedIfOnNewEdmsVersionAndDR(no)) + TextUtils.blankIfNull(getSuffix(no));
@@ -851,6 +806,7 @@ public class EdmsBillableServiceImpl //
 
 	@Override
 	public List<EdmsInvoice> getBillables(EdmsLoadOrder logp) {
-		return invoiceRepository.findByOrderDateAndTruckCodeAndStatus(logp.getOrderDate(), logp.getTruckCode(), Code.CLOSED);
+		return invoiceRepository
+			.findByOrderDateAndTruckCodeAndStatus(logp.getOrderDate(), logp.getTruckCode(), Code.CLOSED);
 	}
 }

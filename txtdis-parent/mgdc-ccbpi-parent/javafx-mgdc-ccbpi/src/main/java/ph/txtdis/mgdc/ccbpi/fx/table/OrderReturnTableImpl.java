@@ -15,8 +15,8 @@ import ph.txtdis.mgdc.ccbpi.service.OrderReturnService;
 @Scope("prototype")
 @Component("orderReturnTable")
 public class OrderReturnTableImpl //
-		extends AbstractBeverageBillableTable<OrderReturnService, OrderReturnDialog> //
-		implements OrderReturnTable {
+	extends AbstractBeverageBillableTable<OrderReturnService, OrderReturnDialog> //
+	implements OrderReturnTable {
 
 	@Override
 	protected List<TableColumn<BillableDetail, ?>> addColumns() {

@@ -1,24 +1,14 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.Arrays.asList;
+import ph.txtdis.dto.ItemFamily;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static ph.txtdis.type.ItemTier.PRINCIPAL;
 
-import ph.txtdis.dto.ItemFamily;
-
 public interface ItemFamilyLimited {
-
-	default ItemFamily getItemFamilyForAll() {
-		ItemFamily a = new ItemFamily();
-		a.setName("ALL");
-		a.setTier(PRINCIPAL);
-		return a;
-	}
-
-	ItemFamilyService getItemFamilyService();
 
 	default List<ItemFamily> listAllFamilies() {
 		try {
@@ -29,6 +19,15 @@ public interface ItemFamilyLimited {
 			return null;
 		}
 	}
+
+	default ItemFamily getItemFamilyForAll() {
+		ItemFamily a = new ItemFamily();
+		a.setName("ALL");
+		a.setTier(PRINCIPAL);
+		return a;
+	}
+
+	ItemFamilyService getItemFamilyService();
 
 	default ItemFamily nullIfAll(ItemFamily f) {
 		return f.equals(getItemFamilyForAll()) ? null : f;

@@ -1,14 +1,14 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.lang.Math.abs;
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.repository.BillableRepository;
 
+import static java.lang.Math.abs;
+import static ph.txtdis.type.PartnerType.EX_TRUCK;
+
 public interface QtyToLoadOrderDetailItemMappingService //
-		extends QtyToBillableDetailsItemMappingService {
+	extends QtyToBillableDetailsItemMappingService {
 
 	default void updateLoadOrderDetailQty(BillableRepository r, Billable b) {
 		BillableEntity e = r.findByCustomerTypeAndBookingId(EX_TRUCK, abs(b.getBookingId()));

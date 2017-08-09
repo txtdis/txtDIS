@@ -8,7 +8,9 @@ import ph.txtdis.type.BillingType;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class Channel extends AbstractCreationTracked<Long> implements Named {
+public class Channel
+	extends AbstractCreationTracked<Long>
+	implements Named {
 
 	private BillingType billingType;
 

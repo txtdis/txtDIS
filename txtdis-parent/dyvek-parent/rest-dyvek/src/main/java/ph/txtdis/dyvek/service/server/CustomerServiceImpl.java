@@ -1,24 +1,20 @@
 package ph.txtdis.dyvek.service.server;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-import static ph.txtdis.type.PartnerType.FINANCIAL;
-import static ph.txtdis.type.PartnerType.OUTLET;
-import static ph.txtdis.type.PartnerType.VENDOR;
-
-import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dyvek.domain.CustomerEntity;
 import ph.txtdis.dyvek.model.Customer;
 import ph.txtdis.dyvek.repository.CustomerRepository;
 import ph.txtdis.service.AbstractCreateNameListService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.PartnerType.*;
+
 @Service("customerService")
 public class CustomerServiceImpl //
-		extends AbstractCreateNameListService<CustomerRepository, CustomerEntity, Customer> //
-		implements CustomerService {
+	extends AbstractCreateNameListService<CustomerRepository, CustomerEntity, Customer> //
+	implements CustomerService {
 
 	@Override
 	public List<Customer> findAllBanks() {
@@ -57,11 +53,6 @@ public class CustomerServiceImpl //
 	}
 
 	@Override
-	public CustomerEntity findEntityByName(String name) {
-		return super.findEntityByName(name);
-	}
-
-	@Override
 	protected Customer toModel(CustomerEntity e) {
 		if (e == null)
 			return null;
@@ -72,6 +63,11 @@ public class CustomerServiceImpl //
 		c.setCreatedBy(e.getCreatedBy());
 		c.setCreatedOn(e.getCreatedOn());
 		return c;
+	}
+
+	@Override
+	public CustomerEntity findEntityByName(String name) {
+		return super.findEntityByName(name);
 	}
 
 	@Override

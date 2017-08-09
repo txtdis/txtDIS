@@ -6,5 +6,6 @@ import ph.txtdis.mgdc.service.server.ConvertibleService;
 import ph.txtdis.service.SavedNameListService;
 
 public interface ChannelService //
-		extends SavedNameListService<Channel>, ConvertibleService<ChannelEntity, Channel> {
+	extends SavedNameListService<Channel>,
+	ConvertibleService<ChannelEntity, Channel> {
 }

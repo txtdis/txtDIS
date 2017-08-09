@@ -1,58 +1,50 @@
 package ph.txtdis.mgdc.gsm.domain;
 
-import static java.lang.Math.abs;
-import static javax.persistence.CascadeType.ALL;
-import static ph.txtdis.util.NumberUtils.toCurrencyText;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractDecisionNeededValidatedCreatedKeyedEntity;
 import ph.txtdis.dto.Booked;
 
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static java.lang.Math.abs;
+import static javax.persistence.CascadeType.ALL;
+import static ph.txtdis.util.NumberUtils.toCurrencyText;
+
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "billing", //
-		indexes = { //
-				@Index(columnList = "booking_id, is_rma, billed_on"), //
-				@Index(columnList = "receiving_id, is_rma"), //
-				@Index(columnList = "order_date, is_rma, picking_id"), //
-				@Index(columnList = "id_no, order_date, prefix, id_no, suffix"), //
-				@Index(columnList = "id_no, is_fully_paid, order_date"), //
-				@Index(columnList = "id_no, is_rma, is_fully_paid, order_date"), //
-				@Index(columnList = "id_no, is_rma, order_date, prefix, id_no, suffix"), //
-				@Index(columnList = "id_no, is_rma, booking_id, order_date"), //
-				@Index(columnList = "prefix, suffix, id_no"), //
-				@Index(columnList = "is_rma, is_valid, order_date"), //
-				@Index(columnList = "is_valid"), //
-				@Index(columnList = "booking_id, created_on"), //
-				@Index(columnList = "booking_id, is_rma, created_on"), //
-				@Index(columnList = "receiving_id, created_on"), //
-				@Index(columnList = "is_rma, booking_id, created_on"), //
-				@Index(columnList = "is_rma, receiving_id, created_on"), //
-				@Index(columnList = "due_date, received_on"), //
-				@Index(columnList = "order_date, received_on"), //
-				@Index(columnList = "id_no, created_on") }, //
-		uniqueConstraints = @UniqueConstraint(columnNames = { "prefix", "id_no", "suffix" }))
+	indexes = { //
+		@Index(columnList = "booking_id, is_rma, billed_on"), //
+		@Index(columnList = "receiving_id, is_rma"), //
+		@Index(columnList = "order_date, is_rma, picking_id"), //
+		@Index(columnList = "id_no, order_date, prefix, id_no, suffix"), //
+		@Index(columnList = "id_no, is_fully_paid, order_date"), //
+		@Index(columnList = "id_no, is_rma, is_fully_paid, order_date"), //
+		@Index(columnList = "id_no, is_rma, order_date, prefix, id_no, suffix"), //
+		@Index(columnList = "id_no, is_rma, booking_id, order_date"), //
+		@Index(columnList = "prefix, suffix, id_no"), //
+		@Index(columnList = "is_rma, is_valid, order_date"), //
+		@Index(columnList = "is_valid"), //
+		@Index(columnList = "booking_id, created_on"), //
+		@Index(columnList = "booking_id, is_rma, created_on"), //
+		@Index(columnList = "receiving_id, created_on"), //
+		@Index(columnList = "is_rma, booking_id, created_on"), //
+		@Index(columnList = "is_rma, receiving_id, created_on"), //
+		@Index(columnList = "due_date, received_on"), //
+		@Index(columnList = "order_date, received_on"), //
+		@Index(columnList = "id_no, created_on")}, //
+	uniqueConstraints = @UniqueConstraint(columnNames = {"prefix", "id_no", "suffix"}))
 public class BillableEntity //
-		extends AbstractDecisionNeededValidatedCreatedKeyedEntity<Long> //
-		implements Booked, DetailedEntity, CustomerDiscountedEntity {
+	extends AbstractDecisionNeededValidatedCreatedKeyedEntity<Long> //
+	implements Booked,
+	DetailedEntity,
+	CustomerDiscountedEntity {
 
 	private static final long serialVersionUID = -4363805360652350591L;
 
@@ -84,8 +76,8 @@ public class BillableEntity //
 
 	@ManyToMany
 	@JoinTable(name = "billing_customer_discount", //
-			joinColumns = { @JoinColumn(name = "billing_id", referencedColumnName = "id") },
-			inverseJoinColumns = { @JoinColumn(name = "customer_discounts_id", referencedColumnName = "id") })
+		joinColumns = {@JoinColumn(name = "billing_id", referencedColumnName = "id")},
+		inverseJoinColumns = {@JoinColumn(name = "customer_discounts_id", referencedColumnName = "id")})
 	private List<CustomerDiscountEntity> customerDiscounts;
 
 	@Column(name = "order_date")

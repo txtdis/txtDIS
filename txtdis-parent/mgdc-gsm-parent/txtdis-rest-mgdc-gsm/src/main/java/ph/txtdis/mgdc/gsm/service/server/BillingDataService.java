@@ -1,11 +1,11 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.time.ZonedDateTime;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.Booked;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.util.NumberUtils;
+
+import java.time.ZonedDateTime;
 
 public interface BillingDataService {
 
@@ -28,12 +28,12 @@ public interface BillingDataService {
 		return e;
 	}
 
-	default boolean isFullyPaid(Billable b) {
-		return !NumberUtils.isPositive(b.getUnpaidValue());
-	}
-
 	default Long numId(Billable b) {
 		return b.getNumId();
+	}
+
+	default boolean isFullyPaid(Billable b) {
+		return !NumberUtils.isPositive(b.getUnpaidValue());
 	}
 
 	default Long negateBookingId(Booked e) {

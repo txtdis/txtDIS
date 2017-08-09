@@ -1,17 +1,7 @@
 package ph.txtdis.mgdc.gsm.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.ENUM;
-import static ph.txtdis.type.Type.OTHERS;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.scene.control.TableColumn;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.dto.Price;
 import ph.txtdis.dto.PricingType;
 import ph.txtdis.fx.table.AbstractTable;
@@ -20,9 +10,16 @@ import ph.txtdis.fx.table.DecisionNeededTableControls;
 import ph.txtdis.mgdc.gsm.dto.Channel;
 import ph.txtdis.mgdc.gsm.fx.dialog.PricingDialog;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
+
 public abstract class AbstractPricingTable //
-		extends AbstractTable<Price> //
-		implements PricingTable {
+	extends AbstractTable<Price> //
+	implements PricingTable {
 
 	@Autowired
 	protected Column<Price, BigDecimal> price;

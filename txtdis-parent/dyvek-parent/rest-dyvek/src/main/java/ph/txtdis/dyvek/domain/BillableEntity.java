@@ -1,37 +1,29 @@
 package ph.txtdis.dyvek.domain;
 
-import static javax.persistence.CascadeType.ALL;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ph.txtdis.domain.AbstractCreatedKeyedEntity;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ph.txtdis.domain.AbstractCreatedKeyedEntity;
+import static javax.persistence.CascadeType.ALL;
 
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "billing", //
-		indexes = { //
-				@Index(name = "billing_customer_id_idx", columnList = "customer_id"), //
-				@Index(name = "billing_delivery_id_idx", columnList = "delivery_id"), //
-				@Index(name = "billing_item_id_idx", columnList = "item_id"), //
-				@Index(name = "billing_order_date_idx", columnList = "order_date"), //
-				@Index(name = "billing_order_id_idx", columnList = "order_id"), //
-				@Index(name = "billing_order_no_idx", columnList = "order_no") })
+	indexes = { //
+		@Index(name = "billing_customer_id_idx", columnList = "customer_id"), //
+		@Index(name = "billing_delivery_id_idx", columnList = "delivery_id"), //
+		@Index(name = "billing_item_id_idx", columnList = "item_id"), //
+		@Index(name = "billing_order_date_idx", columnList = "order_date"), //
+		@Index(name = "billing_order_id_idx", columnList = "order_id"), //
+		@Index(name = "billing_order_no_idx", columnList = "order_no")})
 public class BillableEntity //
-		extends AbstractCreatedKeyedEntity<Long> {
+	extends AbstractCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -4363805360652350591L;
 
@@ -66,8 +58,8 @@ public class BillableEntity //
 
 	private String remarks;
 
-	@OneToOne(mappedBy = "billing")
-	private RemittanceDetailEntity payment;
+	@OneToMany(mappedBy = "billing", cascade = ALL)
+	private List<RemittanceDetailEntity> payments;
 
 	@Override
 	public String toString() {

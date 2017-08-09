@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 import ph.txtdis.domain.EdmsInventory;
 
 @Repository("edmsInventoryRepository")
-public interface EdmsInventoryRepository extends CrudRepository<EdmsInventory, Long> {
+public interface EdmsInventoryRepository
+	extends CrudRepository<EdmsInventory, Long> {
 
 	EdmsInventory findByItemCodeAndUomCode(@Param("code") String c, @Param("uom") String u);
 }

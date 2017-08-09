@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class MistypedDateException extends Exception {
+public class MistypedDateException
+	extends Exception {
 
 	private static final long serialVersionUID = -3092217465652312427L;
 

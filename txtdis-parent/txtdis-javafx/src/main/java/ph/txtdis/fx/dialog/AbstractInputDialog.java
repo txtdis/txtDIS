@@ -1,30 +1,22 @@
 package ph.txtdis.fx.dialog;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import ph.txtdis.fx.control.AppButtonImpl;
-import ph.txtdis.fx.control.LabelFactory;
-import ph.txtdis.fx.pane.DialogButtonBox;
+import org.springframework.beans.factory.annotation.Lookup;
+import ph.txtdis.fx.control.AppButton;
 
-public abstract class AbstractInputDialog //
-		extends AbstractDialog {
+import java.util.List;
 
-	@Autowired
-	protected MessageDialog dialog;
+import static java.util.Collections.singletonList;
 
-	@Autowired
-	protected AppButtonImpl closeButton;
+public abstract class AbstractInputDialog
+	extends AbstractDialog {
 
-	@Autowired
-	protected LabelFactory label;
+	protected AppButton closeButton;
 
-	@Autowired
-	protected DialogButtonBox box;
+	protected String prompt;
 
-	protected String heading, prompt;
+	private String heading;
 
 	public AbstractInputDialog() {
 		super();
@@ -46,27 +38,33 @@ public abstract class AbstractInputDialog //
 		return this;
 	}
 
-	@Override
-	public void refresh() {
-		goToDefaultFocus();
+	protected HBox buttonBox() {
+		return pane.forDialogButtons(buttons());
 	}
 
-	protected Button closeButton(String name) {
-		closeButton.large(name).build();
+	protected List<AppButton> buttons() {
+		return singletonList(closeButton());
+	}
+
+	protected AppButton closeButton() {
+		return closeButton("Close");
+	}
+
+	protected AppButton closeButton(String name) {
+		AppButton closeButton = button.large(name).build();
 		closeButton.onAction(event -> setOnClickedCloseButton());
 		return closeButton;
 	}
 
-	protected HBox buttonBox() {
-		return box.addButtons(buttons());
+	protected void setOnClickedCloseButton() {
+		nullData();
+		refresh();
+		close();
 	}
 
-	protected Button[] buttons() {
-		return new Button[] { closeButton() };
-	}
-
-	protected Button closeButton() {
-		return closeButton("Close");
+	@Override
+	public void refresh() {
+		goToDefaultFocus();
 	}
 
 	protected Label header() {
@@ -77,15 +75,14 @@ public abstract class AbstractInputDialog //
 		return heading;
 	}
 
-	protected void setOnClickedCloseButton() {
-		nullData();
-		refresh();
-		close();
-	}
-
 	protected void resetNodesOnError(Exception e) {
 		e.printStackTrace();
-		dialog.show(e).addParent(this).start();
+		messageDialog().show(e).addParent(this).start();
 		refresh();
+	}
+
+	@Lookup
+	protected MessageDialog messageDialog() {
+		return null;
 	}
 }

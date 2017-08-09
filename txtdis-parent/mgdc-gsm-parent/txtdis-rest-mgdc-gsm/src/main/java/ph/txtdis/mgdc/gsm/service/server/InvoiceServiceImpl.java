@@ -1,5 +1,19 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ph.txtdis.dto.Billable;
+import ph.txtdis.dto.BillableDetail;
+import ph.txtdis.dto.Bom;
+import ph.txtdis.mgdc.gsm.domain.BillableEntity;
+import ph.txtdis.mgdc.gsm.domain.ItemEntity;
+import ph.txtdis.service.RestClientService;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
+
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
@@ -8,34 +22,15 @@ import static ph.txtdis.type.PriceType.DEALER;
 import static ph.txtdis.util.DateTimeUtils.toDate;
 import static ph.txtdis.util.NumberUtils.isZero;
 
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.BillableDetail;
-import ph.txtdis.dto.Bom;
-import ph.txtdis.mgdc.gsm.domain.BillableEntity;
-import ph.txtdis.mgdc.gsm.domain.ItemEntity;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-
 @Service("invoiceService")
 public class InvoiceServiceImpl //
-		extends AbstractSpunSavedBillingService //
-		implements InvoiceService {
+	extends AbstractSpunSavedBillingService //
+	implements InvoiceService {
 
 	private static final String BILLABLE = "billable";
 
 	@Autowired
-	private ReadOnlyService<Billable> readOnlyService;
-
-	@Autowired
-	private SavingService<Billable> savingService;
+	private RestClientService<Billable> restClientService;
 
 	@Autowired
 	private BomService bomService;
@@ -63,6 +58,21 @@ public class InvoiceServiceImpl //
 		return updateLoadOrderQtyAndNegateBookingIdIfFromLoadOrderThenSetBillingData(repository, e, b);
 	}
 
+	private BillableEntity setCancelledData(BillableEntity e) {
+		e.setRemarks(remarks(e));
+		e.setFullyPaid(true);
+		return e;
+	}
+
+	private String remarks(BillableEntity e) {
+		String remarks = e.getRemarks();
+		if (remarks != null && !remarks.trim().isEmpty())
+			remarks = remarks + "\n";
+		else
+			remarks = "";
+		return remarks + CANCELLED;
+	}
+
 	@Override
 	public List<Bom> extractAll(Long itemId, String itemName, BigDecimal qty) {
 		return bomService.extractAll(itemId, itemName, qty);
@@ -71,7 +81,8 @@ public class InvoiceServiceImpl //
 	@Override
 	public List<Billable> findAllBilledButUnpicked() {
 		List<BillableEntity> l = repository
-				.findByCustomerTypeAndBilledOnNotNullAndNumIdGreaterThanAndRmaNullAndPickingNullOrderByOrderDateAscIdAsc(OUTLET, 0L);
+			.findByCustomerTypeAndBilledOnNotNullAndNumIdGreaterThanAndRmaNullAndPickingNullOrderByOrderDateAscIdAsc(
+				OUTLET, 0L);
 		return toModels(l);
 	}
 
@@ -83,7 +94,8 @@ public class InvoiceServiceImpl //
 
 	@Override
 	public List<Billable> findAllOutletBillings() {
-		List<BillableEntity> l = repository.findByCustomerTypeAndBilledOnNotNullAndNumIdGreaterThanAndRmaNullOrderByOrderDateAscIdAsc(OUTLET, 0L);
+		List<BillableEntity> l = repository
+			.findByCustomerTypeAndBilledOnNotNullAndNumIdGreaterThanAndRmaNullOrderByOrderDateAscIdAsc(OUTLET, 0L);
 		return toModels(l);
 	}
 
@@ -98,7 +110,7 @@ public class InvoiceServiceImpl //
 	}
 
 	private List<Billable> billables() throws Exception {
-		return readOnlyService.module(BILLABLE).getList();
+		return restClientService.module(BILLABLE).getList();
 	}
 
 	@Override
@@ -135,7 +147,7 @@ public class InvoiceServiceImpl //
 
 	@Override
 	public Billable saveToEdms(Billable b) throws Exception {
-		savingService.module(BILLABLE).save(expandedBomDetails(b));
+		restClientService.module(BILLABLE).save(expandedBomDetails(b));
 		return b;
 	}
 
@@ -186,21 +198,6 @@ public class InvoiceServiceImpl //
 			return true;
 		BigDecimal qty = b.getDetails().stream().map(BillableDetail::getFinalQty).reduce(ZERO, BigDecimal::add);
 		return isZero(qty);
-	}
-
-	private BillableEntity setCancelledData(BillableEntity e) {
-		e.setRemarks(remarks(e));
-		e.setFullyPaid(true);
-		return e;
-	}
-
-	private String remarks(BillableEntity e) {
-		String remarks = e.getRemarks();
-		if (remarks != null && !remarks.trim().isEmpty())
-			remarks = remarks + "\n";
-		else
-			remarks = "";
-		return remarks + CANCELLED;
 	}
 
 	@Override

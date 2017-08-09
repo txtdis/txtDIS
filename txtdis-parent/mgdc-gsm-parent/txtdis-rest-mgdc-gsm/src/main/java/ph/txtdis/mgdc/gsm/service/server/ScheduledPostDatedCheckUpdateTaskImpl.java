@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component("scheduledPostDatedCheckUpdateTask")
 public class ScheduledPostDatedCheckUpdateTaskImpl //
-		implements ScheduledPostDatedCheckUpdateTask {
+	implements ScheduledPostDatedCheckUpdateTask {
 
 	@Autowired
 	private PostDatedChequeUpdateService chequeService;

@@ -1,32 +1,34 @@
 package ph.txtdis.mgdc.gsm.service;
 
+import ph.txtdis.dto.BillableDetail;
+import ph.txtdis.dto.CreationLogged;
+import ph.txtdis.mgdc.gsm.dto.Item;
+import ph.txtdis.service.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import ph.txtdis.dto.BillableDetail;
-import ph.txtdis.dto.CreationLogged;
-import ph.txtdis.mgdc.gsm.dto.Item;
-import ph.txtdis.service.AppendableDetailService;
-import ph.txtdis.service.CustomerIdAndNameService;
-import ph.txtdis.service.DecisionNeededService;
-import ph.txtdis.service.ItemInputtedService;
-import ph.txtdis.service.OpenDialogHeaderTextService;
-import ph.txtdis.service.QtyPerUomService;
-import ph.txtdis.service.QuantityValidated;
-import ph.txtdis.service.RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
-
 public interface BillableService //
-		extends AppendableDetailService, CreationLogged, CustomerIdAndNameService, DecisionNeededService, ItemBasedService<BillableDetail>,
-		ItemInputtedService<BillableDetail>, OpenDialogHeaderTextService, QtyPerUomService, QuantityValidated,
-		RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long> {
+	extends AppendableDetailService,
+	CreationLogged,
+	CustomerIdAndNameService,
+	DecisionNeededService,
+	ItemBasedService<BillableDetail>,
+	ItemInputtedService<BillableDetail>,
+	OpenDialogHeaderTextService,
+	QtyPerUomService,
+	QuantityValidated,
+	RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long> {
 
 	String getBilledBy();
 
 	ZonedDateTime getBilledOn();
 
 	Long getBookingId();
+
+	void setBookingId(Long id);
 
 	String getCustomerAddress();
 
@@ -48,6 +50,8 @@ public interface BillableService //
 	}
 
 	LocalDate getOrderDate();
+
+	void setOrderDate(LocalDate value);
 
 	List<String> getPayments();
 
@@ -79,16 +83,9 @@ public interface BillableService //
 
 	boolean isAuditor();
 
-	void setBookingId(Long id);
-
 	void setDetails(List<BillableDetail> d);
 
 	void setItem(Item item);
-
-	void setOrderDate(LocalDate value);
-
-	@Override
-	void setRemarks(String remarks);
 
 	void setUnpaidValue(BigDecimal unpaid);
 

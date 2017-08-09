@@ -1,14 +1,13 @@
 package ph.txtdis.dto;
 
-import java.math.BigDecimal;
-
-import org.springframework.stereotype.Component;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 import ph.txtdis.mgdc.gsm.dto.Item;
+
+import java.math.BigDecimal;
 
 @Getter
 @Component

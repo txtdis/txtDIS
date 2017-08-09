@@ -4,5 +4,5 @@ import ph.txtdis.dyvek.model.Customer;
 import ph.txtdis.fx.dialog.InputtedDialog;
 
 public interface TruckingClientDialog //
-		extends InputtedDialog<Customer> {
+	extends InputtedDialog<Customer> {
 }

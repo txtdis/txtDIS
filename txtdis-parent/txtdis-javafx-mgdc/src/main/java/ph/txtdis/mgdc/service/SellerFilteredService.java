@@ -1,20 +1,17 @@
 package ph.txtdis.mgdc.service;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
+import ph.txtdis.dto.SellerSold;
+import ph.txtdis.service.ListedAndResettableService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ph.txtdis.dto.SellerSold;
-import ph.txtdis.service.ListedAndResetableService;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
-public interface SellerFilteredService<T extends SellerSold> extends ListedAndResetableService<T> {
-
-	default boolean filterSeller(String seller, T a) {
-		return seller.equals("ALL") ? true : a.getSeller().equals(seller);
-	}
+public interface SellerFilteredService<T extends SellerSold>
+	extends ListedAndResettableService<T> {
 
 	default List<T> list(String seller) {
 		try {
@@ -23,6 +20,10 @@ public interface SellerFilteredService<T extends SellerSold> extends ListedAndRe
 			e.printStackTrace();
 			return emptyList();
 		}
+	}
+
+	default boolean filterSeller(String seller, T a) {
+		return seller.equals("ALL") ? true : a.getSeller().equals(seller);
 	}
 
 	default List<String> listSellers() {

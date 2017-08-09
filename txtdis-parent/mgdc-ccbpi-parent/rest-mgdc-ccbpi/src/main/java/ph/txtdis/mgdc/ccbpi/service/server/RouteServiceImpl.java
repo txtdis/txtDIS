@@ -6,5 +6,5 @@ import ph.txtdis.mgdc.service.server.AbstractRouteService;
 
 @Service("routeService")
 public class RouteServiceImpl //
-		extends AbstractRouteService {
+	extends AbstractRouteService {
 }

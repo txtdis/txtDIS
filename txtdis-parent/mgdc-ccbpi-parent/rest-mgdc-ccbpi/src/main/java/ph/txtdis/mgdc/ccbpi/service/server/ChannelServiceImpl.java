@@ -9,8 +9,8 @@ import ph.txtdis.service.AbstractCreateNameListService;
 
 @Service("channelService")
 public class ChannelServiceImpl //
-		extends AbstractCreateNameListService<ChannelRepository, ChannelEntity, Channel> //
-		implements ChannelService {
+	extends AbstractCreateNameListService<ChannelRepository, ChannelEntity, Channel> //
+	implements ChannelService {
 
 	@Override
 	public Channel toModel(ChannelEntity e) {

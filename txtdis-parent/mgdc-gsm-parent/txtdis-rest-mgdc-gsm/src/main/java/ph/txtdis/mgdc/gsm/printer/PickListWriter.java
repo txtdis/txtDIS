@@ -1,21 +1,11 @@
 package ph.txtdis.mgdc.gsm.printer;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.rightPad;
-import static ph.txtdis.type.DeliveryType.PICK_UP;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.NumberUtils.divide;
-import static ph.txtdis.util.NumberUtils.isZero;
-import static ph.txtdis.util.NumberUtils.printDecimal;
-import static ph.txtdis.util.NumberUtils.printInteger;
-import static ph.txtdis.util.NumberUtils.toQuantityText;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import ph.txtdis.domain.TruckEntity;
+import ph.txtdis.mgdc.gsm.domain.*;
+import ph.txtdis.mgdc.printer.NotPrintedException;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,19 +13,13 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import ph.txtdis.domain.TruckEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableEntity;
-import ph.txtdis.mgdc.gsm.domain.BomEntity;
-import ph.txtdis.mgdc.gsm.domain.CustomerDiscountEntity;
-import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
-import ph.txtdis.mgdc.gsm.domain.ItemEntity;
-import ph.txtdis.mgdc.gsm.domain.PickListEntity;
-import ph.txtdis.mgdc.printer.NotPrintedException;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.*;
+import static org.apache.commons.lang3.StringUtils.*;
+import static ph.txtdis.type.DeliveryType.PICK_UP;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.NumberUtils.*;
 
 @Component("pickListWriter")
 public class PickListWriter {
@@ -137,7 +121,8 @@ public class PickListWriter {
 	private void printDueToday(BillableEntity b) throws IOException {
 		if (b.getDueDate().isEqual(b.getOrderDate())) {
 			writer.append("NGAYON DIN ANG BAYAD");
-		} else {
+		}
+		else {
 			writer.append("");
 		}
 		writer.append("\r\n");
@@ -183,11 +168,11 @@ public class PickListWriter {
 
 	private List<BomEntity> summaryOfQuantitiesPerItem() {
 		return entity.getBillings().stream()//
-				.map(BillableEntity::getDetails).flatMap(List::stream)//
-				.map(d -> toBoms(d)).flatMap(List::stream)//
-				.collect(groupingBy(BomEntity::getPart, mapping(BomEntity::getQty, reducing(ZERO, BigDecimal::add)))) //
-				.entrySet().stream()//
-				.map(e -> toBom(e)).collect(toList());
+			.map(BillableEntity::getDetails).flatMap(List::stream)//
+			.map(d -> toBoms(d)).flatMap(List::stream)//
+			.collect(groupingBy(BomEntity::getPart, mapping(BomEntity::getQty, reducing(ZERO, BigDecimal::add)))) //
+			.entrySet().stream()//
+			.map(e -> toBom(e)).collect(toList());
 	}
 
 	private BomEntity toBom(BillableDetailEntity d) {

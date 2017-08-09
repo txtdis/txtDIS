@@ -20,8 +20,8 @@ import ph.txtdis.fx.table.StockTakeTable;
 import ph.txtdis.mgdc.ccbpi.service.StockTakeService;
 
 public abstract class AbstractStockTakeApp //
-		extends AbstractRemarkedKeyedApp<StockTakeService, StockTake, Long, Long> //
-		implements StockTakeApp {
+	extends AbstractRemarkedKeyedApp<StockTakeService, StockTake, Long, Long> //
+	implements StockTakeApp {
 
 	@Autowired
 	private AppCombo<String> warehouseCombo, checkerCombo, takerCombo;
@@ -43,6 +43,17 @@ public abstract class AbstractStockTakeApp //
 	}
 
 	@Override
+	public void refresh() {
+		orderDateDisplay.setValue(service.getCountDate());
+		warehouseCombo.items(service.listWarehouses());
+		checkerCombo.items(service.listCheckers());
+		takerCombo.items(service.listTakers());
+		table.items(service.getDetails());
+		isCountToday.set(service.isCountToday());
+		super.refresh();
+	}
+
+	@Override
 	protected void clear() {
 		super.clear();
 		table.removeListener();
@@ -50,7 +61,7 @@ public abstract class AbstractStockTakeApp //
 
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
-		return asList(gridPane(), box.forHorizontalPane(table.build()), trackedPane());
+		return asList(gridPane(), pane.centeredHorizontal(table.build()), trackedPane());
 	}
 
 	private AppGridPane gridPane() {
@@ -68,21 +79,16 @@ public abstract class AbstractStockTakeApp //
 		return gridPane;
 	}
 
+	@Override
+	protected Node orderDateStackPane() {
+		orderDateDisplay.readOnly().build(DATE);
+		return super.orderDateStackPane();
+	}
+
 	private ScrollPane remarksDisplay() {
 		remarksDisplay.build();
 		remarksDisplay.makeEditable();
 		return remarksDisplay.get();
-	}
-
-	@Override
-	public void refresh() {
-		orderDateDisplay.setValue(service.getCountDate());
-		warehouseCombo.items(service.listWarehouses());
-		checkerCombo.items(service.listCheckers());
-		takerCombo.items(service.listTakers());
-		table.items(service.getDetails());
-		isCountToday.set(service.isCountToday());
-		super.refresh();
 	}
 
 	@Override
@@ -91,19 +97,13 @@ public abstract class AbstractStockTakeApp //
 	}
 
 	@Override
-	protected Node orderDateStackPane() {
-		orderDateDisplay.readOnly().build(DATE);
-		return super.orderDateStackPane();
-	}
-
-	@Override
 	protected void setBindings() {
 		isCountToday = new SimpleBooleanProperty(service.isCountToday());
 		isUserAnAuditor = new SimpleBooleanProperty(service.isUserAStockTaker());
 		saveButton.disableIf(table.isEmpty()//
-				.or(isCountToday.not())//
-				.or(isPosted())//
-				.or(isUserAnAuditor.not()));
+			.or(isCountToday.not())//
+			.or(isPosted())//
+			.or(isUserAnAuditor.not()));
 		checkerCombo.disableIf(warehouseCombo.isEmpty());
 		takerCombo.disableIf(checkerCombo.isEmpty());
 		table.disableIf(takerCombo.isCurrentlyDisabled());
@@ -122,7 +122,8 @@ public abstract class AbstractStockTakeApp //
 	private void setWarehouseIfAllCountDateTransactionsAreComplete() {
 		if (service.isNew())
 			try {
-				service.setWarehouseIfAllCountDateTransactionsAreCompleteAndNoStockTakeAlreadyMadeOnCountDate(warehouseCombo.getValue());
+				service.setWarehouseIfAllCountDateTransactionsAreCompleteAndNoStockTakeAlreadyMadeOnCountDate(
+					warehouseCombo.getValue());
 			} catch (Exception e) {
 				showErrorDialog(e);
 				refresh();

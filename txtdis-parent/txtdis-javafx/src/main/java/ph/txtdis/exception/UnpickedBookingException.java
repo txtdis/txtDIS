@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class UnpickedBookingException extends Exception {
+public class UnpickedBookingException
+	extends Exception {
 
 	private static final long serialVersionUID = 4124559920239749600L;
 

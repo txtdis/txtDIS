@@ -1,12 +1,6 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.ReceivingDetail;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCombo;
@@ -14,8 +8,14 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.fx.dialog.ReceivingDialog;
 import ph.txtdis.mgdc.gsm.service.ReceivingService;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 public abstract class AbstractReceivingDialog<AS extends ReceivingService, T extends ReceivingDetail>
-		extends AbstractFieldDialog<T> implements ReceivingDialog<T> {
+	extends AbstractFieldDialog<T>
+	implements ReceivingDialog<T> {
 
 	@Autowired
 	protected LabeledCombo<String> itemCombo;
@@ -27,6 +27,11 @@ public abstract class AbstractReceivingDialog<AS extends ReceivingService, T ext
 	public void refresh() {
 		super.refresh();
 		itemCombo.items(service.listReceivableItemNames());
+	}
+
+	@Override
+	protected List<InputNode<?>> addNodes() {
+		return new ArrayList<>(asList(itemCombo()));
 	}
 
 	protected LabeledCombo<String> itemCombo() {
@@ -41,11 +46,6 @@ public abstract class AbstractReceivingDialog<AS extends ReceivingService, T ext
 		} catch (Exception e) {
 			resetNodesOnError(e);
 		}
-	}
-
-	@Override
-	protected List<InputNode<?>> addNodes() {
-		return new ArrayList<>(asList(itemCombo()));
 	}
 
 	@Override

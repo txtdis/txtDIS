@@ -19,7 +19,7 @@ import ph.txtdis.mgdc.ccbpi.service.server.CustomerService;
 @RequestMapping("/customers")
 @RestController("customerController")
 public class CustomerController //
-		extends AbstractSpunSavedKeyedController<CustomerService, CustomerEntity, Customer> {
+	extends AbstractSpunSavedKeyedController<CustomerService, CustomerEntity, Customer> {
 
 	@RequestMapping(path = "/banks", method = GET)
 	public ResponseEntity<?> banks() {

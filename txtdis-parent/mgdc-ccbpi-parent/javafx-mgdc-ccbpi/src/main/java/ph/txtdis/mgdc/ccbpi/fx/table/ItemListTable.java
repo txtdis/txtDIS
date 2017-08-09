@@ -4,5 +4,5 @@ import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 
 public interface ItemListTable //
-		extends AppTable<Item> {
+	extends AppTable<Item> {
 }

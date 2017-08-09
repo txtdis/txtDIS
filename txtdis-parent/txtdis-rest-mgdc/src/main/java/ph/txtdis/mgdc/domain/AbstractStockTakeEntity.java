@@ -1,21 +1,20 @@
 package ph.txtdis.mgdc.domain;
 
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractCreatedKeyedEntity;
 import ph.txtdis.domain.UserEntity;
 
+import javax.persistence.Column;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import java.time.LocalDate;
+
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public class AbstractStockTakeEntity //
-		extends AbstractCreatedKeyedEntity<Long> {
+	extends AbstractCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -2404308873876734935L;
 

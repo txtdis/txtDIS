@@ -1,9 +1,10 @@
 package ph.txtdis.mgdc.printer;
 
-import static gnu.io.CommPortIdentifier.PORT_SERIAL;
-import static gnu.io.SerialPort.DATABITS_8;
-import static gnu.io.SerialPort.PARITY_NONE;
-import static gnu.io.SerialPort.STOPBITS_1;
+import gnu.io.CommPortIdentifier;
+import gnu.io.PortInUseException;
+import gnu.io.SerialPort;
+import gnu.io.UnsupportedCommOperationException;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,15 +12,13 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Enumeration;
 
-import org.springframework.beans.factory.annotation.Value;
-
-import gnu.io.CommPortIdentifier;
-import gnu.io.PortInUseException;
-import gnu.io.SerialPort;
-import gnu.io.UnsupportedCommOperationException;
+import static gnu.io.CommPortIdentifier.PORT_SERIAL;
+import static gnu.io.SerialPort.*;
 
 public abstract class AbstractCDRKingPrinter<T> //
-		implements ServerPrinter<T> {
+	implements ServerPrinter<T> {
+
+	protected static final int PAPER_WIDTH = 40;
 
 	private static final byte M = (byte) 0;
 
@@ -51,8 +50,6 @@ public abstract class AbstractCDRKingPrinter<T> //
 
 	private static final char PRINTER_STATUS = 1;
 
-	protected static final int PAPER_WIDTH = 40;
-
 	protected OutputStream output;
 
 	protected InputStream input;
@@ -61,10 +58,10 @@ public abstract class AbstractCDRKingPrinter<T> //
 
 	protected SerialPort serial;
 
+	protected T entity;
+
 	@Value("${com.port}")
 	private String comPort;
-
-	protected T entity;
 
 	@Override
 	public void print(T entity) throws Exception {
@@ -81,8 +78,10 @@ public abstract class AbstractCDRKingPrinter<T> //
 		}
 		try {
 			if (portName == null) {
-				throw new Exception(comPort + " cannot be found;\n" + "ensure printer is on and plugged in to said port,\nthen reboot server");
-			} else {
+				throw new Exception(comPort + " cannot be found;\n" +
+					"ensure printer is on and plugged in to said port,\nthen reboot server");
+			}
+			else {
 				serial = portId.open(portName, 100);
 				serial.setSerialPortParams(9600, DATABITS_8, STOPBITS_1, PARITY_NONE);
 				input = serial.getInputStream();

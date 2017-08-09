@@ -3,10 +3,10 @@ package ph.txtdis.mgdc.ccbpi.service;
 import java.util.List;
 
 import ph.txtdis.dto.Warehouse;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 
 public interface WarehouseService //
-		extends ListedAndResetableService<Warehouse> {
+	extends ListedAndResettableService<Warehouse> {
 
 	List<String> listNames();
 }

@@ -1,18 +1,18 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.dto.Bom;
 import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public interface QtyToBillableDetailsItemMappingService {
 
@@ -33,16 +33,32 @@ public interface QtyToBillableDetailsItemMappingService {
 		return m;
 	}
 
+	default List<BillableDetailEntity> getEntityDetails(Map<Long, BillableDetailEntity> m) {
+		return m.entrySet().stream().map(s -> s.getValue()).collect(toList());
+	}
+
 	default List<BillableDetail> getBomExpandedDetails(Billable b) {
 		List<BillableDetail> l = b.getDetails();
 		l = l.stream().filter(d -> d != null).flatMap(d -> expandAllDetails(b, d).stream()).collect(toList());
 		return l;
 	}
 
+	default Map<Long, BillableDetailEntity> mapTheSumOfTheEntityDetailAndDetailItemQuantities(Map<Long,
+		BillableDetailEntity> m,
+	                                                                                          BillableDetail b) {
+		BillableDetailEntity e = m.get(b.getId());
+		if (e != null)
+			m.put(b.getId(), setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(e, b));
+		return m;
+	}
+
 	default List<BillableDetail> expandAllDetails(Billable b, BillableDetail d) {
 		List<Bom> l = extractAll(d.getId(), d.getItemName(), BigDecimal.ONE);
 		return toDetails(b, d, l);
 	}
+
+	BillableDetailEntity setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(BillableDetailEntity e,
+	                                                                               BillableDetail b);
 
 	List<Bom> extractAll(Long itemId, String itemName, BigDecimal qty);
 
@@ -58,17 +74,4 @@ public interface QtyToBillableDetailsItemMappingService {
 		d.setReturnedQty(bd.getReturnedQty().multiply(bom.getQty()));
 		return d;
 	}
-
-	default List<BillableDetailEntity> getEntityDetails(Map<Long, BillableDetailEntity> m) {
-		return m.entrySet().stream().map(s -> s.getValue()).collect(toList());
-	}
-
-	default Map<Long, BillableDetailEntity> mapTheSumOfTheEntityDetailAndDetailItemQuantities(Map<Long, BillableDetailEntity> m, BillableDetail b) {
-		BillableDetailEntity e = m.get(b.getId());
-		if (e != null)
-			m.put(b.getId(), setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(e, b));
-		return m;
-	}
-
-	BillableDetailEntity setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(BillableDetailEntity e, BillableDetail b);
 }

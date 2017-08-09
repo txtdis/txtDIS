@@ -73,7 +73,7 @@ public class TabularCell<S extends Keyed<?>, T> {
 	private void onDoubleMouseClicks() {
 		tableColumn = tableCell.getTableColumn();
 		table = (AbstractTable<S>) tableColumn.getTableView();
-		selectionIds = new String[] { itemId(), columnIdx(), appData() };
+		selectionIds = new String[]{itemId(), columnIdx(), appData()};
 		stage = (Stage) tableCell.getScene().getWindow();
 		launchAppIfAble();
 	}
@@ -106,22 +106,15 @@ public class TabularCell<S extends Keyed<?>, T> {
 			launchApp();
 	}
 
+	private void setSelectedItem() {
+		table.setItem(tableItem);
+		stage.close();
+	}
+
 	private void launchDialog() {
 		app.actOn(selectionIds);
 		app.start();
 		refreshTable();
-	}
-
-	private void refreshTable() {
-		ObservableList<S> l = observableArrayList(table.getItems());
-		l.set(Integer.valueOf(selectionIds[0]) - 1, addedItem());
-		table.setItems(l);
-	}
-
-	@SuppressWarnings("unchecked")
-	private S addedItem() {
-		List<S> l = ((AbstractFieldDialog<S>) app).getAddedItems();
-		return l == null || l.isEmpty() ? null : l.get(0);
 	}
 
 	private void launchApp() {
@@ -131,13 +124,20 @@ public class TabularCell<S extends Keyed<?>, T> {
 		app.actOn(selectionIds);
 	}
 
+	private void refreshTable() {
+		ObservableList<S> l = observableArrayList(table.getItems());
+		l.set(Integer.valueOf(selectionIds[0]) - 1, addedItem());
+		table.setItems(l);
+	}
+
 	private ModuleType type() {
 		return ((Typed) tableItem).type();
 	}
 
-	private void setSelectedItem() {
-		table.setItem(tableItem);
-		stage.close();
+	@SuppressWarnings("unchecked")
+	private S addedItem() {
+		List<S> l = ((AbstractFieldDialog<S>) app).getAddedItems();
+		return l == null || l.isEmpty() ? null : l.get(0);
 	}
 
 	@SuppressWarnings("unchecked")

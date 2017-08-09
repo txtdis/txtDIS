@@ -11,6 +11,6 @@ import ph.txtdis.mgdc.ccbpi.service.DeliveryVarianceService;
 @Scope("prototype")
 @Component("deliveryVarianceApp")
 public class DeliveryVarianceAppImpl //
-		extends AbstractReportApp<DeliveryVarianceTable, DeliveryVarianceService, SalesItemVariance> //
-		implements DeliveryVarianceApp {
+	extends AbstractReportApp<DeliveryVarianceTable, DeliveryVarianceService, SalesItemVariance> //
+	implements DeliveryVarianceApp {
 }

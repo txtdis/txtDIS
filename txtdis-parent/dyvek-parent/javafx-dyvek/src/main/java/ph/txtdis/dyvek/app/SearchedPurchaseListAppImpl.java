@@ -8,7 +8,7 @@ import ph.txtdis.dyvek.service.PurchaseService;
 
 @Scope("prototype")
 @Component("searchedPurchaseListApp")
-public class SearchedPurchaseListAppImpl //
-		extends AbstractSearchedOrderListApp<PurchaseListTable, PurchaseService> //
-		implements SearchedPurchaseListApp {
+public class SearchedPurchaseListAppImpl
+	extends AbstractSearchedOrderListApp<PurchaseListTable, PurchaseService>
+	implements SearchedPurchaseListApp {
 }

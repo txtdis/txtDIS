@@ -4,5 +4,6 @@ import ph.txtdis.app.ItemApp;
 import ph.txtdis.app.LaunchableApp;
 
 public interface LaunchableItemApp //
-		extends LaunchableApp, ItemApp {
+	extends LaunchableApp,
+	ItemApp {
 }

@@ -1,29 +1,26 @@
 package ph.txtdis.dyvek.app;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import ph.txtdis.dyvek.fx.dialog.ClientBillDialogImpl;
+import ph.txtdis.dyvek.fx.dialog.ClientBillDialog;
 import ph.txtdis.dyvek.service.ClientBillAssignmentService;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.info.Information;
+
+import java.util.List;
 
 @Scope("prototype")
 @Component("clientBillAssignmentApp")
-public class ClientBillAssignmentAppImpl //
-		extends AbstractBillingApp<UnassignedClientDeliveryListApp, SalesAssignedDeliveryListApp, ClientBillAssignmentService> //
-		implements ClientBillAssignmentApp {
-
-	@Autowired
-	private ClientBillDialogImpl billDialog;
+public class ClientBillAssignmentAppImpl
+	extends AbstractBillingApp<UnassignedClientDeliveryListApp, SalesAssignedDeliveryListApp,
+	ClientBillAssignmentService>
+	implements ClientBillAssignmentApp {
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = super.addButtons();
-		b.add(billActionButton.icon("adjustment").tooltip("Adjustments...").build());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = super.addButtons();
+		b.add(billActionButton = button.icon("adjustment").tooltip("Adjustments...").build());
 		return b;
 	}
 
@@ -33,17 +30,35 @@ public class ClientBillAssignmentAppImpl //
 	}
 
 	@Override
+	@Lookup("unassignedClientDeliveryListApp")
+	protected UnassignedClientDeliveryListApp openOrderListApp() {
+		return null;
+	}
+
+	@Override
 	protected void openBillingDialog() {
 		try {
-			billDialog.addParent(this).start();
-			service.setAdjustments(billDialog.getAddedItems());
+			ClientBillDialog d = billDialog();
+			d.addParent(this).start();
+			service.setAdjustments(d.getAddedItems());
 		} catch (Information i) {
-			dialog.show(i).addParent(this).start();
+			messageDialog.show(i).addParent(this).start();
 		} catch (Exception e) {
 			e.printStackTrace();
 			showErrorDialog(e);
 		} finally {
 			refresh();
 		}
+	}
+
+	@Lookup
+	ClientBillDialog billDialog() {
+		return null;
+	}
+
+	@Override
+	@Lookup("salesAssignedDeliveryListApp")
+	protected SalesAssignedDeliveryListApp orderListApp() {
+		return null;
 	}
 }

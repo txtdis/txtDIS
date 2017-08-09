@@ -1,7 +1,7 @@
 package ph.txtdis.app;
 
 public interface LaunchableApp //
-		extends StartableApp {
+	extends App {
 
 	void actOn(String... id);
 
@@ -9,10 +9,10 @@ public interface LaunchableApp //
 		return false;
 	}
 
-	void showAndWait();
-
 	default void startAndWait() {
 		initialize();
 		showAndWait();
 	}
+
+	void showAndWait();
 }

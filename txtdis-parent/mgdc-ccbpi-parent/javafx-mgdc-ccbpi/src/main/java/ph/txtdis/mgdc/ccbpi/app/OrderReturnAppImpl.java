@@ -20,8 +20,8 @@ import ph.txtdis.type.Type;
 @Scope("prototype")
 @Component("orderReturnApp")
 public class OrderReturnAppImpl //
-		extends AbstractBillableApp<OrderReturnService, OrderReturnTable, Long> //
-		implements OrderReturnApp {
+	extends AbstractBillableApp<OrderReturnService, OrderReturnTable, Long> //
+	implements OrderReturnApp {
 
 	@Autowired
 	private AppCombo<OrderReturnType> reasonCombo;
@@ -38,20 +38,12 @@ public class OrderReturnAppImpl //
 	}
 
 	@Override
-	protected void buildFields() {
-		super.buildFields();
-		orderInput.build(Type.TEXT);
-		customerDisplay.readOnly().build(Type.TEXT);
-		collectorDisplay.readOnly().build(Type.TEXT);
-	}
-
-	@Override
 	protected String getDialogInput() {
 		openByIdDialog //
-				.idPrompt(service.getOpenDialogKeyPrompt()) //
-				.header(service.getOpenDialogHeader()) //
-				.prompt(service.getOpenDialogPrompt()) //
-				.addParent(this).start();
+			.idPrompt(service.getOpenDialogKeyPrompt()) //
+			.header(service.getOpenDialogHeader()) //
+			.prompt(service.getOpenDialogPrompt()) //
+			.addParent(this).start();
 		return openByIdDialog.getKey();
 	}
 
@@ -59,9 +51,17 @@ public class OrderReturnAppImpl //
 	protected List<Node> mainVerticalPaneNodes() {
 		buildFields();
 		return Arrays.asList( //
-				gridPane(), //
-				totaledTableApp.addNoSubHeadTablePane(table), //
-				trackedPane());
+			gridPane(), //
+			totaledTableApp.addNoSubHeadTablePane(table), //
+			trackedPane());
+	}
+
+	@Override
+	protected void buildFields() {
+		super.buildFields();
+		orderInput.build(Type.TEXT);
+		customerDisplay.readOnly().build(Type.TEXT);
+		collectorDisplay.readOnly().build(Type.TEXT);
 	}
 
 	@Override
@@ -152,7 +152,9 @@ public class OrderReturnAppImpl //
 		gridPane.add(collectorDisplay, 1, 1);
 		gridPane.add(label.field("Reason"), 2, 1);
 		gridPane.add(reasonCombo, 3, 1);
-	};
+	}
+
+	;
 
 	@Override
 	public void start() {

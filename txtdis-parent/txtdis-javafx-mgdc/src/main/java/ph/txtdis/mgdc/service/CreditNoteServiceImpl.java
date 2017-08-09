@@ -1,26 +1,8 @@
 package ph.txtdis.mgdc.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.time.LocalDate.now;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.UserType.AUDITOR;
-import static ph.txtdis.type.UserType.CASHIER;
-import static ph.txtdis.type.UserType.HEAD_CASHIER;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.CreditNote;
 import ph.txtdis.dto.CreditNoteDump;
 import ph.txtdis.dto.CreditNotePayment;
@@ -30,16 +12,28 @@ import ph.txtdis.exception.InvalidException;
 import ph.txtdis.exception.UnauthorizedUserException;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.fx.table.CreditNoteListTable;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SpunKeyedService;
-import ph.txtdis.type.UserType;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.util.ClientTypeMap;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static java.math.BigDecimal.ZERO;
+import static java.time.LocalDate.now;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.UserUtils.isUser;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("creditNoteService")
 public class CreditNoteServiceImpl //
-		implements CreditNoteService {
+	implements CreditNoteService {
 
 	private static final String DATA_DUMP = "Data Dump";
 
@@ -50,16 +44,7 @@ public class CreditNoteServiceImpl //
 	private static final String UNVALIDATED = "Unvalidated";
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<CreditNote> readOnlyService;
-
-	@Autowired
-	private SavingService<CreditNote> savingService;
-
-	@Autowired
-	private SpunKeyedService<CreditNote, Long> spunService;
+	private RestClientService<CreditNote> restClientService;
 
 	@Autowired
 	private ExcelReportWriter excelWriter;
@@ -79,13 +64,25 @@ public class CreditNoteServiceImpl //
 	}
 
 	@Override
-	public boolean canApprove() {
-		return isUser(MANAGER) || isUser(HEAD_CASHIER);
+	public void reset() {
+		set(null);
+		excelName = null;
+		sheetName = null;
+	}
+
+	@Override
+	public <T extends Keyed<Long>> void set(T t) {
+		creditNote = (CreditNote) t;
 	}
 
 	@Override
 	public boolean canReject() {
 		return canApprove() || isUser(AUDITOR);
+	}
+
+	@Override
+	public boolean canApprove() {
+		return isUser(MANAGER) || isUser(HEAD_CASHIER);
 	}
 
 	@Override
@@ -96,59 +93,17 @@ public class CreditNoteServiceImpl //
 		writeAnExcelFile(tables);
 	}
 
-	@Override
-	public CreditNotePayment createPayment(LocalDate d, String reference, BigDecimal payment, String remarks) {
-		CreditNotePayment p = new CreditNotePayment();
-		p.setPaymentDate(d);
-		p.setReference(reference);
-		p.setPaymentValue(payment);
-		p.setPaymentRemarks(remarks);
-		return p;
+	private void setExcelName(String name) {
+		excelName = name;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public CreditNote findByModuleId(Long id) throws Exception {
-		return findById(id);
+	public String getUnpaidHeaderText() {
+		return UNPAID + " " + getHeaderName() + " " + LIST;
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public CreditNote get() {
-		if (creditNote == null)
-			set(new CreditNote());
-		return creditNote;
-	}
-
-	@Override
-	public String getAlternateName() {
-		return "C/N";
-	}
-
-	@Override
-	public String getAppendableErrorMessage() {
-		return "Head Office Cashiers only";
-	}
-
-	@Override
-	public BigDecimal getBalance() {
-		BigDecimal v = get().getBalanceValue();
-		return v != null ? v : ZERO;
-	}
-
-	@Override
-	public String getCreatedBy() {
-		return get().getCreatedBy();
-	}
-
-	@Override
-	public ZonedDateTime getCreatedOn() {
-		return get().getCreatedOn();
-	}
-
-	@Override
-	public LocalDate getCreditDate() {
-		return get().getCreditDate();
+	private void setSheetName(String name) {
+		sheetName = name;
 	}
 
 	@Override
@@ -160,10 +115,28 @@ public class CreditNoteServiceImpl //
 		}
 	}
 
+	private void writeAnExcelFile(AppTable<?>... tables) throws IOException {
+		tables[0].setId(excelName());
+		excelWriter.table(tables).filename(excelFileName()).sheetname(sheetName).write();
+	}
+
+	@Override
+	public String getHeaderName() {
+		return "Credit Note";
+	}
+
 	private List<CreditNoteDump> toCreditNoteDumpList(CreditNote c) {
 		if (c.getPayments().isEmpty())
 			return asList(creditNoteOnlyDump(c));
 		return creditNoteDumpList(c);
+	}
+
+	private String excelName() {
+		return excelName + " as of " + toDateDisplay(now());
+	}
+
+	private String excelFileName() {
+		return excelName().replace(" ", ".").replace("/", "-");
 	}
 
 	private CreditNoteDump creditNoteOnlyDump(CreditNote c) {
@@ -192,6 +165,61 @@ public class CreditNoteServiceImpl //
 	}
 
 	@Override
+	public CreditNotePayment createPayment(LocalDate d, String reference, BigDecimal payment, String remarks) {
+		CreditNotePayment p = new CreditNotePayment();
+		p.setPaymentDate(d);
+		p.setReference(reference);
+		p.setPaymentValue(payment);
+		p.setPaymentRemarks(remarks);
+		return p;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public CreditNote findByModuleId(Long id) throws Exception {
+		return findById(id);
+	}
+
+	@Override
+	public String getAlternateName() {
+		return "C/N";
+	}
+
+	@Override
+	public String getAppendableErrorMessage() {
+		return "Head Office Cashiers only";
+	}
+
+	@Override
+	public BigDecimal getBalance() {
+		BigDecimal v = get().getBalanceValue();
+		return v != null ? v : ZERO;
+	}
+
+	@Override
+	public String getCreatedBy() {
+		return get().getCreatedBy();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public CreditNote get() {
+		if (creditNote == null)
+			set(new CreditNote());
+		return creditNote;
+	}
+
+	@Override
+	public ZonedDateTime getCreatedOn() {
+		return get().getCreatedOn();
+	}
+
+	@Override
+	public LocalDate getCreditDate() {
+		return get().getCreditDate();
+	}
+
+	@Override
 	public String getDecidedBy() {
 		return get().getDecidedBy();
 	}
@@ -207,13 +235,18 @@ public class CreditNoteServiceImpl //
 	}
 
 	@Override
-	public String getHeaderName() {
-		return "Credit Note";
+	public void setDescription(String text) {
+		get().setDescription(text);
 	}
 
 	@Override
 	public Long getId() {
 		return get().getId();
+	}
+
+	@Override
+	public void setId(Long id) {
+		get().setId(id);
 	}
 
 	@Override
@@ -232,16 +265,6 @@ public class CreditNoteServiceImpl //
 	}
 
 	@Override
-	public ReadOnlyService<CreditNote> getListedReadOnlyService() {
-		return getReadOnlyService();
-	}
-
-	@Override
-	public String getModuleName() {
-		return "creditNote";
-	}
-
-	@Override
 	public BigDecimal getPayment() {
 		return getTotal().subtract(getBalance());
 	}
@@ -252,14 +275,13 @@ public class CreditNoteServiceImpl //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public ReadOnlyService<CreditNote> getReadOnlyService() {
-		return readOnlyService;
+	public String getReference() {
+		return get().getReference();
 	}
 
 	@Override
-	public String getReference() {
-		return get().getReference();
+	public void setReference(String text) {
+		get().setReference(text);
 	}
 
 	@Override
@@ -268,19 +290,30 @@ public class CreditNoteServiceImpl //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public SavingService<CreditNote> getSavingService() {
-		return savingService;
+	public void setRemarks(String text) {
+		get().setRemarks(text);
 	}
 
 	@Override
-	public SpunKeyedService<CreditNote, Long> getSpunService() {
-		return spunService;
+	@SuppressWarnings("unchecked")
+	public RestClientService<CreditNote> getRestClientService() {
+		return restClientService;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public RestClientService<CreditNote> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public String getTitleName() {
 		return getUsername() + "@" + modulePrefix + " " + CreditNoteService.super.getTitleName();
+	}
+
+	@Override
+	public String getUsername() {
+		return username();
 	}
 
 	@Override
@@ -295,21 +328,6 @@ public class CreditNoteServiceImpl //
 	}
 
 	@Override
-	public String getUsername() {
-		return credentialService.username();
-	}
-
-	@Override
-	public String getUnpaidHeaderText() {
-		return UNPAID + " " + getHeaderName() + " " + LIST;
-	}
-
-	@Override
-	public String getUnvalidatedHeaderText() {
-		return UNVALIDATED + " " + getHeaderName() + " " + LIST;
-	}
-
-	@Override
 	public boolean isAppendable() {
 		return !isNew() && canApprove();
 	}
@@ -321,22 +339,20 @@ public class CreditNoteServiceImpl //
 
 	private List<CreditNote> list(String endPt) {
 		try {
-			return getReadOnlyService().module(getModuleName()).getList(endPt);
+			return restClientService.module(getModuleName()).getList(endPt);
 		} catch (Exception e) {
 			return null;
 		}
 	}
 
 	@Override
-	public List<CreditNote> listUnvalidated() {
-		return list("/unvalidated");
+	public String getModuleName() {
+		return "creditNote";
 	}
 
 	@Override
-	public void reset() {
-		set(null);
-		excelName = null;
-		sheetName = null;
+	public List<CreditNote> listUnvalidated() {
+		return list("/unvalidated");
 	}
 
 	@Override
@@ -347,32 +363,6 @@ public class CreditNoteServiceImpl //
 		writeAnExcelFile(tables);
 	}
 
-	private void setExcelName(String name) {
-		excelName = name;
-	}
-
-	private void setSheetName(String name) {
-		sheetName = name;
-	}
-
-	private void writeAnExcelFile(AppTable<?>... tables) throws IOException {
-		tables[0].setId(excelName());
-		excelWriter.table(tables).filename(excelFileName()).sheetname(sheetName).write();
-	}
-
-	private String excelName() {
-		return excelName + " as of " + toDateDisplay(now());
-	}
-
-	private String excelFileName() {
-		return excelName().replace(" ", ".").replace("/", "-");
-	}
-
-	@Override
-	public <T extends Keyed<Long>> void set(T t) {
-		creditNote = (CreditNote) t;
-	}
-
 	@Override
 	public void setCreditDateUponUserValidation(LocalDate d) throws Exception {
 		if (!isNew())
@@ -380,30 +370,6 @@ public class CreditNoteServiceImpl //
 		if (isUser(MANAGER) && isUser(CASHIER))
 			throw new UnauthorizedUserException("Branch Office Cashiers only");
 		get().setCreditDate(d);
-	}
-
-	private boolean isUser(UserType role) {
-		return credentialService.isUser(role);
-	}
-
-	@Override
-	public void setDescription(String text) {
-		get().setDescription(text);
-	}
-
-	@Override
-	public void setId(Long id) {
-		get().setId(id);
-	}
-
-	@Override
-	public void setReference(String text) {
-		get().setReference(text);
-	}
-
-	@Override
-	public void setRemarks(String text) {
-		get().setRemarks(text);
 	}
 
 	@Override
@@ -443,5 +409,10 @@ public class CreditNoteServiceImpl //
 		setExcelName(getUnvalidatedHeaderText());
 		setSheetName(UNVALIDATED);
 		writeAnExcelFile(table);
+	}
+
+	@Override
+	public String getUnvalidatedHeaderText() {
+		return UNVALIDATED + " " + getHeaderName() + " " + LIST;
 	}
 }

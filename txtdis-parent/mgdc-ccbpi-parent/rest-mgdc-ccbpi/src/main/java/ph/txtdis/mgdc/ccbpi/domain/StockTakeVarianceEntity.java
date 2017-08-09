@@ -13,7 +13,7 @@ import ph.txtdis.mgdc.domain.AbstractStockTakeVarianceEntity;
 @Table(name = "stock_take_variance")
 @EqualsAndHashCode(callSuper = true)
 public class StockTakeVarianceEntity //
-		extends AbstractStockTakeVarianceEntity {
+	extends AbstractStockTakeVarianceEntity {
 
 	private static final long serialVersionUID = 9092668909841849439L;
 
@@ -23,12 +23,12 @@ public class StockTakeVarianceEntity //
 	@Override
 	public String toString() {
 		return getCountDate() + ": " //
-				+ getItem().getName() + ", " //
-				+ getQuality() //
-				+ ", start= " + getStartQty() //
-				+ ", in= " + getInQty() //
-				+ ", out= " + getOutQty() // 
-				+ ", actual= " + getActualQty() //
-				+ ", final= " + getFinalQty();
+			+ getItem().getName() + ", " //
+			+ getQuality() //
+			+ ", start= " + getStartQty() //
+			+ ", in= " + getInQty() //
+			+ ", out= " + getOutQty() //
+			+ ", actual= " + getActualQty() //
+			+ ", final= " + getFinalQty();
 	}
 }

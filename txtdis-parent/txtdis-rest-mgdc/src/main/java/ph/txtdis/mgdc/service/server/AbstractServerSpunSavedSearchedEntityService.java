@@ -1,18 +1,18 @@
 package ph.txtdis.mgdc.service.server;
 
-import java.io.Serializable;
-
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.repository.SpunRepository;
 import ph.txtdis.service.AbstractSavedReferencedKeyedService;
 
+import java.io.Serializable;
+
 public abstract class AbstractServerSpunSavedSearchedEntityService< //
-		R extends SpunRepository<E, PK>, //
-		E extends Keyed<PK>, //
-		T extends Keyed<PK>, //
-		PK extends Serializable> //
-		extends AbstractSavedReferencedKeyedService<R, E, T, PK> //
-		implements SpunSavedReferencedKeyedService<E, T, PK> {
+	R extends SpunRepository<E, PK>, //
+	E extends Keyed<PK>, //
+	T extends Keyed<PK>, //
+	PK extends Serializable> //
+	extends AbstractSavedReferencedKeyedService<R, E, T, PK> //
+	implements SpunSavedReferencedKeyedService<E, T, PK> {
 
 	@Override
 	public T next(PK id) {
@@ -31,6 +31,10 @@ public abstract class AbstractServerSpunSavedSearchedEntityService< //
 		return repository.findFirstByIdGreaterThanOrderByIdAsc(id);
 	}
 
+	protected E lastEntity() {
+		return repository.findFirstByOrderByIdDesc();
+	}
+
 	@Override
 	public T previous(PK id) {
 		return toModel(isNewOrFirst(id) ? lastEntity() : previousEntity(id));
@@ -38,10 +42,6 @@ public abstract class AbstractServerSpunSavedSearchedEntityService< //
 
 	private boolean isNewOrFirst(PK id) {
 		return id == null || findEntityByPrimaryKey(id).equals(firstEntity());
-	}
-
-	protected E lastEntity() {
-		return repository.findFirstByOrderByIdDesc();
 	}
 
 	protected E previousEntity(PK id) {

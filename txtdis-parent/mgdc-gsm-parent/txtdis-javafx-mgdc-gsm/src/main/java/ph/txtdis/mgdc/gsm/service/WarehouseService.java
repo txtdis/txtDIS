@@ -1,17 +1,19 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.dto.Warehouse;
 import ph.txtdis.info.Information;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 import ph.txtdis.service.TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService;
 import ph.txtdis.service.UniqueNamedService;
 
+import java.util.List;
+
 public interface WarehouseService //
-		extends ItemFamilyLimited, ListedAndResetableService<Warehouse>, TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService,
-		UniqueNamedService<Warehouse> {
+	extends ItemFamilyLimited,
+	ListedAndResettableService<Warehouse>,
+	TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService,
+	UniqueNamedService<Warehouse> {
 
 	List<String> listNames();
 

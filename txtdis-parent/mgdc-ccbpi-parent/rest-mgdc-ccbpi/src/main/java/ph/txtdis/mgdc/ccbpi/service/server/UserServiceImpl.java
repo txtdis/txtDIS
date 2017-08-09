@@ -6,5 +6,5 @@ import ph.txtdis.service.AbstractUserService;
 
 @Service("userService")
 public class UserServiceImpl
-		extends AbstractUserService {
+	extends AbstractUserService {
 }

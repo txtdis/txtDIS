@@ -30,8 +30,8 @@ import ph.txtdis.type.UomType;
 
 @Service("deliveryListService")
 public class DeliveryListServiceImpl //
-		extends AbstractCokeBillableService //
-		implements DeliveryListService {
+	extends AbstractCokeBillableService //
+	implements DeliveryListService {
 
 	private static final String ROUTE_ID = "E3CX";
 
@@ -52,15 +52,20 @@ public class DeliveryListServiceImpl //
 			throw new DuplicateException("DDL dated " + toDateDisplay(getOrderDate()));
 	}
 
+	private Billable findByOrderDateAndRoute(LocalDate date, String route) throws Exception {
+		return getRestClientService().module(getModuleName()).getOne("/ddl?date=" + date + "&route=" + route);
+	}
+
+	@Override
+	public String getModuleName() {
+		return "deliveryList";
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public Billable findByOrderNo(String id) throws Exception {
 		Billable b = findByOrderDateAndRoute(date(id), route(id));
 		return throwNotFoundExceptionIfNull(b, id);
-	}
-
-	private Billable findByOrderDateAndRoute(LocalDate date, String route) throws Exception {
-		return getReadOnlyService().module(getModuleName()).getOne("/ddl?date=" + date + "&route=" + route);
 	}
 
 	private LocalDate date(String id) throws Exception {
@@ -85,22 +90,6 @@ public class DeliveryListServiceImpl //
 	}
 
 	@Override
-	public BillableDetail createDetail() {
-		BillableDetail d = super.createDetail();
-		d.setPriceValue(currentPurchasePriceValue(d));
-		return d;
-	}
-
-	private BigDecimal currentPurchasePriceValue(BillableDetail d) {
-		return itemService.getCurrentPriceValue(d.getId(), getOrderDate(), PURCHASE);
-	}
-
-	@Override
-	public String getModuleName() {
-		return "deliveryList";
-	}
-
-	@Override
 	public String getOpenDialogKeyPrompt() {
 		return getAbbreviatedModuleNoPrompt();
 	}
@@ -108,8 +97,8 @@ public class DeliveryListServiceImpl //
 	@Override
 	public String getOpenDialogPrompt() {
 		return "Format is: " + ORDER_DATE + ROUTE_ID //
-				+ "\nfor DDL dated " + DATE //
-				+ " of " + getRoutePrompt() + " " + ROUTE_ID;
+			+ "\nfor DDL dated " + DATE //
+			+ " of " + getRoutePrompt() + " " + ROUTE_ID;
 	}
 
 	@Override
@@ -122,20 +111,13 @@ public class DeliveryListServiceImpl //
 		return ocsDate() + route();
 	}
 
+	private String ocsDate() {
+		return toOrderConfirmationDate(getOrderDate());
+	}
+
 	@Override
 	public void initializeMap() {
 		map = new HashMap<>();
-	}
-
-	@Override
-	public List<String> listRouteNames() {
-		return isNew() ? routeNames() : asList(route());
-	}
-
-	private List<String> routeNames() {
-		List<String> routes = new ArrayList<>(asList("IMPORT"));
-		routes.addAll(channelService.listNames());
-		return routes;
 	}
 
 	@Override
@@ -156,14 +138,21 @@ public class DeliveryListServiceImpl //
 	}
 
 	@Override
+	public List<String> listRouteNames() {
+		return isNew() ? routeNames() : asList(route());
+	}
+
+	private List<String> routeNames() {
+		List<String> routes = new ArrayList<>(asList("IMPORT"));
+		routes.addAll(channelService.listNames());
+		return routes;
+	}
+
+	@Override
 	public void saveExtractedDDLs() throws Information, Exception {
 		for (Billable ddl : map.values())
 			set(save(ddl));
 		throw new SuccessfulSaveInfo(ocsDate());
-	}
-
-	private String ocsDate() {
-		return toOrderConfirmationDate(getOrderDate());
 	}
 
 	@Override
@@ -201,6 +190,17 @@ public class DeliveryListServiceImpl //
 
 	private List<BillableDetail> details(List<BillableDetail> details) {
 		return details == null ? new ArrayList<>() : new ArrayList<>(details);
+	}
+
+	@Override
+	public BillableDetail createDetail() {
+		BillableDetail d = super.createDetail();
+		d.setPriceValue(currentPurchasePriceValue(d));
+		return d;
+	}
+
+	private BigDecimal currentPurchasePriceValue(BillableDetail d) {
+		return itemService.getCurrentPriceValue(d.getId(), getOrderDate(), PURCHASE);
 	}
 
 	@Override

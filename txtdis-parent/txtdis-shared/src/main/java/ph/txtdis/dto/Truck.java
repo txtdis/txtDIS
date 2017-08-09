@@ -6,8 +6,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Truck //
-		extends AbstractCreationTracked<Long> //
-		implements Named {
+	extends AbstractCreationTracked<Long> //
+	implements Named {
 
 	private String name, route;
 

@@ -1,15 +1,6 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.STOCK_CHECKER;
-import static ph.txtdis.type.UserType.STORE_KEEPER;
-import static ph.txtdis.util.NumberUtils.isZero;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.dto.Keyed;
@@ -20,9 +11,16 @@ import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.service.TotaledBillableService;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.NumberUtils.isZero;
+import static ph.txtdis.util.UserUtils.isUser;
+
 public abstract class AbstractReceivingReportService //
-		extends AbstractBillableService //
-		implements ReceivingReportService {
+	extends AbstractBillableService //
+	implements ReceivingReportService {
 
 	@Autowired
 	private TotaledBillableService totalService;
@@ -83,18 +81,18 @@ public abstract class AbstractReceivingReportService //
 	}
 
 	@Override
-	public String getModuleName() {
-		return "receivingReport";
-	}
-
-	@Override
-	public String getModuleNo() {
-		return getReceivingId().toString();
+	public void setReceivingDetail(ReceivingDetail detail) {
+		receivingDetail = (BillableDetail) detail;
 	}
 
 	@Override
 	public String getSavingInfo() {
 		return getAbbreviatedModuleNoPrompt() + getModuleNo();
+	}
+
+	@Override
+	public String getModuleNo() {
+		return getReceivingId().toString();
 	}
 
 	@Override
@@ -141,11 +139,6 @@ public abstract class AbstractReceivingReportService //
 	}
 
 	@Override
-	public void setReceivingDetail(ReceivingDetail detail) {
-		receivingDetail = (BillableDetail) detail;
-	}
-
-	@Override
 	public void updateSummaries(List<BillableDetail> items) {
 		super.updateSummaries(items);
 		set(totalService.updateFinalTotals(get()));
@@ -158,26 +151,31 @@ public abstract class AbstractReceivingReportService //
 	}
 
 	protected Billable validateBooking(Long id) throws Exception {
-		Billable booking = getReadOnlyService().module(getModuleName()).getOne("/booking?id=" + id);
+		Billable booking = getRestClientService().module(getModuleName()).getOne("/booking?id=" + id);
 		confirmBookingExists(id.toString(), booking);
 		confirmBookingHasBeenPicked(id.toString(), booking);
 		confirmBookingIsStillReceivable(id, booking);
 		return booking;
 	}
 
-	protected void confirmBookingIsStillReceivable(Long bookingId, Billable b) throws Exception {
-		confirmItemsNotBeenReceived(bookingId, b);
-	}
-
-	protected void confirmItemsNotBeenReceived(Long id, Billable b) throws Exception {
-		Long receivingId = b.getReceivingId();
-		if (receivingId != null)
-			throw new AlreadyReceivedBookingIdException(getReferencePrompt(b), id.toString(), receivingId);
-	}
-
 	private void updateBasedOnBooking(Billable b) {
 		bookedDetails = b.getDetails();
 		b.setDetails(null);
 		set(b);
+	}
+
+	@Override
+	public String getModuleName() {
+		return "receivingReport";
+	}
+
+	protected void confirmBookingIsStillReceivable(Long bookingId, Billable b) throws Exception {
+		confirmItemsNotBeenReceived(bookingId, b);
+	}
+
+	private void confirmItemsNotBeenReceived(Long id, Billable b) throws Exception {
+		Long receivingId = b.getReceivingId();
+		if (receivingId != null)
+			throw new AlreadyReceivedBookingIdException(getReferencePrompt(b), id.toString(), receivingId);
 	}
 }

@@ -1,19 +1,22 @@
 package ph.txtdis.service;
 
+import ph.txtdis.dto.CreationLogged;
+import ph.txtdis.dto.Remittance;
+import ph.txtdis.type.PaymentType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import ph.txtdis.dto.CreationLogged;
-import ph.txtdis.dto.Remittance;
-import ph.txtdis.info.Information;
-import ph.txtdis.type.PaymentType;
-
-public interface RemittanceService //
-		extends BankDrawnCheckService<Remittance>, DecisionNeededService, OpenDialogHeaderTextService, ResettableService,
-		RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long>, Spreadsheet<Remittance>,
-		CreationLogged {
+public interface RemittanceService
+	extends BankDrawnCheckService<Remittance>,
+	DecisionNeededService,
+	OpenDialogHeaderTextService,
+	ResettableService,
+	RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<Long>,
+	Spreadsheet<Remittance>,
+	CreationLogged {
 
 	boolean canDepositCash();
 
@@ -24,6 +27,8 @@ public interface RemittanceService //
 	boolean canReceiveTransferredPayments();
 
 	Long getCheckId();
+
+	void setCheckId(Long id);
 
 	List<String> getCollectors();
 
@@ -38,6 +43,8 @@ public interface RemittanceService //
 	List<String> getDraweeBanks();
 
 	LocalDate getPaymentDate();
+
+	void setPaymentDate(LocalDate d);
 
 	PaymentType[] getPaymentTypes();
 
@@ -59,10 +66,6 @@ public interface RemittanceService //
 
 	void resetInputDataRelatedToPayment();
 
-	void save(List<Remittance> l) throws Information, Exception;
-
-	void setCheckId(Long id);
-
 	void setCollector(String s);
 
 	void setDepositData(String bank, ZonedDateTime depositedOn);
@@ -72,8 +75,6 @@ public interface RemittanceService //
 	void setFundTransferData();
 
 	void setPayment(BigDecimal p);
-
-	void setPaymentDate(LocalDate d);
 
 	void validateBankCheckBeforeSetting(String bank) throws Exception;
 

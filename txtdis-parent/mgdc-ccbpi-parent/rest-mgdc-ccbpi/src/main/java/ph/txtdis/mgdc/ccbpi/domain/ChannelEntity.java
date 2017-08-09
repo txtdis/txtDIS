@@ -14,11 +14,11 @@ import ph.txtdis.type.BillingType;
 @Data
 @Entity
 @Table(name = "channel", //
-		indexes = { @Index(columnList = "is_visited") })
+	indexes = {@Index(columnList = "is_visited")})
 @EqualsAndHashCode(callSuper = true)
 public class ChannelEntity //
-		extends AbstractNamedCreatedKeyedEntity<Long> //
-		implements Named {
+	extends AbstractNamedCreatedKeyedEntity<Long> //
+	implements Named {
 
 	private static final long serialVersionUID = -8012814058038917889L;
 

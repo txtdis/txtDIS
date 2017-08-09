@@ -6,15 +6,15 @@ import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase
 import org.apache.commons.lang3.StringUtils;
 
 public interface HeaderNameService //
-		extends ModuleNamedService {
+	extends ModuleNamedService {
+
+	default String getNewHeaderName() {
+		return "New " + getHeaderName();
+	}
 
 	default String getHeaderName() {
 		String name = capitalize(getModuleName());
 		String[] names = splitByCharacterTypeCamelCase(name);
 		return StringUtils.join(names, " ");
-	}
-
-	default String getNewHeaderName() {
-		return "New " + getHeaderName();
 	}
 }

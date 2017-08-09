@@ -1,21 +1,20 @@
 package ph.txtdis.app;
 
+import javafx.stage.Stage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.stage.Stage;
 
 @Scope("prototype")
 @Component("dialogClosingOnlyApp")
 public class DialogClosingOnlyApp //
-		implements LaunchableApp {
+	implements LaunchableApp {
 
 	@Override
 	public void actOn(String... id) {
 	}
 
 	@Override
-	public StartableApp addParent(Stage stage) {
+	public App addParent(Stage stage) {
 		return null;
 	}
 

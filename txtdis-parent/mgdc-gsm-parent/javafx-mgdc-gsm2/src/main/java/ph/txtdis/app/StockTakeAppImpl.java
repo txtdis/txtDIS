@@ -7,5 +7,6 @@ import ph.txtdis.mgdc.gsm.app.AbstractStockTakeApp;
 
 @Scope("prototype")
 @Component("stockTakeApp")
-public class StockTakeAppImpl extends AbstractStockTakeApp {
+public class StockTakeAppImpl
+	extends AbstractStockTakeApp {
 }

@@ -1,28 +1,26 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.app.AbstractPaymentDetailedRemittanceApp;
 import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.control.AppButtonImpl;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.mgdc.service.AdjustableInputtedPaymentDetailedRemittanceService;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 @Scope("prototype")
 @Component("remittanceApp")
 public class RemittanceAppImpl //
-		extends AbstractPaymentDetailedRemittanceApp<AdjustableInputtedPaymentDetailedRemittanceService> {
+	extends AbstractPaymentDetailedRemittanceApp<AdjustableInputtedPaymentDetailedRemittanceService> {
 
 	@Autowired
 	private AppButton paymentReceiptButton, unvalidatedListButton;
@@ -39,8 +37,8 @@ public class RemittanceAppImpl //
 	private BooleanProperty canReceiveTransferredPayments;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		b.add(6, paymentReceiptButton.icon("payment").tooltip("Receive payment").build());
 		b.add(unvalidatedListButton.icon("list").tooltip("List unvalidated").build());
 		return b;
@@ -55,7 +53,8 @@ public class RemittanceAppImpl //
 
 	@Override
 	protected List<Node> depositNodes() {
-		List<Node> l = new ArrayList<>(logNodes("Payment Received by", paymentReceivedByDisplay, paymentReceivedOnDisplay));
+		List<Node> l =
+			new ArrayList<>(logNodes("Payment Received by", paymentReceivedByDisplay, paymentReceivedOnDisplay));
 		l.addAll(super.depositNodes());
 		return l;
 	}
@@ -71,8 +70,8 @@ public class RemittanceAppImpl //
 	@Override
 	protected BooleanBinding saveButtonDisableBindings() {
 		return super.saveButtonDisableBindings() //
-				.or(draweeBankCombo.are(service.listAdjustingAccounts()) //
-						.and(remarksDisplay.isEmpty()));
+			.or(draweeBankCombo.are(service.listAdjustingAccounts()) //
+				.and(remarksDisplay.isEmpty()));
 	}
 
 	@Override
@@ -112,7 +111,7 @@ public class RemittanceAppImpl //
 
 	private void actOnPending(String id) {
 		String msg = "Validate, deposit or receive\nRemittance No. " + id + "\nfirst, to proceed.";
-		dialog.showError(msg).addParent(this).start();
+		messageDialog.showError(msg).addParent(this).start();
 		actOn(id, "");
 	}
 }

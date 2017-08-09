@@ -9,7 +9,8 @@ import ph.txtdis.mgdc.ccbpi.domain.ItemEntity;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.type.PriceType;
 
-public interface EmptiesItemService extends ItemService {
+public interface EmptiesItemService
+	extends ItemService {
 
 	List<Item> listEmpties();
 

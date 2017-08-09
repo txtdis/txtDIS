@@ -1,16 +1,20 @@
 package ph.txtdis.service;
 
-import static java.time.DayOfWeek.SUNDAY;
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.PaymentType.CASH;
-import static ph.txtdis.type.PaymentType.CHECK;
-import static ph.txtdis.type.PaymentType.values;
-import static ph.txtdis.type.UserType.CASHIER;
-import static ph.txtdis.type.UserType.COLLECTOR;
-import static ph.txtdis.type.UserType.HEAD_CASHIER;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.util.DateTimeUtils.toHypenatedYearMonthDay;
-import static ph.txtdis.util.TextUtils.blankIfNullElseAddCarriageReturn;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import ph.txtdis.dto.DecisionNeededValidatedCreatedKeyed;
+import ph.txtdis.dto.Keyed;
+import ph.txtdis.dto.Remittance;
+import ph.txtdis.excel.ExcelReportWriter;
+import ph.txtdis.exception.CashCollectionHasBeenReceivedFromCollectorException;
+import ph.txtdis.exception.DuplicateCheckException;
+import ph.txtdis.exception.NotFoundException;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.info.Information;
+import ph.txtdis.info.SuccessfulSaveInfo;
+import ph.txtdis.type.PaymentType;
+import ph.txtdis.util.ClientTypeMap;
+import ph.txtdis.util.DateTimeUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -19,50 +23,26 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import static java.util.Collections.singletonList;
+import static ph.txtdis.type.PaymentType.*;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.DateTimeUtils.toHypenatedYearMonthDay;
+import static ph.txtdis.util.TextUtils.blankIfNullElseAddCarriageReturn;
+import static ph.txtdis.util.UserUtils.isUser;
+import static ph.txtdis.util.UserUtils.username;
 
-import ph.txtdis.dto.DecisionNeededValidatedCreatedKeyed;
-import ph.txtdis.dto.Keyed;
-import ph.txtdis.dto.Remittance;
-import ph.txtdis.excel.ExcelReportWriter;
-import ph.txtdis.exception.CashCollectionHasBeenReceivedFromCollectorException;
-import ph.txtdis.exception.DuplicateCheckException;
-import ph.txtdis.exception.NotFoundException;
-import ph.txtdis.exception.NotTodayOrYesterdayCashPaymentException;
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.info.Information;
-import ph.txtdis.info.SuccessfulSaveInfo;
-import ph.txtdis.type.PaymentType;
-import ph.txtdis.util.ClientTypeMap;
-import ph.txtdis.util.DateTimeUtils;
-
-public abstract class AbstractRemittanceService //
-		implements RemittanceService {
+public abstract class AbstractRemittanceService 
+	implements RemittanceService {
 
 	@Autowired
 	private FinancialService bankService;
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<Remittance> readOnlyService;
-
-	@Autowired
-	private SavingService<Remittance> savingService;
-
-	@Autowired
-	private SavingService<List<Remittance>> listSavingService;
-
-	@Autowired
-	private SpunKeyedService<Remittance, Long> spunService;
+	private RestClientService<Remittance> restClientService;
 
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	protected SyncService syncService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -85,21 +65,28 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	public boolean canApprove() {
-		if (!isAHeadCashier())
-			return false;
-		if (getDepositedOn() == null)
-			return false;
-		return isCashPayment() ? true : checkCleared();
+	public void reset() {
+		set(new Remittance());
+		collectors = null;
 	}
 
-	protected boolean isAHeadCashier() {
-		return credentialService.isUser(HEAD_CASHIER) || credentialService.isUser(MANAGER);
+	@Override
+	public <T extends Keyed<Long>> void set(T t) {
+		payment = (Remittance) t;
+	}
+
+	@Override
+	public boolean canApprove() {
+		return isAHeadCashier() && getDepositedOn() != null && (isCashPayment() || checkCleared());
 	}
 
 	@Override
 	public boolean canDepositCash() {
 		return isAHeadCashier();
+	}
+
+	protected boolean isAHeadCashier() {
+		return isUser(HEAD_CASHIER) || isUser(MANAGER);
 	}
 
 	@Override
@@ -113,17 +100,17 @@ public abstract class AbstractRemittanceService //
 	}
 
 	private boolean isACashier() {
-		return isAHeadCashier() || credentialService.isUser(CASHIER);
+		return isAHeadCashier() || isUser(CASHIER);
 	}
 
 	@Override
 	public boolean canReceiveTransferredPayments() {
-		return isAHeadCashier() //
-				&& !isNew() //
-				&& getReceivedOn() == null //
-				&& getDepositedOn() == null //
-				&& getDecidedOn() == null //
-				&& (getPaymentDate() != null && getPaymentDate().isAfter(syncService.getServerDate()));
+		return isAHeadCashier() 
+			&& !isNew() 
+			&& getReceivedOn() == null 
+			&& getDepositedOn() == null 
+			&& getDecidedOn() == null 
+			&& (getPaymentDate() != null && getPaymentDate().isAfter(getServerDate()));
 	}
 
 	@Override
@@ -132,30 +119,22 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	public Remittance findByCheck(String bank, Long checkId) throws Exception {
-		return findRemittance("/check?bank=" + bank + "&id=" + checkId);
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
 	public Remittance findByOrderNo(String key) throws Exception {
-		Remittance e = (Remittance) findByModuleKey(key);
+		Remittance e = findByModuleKey(key);
 		if (e == null)
 			throw new NotFoundException(getAbbreviatedModuleNoPrompt() + key);
 		return e;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public Remittance get() {
-		if (payment == null)
-			reset();
-		return payment;
+	public String getAbbreviatedModuleNoPrompt() {
+		return getHeaderName() + " ID ";
 	}
 
 	@Override
-	public String getAbbreviatedModuleNoPrompt() {
-		return getHeaderName() + " ID ";
+	public String getHeaderName() {
+		return "Remittance";
 	}
 
 	@Override
@@ -173,15 +152,10 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	public Long getCheckId() {
-		return get().getCheckId();
-	}
-
-	@Override
 	public List<String> getReceivedFromList() {
 		if (collectors == null)
 			collectors = getCollectors();
-		return getId() == null ? collectors : asList(get().getCollector());
+		return getId() == null ? collectors : singletonList(get().getReceivedFrom());
 	}
 
 	@Override
@@ -192,6 +166,14 @@ public abstract class AbstractRemittanceService //
 	@Override
 	public String getCreatedBy() {
 		return get().getCreatedBy();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Remittance get() {
+		if (payment == null)
+			reset();
+		return payment;
 	}
 
 	@Override
@@ -230,13 +212,13 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	public String getHeaderName() {
-		return "Remittance";
+	public Long getId() {
+		return get().getId();
 	}
 
 	@Override
-	public Long getId() {
-		return get().getId();
+	public void setId(Long id) {
+		get().setId(id);
 	}
 
 	@Override
@@ -244,27 +226,23 @@ public abstract class AbstractRemittanceService //
 		return get().getIsValid();
 	}
 
-	@Override
-	public ReadOnlyService<Remittance> getListedReadOnlyService() {
-		return getReadOnlyService();
-	}
-
 	protected LocalDate goLiveDate() {
 		return DateTimeUtils.toDate(goLive);
 	}
 
 	@Override
-	public String getModuleName() {
-		return "remittance";
-	}
-
-	@Override
 	public List<String> getDraweeBanks() {
-		return getId() == null ? listBanks() : asList(getDraweeBank());
+		return getId() == null ? listBanks() : singletonList(getDraweeBank());
 	}
 
 	protected String getDraweeBank() {
 		return get().getDraweeBank();
+	}
+
+	@Override
+	public void setDraweeBank(String c) {
+		if (isNew())
+			get().setDraweeBank(c);
 	}
 
 	@Override
@@ -278,16 +256,26 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	public PaymentType[] getPaymentTypes() {
-		if (isNew())
-			return values();
-		return new PaymentType[] { getCheckId() == null ? CASH : CHECK };
+	public void setPaymentDate(LocalDate d) {
+		get().setPaymentDate(d);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public ReadOnlyService<Remittance> getReadOnlyService() {
-		return readOnlyService;
+	public PaymentType[] getPaymentTypes() {
+		if (isNew())
+			return PaymentType.values();
+		return new PaymentType[]{getCheckId() == null ? CASH : CHECK};
+	}
+
+	@Override
+	public Long getCheckId() {
+		return get().getCheckId();
+	}
+
+	@Override
+	public void setCheckId(Long id) {
+		if (isNew())
+			get().setCheckId(id);
 	}
 
 	@Override
@@ -306,24 +294,27 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public SavingService<Remittance> getSavingService() {
-		return savingService;
+	public void setRemarks(String text) {
+		if (getRemarks() != null)
+			text = getRemarks() + "\n" + text;
+		get().setRemarks(text);
 	}
 
 	@Override
-	public SpunKeyedService<Remittance, Long> getSpunService() {
-		return spunService;
+	@SuppressWarnings("unchecked")
+	public RestClientService<Remittance> getRestClientService() {
+		return restClientService;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public RestClientService<Remittance> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public String getSubhead() {
 		return null;
-	}
-
-	@Override
-	public String getTitleName() {
-		return getUsername() + "@" + modulePrefix + " " + RemittanceService.super.getTitleName();
 	}
 
 	@Override
@@ -345,6 +336,15 @@ public abstract class AbstractRemittanceService //
 		return findRemittance().getOne(endPt);
 	}
 
+	private RestClientService<Remittance> findRemittance() {
+		return restClientService.module(getModuleName());
+	}
+
+	@Override
+	public String getModuleName() {
+		return "remittance";
+	}
+
 	@Override
 	public BigDecimal getValue() {
 		return get().getValue();
@@ -364,6 +364,10 @@ public abstract class AbstractRemittanceService //
 		}
 	}
 
+	protected List<Remittance> listRemittances(String endPt) throws Exception {
+		return findRemittance().getList(endPt);
+	}
+
 	@Override
 	public void open(String bank, Long checkId) throws Exception {
 		Remittance p = findByCheck(bank, checkId);
@@ -373,9 +377,8 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	public void reset() {
-		set(new Remittance());
-		collectors = null;
+	public Remittance findByCheck(String bank, Long checkId) throws Exception {
+		return findRemittance("/check?bank=" + bank + "&id=" + checkId);
 	}
 
 	@Override
@@ -394,31 +397,33 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	public void save(List<Remittance> l) throws Information, Exception {
-		listSavingService.module(getModuleName()).save(l);
-	}
-
-	@Override
 	@SuppressWarnings("unchecked")
 	public void saveAsExcel(AppTable<Remittance>... tables) throws IOException {
 		excel.table(tables).filename(excelName()).sheetname(getExcelSheetName()).write();
 	}
 
-	@Override
-	public <T extends Keyed<Long>> void set(T t) {
-		payment = (Remittance) t;
+	private String excelName() {
+		return getTitleName().replace(getUsername() + "@", "").replace(" ", ".") + "." + getExcelSheetName();
+	}
+
+	private String getExcelSheetName() {
+		return toHypenatedYearMonthDay(getServerDate().minusDays(15L)) + ".toDate";
 	}
 
 	@Override
-	public void setCheckId(Long id) {
-		if (isNew())
-			get().setCheckId(id);
+	public String getTitleName() {
+		return getUsername() + "@" + modulePrefix + " " + RemittanceService.super.getTitleName();
+	}
+
+	@Override
+	public String getUsername() {
+		return username();
 	}
 
 	@Override
 	public void setCollector(String s) {
 		if (isNew())
-			get().setCollector(s);
+			get().setReceivedFrom(s);
 	}
 
 	@Override
@@ -430,12 +435,6 @@ public abstract class AbstractRemittanceService //
 	}
 
 	@Override
-	public void setDraweeBank(String c) {
-		if (isNew())
-			get().setDraweeBank(c);
-	}
-
-	@Override
 	public void setFundTransferData() {
 		get().setReceivedBy(getUsername());
 		get().setReceivedOn(ZonedDateTime.now());
@@ -444,18 +443,6 @@ public abstract class AbstractRemittanceService //
 	@Override
 	public void setPayment(BigDecimal p) {
 		get().setValue(p);
-	}
-
-	@Override
-	public void setPaymentDate(LocalDate d) {
-		get().setPaymentDate(d);
-	}
-
-	@Override
-	public void setRemarks(String text) {
-		if (getRemarks() != null)
-			text = getRemarks() + "\n" + text;
-		get().setRemarks(text);
 	}
 
 	@Override
@@ -471,10 +458,8 @@ public abstract class AbstractRemittanceService //
 	@Override
 	public void validateCashCollection() throws Exception {
 		LocalDate d = getPaymentDate();
-		if (!isNew() || d == null || credentialService.isUser(MANAGER))
+		if (!isNew() || d == null || isUser(MANAGER))
 			return;
-		// TODO -- remove later
-		// validateCashPaymentDateIsYesterdayOrToday(d);
 		validateNoCashPaymentsReceivedFromCollector(d);
 	}
 
@@ -484,56 +469,21 @@ public abstract class AbstractRemittanceService //
 	}
 
 	protected boolean checkCleared() {
-		return syncService.getServerDate().isAfter(getPaymentDate().plusDays(3L));
-	}
-
-	private ReadOnlyService<Remittance> findRemittance() {
-		return readOnlyService.module(getModuleName());
-	}
-
-	protected List<Remittance> listRemittances(String endPt) throws Exception {
-		return findRemittance().getList(endPt);
-	}
-
-	private String excelName() {
-		return getTitleName().replace(getUsername() + "@", "").replace(" ", ".") + "." + getExcelSheetName();
-	}
-
-	private String getExcelSheetName() {
-		return toHypenatedYearMonthDay(syncService.getServerDate().minusDays(15L)) + ".toDate";
+		return getServerDate().isAfter(getPaymentDate().plusDays(3L));
 	}
 
 	@Override
-	public <T extends DecisionNeededValidatedCreatedKeyed<Long>> String addDecisionToRemarks(T t, Boolean isValid, String remarks) {
+	public <T extends DecisionNeededValidatedCreatedKeyed<Long>> String addDecisionToRemarks(T t,
+	                                                                                         Boolean isValid,
+	                                                                                         String remarks) {
 		String s = blankIfNullElseAddCarriageReturn(t.getRemarks());
 		return s + getDecisionTag(isValid, "IN", "VALID", remarks);
 	}
 
-	// TODO -- use later
-	@SuppressWarnings("unused")
-	private void validateCashPaymentDateIsYesterdayOrToday(LocalDate d) throws Exception {
-		LocalDate today = syncService.getServerDate();
-		LocalDate yesterday = today.minusDays(1L);
-		if (yesterday.getDayOfWeek() == SUNDAY)
-			yesterday = today.minusDays(1L);
-		if (d.isBefore(yesterday) || d.isAfter(today))
-			throw new NotTodayOrYesterdayCashPaymentException();
-	}
-
 	private void validateNoCashPaymentsReceivedFromCollector(LocalDate d) throws Exception {
-		String c = get().getCollector();
-		Remittance p = findRemittance("/collector?name=" + c + "&date=" + d);
+		String c = get().getReceivedFrom();
+		Remittance p = findRemittance("/receivedFrom?name=" + c + "&date=" + d);
 		if (p != null)
 			throw new CashCollectionHasBeenReceivedFromCollectorException(c, d);
-	}
-
-	@Override
-	public void setId(Long id) {
-		get().setId(id);
-	}
-
-	@Override
-	public String getUsername() {
-		return credentialService.username();
 	}
 }

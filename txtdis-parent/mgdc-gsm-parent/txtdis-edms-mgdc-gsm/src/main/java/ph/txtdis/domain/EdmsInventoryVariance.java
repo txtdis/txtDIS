@@ -14,8 +14,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "tr_dsmr_h")
-public class EdmsInventoryVariance extends EdmsAbstractWarehousedDatedRemarkedReferencedStatusCreatedId
-		implements Serializable {
+public class EdmsInventoryVariance
+	extends EdmsAbstractWarehousedDatedRemarkedReferencedStatusCreatedId
+	implements Serializable {
 
 	private static final long serialVersionUID = -8228232219863703852L;
 

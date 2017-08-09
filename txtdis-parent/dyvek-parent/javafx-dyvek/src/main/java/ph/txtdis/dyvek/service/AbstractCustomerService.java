@@ -1,37 +1,32 @@
 package ph.txtdis.dyvek.service;
 
-import static org.apache.commons.lang3.StringUtils.uncapitalize;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dyvek.model.Customer;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.PartnerType;
 import ph.txtdis.util.ClientTypeMap;
 
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.uncapitalize;
+
 public abstract class AbstractCustomerService //
-		implements CustomerService {
+	implements CustomerService {
 
 	@Autowired
-	protected ReadOnlyService<Customer> readOnlyService;
-
-	@Autowired
-	private SavingService<Customer> savingService;
+	private RestClientService<Customer> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
 
 	@Override
-	public ReadOnlyService<Customer> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<Customer> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
-	public String getModuleName() {
-		return "customer";
+	public RestClientService<Customer> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -62,6 +57,11 @@ public abstract class AbstractCustomerService //
 		Customer c = new Customer();
 		c.setName(name);
 		c.setType(type);
-		return savingService.module(getModuleName()).save(c);
+		return restClientService.module(getModuleName()).save(c);
+	}
+
+	@Override
+	public String getModuleName() {
+		return "customer";
 	}
 }

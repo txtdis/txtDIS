@@ -1,4 +1,5 @@
 package ph.txtdis.mgdc.fx.dialog;
 
-public interface GoodRmaDialog extends BillableDialog {
+public interface GoodRmaDialog
+	extends BillableDialog {
 }

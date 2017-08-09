@@ -3,7 +3,7 @@ package ph.txtdis.converter;
 import javafx.util.StringConverter;
 
 public class UpperCaseConverter //
-		extends StringConverter<String> {
+	extends StringConverter<String> {
 
 	@Override
 	public String toString(String text) {

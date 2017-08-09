@@ -1,10 +1,10 @@
 package ph.txtdis.mgdc.service;
 
-import static java.time.LocalDate.now;
+import ph.txtdis.exception.DateInThePastException;
 
 import java.time.LocalDate;
 
-import ph.txtdis.exception.DateInThePastException;
+import static java.time.LocalDate.now;
 
 public interface DateNotInThePast {
 

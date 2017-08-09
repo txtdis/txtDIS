@@ -1,33 +1,17 @@
 package ph.txtdis.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.time.DayOfWeek.FRIDAY;
-import static java.time.DayOfWeek.MONDAY;
-import static java.time.DayOfWeek.SATURDAY;
-import static java.time.DayOfWeek.SUNDAY;
-import static java.time.DayOfWeek.THURSDAY;
-import static java.time.DayOfWeek.TUESDAY;
-import static java.time.DayOfWeek.WEDNESDAY;
-import static java.util.Arrays.asList;
-import static java.util.Comparator.comparing;
-import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
-import static ph.txtdis.service.EdmsLocationServiceImpl.MANILA;
-import static ph.txtdis.service.EdmsLocationServiceImpl.MANILA_DISTRICTS;
-import static ph.txtdis.type.PartnerType.OUTLET;
-import static ph.txtdis.type.PriceType.DEALER;
-import static ph.txtdis.type.VisitFrequency.F4;
-import static ph.txtdis.util.Code.ACTIVE;
-import static ph.txtdis.util.Code.CASH_AND_CREDIT;
-import static ph.txtdis.util.Code.CASH_ONLY;
-import static ph.txtdis.util.Code.COD;
-import static ph.txtdis.util.Code.CUSTOMER_PREFIX;
-import static ph.txtdis.util.Code.EDMS;
-import static ph.txtdis.util.Code.NO;
-import static ph.txtdis.util.Code.VOID;
-import static ph.txtdis.util.Code.YES;
-import static ph.txtdis.util.DateTimeUtils.toTimestampText;
-import static ph.txtdis.util.TextUtils.blankIfNull;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.domain.*;
+import ph.txtdis.dto.*;
+import ph.txtdis.mgdc.gsm.dto.Channel;
+import ph.txtdis.mgdc.gsm.dto.Customer;
+import ph.txtdis.repository.*;
+import ph.txtdis.type.PartnerType;
+import ph.txtdis.type.VisitFrequency;
+import ph.txtdis.util.Code;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -37,40 +21,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.domain.EdmsAgingReceivable;
-import ph.txtdis.domain.EdmsCreditDetail;
-import ph.txtdis.domain.EdmsCustomer;
-import ph.txtdis.domain.EdmsCustomerBank;
-import ph.txtdis.domain.EdmsInvoice;
-import ph.txtdis.domain.EdmsOutletType;
-import ph.txtdis.domain.EdmsWeeklyVisit;
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.CreditDetail;
-import ph.txtdis.dto.Location;
-import ph.txtdis.dto.PricingType;
-import ph.txtdis.dto.Route;
-import ph.txtdis.dto.Routing;
-import ph.txtdis.dto.WeeklyVisit;
-import ph.txtdis.mgdc.gsm.dto.Channel;
-import ph.txtdis.mgdc.gsm.dto.Customer;
-import ph.txtdis.repository.EdmsAgingReceivableRepository;
-import ph.txtdis.repository.EdmsChannelRepository;
-import ph.txtdis.repository.EdmsCreditDetailRepository;
-import ph.txtdis.repository.EdmsCustomerBankRepository;
-import ph.txtdis.repository.EdmsCustomerRepository;
-import ph.txtdis.repository.EdmsWeeklyVisitRepository;
-import ph.txtdis.type.PartnerType;
-import ph.txtdis.type.VisitFrequency;
-import ph.txtdis.util.Code;
+import static java.math.BigDecimal.ZERO;
+import static java.time.DayOfWeek.*;
+import static java.util.Arrays.asList;
+import static java.util.Comparator.comparing;
+import static org.apache.commons.lang3.StringUtils.leftPad;
+import static org.apache.commons.lang3.text.WordUtils.capitalizeFully;
+import static ph.txtdis.service.EdmsLocationServiceImpl.MANILA;
+import static ph.txtdis.service.EdmsLocationServiceImpl.MANILA_DISTRICTS;
+import static ph.txtdis.type.PartnerType.OUTLET;
+import static ph.txtdis.type.PriceType.DEALER;
+import static ph.txtdis.type.VisitFrequency.F4;
+import static ph.txtdis.util.Code.*;
+import static ph.txtdis.util.DateTimeUtils.toTimestampText;
+import static ph.txtdis.util.TextUtils.blankIfNull;
 
 @Service("customerService")
 public class EdmsCustomerServiceImpl //
-		implements EdmsCustomerService {
+	implements EdmsCustomerService {
 
 	@Autowired
 	private EdmsAgingReceivableRepository agingRepository;
@@ -147,6 +115,14 @@ public class EdmsCustomerServiceImpl //
 		saveVisitSchedule(e, c);
 	}
 
+	private void saveCreditDetail(Customer c) {
+		EdmsCreditDetail e = creditDetailRepository.findByCustomerCode(code(c));
+		CreditDetail cd = getCredit(c);
+		if (e == null)
+			e = createCreditDetail(e, cd, code(c));
+		updateEdmsCreditDetail(e, cd);
+	}
+
 	private String code(Customer c) {
 		return prefix + leftPad(c.getId().toString(), 8, "0");
 	}
@@ -158,10 +134,57 @@ public class EdmsCustomerServiceImpl //
 		return saveCustomer(c);
 	}
 
+	private EdmsCustomer updateCustomer(EdmsCustomer e, Customer c) {
+		e.setCode(code(c));
+		e.setName(name(c));
+		e.setBusinessName(e.getName());
+		e.setSellerCode(route(c));
+		e.setChannel(channel(c));
+		e.setStatus(status(c));
+		e.setVisitFrequency(visitFrequency(c));
+		e.setVisitDay(visitDay(c));
+		e.setStreet(street(c));
+		e.setBarangay(barangay(c));
+		e.setCity(city(c));
+		e.setProvince(province(c));
+		e.setOwner(owner(c));
+		e.setPhoneNo(phoneNo(c));
+		return customerRepository.save(e);
+	}
+
+	private void saveVisitSchedule(EdmsCustomer ec, Customer c) {
+		EdmsWeeklyVisit ev = new EdmsWeeklyVisit();
+		ev.setCode(ec.getCode());
+		ev.setFrequency(ec.getVisitFrequency());
+		ev = weeklySchedule(ev, ec, c);
+		weeklyVisitRepository.save(ev);
+	}
+
+	private CreditDetail getCredit(Customer c) {
+		return c.getCreditDetails().stream() //
+			.filter(p -> !p.getStartDate().isAfter(LocalDate.now())) //
+			.max(comparing(CreditDetail::getStartDate)) //
+			.orElse(null);
+	}
+
+	private EdmsCreditDetail createCreditDetail(EdmsCreditDetail e, CreditDetail cd, String code) {
+		e = new EdmsCreditDetail();
+		e.setCustomerCode(code);
+		e.setChequeAllowed(isChequeAllowed(cd));
+		return e;
+	}
+
+	private void updateEdmsCreditDetail(EdmsCreditDetail e, CreditDetail cd) {
+		e.setPayment(payment(cd));
+		e.setPaymentTermCode(paymentTerm(cd));
+		e.setCreditLimit(creditLimit(cd));
+		creditDetailRepository.save(e);
+	}
+
 	private void saveAutoNo(Customer c) {
 		autoNumberService.saveAutoNo( //
-				CUSTOMER_PREFIX, //
-				c.getId().toString());
+			CUSTOMER_PREFIX, //
+			c.getId().toString());
 	}
 
 	private void saveCustomerBank(Customer c) {
@@ -189,24 +212,6 @@ public class EdmsCustomerServiceImpl //
 		return e;
 	}
 
-	private EdmsCustomer updateCustomer(EdmsCustomer e, Customer c) {
-		e.setCode(code(c));
-		e.setName(name(c));
-		e.setBusinessName(e.getName());
-		e.setSellerCode(route(c));
-		e.setChannel(channel(c));
-		e.setStatus(status(c));
-		e.setVisitFrequency(visitFrequency(c));
-		e.setVisitDay(visitDay(c));
-		e.setStreet(street(c));
-		e.setBarangay(barangay(c));
-		e.setCity(city(c));
-		e.setProvince(province(c));
-		e.setOwner(owner(c));
-		e.setPhoneNo(phoneNo(c));
-		return customerRepository.save(e);
-	}
-
 	private String name(Customer c) {
 		String name = c.getName();
 		return name == null ? null : capitalizeFully(name, ' ', '(');
@@ -215,11 +220,6 @@ public class EdmsCustomerServiceImpl //
 	private String route(Customer c) {
 		Route route = c.getRoute();
 		return route == null ? null : capitalizeFully(route.getName(), ' ', '-');
-	}
-
-	private String street(Customer c) {
-		String street = c.getStreet();
-		return street == null ? null : capitalizeFully(street, ' ', '.');
 	}
 
 	private String channel(Customer c) {
@@ -244,37 +244,9 @@ public class EdmsCustomerServiceImpl //
 		return l == null || l.isEmpty() ? day(SUNDAY) : visitDay(l);
 	}
 
-	private String day(DayOfWeek d) {
-		return capitalizeFully(d.toString());
-	}
-
-	private String visitDay(List<WeeklyVisit> l) {
-		String day = visitDay(l.get(0));
-		if (day == null)
-			day = visitDay(l.get(1));
-		if (day == null)
-			day = day(SUNDAY);
-		return day;
-	}
-
-	private String visitDay(WeeklyVisit v) {
-		if (v.isMon())
-			return day(MONDAY);
-		if (v.isTue())
-			return day(TUESDAY);
-		if (v.isWed())
-			return day(WEDNESDAY);
-		if (v.isThu())
-			return day(THURSDAY);
-		if (v.isFri())
-			return day(FRIDAY);
-		if (v.isSat())
-			return day(SATURDAY);
-		return null;
-	}
-
-	private String phoneNo(Customer c) {
-		return capitalizeFully(blankIfNull(c.getMobile()));
+	private String street(Customer c) {
+		String street = c.getStreet();
+		return street == null ? null : capitalizeFully(street, ' ', '.');
 	}
 
 	private String barangay(Customer c) {
@@ -293,12 +265,8 @@ public class EdmsCustomerServiceImpl //
 		return capitalizeFully(blankIfNull(c.getContactName()));
 	}
 
-	private void saveVisitSchedule(EdmsCustomer ec, Customer c) {
-		EdmsWeeklyVisit ev = new EdmsWeeklyVisit();
-		ev.setCode(ec.getCode());
-		ev.setFrequency(ec.getVisitFrequency());
-		ev = weeklySchedule(ev, ec, c);
-		weeklyVisitRepository.save(ev);
+	private String phoneNo(Customer c) {
+		return capitalizeFully(blankIfNull(c.getMobile()));
 	}
 
 	private EdmsWeeklyVisit weeklySchedule(EdmsWeeklyVisit ev, EdmsCustomer ec, Customer c) {
@@ -319,6 +287,35 @@ public class EdmsCustomerServiceImpl //
 		return ev;
 	}
 
+	private Byte isChequeAllowed(CreditDetail cd) {
+		return cd == null || cd.getGracePeriodInDays() == 0 ? NO : YES;
+	}
+
+	private String payment(CreditDetail cd) {
+		return isCOD(cd) ? CASH_ONLY : CASH_AND_CREDIT;
+	}
+
+	private String paymentTerm(CreditDetail cd) {
+		return isCOD(cd) ? COD : cd.getTermInDays() + " Days";
+	}
+
+	private BigDecimal creditLimit(CreditDetail cd) {
+		return isCOD(cd) ? ZERO : cd.getCreditLimit();
+	}
+
+	private String day(DayOfWeek d) {
+		return capitalizeFully(d.toString());
+	}
+
+	private String visitDay(List<WeeklyVisit> l) {
+		String day = visitDay(l.get(0));
+		if (day == null)
+			day = visitDay(l.get(1));
+		if (day == null)
+			day = day(SUNDAY);
+		return day;
+	}
+
 	private EdmsWeeklyVisit week1schedule(EdmsWeeklyVisit v, DayOfWeek day) {
 		if (day == SUNDAY)
 			v.setWeek1sun(nextWeek1SundaySequence());
@@ -337,13 +334,83 @@ public class EdmsCustomerServiceImpl //
 		return v;
 	}
 
+	private EdmsWeeklyVisit week2schedule(EdmsWeeklyVisit v, DayOfWeek day) {
+		if (day == SUNDAY)
+			v.setWeek2sun(nextWeek2SundaySequence());
+		else if (day == MONDAY)
+			v.setWeek2mon(nextWeek2MondaySequence());
+		else if (day == TUESDAY)
+			v.setWeek2tue(nextWeek2TuesdaySequence());
+		else if (day == WEDNESDAY)
+			v.setWeek2wed(nextWeek2WednesdaySequence());
+		else if (day == THURSDAY)
+			v.setWeek2thu(nextWeek2ThursdaySequence());
+		else if (day == FRIDAY)
+			v.setWeek2fri(nextWeek2FridaySequence());
+		else if (day == SATURDAY)
+			v.setWeek2sat(nextWeek2SaturdaySequence());
+		return v;
+	}
+
+	private EdmsWeeklyVisit week3schedule(EdmsWeeklyVisit v, DayOfWeek day) {
+		if (day == SUNDAY)
+			v.setWeek3sun(nextWeek3SundaySequence());
+		else if (day == MONDAY)
+			v.setWeek3mon(nextWeek3MondaySequence());
+		else if (day == TUESDAY)
+			v.setWeek3tue(nextWeek3TuesdaySequence());
+		else if (day == WEDNESDAY)
+			v.setWeek3wed(nextWeek3WednesdaySequence());
+		else if (day == THURSDAY)
+			v.setWeek3thu(nextWeek3ThursdaySequence());
+		else if (day == FRIDAY)
+			v.setWeek3fri(nextWeek3FridaySequence());
+		else if (day == SATURDAY)
+			v.setWeek3sat(nextWeek3SaturdaySequence());
+		return v;
+	}
+
+	private EdmsWeeklyVisit week4schedule(EdmsWeeklyVisit v, DayOfWeek day) {
+		if (day == SUNDAY)
+			v.setWeek4sun(nextWeek4SundaySequence());
+		else if (day == MONDAY)
+			v.setWeek4mon(nextWeek4MondaySequence());
+		else if (day == TUESDAY)
+			v.setWeek4tue(nextWeek4TuesdaySequence());
+		else if (day == WEDNESDAY)
+			v.setWeek4wed(nextWeek4WednesdaySequence());
+		else if (day == THURSDAY)
+			v.setWeek4thu(nextWeek4ThursdaySequence());
+		else if (day == FRIDAY)
+			v.setWeek4fri(nextWeek4FridaySequence());
+		else if (day == SATURDAY)
+			v.setWeek4sat(nextWeek4SaturdaySequence());
+		return v;
+	}
+
+	private boolean isCOD(CreditDetail cd) {
+		return cd == null || cd.getTermInDays() == 0;
+	}
+
+	private String visitDay(WeeklyVisit v) {
+		if (v.isMon())
+			return day(MONDAY);
+		if (v.isTue())
+			return day(TUESDAY);
+		if (v.isWed())
+			return day(WEDNESDAY);
+		if (v.isThu())
+			return day(THURSDAY);
+		if (v.isFri())
+			return day(FRIDAY);
+		if (v.isSat())
+			return day(SATURDAY);
+		return null;
+	}
+
 	private String nextWeek1SundaySequence() {
 		EdmsWeeklyVisit v = weeklyVisitRepository.findFirstByWeek1sunNotOrderByIdDesc("");
 		return v == null ? "1" : increment(v.getWeek1sun());
-	}
-
-	private String increment(String sequence) {
-		return String.valueOf(Integer.valueOf(sequence) + 1);
 	}
 
 	private String nextWeek1MondaySequence() {
@@ -374,24 +441,6 @@ public class EdmsCustomerServiceImpl //
 	private String nextWeek1SaturdaySequence() {
 		EdmsWeeklyVisit v = weeklyVisitRepository.findFirstByWeek1satNotOrderByIdDesc("");
 		return v == null ? "1" : increment(v.getWeek1sat());
-	}
-
-	private EdmsWeeklyVisit week2schedule(EdmsWeeklyVisit v, DayOfWeek day) {
-		if (day == SUNDAY)
-			v.setWeek2sun(nextWeek2SundaySequence());
-		else if (day == MONDAY)
-			v.setWeek2mon(nextWeek2MondaySequence());
-		else if (day == TUESDAY)
-			v.setWeek2tue(nextWeek2TuesdaySequence());
-		else if (day == WEDNESDAY)
-			v.setWeek2wed(nextWeek2WednesdaySequence());
-		else if (day == THURSDAY)
-			v.setWeek2thu(nextWeek2ThursdaySequence());
-		else if (day == FRIDAY)
-			v.setWeek2fri(nextWeek2FridaySequence());
-		else if (day == SATURDAY)
-			v.setWeek2sat(nextWeek2SaturdaySequence());
-		return v;
 	}
 
 	private String nextWeek2SundaySequence() {
@@ -429,24 +478,6 @@ public class EdmsCustomerServiceImpl //
 		return v == null ? "1" : increment(v.getWeek2sat());
 	}
 
-	private EdmsWeeklyVisit week3schedule(EdmsWeeklyVisit v, DayOfWeek day) {
-		if (day == SUNDAY)
-			v.setWeek3sun(nextWeek3SundaySequence());
-		else if (day == MONDAY)
-			v.setWeek3mon(nextWeek3MondaySequence());
-		else if (day == TUESDAY)
-			v.setWeek3tue(nextWeek3TuesdaySequence());
-		else if (day == WEDNESDAY)
-			v.setWeek3wed(nextWeek3WednesdaySequence());
-		else if (day == THURSDAY)
-			v.setWeek3thu(nextWeek3ThursdaySequence());
-		else if (day == FRIDAY)
-			v.setWeek3fri(nextWeek3FridaySequence());
-		else if (day == SATURDAY)
-			v.setWeek3sat(nextWeek3SaturdaySequence());
-		return v;
-	}
-
 	private String nextWeek3SundaySequence() {
 		EdmsWeeklyVisit v = weeklyVisitRepository.findFirstByWeek3sunNotOrderByIdDesc("");
 		return v == null ? "1" : increment(v.getWeek3sun());
@@ -480,24 +511,6 @@ public class EdmsCustomerServiceImpl //
 	private String nextWeek3SaturdaySequence() {
 		EdmsWeeklyVisit v = weeklyVisitRepository.findFirstByWeek3satNotOrderByIdDesc("");
 		return v == null ? "1" : increment(v.getWeek3sat());
-	}
-
-	private EdmsWeeklyVisit week4schedule(EdmsWeeklyVisit v, DayOfWeek day) {
-		if (day == SUNDAY)
-			v.setWeek4sun(nextWeek4SundaySequence());
-		else if (day == MONDAY)
-			v.setWeek4mon(nextWeek4MondaySequence());
-		else if (day == TUESDAY)
-			v.setWeek4tue(nextWeek4TuesdaySequence());
-		else if (day == WEDNESDAY)
-			v.setWeek4wed(nextWeek4WednesdaySequence());
-		else if (day == THURSDAY)
-			v.setWeek4thu(nextWeek4ThursdaySequence());
-		else if (day == FRIDAY)
-			v.setWeek4fri(nextWeek4FridaySequence());
-		else if (day == SATURDAY)
-			v.setWeek4sat(nextWeek4SaturdaySequence());
-		return v;
 	}
 
 	private String nextWeek4SundaySequence() {
@@ -535,53 +548,8 @@ public class EdmsCustomerServiceImpl //
 		return v == null ? "1" : increment(v.getWeek4sat());
 	}
 
-	private void saveCreditDetail(Customer c) {
-		EdmsCreditDetail e = creditDetailRepository.findByCustomerCode(code(c));
-		CreditDetail cd = getCredit(c);
-		if (e == null)
-			e = createCreditDetail(e, cd, code(c));
-		updateEdmsCreditDetail(e, cd);
-	}
-
-	private EdmsCreditDetail createCreditDetail(EdmsCreditDetail e, CreditDetail cd, String code) {
-		e = new EdmsCreditDetail();
-		e.setCustomerCode(code);
-		e.setChequeAllowed(isChequeAllowed(cd));
-		return e;
-	}
-
-	private Byte isChequeAllowed(CreditDetail cd) {
-		return cd == null || cd.getGracePeriodInDays() == 0 ? NO : YES;
-	}
-
-	private CreditDetail getCredit(Customer c) {
-		return c.getCreditDetails().stream() //
-				.filter(p -> !p.getStartDate().isAfter(LocalDate.now())) //
-				.max(comparing(CreditDetail::getStartDate)) //
-				.orElse(null);
-	}
-
-	private void updateEdmsCreditDetail(EdmsCreditDetail e, CreditDetail cd) {
-		e.setPayment(payment(cd));
-		e.setPaymentTermCode(paymentTerm(cd));
-		e.setCreditLimit(creditLimit(cd));
-		creditDetailRepository.save(e);
-	}
-
-	private String payment(CreditDetail cd) {
-		return isCOD(cd) ? CASH_ONLY : CASH_AND_CREDIT;
-	}
-
-	private boolean isCOD(CreditDetail cd) {
-		return cd == null || cd.getTermInDays() == 0;
-	}
-
-	private String paymentTerm(CreditDetail cd) {
-		return isCOD(cd) ? COD : cd.getTermInDays() + " Days";
-	}
-
-	private BigDecimal creditLimit(CreditDetail cd) {
-		return isCOD(cd) ? ZERO : cd.getCreditLimit();
+	private String increment(String sequence) {
+		return String.valueOf(Integer.valueOf(sequence) + 1);
 	}
 
 	@Override
@@ -595,7 +563,8 @@ public class EdmsCustomerServiceImpl //
 	@Override
 	public List<String> getProvinces() {
 		Iterable<EdmsCustomer> i = customerRepository.findAll();
-		return StreamSupport.stream(i.spliterator(), false).map(c -> c.getProvince().toUpperCase().trim()).distinct().collect(Collectors.toList());
+		return StreamSupport.stream(i.spliterator(), false).map(c -> c.getProvince().toUpperCase().trim()).distinct()
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -604,8 +573,29 @@ public class EdmsCustomerServiceImpl //
 		return l.stream().map(c -> correctCity(c)).distinct().collect(Collectors.toList());
 	}
 
+	private String correctCity(EdmsCustomer c) {
+		String city = c.getCity();
+		return city == null ? null : correctCity(city.toUpperCase().trim());
+	}
+
+	private String correctCity(String city) {
+		city = city//
+			.replace("CITY OF ", "")//
+			.replace(" ,CITY", "")//
+			.replace("SAN ADRESS", "SAN ANDRES")//
+			.replace("BASECO", "PORT AREA")//
+			.replace("CALOOCAN", "KALOOKAN");
+		return isAManilaDistrict(city) ? EdmsLocationServiceImpl.MANILA : city;
+	}
+
 	private boolean isAManilaDistrict(String city) {
 		return MANILA_DISTRICTS.stream().anyMatch(d -> d.equalsIgnoreCase(city));
+	}
+
+	@Override
+	public List<Customer> list() {
+		Iterable<EdmsCustomer> i = customerRepository.findAll();
+		return StreamSupport.stream(i.spliterator(), false).map(e -> toCustomer(e)).collect(Collectors.toList());
 	}
 
 	private Customer toCustomer(EdmsCustomer e) {
@@ -624,12 +614,6 @@ public class EdmsCustomerServiceImpl //
 		return c;
 	}
 
-	private PricingType dealerPrice() {
-		PricingType p = new PricingType();
-		p.setName(DEALER.toString());
-		return p;
-	}
-
 	private Customer toCustomer(String name) {
 		Customer c = new Customer();
 		c.setName(name.toUpperCase().trim().replace("`", "'"));
@@ -639,16 +623,6 @@ public class EdmsCustomerServiceImpl //
 	private String getStreet(EdmsCustomer e) {
 		String st = getStreetNo(e) + getStreetName(e);
 		return !st.isEmpty() ? st : null;
-	}
-
-	private String getStreetNo(EdmsCustomer e) {
-		String no = e.getStreetNo();
-		return no == null || no.isEmpty() ? "" : no + " ";
-	}
-
-	private String getStreetName(EdmsCustomer e) {
-		String st = e.getStreet();
-		return st == null || st.isEmpty() ? "" : st.toUpperCase().trim();
 	}
 
 	private Location getProvince(EdmsCustomer e) {
@@ -662,72 +636,9 @@ public class EdmsCustomerServiceImpl //
 		return e == null ? null : getCityFromProperName(e);
 	}
 
-	private Location getCityFromProperName(EdmsCustomer e) {
-		String city = e.getCity();
-		return city == null || city.isEmpty() ? null : getCityFromProperName(city.toUpperCase().trim());
-	}
-
-	private Location getCityFromProperName(String city) {
-		String name = correctCity(city);
-		return locationService.toCity(name);
-	}
-
-	private String correctCity(String city) {
-		city = city//
-				.replace("CITY OF ", "")//
-				.replace(" ,CITY", "")//
-				.replace("SAN ADRESS", "SAN ANDRES")//
-				.replace("BASECO", "PORT AREA")//
-				.replace("CALOOCAN", "KALOOKAN");
-		return isAManilaDistrict(city) ? EdmsLocationServiceImpl.MANILA : city;
-	}
-
-	private String correctCity(EdmsCustomer c) {
-		String city = c.getCity();
-		return city == null ? null : correctCity(city.toUpperCase().trim());
-	}
-
 	private Location getBarangay(Customer c, EdmsCustomer e) {
 		String city = locationService.getCity(c);
 		return noBarangayOrCityExists(e, city) ? null : getBarangayFromCustomer(e, city.toUpperCase().trim());
-	}
-
-	private boolean noBarangayOrCityExists(EdmsCustomer e, String city) {
-		return noBarangayExists(e) || noCityExists(e) || noCityExists(city);
-	}
-
-	private boolean noBarangayExists(EdmsCustomer e) {
-		String brgy = e.getBarangay();
-		return brgy == null || brgy.isEmpty();
-	}
-
-	private boolean noCityExists(EdmsCustomer e) {
-		String city = e.getCity();
-		return noCityExists(city);
-	}
-
-	private boolean noCityExists(String city) {
-		return city == null || city.isEmpty();
-	}
-
-	private Location getBarangayFromCustomer(EdmsCustomer e, String city) {
-		String barangay = getBarangayFromProperNames(e, city);
-		return locationService.getBarangay(barangay, city);
-	}
-
-	private String getBarangayFromProperNames(EdmsCustomer e, String city) {
-		String barangay = e.getBarangay();
-		if (city.equals(MANILA))
-			barangay = e.getCity();
-		return correctBarangay(barangay.toUpperCase().trim());
-	}
-
-	private String correctBarangay(String barangay) {
-		return barangay//
-				.replace("SAN ADRESS", "SAN ANDRES")//
-				.replace("BASECO", "PORT AREA")//
-				.replace("BRGY.", "BARANGAY")//
-				.replace("BRGY", "BARANGAY");
 	}
 
 	private Channel toChannel(EdmsCustomer e) {
@@ -748,20 +659,15 @@ public class EdmsCustomerServiceImpl //
 		return Arrays.asList(cd);
 	}
 
-	private int toTerm(String terms) {
-		return Integer.valueOf(StringUtils.substringBefore(terms, " ").trim());
+	private PricingType dealerPrice() {
+		PricingType p = new PricingType();
+		p.setName(DEALER.toString());
+		return p;
 	}
 
 	private List<Routing> toRouteHistory(EdmsCustomer c) {
 		Route r = routeService.toNameOnlyRouteFromSeller(c.getSellerCode());
 		return toRouteHistory(r);
-	}
-
-	private List<Routing> toRouteHistory(Route r) {
-		Routing e = new Routing();
-		e.setStartDate(edmsService.goLiveDate());
-		e.setRoute(r);
-		return asList(e);
 	}
 
 	private VisitFrequency toVisitFrequency(String f) {
@@ -774,6 +680,41 @@ public class EdmsCustomerServiceImpl //
 	private List<WeeklyVisit> toVisitSchedule(EdmsCustomer c) {
 		EdmsWeeklyVisit v = weeklyVisitRepository.findByCode(c.getCode());
 		return v == null ? null : asList(week1(v), week2(v), week3(v), week4(v), week5(v));
+	}
+
+	private String getStreetNo(EdmsCustomer e) {
+		String no = e.getStreetNo();
+		return no == null || no.isEmpty() ? "" : no + " ";
+	}
+
+	private String getStreetName(EdmsCustomer e) {
+		String st = e.getStreet();
+		return st == null || st.isEmpty() ? "" : st.toUpperCase().trim();
+	}
+
+	private Location getCityFromProperName(EdmsCustomer e) {
+		String city = e.getCity();
+		return city == null || city.isEmpty() ? null : getCityFromProperName(city.toUpperCase().trim());
+	}
+
+	private boolean noBarangayOrCityExists(EdmsCustomer e, String city) {
+		return noBarangayExists(e) || noCityExists(e) || noCityExists(city);
+	}
+
+	private Location getBarangayFromCustomer(EdmsCustomer e, String city) {
+		String barangay = getBarangayFromProperNames(e, city);
+		return locationService.getBarangay(barangay, city);
+	}
+
+	private int toTerm(String terms) {
+		return Integer.valueOf(StringUtils.substringBefore(terms, " ").trim());
+	}
+
+	private List<Routing> toRouteHistory(Route r) {
+		Routing e = new Routing();
+		e.setStartDate(edmsService.goLiveDate());
+		e.setRoute(r);
+		return asList(e);
 	}
 
 	private WeeklyVisit week1(EdmsWeeklyVisit e) {
@@ -841,15 +782,44 @@ public class EdmsCustomerServiceImpl //
 		return v;
 	}
 
-	@Override
-	public List<Customer> list() {
-		Iterable<EdmsCustomer> i = customerRepository.findAll();
-		return StreamSupport.stream(i.spliterator(), false).map(e -> toCustomer(e)).collect(Collectors.toList());
+	private Location getCityFromProperName(String city) {
+		String name = correctCity(city);
+		return locationService.toCity(name);
+	}
+
+	private boolean noBarangayExists(EdmsCustomer e) {
+		String brgy = e.getBarangay();
+		return brgy == null || brgy.isEmpty();
+	}
+
+	private boolean noCityExists(EdmsCustomer e) {
+		String city = e.getCity();
+		return noCityExists(city);
+	}
+
+	private boolean noCityExists(String city) {
+		return city == null || city.isEmpty();
+	}
+
+	private String getBarangayFromProperNames(EdmsCustomer e, String city) {
+		String barangay = e.getBarangay();
+		if (city.equals(MANILA))
+			barangay = e.getCity();
+		return correctBarangay(barangay.toUpperCase().trim());
+	}
+
+	private String correctBarangay(String barangay) {
+		return barangay//
+			.replace("SAN ADRESS", "SAN ANDRES")//
+			.replace("BASECO", "PORT AREA")//
+			.replace("BRGY.", "BARANGAY")//
+			.replace("BRGY", "BARANGAY");
 	}
 
 	@Override
 	public List<Customer> listonAction() {
-		return sellerService.getAll().map(s -> s.getTruckCode().toUpperCase().trim()).map(n -> toExTruck(n)).collect(Collectors.toList());
+		return sellerService.getAll().map(s -> s.getTruckCode().toUpperCase().trim()).map(n -> toExTruck(n))
+			.collect(Collectors.toList());
 	}
 
 	private Customer toExTruck(String name) {

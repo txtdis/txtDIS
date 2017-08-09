@@ -4,18 +4,26 @@ import ph.txtdis.dto.Keyed;
 import ph.txtdis.exception.NotFoundException;
 
 public interface SpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService<PK> //
-		extends OpenDialogHeaderTextService, ResettableService, SpunById<PK>, SavedService<PK>,
-		TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService {
-
-	<T extends Keyed<PK>> ReadOnlyService<T> getReadOnlyService();
-
-	@SuppressWarnings("unchecked")
-	default <T extends Keyed<PK>> T findByEndPt(String endPt) throws Exception {
-		return (T) getReadOnlyService().module(getModuleName()).getOne(endPt);
-	}
+	extends OpenDialogHeaderTextService,
+	ResettableService,
+	SpunByIdService<PK>,
+	SavedService<PK>,
+	TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService {
 
 	default <T extends Keyed<PK>> T findById(Long id) throws Exception {
 		return findByOrderNo(id.toString());
+	}
+
+	default <T extends Keyed<PK>> T findByOrderNo(String key) throws Exception {
+		T e = findByEndPt("/" + key);
+		if (e == null)
+			throw new NotFoundException(getAbbreviatedModuleNoPrompt() + key);
+		return e;
+	}
+
+	@SuppressWarnings("unchecked")
+	default <T extends Keyed<PK>> T findByEndPt(String endPt) throws Exception {
+		return (T) getRestClientService().module(getModuleName()).getOne(endPt);
 	}
 
 	default <T extends Keyed<PK>> T findByModuleId(Long id) throws Exception {
@@ -26,24 +34,17 @@ public interface SpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamed
 		return findByEndPt("/find?id=" + key);
 	}
 
-	default <T extends Keyed<PK>> T findByOrderNo(String key) throws Exception {
-		T e = findByEndPt("/" + key);
-		if (e == null)
-			throw new NotFoundException(getAbbreviatedModuleNoPrompt() + key);
-		return e;
-	}
-
-	default String getModuleNo() {
-		return getId().toString();
+	@Override
+	default String getTitleName() {
+		return isNew() ? getNewHeaderName() : getPostedTitleText();
 	}
 
 	default String getPostedTitleText() {
 		return getAbbreviatedModuleNoPrompt() + getModuleNo();
 	}
 
-	@Override
-	default String getTitleName() {
-		return isNew() ? getNewHeaderName() : getPostedTitleText();
+	default String getModuleNo() {
+		return getId().toString();
 	}
 
 	default void openByDoubleClickedTableCellId(Long id) throws Exception {

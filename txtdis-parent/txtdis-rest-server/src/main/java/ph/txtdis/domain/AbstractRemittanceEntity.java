@@ -1,20 +1,19 @@
 package ph.txtdis.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public class AbstractRemittanceEntity //
-		extends AbstractDecisionNeededValidatedCreatedKeyedEntity<Long> {
+	extends AbstractDecisionNeededValidatedCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = 4975638841644224415L;
 

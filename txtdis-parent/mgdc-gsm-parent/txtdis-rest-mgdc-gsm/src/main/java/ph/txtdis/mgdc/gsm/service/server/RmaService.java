@@ -5,7 +5,7 @@ import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.service.server.SpunSavedReferencedKeyedService;
 
 public interface RmaService //
-		extends SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
+	extends SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
 
 	Billable findOpenRmaByCustomerId(Long customerId) throws Exception;
 

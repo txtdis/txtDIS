@@ -1,10 +1,7 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.dto.ItemTree;
 import ph.txtdis.mgdc.gsm.domain.ItemTreeEntity;
@@ -12,10 +9,12 @@ import ph.txtdis.mgdc.gsm.repository.ItemTreeRepository;
 import ph.txtdis.mgdc.service.server.ConvertibleItemFamilyService;
 import ph.txtdis.service.AbstractSavedReferencedKeyedService;
 
+import java.util.List;
+
 @Service("itemTreeService")
 public class ItemTreeServiceImpl //
-		extends AbstractSavedReferencedKeyedService<ItemTreeRepository, ItemTreeEntity, ItemTree, Long> //
-		implements ItemTreeService {
+	extends AbstractSavedReferencedKeyedService<ItemTreeRepository, ItemTreeEntity, ItemTree, Long> //
+	implements ItemTreeService {
 
 	@Autowired
 	private ConvertibleItemFamilyService familyService;
@@ -24,12 +23,6 @@ public class ItemTreeServiceImpl //
 	public ItemTree find(ItemFamily family, ItemFamily parent) {
 		ItemTreeEntity e = repository.findByFamilyIdAndParentId(family.getId(), parent.getId());
 		return toModel(e);
-	}
-
-	@Override
-	public List<ItemTree> list() {
-		List<ItemTreeEntity> l = repository.findByOrderByFamilyAscParentAsc();
-		return toModels(l);
 	}
 
 	@Override
@@ -43,6 +36,12 @@ public class ItemTreeServiceImpl //
 		t.setCreatedBy(e.getCreatedBy());
 		t.setCreatedOn(e.getCreatedOn());
 		return t;
+	}
+
+	@Override
+	public List<ItemTree> list() {
+		List<ItemTreeEntity> l = repository.findByOrderByFamilyAscParentAsc();
+		return toModels(l);
 	}
 
 	@Override

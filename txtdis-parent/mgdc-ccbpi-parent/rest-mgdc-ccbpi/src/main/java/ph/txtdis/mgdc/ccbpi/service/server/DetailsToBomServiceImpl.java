@@ -27,24 +27,38 @@ import ph.txtdis.type.QuantityType;
 
 @Service("detailsToBomService")
 public class DetailsToBomServiceImpl //
-		implements DetailsToBomService {
+	implements DetailsToBomService {
 
 	private static Logger logger = getLogger(DetailsToBomServiceImpl.class);
 
 	@Override
+	public List<BomEntity> toEmptiesBomList(QuantityType type, List<? extends DetailedEntity> details) {
+		List<BomEntity> contents = toBomList(type, details);
+		return toEmptiesBomList(contents);
+	}
+
+	@Override
 	public List<BomEntity> toBomList(QuantityType type, List<? extends DetailedEntity> entities) {
 		return entities == null ? emptyList() //
-				: entities.stream() //
-						.flatMap(entity -> entity.getDetails().stream()) //
-						.map(d -> toBom(d.getItem(), qty(type, d)))
-						.collect(groupingBy( //
-								BomEntity::getPart, //
-								mapping( //
-										BomEntity::getQty, //
-										reducing(ZERO, BigDecimal::add)))) //
-						.entrySet().stream() //
-						.map(e -> toBom(e.getKey(), e.getValue())) //
-						.collect(Collectors.toList());
+			: entities.stream() //
+			.flatMap(entity -> entity.getDetails().stream()) //
+			.map(d -> toBom(d.getItem(), qty(type, d)))
+			.collect(groupingBy( //
+				BomEntity::getPart, //
+				mapping( //
+					BomEntity::getQty, //
+					reducing(ZERO, BigDecimal::add)))) //
+			.entrySet().stream() //
+			.map(e -> toBom(e.getKey(), e.getValue())) //
+			.collect(Collectors.toList());
+	}
+
+	private List<BomEntity> toEmptiesBomList(List<BomEntity> boms) {
+		return boms == null ? Collections.emptyList()
+			: boms.stream() //
+			.map(b -> toBom(item(b).getEmpties(), b.getQty())) //
+			.filter(b -> item(b) != null) //
+			.collect(Collectors.toList());
 	}
 
 	private BomEntity toBom(ItemEntity i, BigDecimal qty) {
@@ -67,20 +81,6 @@ public class DetailsToBomServiceImpl //
 			throw new RuntimeException("No applicable type");
 		logger.info("\n    Qty@qty = " + type + ": " + qty);
 		return qty;
-	}
-
-	@Override
-	public List<BomEntity> toEmptiesBomList(QuantityType type, List<? extends DetailedEntity> details) {
-		List<BomEntity> contents = toBomList(type, details);
-		return toEmptiesBomList(contents);
-	}
-
-	private List<BomEntity> toEmptiesBomList(List<BomEntity> boms) {
-		return boms == null ? Collections.emptyList()
-				: boms.stream() //
-						.map(b -> toBom(item(b).getEmpties(), b.getQty())) //
-						.filter(b -> item(b) != null) //
-						.collect(Collectors.toList());
 	}
 
 	private ItemEntity item(BomEntity b) {

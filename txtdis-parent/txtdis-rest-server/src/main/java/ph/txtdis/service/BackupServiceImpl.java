@@ -1,27 +1,20 @@
 package ph.txtdis.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.exception.FailedReplicationException;
+
+import java.io.IOException;
+import java.util.List;
+
 import static java.io.File.separator;
 import static java.lang.System.getProperty;
 import static java.util.Arrays.asList;
 import static ph.txtdis.util.BinaryUtils.toBytes;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.exception.FailedReplicationException;
-
 @Service("backupService")
 public class BackupServiceImpl //
-		implements BackupService {
-
-	@Value("${database.password}")
-	private String databasePassword;
-
-	@Value("${spring.datasource.password}")
-	private String password;
+	implements BackupService {
 
 	@Value("${database.name}")
 	protected String databaseName;
@@ -34,6 +27,18 @@ public class BackupServiceImpl //
 
 	protected String backup;
 
+	@Value("${database.password}")
+	private String databasePassword;
+
+	@Value("${spring.datasource.password}")
+	private String password;
+
+	@Override
+	public byte[] getBackupBytes() throws FailedReplicationException {
+		backup();
+		return toBytes(backup);
+	}
+
 	@Override
 	public void backup() throws FailedReplicationException {
 		try {
@@ -44,10 +49,11 @@ public class BackupServiceImpl //
 		}
 	}
 
-	@Override
-	public byte[] getBackupBytes() throws FailedReplicationException {
-		backup();
-		return toBytes(backup);
+	private void startBackup() throws IOException, InterruptedException, FailedReplicationException {
+		Process p = buildProcess().start();
+		p.waitFor();
+		if (p.exitValue() != 0)
+			throw new FailedReplicationException("Backup");
 	}
 
 	private ProcessBuilder buildProcess() {
@@ -57,24 +63,17 @@ public class BackupServiceImpl //
 		return pb;
 	}
 
-	private void startBackup() throws IOException, InterruptedException, FailedReplicationException {
-		Process p = buildProcess().start();
-		p.waitFor();
-		if (p.exitValue() != 0)
-			throw new FailedReplicationException("Backup");
-	}
-
 	private List<String> backupCommand() {
 		return asList(postgresAppPath(), //
-				"--host=localhost", //
-				"--port=5432", //
-				"--username=" + username, //
-				"--no-password", //
-				"--file=" + backup, //
-				"--format=custom", //
-				"--compress=9", //
-				"--verbose", //
-				"--dbname=" + databaseName);
+			"--host=localhost", //
+			"--port=5432", //
+			"--username=" + username, //
+			"--no-password", //
+			"--file=" + backup, //
+			"--format=custom", //
+			"--compress=9", //
+			"--verbose", //
+			"--dbname=" + databaseName);
 	}
 
 	private String postgresAppPath() {

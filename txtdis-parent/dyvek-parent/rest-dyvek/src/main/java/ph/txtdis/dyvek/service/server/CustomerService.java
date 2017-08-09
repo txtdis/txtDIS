@@ -1,13 +1,13 @@
 package ph.txtdis.dyvek.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dyvek.domain.CustomerEntity;
 import ph.txtdis.dyvek.model.Customer;
 import ph.txtdis.service.SavedNameListService;
 
+import java.util.List;
+
 public interface CustomerService //
-		extends SavedNameListService<Customer> {
+	extends SavedNameListService<Customer> {
 
 	List<Customer> findAllBanks();
 

@@ -1,4 +1,5 @@
 package ph.txtdis.app;
 
-public interface PickListApp extends StartableApp {
+public interface PickListApp
+	extends App {
 }

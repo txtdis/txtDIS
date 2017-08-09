@@ -1,7 +1,6 @@
 package ph.txtdis.dyvek.service.server;
 
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dyvek.domain.ItemEntity;
 import ph.txtdis.dyvek.model.Item;
 import ph.txtdis.dyvek.repository.ItemRepository;
@@ -9,8 +8,8 @@ import ph.txtdis.service.AbstractCreateNameListService;
 
 @Service("itemService")
 public class ItemServiceImpl //
-		extends AbstractCreateNameListService<ItemRepository, ItemEntity, Item> //
-		implements ItemService {
+	extends AbstractCreateNameListService<ItemRepository, ItemEntity, Item> //
+	implements ItemService {
 
 	@Override
 	public ItemEntity findEntityByName(String name) {

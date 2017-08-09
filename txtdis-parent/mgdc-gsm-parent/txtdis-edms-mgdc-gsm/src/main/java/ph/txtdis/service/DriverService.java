@@ -5,7 +5,7 @@ import ph.txtdis.dto.PickList;
 import ph.txtdis.dto.User;
 
 public interface DriverService //
-		extends SavedService<User> {
+	extends SavedService<User> {
 
 	String getCode(EdmsSeller s);
 

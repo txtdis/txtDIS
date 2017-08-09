@@ -1,24 +1,9 @@
 package ph.txtdis.mgdc.fx.dialog;
 
-import static java.math.BigDecimal.ZERO;
-import static ph.txtdis.type.BillingType.DELIVERY;
-import static ph.txtdis.type.BillingType.INVOICE;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.DATE;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-import static ph.txtdis.util.NumberUtils.isPositive;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-
+import javafx.beans.binding.BooleanBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.beans.binding.BooleanBinding;
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.RemittanceDetail;
 import ph.txtdis.fx.control.InputNode;
@@ -28,9 +13,22 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.service.AdjustableInputtedPaymentDetailedRemittanceService;
 import ph.txtdis.type.BillingType;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.math.BigDecimal.ZERO;
+import static ph.txtdis.type.BillingType.DELIVERY;
+import static ph.txtdis.type.BillingType.INVOICE;
+import static ph.txtdis.type.Type.*;
+import static ph.txtdis.util.NumberUtils.isPositive;
+
 @Scope("prototype")
 @Component("paymentDialog")
-public class PaymentDialogImpl extends AbstractFieldDialog<RemittanceDetail> implements PaymentDialog {
+public class PaymentDialogImpl
+	extends AbstractFieldDialog<RemittanceDetail>
+	implements PaymentDialog {
 
 	@Autowired
 	private LabeledCombo<BillingType> billableCombo;
@@ -55,16 +53,16 @@ public class PaymentDialogImpl extends AbstractFieldDialog<RemittanceDetail> imp
 	@Override
 	protected List<InputNode<?>> addNodes() {
 		return Arrays.asList(//
-				billableCombo(), //
-				prefixField(), //
-				idField(), //
-				suffixField(), //
-				customerDisplay(), //
-				dateDueDisplay(), //
-				receivableDisplay(), //
-				paymentField(), //
-				balanceDisplay(), //
-				remainingDisplay());
+			billableCombo(), //
+			prefixField(), //
+			idField(), //
+			suffixField(), //
+			customerDisplay(), //
+			dateDueDisplay(), //
+			receivableDisplay(), //
+			paymentField(), //
+			balanceDisplay(), //
+			remainingDisplay());
 	}
 
 	private LabeledCombo<BillingType> billableCombo() {
@@ -85,9 +83,9 @@ public class PaymentDialogImpl extends AbstractFieldDialog<RemittanceDetail> imp
 
 	private void updateUponIdValidation(BillingType b) throws Exception {
 		Billable i = remitService.updateUponIdValidation(b, //
-				prefixField.getValue(), //
-				idField.getValue(), //
-				suffixField.getValue());
+			prefixField.getValue(), //
+			idField.getValue(), //
+			suffixField.getValue());
 		updateBillableDisplays(billable = i);
 	}
 

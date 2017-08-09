@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 @Component("orderTable")
 public class OrderTableImpl //
-		extends AbstractBillableDetailTable //
-		implements OrderTable {
+	extends AbstractBillableDetailTable //
+	implements OrderTable {
 
 	@Override
 	protected String orderNoColumnName() {

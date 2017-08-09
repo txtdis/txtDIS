@@ -3,17 +3,20 @@ package ph.txtdis.fx.dialog;
 import javafx.application.Platform;
 import javafx.stage.WindowEvent;
 import ph.txtdis.util.FontIcon;
+import ph.txtdis.util.UserUtils;
+
+import static ph.txtdis.util.UserUtils.*;
 
 public abstract class AbstractMainMenu //
-		extends AbstractMenu //
-		implements MainMenu {
+	extends AbstractMenu //
+	implements MainMenu {
 
 	@Override
 	public void display() {
 		getIcons().add(new FontIcon("\ue945"));
-		setTitle(credentialService.username() + "@" + modulePrefix + " Main Menu");
+		setTitle(username() + "@" + modulePrefix + " Main Menu");
 		setScene(createScene());
-		styleSheet.update(credentialService.user().getStyle());
+		styleSheet.update(user().getStyle());
 		setOnCloseRequest(e -> onCloseRequestAction(e));
 		show();
 	}

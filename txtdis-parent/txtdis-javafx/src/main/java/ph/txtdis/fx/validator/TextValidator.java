@@ -5,7 +5,7 @@ import javafx.beans.value.ObservableValue;
 import ph.txtdis.fx.control.AppFieldImpl;
 
 public class TextValidator //
-		implements ChangeListener<String> {
+	implements ChangeListener<String> {
 
 	private boolean ignore;
 
@@ -15,7 +15,7 @@ public class TextValidator //
 
 	public TextValidator(AppFieldImpl<?> input) {
 		this.input = input;
-		this.restrict = "[a-zA-Z0-9-\\[\\]*:,.&'+/!%()ÑX ]";
+		this.restrict = "[a-zA-Z0-9-\\[\\]*:,.&'+/!%()Ñ ]";
 	}
 
 	@Override
@@ -26,11 +26,13 @@ public class TextValidator //
 			ignore = true;
 			input.setText(oldValue);
 			ignore = false;
-		} else if (input.length() > 0 && newValue.length() > input.length()) {
+		}
+		else if (input.length() > 0 && newValue.length() > input.length()) {
 			ignore = true;
 			input.setText(newValue.substring(0, input.length()));
 			ignore = false;
-		} else {
+		}
+		else {
 			input.setText(newValue.toUpperCase());
 		}
 	}

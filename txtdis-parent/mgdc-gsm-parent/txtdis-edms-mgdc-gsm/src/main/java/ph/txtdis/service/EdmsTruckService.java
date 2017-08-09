@@ -6,7 +6,7 @@ import ph.txtdis.dto.Keyed;
 import ph.txtdis.dto.Truck;
 
 public interface EdmsTruckService //
-		extends SavedNameListService<Truck> {
+	extends SavedNameListService<Truck> {
 
 	EdmsTruck findEntityByPlateNo(String plate);
 

@@ -1,9 +1,9 @@
 package ph.txtdis.excel;
 
+import ph.txtdis.fx.table.AppTable;
+
 import java.io.IOException;
 import java.util.List;
-
-import ph.txtdis.fx.table.AppTable;
 
 public interface ExcelWriter {
 

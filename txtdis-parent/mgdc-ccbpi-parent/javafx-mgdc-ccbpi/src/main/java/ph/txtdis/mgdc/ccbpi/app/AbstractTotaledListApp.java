@@ -17,23 +17,13 @@ import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.ccbpi.service.ListService;
 
 public abstract class AbstractTotaledListApp<AT extends AppTable<SalesItemVariance>, AS extends ListService> //
-		extends AbstractExcelApp<AT, AS, SalesItemVariance> //
-		implements LaunchableApp {
+	extends AbstractExcelApp<AT, AS, SalesItemVariance> //
+	implements LaunchableApp {
 
 	private static Logger logger = getLogger(AbstractTotaledListApp.class);
 
 	@Autowired
 	private TotaledTableApp<SalesItemVariance> totaledTableApp;
-
-	@Override
-	public void refresh() {
-		try {
-			super.refresh();
-			totaledTableApp.refresh(service);
-		} catch (Exception e) {
-			showErrorDialog(e);
-		}
-	}
 
 	@Override
 	public void start() {
@@ -57,6 +47,16 @@ public abstract class AbstractTotaledListApp<AT extends AppTable<SalesItemVarian
 	}
 
 	protected abstract void setList(String[] ids) throws Exception;
+
+	@Override
+	public void refresh() {
+		try {
+			super.refresh();
+			totaledTableApp.refresh(service);
+		} catch (Exception e) {
+			showErrorDialog(e);
+		}
+	}
 
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {

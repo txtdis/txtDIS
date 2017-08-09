@@ -15,8 +15,8 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 
 public abstract class AbstractCokeBillableService //
-		extends AbstractBillableService //
-		implements ShippedBillableService {
+	extends AbstractBillableService //
+	implements ShippedBillableService {
 
 	protected static final String CUSTOMER_ID = "123456789";
 
@@ -43,13 +43,13 @@ public abstract class AbstractCokeBillableService //
 	}
 
 	@Override
-	public String getRoute() {
-		return get().getSuffix();
+	public String getSavingInfo() {
+		return getAbbreviatedModuleNoPrompt() + getBookingId();
 	}
 
 	@Override
-	public String getSavingInfo() {
-		return getAbbreviatedModuleNoPrompt() + getBookingId();
+	public String getRoute() {
+		return get().getSuffix();
 	}
 
 	@Override

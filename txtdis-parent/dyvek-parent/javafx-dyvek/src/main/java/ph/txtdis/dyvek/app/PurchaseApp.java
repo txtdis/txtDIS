@@ -1,5 +1,5 @@
 package ph.txtdis.dyvek.app;
 
-public interface PurchaseApp //
-		extends ToDoApp {
+public interface PurchaseApp
+	extends ToDoApp {
 }

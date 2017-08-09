@@ -1,22 +1,21 @@
 package ph.txtdis.service;
 
-import static ph.txtdis.util.Code.addZeroes;
-import static ph.txtdis.util.DateTimeUtils.to24HourTimestampText;
-import static ph.txtdis.util.DateTimeUtils.toZonedDateTimeFrom24HourTimestamp;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsInvoice;
 import ph.txtdis.domain.EdmsTruck;
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.dto.Truck;
 import ph.txtdis.repository.EdmsTruckRepository;
 
+import static ph.txtdis.util.Code.addZeroes;
+import static ph.txtdis.util.DateTimeUtils.to24HourTimestampText;
+import static ph.txtdis.util.DateTimeUtils.toZonedDateTimeFrom24HourTimestamp;
+
 @Service("truckService")
 public class EdmsTruckServiceImpl //
-		extends AbstractCreateNameListService<EdmsTruckRepository, EdmsTruck, Truck> //
-		implements EdmsTruckService {
+	extends AbstractCreateNameListService<EdmsTruckRepository, EdmsTruck, Truck> //
+	implements EdmsTruckService {
 
 	@Value("${client.user}")
 	private String username;
@@ -30,12 +29,7 @@ public class EdmsTruckServiceImpl //
 	@Override
 	public EdmsTruck findEntityByPlateNo(String no) {
 		return no == null || no.isEmpty() ? null : //
-				repository.findByNameIgnoreCase(no);
-	}
-
-	@Override
-	public String getDescription() {
-		return description;
+			repository.findByNameIgnoreCase(no);
 	}
 
 	@Override
@@ -49,11 +43,6 @@ public class EdmsTruckServiceImpl //
 	}
 
 	@Override
-	public String getCode(Keyed<Long> r) {
-		return r == null || r.getId() == null ? "" : truckPrefix + addZeroes(2, r.getId().toString());
-	}
-
-	@Override
 	protected EdmsTruck toEntity(Truck t) {
 		EdmsTruck e = new EdmsTruck();
 		e.setCode(getCode(t));
@@ -64,6 +53,16 @@ public class EdmsTruckServiceImpl //
 		e.setModifiedBy("");
 		e.setModifiedOn("");
 		return e;
+	}
+
+	@Override
+	public String getCode(Keyed<Long> r) {
+		return r == null || r.getId() == null ? "" : truckPrefix + addZeroes(2, r.getId().toString());
+	}
+
+	@Override
+	public String getDescription() {
+		return description;
 	}
 
 	@Override

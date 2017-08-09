@@ -1,19 +1,10 @@
 package ph.txtdis.mgdc.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.BOOLEAN;
-import static ph.txtdis.type.Type.FRACTION;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.time.LocalDate;
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.apache.commons.lang3.math.Fraction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.app.StockTakeApp;
 import ph.txtdis.dto.StockTakeVariance;
 import ph.txtdis.fx.table.AbstractTable;
@@ -23,9 +14,17 @@ import ph.txtdis.fx.table.StockTakeVarianceTable;
 import ph.txtdis.mgdc.app.LaunchableItemApp;
 import ph.txtdis.service.StockTakeVarianceService;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
+
 @Scope("prototype")
 @Component("stockTakeVarianceTable")
-public class StockTakeVarianceTableImpl extends AbstractTable<StockTakeVariance> implements StockTakeVarianceTable {
+public class StockTakeVarianceTableImpl
+	extends AbstractTable<StockTakeVariance>
+	implements StockTakeVarianceTable {
 
 	@Autowired
 	private LaunchableItemApp itemApp;
@@ -51,18 +50,20 @@ public class StockTakeVarianceTableImpl extends AbstractTable<StockTakeVariance>
 	@Override
 	protected List<TableColumn<StockTakeVariance, ?>> addColumns() {
 		return asList( //
-				item.launches(itemApp).ofType(TEXT).width(180).build("Item", "item"), //
-				start.launches(stockTakeApp).addLaunchData(previousCountDate()).ofType(FRACTION).width(90).build(service.getBeginningColumnName(),
-						"startQtyInFractions"), //
-				in.ofType(FRACTION).width(90).build("Incoming", "inQtyInFractions"), //
-				out.ofType(FRACTION).width(90).build("Outgoing", "outQtyInFractions"), //
-				end.ofType(FRACTION).width(90).build(service.getExpectedColumnName(), "endQtyInFractions"), //
-				actual.launches(stockTakeApp).addLaunchData(latestCountDate()).ofType(FRACTION).width(90).build(service.getActualColumnName(),
-						"actualQtyInFractions"), //
-				variance.ofType(FRACTION).width(90).build(service.getVarianceColumnName(), "varianceQtyInFractions"), //
-				adjusted.ofType(FRACTION).width(90).build("Final", "finalQtyInFractions"), //
-				isValid.ofType(BOOLEAN).build("OK", "isValid"), //
-				justification.ofType(TEXT).width(360).build("Justification", "justification") //
+			item.launches(itemApp).ofType(TEXT).width(180).build("Item", "item"), //
+			start.launches(stockTakeApp).addLaunchData(previousCountDate()).ofType(FRACTION).width(90)
+				.build(service.getBeginningColumnName(),
+					"startQtyInFractions"), //
+			in.ofType(FRACTION).width(90).build("Incoming", "inQtyInFractions"), //
+			out.ofType(FRACTION).width(90).build("Outgoing", "outQtyInFractions"), //
+			end.ofType(FRACTION).width(90).build(service.getExpectedColumnName(), "endQtyInFractions"), //
+			actual.launches(stockTakeApp).addLaunchData(latestCountDate()).ofType(FRACTION).width(90)
+				.build(service.getActualColumnName(),
+					"actualQtyInFractions"), //
+			variance.ofType(FRACTION).width(90).build(service.getVarianceColumnName(), "varianceQtyInFractions"), //
+			adjusted.ofType(FRACTION).width(90).build("Final", "finalQtyInFractions"), //
+			isValid.ofType(BOOLEAN).build("OK", "isValid"), //
+			justification.ofType(TEXT).width(360).build("Justification", "justification") //
 		);
 	}
 

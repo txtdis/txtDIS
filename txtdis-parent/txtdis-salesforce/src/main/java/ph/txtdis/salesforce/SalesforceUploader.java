@@ -1,11 +1,13 @@
 package ph.txtdis.salesforce;
 
-import static java.io.File.separator;
-import static java.lang.System.getProperty;
-import static java.nio.file.Files.newBufferedWriter;
-import static java.nio.file.Paths.get;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.log4j.Logger.getLogger;
+import org.apache.log4j.Logger;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import ph.txtdis.dto.SalesforceEntity;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -16,15 +18,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import ph.txtdis.dto.SalesforceEntity;
+import static java.io.File.separator;
+import static java.lang.System.getProperty;
+import static java.nio.file.Files.newBufferedWriter;
+import static java.nio.file.Paths.get;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.apache.log4j.Logger.getLogger;
 
 public abstract class SalesforceUploader {
 
@@ -48,23 +47,11 @@ public abstract class SalesforceUploader {
 		return uploads;
 	}
 
-	protected abstract void inputData();
-
 	private void setFirefoxDriver() {
 		driver = new FirefoxDriver();
 		addCookies();
 		driver.manage().timeouts().implicitlyWait(300, SECONDS);
 		setWait();
-	}
-
-	private void addCookies() {
-		try (Stream<String> stream = Files.lines(path())) {
-			stream.map(l -> l.split("|"))//
-					.map(a -> getCookie(a))//
-					.forEach(c -> driver.manage().addCookie(c));
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}
 	}
 
 	private void loginToSalesForceWebsite() {
@@ -74,10 +61,22 @@ public abstract class SalesforceUploader {
 		driver.findElement(By.id("Login")).click();
 	}
 
+	protected abstract void inputData();
+
 	private void saveCookies() {
 		try (BufferedWriter w = newBufferedWriter(path())) {
 			for (Cookie c : driver.manage().getCookies())
 				writeCookie(w, c);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+	}
+
+	private void addCookies() {
+		try (Stream<String> stream = Files.lines(path())) {
+			stream.map(l -> l.split("|"))//
+				.map(a -> getCookie(a))//
+				.forEach(c -> driver.manage().addCookie(c));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -89,23 +88,23 @@ public abstract class SalesforceUploader {
 		wait.ignoring(StaleElementReferenceException.class);
 	}
 
+	private Path path() {
+		return get(getProperty("user.home") + separator + //
+			"AppData" + separator + //
+			"Local" + separator + //
+			"txtDIS" + separator + //
+			"salesforce.cookie");
+	}
+
 	private void writeCookie(BufferedWriter w, Cookie c) throws IOException {
 		w.write(c.getName() + "|" + //
-				c.getValue() + "|" + "\n");
+			c.getValue() + "|" + "\n");
 	}
 
 	private Cookie getCookie(String[] s) {
 		String name = s[0];
 		String value = s[1];
 		return new Cookie(name, value);
-	}
-
-	private Path path() {
-		return get(getProperty("user.home") + separator + //
-				"AppData" + separator + //
-				"Local" + separator + //
-				"txtDIS" + separator + //
-				"salesforce.cookie");
 	}
 
 	protected void findByButtonXPath(String item, String button, String foundItem) {

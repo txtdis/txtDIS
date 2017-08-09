@@ -1,14 +1,6 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.domain.UserEntity;
 import ph.txtdis.dto.StockTake;
 import ph.txtdis.dto.StockTakeDetail;
@@ -22,8 +14,18 @@ import ph.txtdis.mgdc.repository.WarehouseRepository;
 import ph.txtdis.repository.UserRepository;
 import ph.txtdis.type.UomType;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+
 public abstract class AbstractStockTakeService //
-		implements StockTakeService {
+	implements StockTakeService {
+
+	@Autowired
+	protected StockTakeRepository stockTakeRepository;
 
 	@Autowired
 	private ItemService itemService;
@@ -34,13 +36,57 @@ public abstract class AbstractStockTakeService //
 	@Autowired
 	private WarehouseRepository warehouseRepository;
 
-	@Autowired
-	protected StockTakeRepository stockTakeRepository;
-
 	@Override
 	public StockTake find(Long id) {
 		StockTakeEntity i = stockTakeRepository.findOne(id);
 		return toStockTake(i);
+	}
+
+	public StockTake toStockTake(StockTakeEntity p) {
+		return p == null ? null : convert(p);
+	}
+
+	private StockTake convert(StockTakeEntity e) {
+		StockTake s = new StockTake();
+		s.setId(e.getId());
+		s.setCountDate(e.getStockTakeDate());
+		s.setWarehouse(toName(e.getWarehouse()));
+		s.setChecker(toName(e.getChecker()));
+		s.setTaker(toName(e.getTaker()));
+		s.setDetails(toStockTakeDetails(e));
+		s.setCreatedBy(e.getCreatedBy());
+		s.setCreatedOn(e.getCreatedOn());
+		return s;
+	}
+
+	private String toName(WarehouseEntity u) {
+		return u == null ? null : u.getName();
+	}
+
+	private String toName(UserEntity user) {
+		return user == null ? null : user.getName();
+	}
+
+	private List<StockTakeDetail> toStockTakeDetails(StockTakeEntity i) {
+		return i.getDetails().stream().map(id -> toStockTakeDetail(id)).collect(toList());
+	}
+
+	private StockTakeDetail toStockTakeDetail(StockTakeDetailEntity e) {
+		StockTakeDetail d = new StockTakeDetail();
+		ItemEntity i = e.getItem();
+		d.setId(i.getId());
+		d.setName(i.getName());
+		d.setQty(e.getQty());
+		d.setQuality(e.getQuality());
+		d.setUom(e.getUom());
+		d.setQtyPerCase(getQtyPerCase(e));
+		return d;
+	}
+
+	private int getQtyPerCase(StockTakeDetailEntity e) {
+		if (e.getUom() != UomType.CS)
+			return 0;
+		return itemService.getCountPerCase(e.getItem());
 	}
 
 	@Override
@@ -49,6 +95,11 @@ public abstract class AbstractStockTakeService //
 		if (i == null)
 			throw new NotFoundException("Stock take on " + toDateDisplay(d));
 		return toStockTake(i);
+	}
+
+	@Override
+	public StockTakeEntity findLatestEntityOnOrBeforeCutoff(LocalDate d) {
+		return stockTakeRepository.findFirstByStockTakeDateLessThanEqualOrderByStockTakeDateDesc(d);
 	}
 
 	@Override
@@ -69,11 +120,6 @@ public abstract class AbstractStockTakeService //
 	}
 
 	@Override
-	public StockTakeEntity findLatestEntityOnOrBeforeCutoff(LocalDate d) {
-		return stockTakeRepository.findFirstByStockTakeDateLessThanEqualOrderByStockTakeDateDesc(d);
-	}
-
-	@Override
 	public StockTake first() {
 		StockTakeEntity i = stockTakeRepository.findFirstByOrderByIdAsc();
 		return toStockTake(i);
@@ -83,6 +129,16 @@ public abstract class AbstractStockTakeService //
 	public StockTake firstToSpin() {
 		StockTakeEntity i = firstSpun();
 		return spunIdOnlyStockTake(i);
+	}
+
+	private StockTakeEntity firstSpun() {
+		return stockTakeRepository.findFirstByOrderByIdAsc();
+	}
+
+	private StockTake spunIdOnlyStockTake(StockTakeEntity i) {
+		StockTake a = new StockTake();
+		a.setId(i.getId());
+		return a;
 	}
 
 	@Override
@@ -95,6 +151,10 @@ public abstract class AbstractStockTakeService //
 	public StockTake lastToSpin() {
 		StockTakeEntity i = lastSpun();
 		return spunIdOnlyStockTake(i);
+	}
+
+	private StockTakeEntity lastSpun() {
+		return stockTakeRepository.findFirstByOrderByIdDesc();
 	}
 
 	@Override
@@ -116,75 +176,6 @@ public abstract class AbstractStockTakeService //
 		return toStockTake(i);
 	}
 
-	private StockTakeEntity firstSpun() {
-		return stockTakeRepository.findFirstByOrderByIdAsc();
-	}
-
-	private StockTakeEntity lastSpun() {
-		return stockTakeRepository.findFirstByOrderByIdDesc();
-	}
-
-	private StockTake spunIdOnlyStockTake(StockTakeEntity i) {
-		StockTake a = new StockTake();
-		a.setId(i.getId());
-		return a;
-	}
-
-	public List<StockTake> toStockTake(List<StockTakeEntity> p) {
-		return p == null ? null : convert(p);
-	}
-
-	public StockTake toStockTake(StockTakeEntity p) {
-		return p == null ? null : convert(p);
-	}
-
-	private List<StockTake> convert(List<StockTakeEntity> l) {
-		return l.stream().map(p -> convert(p)).collect(toList());
-	}
-
-	private StockTake convert(StockTakeEntity e) {
-		StockTake s = new StockTake();
-		s.setId(e.getId());
-		s.setCountDate(e.getStockTakeDate());
-		s.setWarehouse(toName(e.getWarehouse()));
-		s.setChecker(toName(e.getChecker()));
-		s.setTaker(toName(e.getTaker()));
-		s.setDetails(toStockTakeDetails(e));
-		s.setCreatedBy(e.getCreatedBy());
-		s.setCreatedOn(e.getCreatedOn());
-		return s;
-	}
-
-	private String toName(UserEntity user) {
-		return user == null ? null : user.getName();
-	}
-
-	private String toName(WarehouseEntity u) {
-		return u == null ? null : u.getName();
-	}
-
-	private StockTakeDetail toStockTakeDetail(StockTakeDetailEntity e) {
-		StockTakeDetail d = new StockTakeDetail();
-		ItemEntity i = e.getItem();
-		d.setId(i.getId());
-		d.setName(i.getName());
-		d.setQty(e.getQty());
-		d.setQuality(e.getQuality());
-		d.setUom(e.getUom());
-		d.setQtyPerCase(getQtyPerCase(e));
-		return d;
-	}
-
-	private int getQtyPerCase(StockTakeDetailEntity e) {
-		if (e.getUom() != UomType.CS)
-			return 0;
-		return itemService.getCountPerCase(e.getItem());
-	}
-
-	private List<StockTakeDetail> toStockTakeDetails(StockTakeEntity i) {
-		return i.getDetails().stream().map(id -> toStockTakeDetail(id)).collect(toList());
-	}
-
 	public StockTakeEntity toStockTaking(StockTake l) {
 		return l == null ? null : create(l);
 	}
@@ -199,8 +190,12 @@ public abstract class AbstractStockTakeService //
 		return e;
 	}
 
-	private ItemEntity toItem(StockTakeDetail ad) {
-		return itemService.findEntityByPrimaryKey(ad.getId());
+	private WarehouseEntity toWarehouse(StockTake s) {
+		return s == null ? null : warehouseRepository.findByNameIgnoreCase(s.getWarehouse());
+	}
+
+	private UserEntity toUser(String n) {
+		return n == null ? null : userRepository.findOne(n);
 	}
 
 	protected List<StockTakeDetailEntity> toStockTakingDetails(StockTakeEntity i, StockTake e) {
@@ -217,11 +212,15 @@ public abstract class AbstractStockTakeService //
 		return ed;
 	}
 
-	private UserEntity toUser(String n) {
-		return n == null ? null : userRepository.findOne(n);
+	private ItemEntity toItem(StockTakeDetail ad) {
+		return itemService.findEntityByPrimaryKey(ad.getId());
 	}
 
-	private WarehouseEntity toWarehouse(StockTake s) {
-		return s == null ? null : warehouseRepository.findByNameIgnoreCase(s.getWarehouse());
+	public List<StockTake> toStockTake(List<StockTakeEntity> p) {
+		return p == null ? null : convert(p);
+	}
+
+	private List<StockTake> convert(List<StockTakeEntity> l) {
+		return l.stream().map(p -> convert(p)).collect(toList());
 	}
 }

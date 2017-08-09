@@ -14,8 +14,8 @@ import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.type.Type;
 
 public abstract class AbstractItemListTable //
-		extends AbstractTable<Item> //
-		implements ItemListTable {
+	extends AbstractTable<Item> //
+	implements ItemListTable {
 
 	@Autowired
 	private Column<Item, String> name;
@@ -26,7 +26,7 @@ public abstract class AbstractItemListTable //
 	@Override
 	protected List<TableColumn<Item, ?>> addColumns() {
 		return asList( //
-				name.ofType(Type.TEXT).width(240).build("Name", "name"), //
-				description.ofType(TEXT).width(480).build("Description", "description"));
+			name.ofType(Type.TEXT).width(240).build("Name", "name"), //
+			description.ofType(TEXT).width(480).build("Description", "description"));
 	}
 }

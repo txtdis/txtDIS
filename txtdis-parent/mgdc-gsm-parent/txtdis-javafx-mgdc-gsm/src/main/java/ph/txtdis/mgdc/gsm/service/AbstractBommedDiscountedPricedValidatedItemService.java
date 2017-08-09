@@ -1,30 +1,8 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.type.ItemType.FREE;
-import static ph.txtdis.type.ItemType.PURCHASED;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.DateTimeUtils.toHypenatedYearMonthDay;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import ph.txtdis.dto.AbstractDecisionNeeded;
-import ph.txtdis.dto.Bom;
-import ph.txtdis.dto.ItemFamily;
-import ph.txtdis.dto.Price;
-import ph.txtdis.dto.PricingType;
-import ph.txtdis.dto.QtyPerUom;
+import ph.txtdis.dto.*;
 import ph.txtdis.excel.ExcelReportWriter;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.NotAPurchasedItemException;
@@ -33,29 +11,40 @@ import ph.txtdis.exception.NotToBeSoldItemException;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.service.PricingTypeService;
-import ph.txtdis.service.SyncService;
 import ph.txtdis.type.ItemType;
 import ph.txtdis.type.UomType;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.type.ItemType.FREE;
+import static ph.txtdis.type.ItemType.PURCHASED;
+import static ph.txtdis.util.DateTimeUtils.*;
+
 public abstract class AbstractBommedDiscountedPricedValidatedItemService //
-		extends AbstractItemService //
-		implements BommedDiscountedPricedValidatedItemService {
+	extends AbstractItemService //
+	implements BommedDiscountedPricedValidatedItemService {
+
+	private static final String PRICING_TAB = "Pricing";
 
 	private static Logger logger = getLogger(AbstractBommedDiscountedPricedValidatedItemService.class);
 
-	private static final String PRICING_TAB = "Pricing";
+	@Autowired
+	protected PricingTypeService pricingTypeService;
 
 	@Autowired
 	private ExcelReportWriter excel;
 
 	@Autowired
 	private ItemFamilyService itemFamilyService;
-
-	@Autowired
-	private SyncService syncService;
-
-	@Autowired
-	protected PricingTypeService pricingTypeService;
 
 	private Item part;
 
@@ -77,10 +66,16 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 		return newPrice(type, price, startDate);
 	}
 
-	private void validateStartDateOfPricingType(List<Price> prices, PricingType type, LocalDate startDate) throws Exception {
+	private void validateStartDateOfPricingType(List<Price> prices, PricingType type, LocalDate startDate)
+		throws Exception {
 		// confirmDateIsNotInThePast(startDate);
 		if (startDateForPaymentTypeExists(prices, type, startDate))
 			throw new DuplicateException(toDateDisplay(startDate) + " for " + type);
+	}
+
+	@Override
+	public List<Price> getPriceList() {
+		return get().getPriceList();
 	}
 
 	private Price newPrice(PricingType type, BigDecimal price, LocalDate startDate) {
@@ -100,7 +95,16 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
-	public QtyPerUom createQtyPerUom(UomType uom, BigDecimal qty, Boolean isPurchased, Boolean isSold, Boolean isReported) {
+	public void setPriceList(List<Price> items) {
+		get().setPriceList(items);
+	}
+
+	@Override
+	public QtyPerUom createQtyPerUom(UomType uom,
+	                                 BigDecimal qty,
+	                                 Boolean isPurchased,
+	                                 Boolean isSold,
+	                                 Boolean isReported) {
 		QtyPerUom q = new QtyPerUom();
 		q.setUom(uom);
 		q.setQty(qty);
@@ -124,6 +128,11 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
+	public void setDescription(String text) {
+		get().setDescription(text);
+	}
+
+	@Override
 	public List<Bom> getDetails() {
 		List<Bom> l = listBoms();
 		logger.info("\n    listBOMs@getDetails = " + l);
@@ -131,8 +140,18 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
+	public List<Bom> listBoms() {
+		return get().getBoms();
+	}
+
+	@Override
 	public LocalDate getEndOfLife() {
 		return get().getEndOfLife();
+	}
+
+	@Override
+	public void setEndOfLife(LocalDate d) {
+		get().setEndOfLife(d);
 	}
 
 	@Override
@@ -151,24 +170,19 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
-	public List<Price> getPriceList() {
-		return get().getPriceList();
+	public void setName(String text) {
+		get().setName(text);
 	}
 
 	@Override
 	public BigDecimal getQtyPerUom(Item item, UomType uom) {
 		try {
 			return item.getQtyPerUomList().stream() //
-					.filter(q -> q.getUom() == uom) //
-					.findAny().get().getQty();
+				.filter(q -> q.getUom() == uom) //
+				.findAny().get().getQty();
 		} catch (Exception e) {
 			return ZERO;
 		}
-	}
-
-	@Override
-	public ItemType getType() {
-		return get().getType();
 	}
 
 	@Override
@@ -177,12 +191,8 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
-	public boolean hasPurchaseUom() {
-		try {
-			return uomExists(q -> q.getPurchased() != null && q.getPurchased() == true);
-		} catch (Exception e) {
-			return false;
-		}
+	public boolean hasSoldUom() {
+		return uomExists(q -> q.getSold() != null && q.getSold() == true);
 	}
 
 	private boolean uomExists(Predicate<QtyPerUom> p) {
@@ -190,13 +200,8 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
-	public boolean hasReportUom() {
-		return uomExists(q -> q.getReported() != null && q.getReported() == true);
-	}
-
-	@Override
-	public boolean hasSoldUom() {
-		return uomExists(q -> q.getSold() != null && q.getSold() == true);
+	public List<QtyPerUom> listQtyPerUom() {
+		return get().getQtyPerUomList();
 	}
 
 	@Override
@@ -205,18 +210,28 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
+	public void setNotDiscounted(boolean b) {
+		get().setNotDiscounted(b);
+	}
+
+	@Override
 	public boolean isPurchased() {
 		return getType() == PURCHASED;
 	}
 
 	@Override
-	public boolean isSold() {
-		return getType() != FREE;
+	public ItemType getType() {
+		return get().getType();
 	}
 
 	@Override
-	public List<Bom> listBoms() {
-		return get().getBoms();
+	public void setType(ItemType t) {
+		get().setType(t);
+	}
+
+	@Override
+	public boolean isSold() {
+		return getType() != FREE;
 	}
 
 	@Override
@@ -230,7 +245,8 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	private List<UomType> filterBoughtUom(Item item) {
 		List<QtyPerUom> qpu = item.getQtyPerUomList();
 		return qpu == null ? new ArrayList<>()
-				: qpu.stream().filter(q -> q.getPurchased() != null && q.getPurchased()).map(q -> q.getUom()).collect(toList());
+			:
+			qpu.stream().filter(q -> q.getPurchased() != null && q.getPurchased()).map(q -> q.getUom()).collect(toList());
 	}
 
 	@Override
@@ -254,11 +270,6 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
-	public List<QtyPerUom> listQtyPerUom() {
-		return get().getQtyPerUomList();
-	}
-
-	@Override
 	public List<UomType> listSellingUoms() {
 		try {
 			return listSellingUoms(item);
@@ -277,7 +288,8 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 
 	private List<UomType> filterSoldUom(Item item) {
 		List<QtyPerUom> qpu = item.getQtyPerUomList();
-		return qpu == null ? new ArrayList<>() : qpu.stream().filter(q -> q.getSold() != null && q.getSold()).map(q -> q.getUom()).collect(toList());
+		return qpu == null ? new ArrayList<>() :
+			qpu.stream().filter(q -> q.getSold() != null && q.getSold()).map(q -> q.getUom()).collect(toList());
 	}
 
 	@Override
@@ -329,18 +341,13 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
+	public LocalDate today() {
+		return getServerDate();
+	}
+
+	@Override
 	public void setBoms(List<Bom> l) {
 		get().setBoms(l);
-	}
-
-	@Override
-	public void setDescription(String text) {
-		get().setDescription(text);
-	}
-
-	@Override
-	public void setEndOfLife(LocalDate d) {
-		get().setEndOfLife(d);
 	}
 
 	@Override
@@ -349,20 +356,10 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
-	public void setName(String text) {
-		get().setName(text);
-	}
-
-	@Override
 	public void setNameIfUnique(String text) throws Exception {
 		if (findByName(text) != null)
 			throw new DuplicateException(text);
 		get().setName(text);
-	}
-
-	@Override
-	public void setNotDiscounted(boolean b) {
-		get().setNotDiscounted(b);
 	}
 
 	@Override
@@ -374,28 +371,13 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
-	public void setPriceList(List<Price> items) {
-		get().setPriceList(items);
-	}
-
-	@Override
 	public void setQtyPerUomList(List<QtyPerUom> list) {
 		get().setQtyPerUomList(list);
 	}
 
 	@Override
-	public void setType(ItemType t) {
-		get().setType(t);
-	}
-
-	@Override
 	public void setVendorId(String id) {
 		get().setVendorNo(id);
-	}
-
-	@Override
-	public LocalDate today() {
-		return syncService.getServerDate();
 	}
 
 	@Override
@@ -423,10 +405,24 @@ public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	}
 
 	@Override
+	public boolean hasPurchaseUom() {
+		try {
+			return uomExists(q -> q.getPurchased() != null && q.getPurchased() == true);
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	@Override
 	public void validateReportedUom(Boolean value) throws DuplicateException {
 		if (isNewQtyPerUom())
 			return;
 		if (hasReportUom())
 			throw new DuplicateException("A report UOM");
+	}
+
+	@Override
+	public boolean hasReportUom() {
+		return uomExists(q -> q.getReported() != null && q.getReported() == true);
 	}
 }

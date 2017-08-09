@@ -25,7 +25,7 @@ import ph.txtdis.util.DateTimeUtils;
 
 @Component("revision3")
 public class Revision3Impl //
-		implements Revision3 {
+	implements Revision3 {
 
 	@Autowired
 	private CustomerRepository customerRepository;
@@ -42,7 +42,8 @@ public class Revision3Impl //
 		Date date = DateTimeUtils.toUtilDate("2009-06-07");
 		SyncEntity sync = backupSync();
 		if (areDiscountsGivenAndRouteReplacementAndConversionNotDone(date, sync))
-			givePickUpDiscountsToSelectedCustomersAndReplaceRoutesFromCokestoTrucksAndConvertTheFormerToChannels(date, sync);
+			givePickUpDiscountsToSelectedCustomersAndReplaceRoutesFromCokestoTrucksAndConvertTheFormerToChannels(date,
+				sync);
 	}
 
 	private SyncEntity backupSync() {
@@ -55,14 +56,22 @@ public class Revision3Impl //
 		return !syncDate.isEqual(referenceDate);
 	}
 
-	private void givePickUpDiscountsToSelectedCustomersAndReplaceRoutesFromCokestoTrucksAndConvertTheFormerToChannels(Date date, SyncEntity sync) {
+	private void givePickUpDiscountsToSelectedCustomersAndReplaceRoutesFromCokestoTrucksAndConvertTheFormerToChannels(
+		Date date,
+		SyncEntity sync) {
 		givePickUpDiscountsToApprovedCustomers();
 		syncRepository.save(updateSync(sync, date));
 	}
 
 	private void givePickUpDiscountsToApprovedCustomers() {
-		List<Long> vendorIds = asList(13L, 21L, 26L, 29L, 35L, 504990464L, 503760889L, 503773439L, 504777816L, 504696211L);
+		List<Long> vendorIds =
+			asList(13L, 21L, 26L, 29L, 35L, 504990464L, 503760889L, 503773439L, 504777816L, 504696211L);
 		vendorIds.stream().forEach(v -> giveDiscountToCustomer(v));
+	}
+
+	private SyncEntity updateSync(SyncEntity sync, Date date) {
+		sync.setLastSync(date);
+		return sync;
 	}
 
 	private void giveDiscountToCustomer(Long vendorId) {
@@ -84,10 +93,5 @@ public class Revision3Impl //
 
 	private LocalDate goLiveDate() {
 		return DateTimeUtils.toDate(goLive);
-	}
-
-	private SyncEntity updateSync(SyncEntity sync, Date date) {
-		sync.setLastSync(date);
-		return sync;
 	}
 }

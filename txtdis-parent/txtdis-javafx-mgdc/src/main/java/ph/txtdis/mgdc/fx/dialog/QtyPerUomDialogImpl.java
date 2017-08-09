@@ -1,17 +1,8 @@
 package ph.txtdis.mgdc.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.QUANTITY;
-import static ph.txtdis.util.NumberUtils.isZero;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.QtyPerUom;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCheckBox;
@@ -21,10 +12,18 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.service.ValidatedUomService;
 import ph.txtdis.type.UomType;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.QUANTITY;
+import static ph.txtdis.util.NumberUtils.isZero;
+
 @Scope("prototype")
 @Component("qtyPerUomDialog")
 public class QtyPerUomDialogImpl //
-		extends AbstractFieldDialog<QtyPerUom> {
+	extends AbstractFieldDialog<QtyPerUom> {
 
 	@Autowired
 	private ValidatedUomService service;
@@ -38,25 +37,17 @@ public class QtyPerUomDialogImpl //
 	@Autowired
 	private LabeledCheckBox isPurchasedCheckBox, isSoldCheckBox, isReportedCheckBox;
 
-	private LabeledCheckBox isPurchasedCheckBox() {
-		isPurchasedCheckBox.name("Purchased").build();
-		isPurchasedCheckBox.onAction(e -> verifyPurchasedUom());
-		return isPurchasedCheckBox;
-	}
-
-	private LabeledCheckBox isReportedCheckBox() {
-		isReportedCheckBox.name("Reported").build();
-		isReportedCheckBox.onAction(e -> verifyReportedUom());
-		return isReportedCheckBox;
-	}
-
-	private Boolean nullIfFalse(boolean b) {
-		return b ? b : null;
-	}
-
-	private void nullIfZero() {
-		if (isZero(qtyField.getValue()))
-			qtyField.clear();
+	@Override
+	protected List<InputNode<?>> addNodes() {
+		List<InputNode<?>> l = new ArrayList<>(asList(//
+			uomCombo.name("UOM").items(service.listUoms()).build(), //
+			qtyField(), //
+			isReportedCheckBox()));
+		if (service.isSold())
+			l.add(2, isSoldCheckBox.name("Sold").build());
+		if (service.isPurchased())
+			l.add(2, isPurchasedCheckBox());
+		return l;
 	}
 
 	private LabeledField<BigDecimal> qtyField() {
@@ -65,12 +56,21 @@ public class QtyPerUomDialogImpl //
 		return qtyField;
 	}
 
-	private void verifyPurchasedUom() {
-		try {
-			service.validatePurchasedUom(isPurchasedCheckBox.getValue());
-		} catch (Exception e) {
-			resetNodesOnError(e);
-		}
+	private LabeledCheckBox isReportedCheckBox() {
+		isReportedCheckBox.name("Reported").build();
+		isReportedCheckBox.onAction(e -> verifyReportedUom());
+		return isReportedCheckBox;
+	}
+
+	private LabeledCheckBox isPurchasedCheckBox() {
+		isPurchasedCheckBox.name("Purchased").build();
+		isPurchasedCheckBox.onAction(e -> verifyPurchasedUom());
+		return isPurchasedCheckBox;
+	}
+
+	private void nullIfZero() {
+		if (isZero(qtyField.getValue()))
+			qtyField.clear();
 	}
 
 	private void verifyReportedUom() {
@@ -81,27 +81,26 @@ public class QtyPerUomDialogImpl //
 		}
 	}
 
-	@Override
-	protected List<InputNode<?>> addNodes() {
-		List<InputNode<?>> l = new ArrayList<>(asList(//
-				uomCombo.name("UOM").items(service.listUoms()).build(), //
-				qtyField(), //
-				isReportedCheckBox()));
-		if (service.isSold())
-			l.add(2, isSoldCheckBox.name("Sold").build());
-		if (service.isPurchased())
-			l.add(2, isPurchasedCheckBox());
-		return l;
+	private void verifyPurchasedUom() {
+		try {
+			service.validatePurchasedUom(isPurchasedCheckBox.getValue());
+		} catch (Exception e) {
+			resetNodesOnError(e);
+		}
 	}
 
 	@Override
 	protected QtyPerUom createEntity() {
 		return service.createQtyPerUom(//
-				uomCombo.getValue(), //
-				qtyField.getValue(), //
-				nullIfFalse(isPurchasedCheckBox.getValue()), //
-				nullIfFalse(isSoldCheckBox.getValue()), //
-				nullIfFalse(isReportedCheckBox.getValue()));
+			uomCombo.getValue(), //
+			qtyField.getValue(), //
+			nullIfFalse(isPurchasedCheckBox.getValue()), //
+			nullIfFalse(isSoldCheckBox.getValue()), //
+			nullIfFalse(isReportedCheckBox.getValue()));
+	}
+
+	private Boolean nullIfFalse(boolean b) {
+		return b ? b : null;
 	}
 
 	@Override

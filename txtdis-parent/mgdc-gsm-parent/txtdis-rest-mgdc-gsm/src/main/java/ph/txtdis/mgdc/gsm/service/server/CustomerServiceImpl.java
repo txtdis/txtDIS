@@ -1,30 +1,20 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-import static java.time.DayOfWeek.FRIDAY;
-import static java.time.DayOfWeek.MONDAY;
-import static java.time.DayOfWeek.SATURDAY;
-import static java.time.DayOfWeek.THURSDAY;
-import static java.time.DayOfWeek.TUESDAY;
-import static java.time.DayOfWeek.WEDNESDAY;
-import static java.time.LocalDate.now;
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
-import static ph.txtdis.type.LocationType.BARANGAY;
-import static ph.txtdis.type.LocationType.CITY;
-import static ph.txtdis.type.LocationType.PROVINCE;
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-import static ph.txtdis.type.PartnerType.FINANCIAL;
-import static ph.txtdis.type.PartnerType.INTERNAL;
-import static ph.txtdis.type.PartnerType.OUTLET;
-import static ph.txtdis.type.PartnerType.VENDOR;
-import static ph.txtdis.type.RouteType.PRE_SELL;
-import static ph.txtdis.util.DateTimeUtils.endOfDay;
-import static ph.txtdis.util.DateTimeUtils.toDate;
-import static ph.txtdis.util.NumberUtils.isPositive;
-import static ph.txtdis.util.TextUtils.HAS_OVERDUES;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ph.txtdis.dto.*;
+import ph.txtdis.mgdc.domain.LocationEntity;
+import ph.txtdis.mgdc.domain.PricingTypeEntity;
+import ph.txtdis.mgdc.gsm.domain.*;
+import ph.txtdis.mgdc.gsm.dto.Customer;
+import ph.txtdis.mgdc.service.server.HolidayService;
+import ph.txtdis.mgdc.service.server.PricingTypeService;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.type.PartnerType;
+import ph.txtdis.type.VisitFrequency;
+import ph.txtdis.util.DateTimeUtils;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -35,39 +25,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import ph.txtdis.dto.CustomerReceivableReport;
-import ph.txtdis.dto.Location;
-import ph.txtdis.dto.PricingType;
-import ph.txtdis.dto.Route;
-import ph.txtdis.dto.Routing;
-import ph.txtdis.dto.WeeklyVisit;
-import ph.txtdis.mgdc.domain.LocationEntity;
-import ph.txtdis.mgdc.domain.PricingTypeEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableEntity;
-import ph.txtdis.mgdc.gsm.domain.CreditDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.CustomerDiscountEntity;
-import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
-import ph.txtdis.mgdc.gsm.domain.RoutingEntity;
-import ph.txtdis.mgdc.gsm.domain.WeeklyVisitEntity;
-import ph.txtdis.mgdc.gsm.dto.Customer;
-import ph.txtdis.mgdc.service.server.HolidayService;
-import ph.txtdis.mgdc.service.server.PricingTypeService;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.type.PartnerType;
-import ph.txtdis.type.VisitFrequency;
-import ph.txtdis.util.DateTimeUtils;
+import static java.math.BigDecimal.ZERO;
+import static java.time.DayOfWeek.*;
+import static java.time.LocalDate.now;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
+import static ph.txtdis.type.LocationType.*;
+import static ph.txtdis.type.PartnerType.*;
+import static ph.txtdis.type.RouteType.PRE_SELL;
+import static ph.txtdis.util.DateTimeUtils.endOfDay;
+import static ph.txtdis.util.DateTimeUtils.toDate;
+import static ph.txtdis.util.NumberUtils.isPositive;
+import static ph.txtdis.util.TextUtils.HAS_OVERDUES;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("customerService")
 public class CustomerServiceImpl //
-		extends AbstractCustomerService //
-		implements CreditedAndDiscountedCustomerService {
+	extends AbstractCustomerService //
+	implements CreditedAndDiscountedCustomerService {
 
 	private static final String CUSTOMER = "customer";
 
@@ -76,9 +53,6 @@ public class CustomerServiceImpl //
 
 	@Autowired
 	private ChannelService channelService;
-
-	@Autowired
-	private CredentialService credentialService;
 
 	@Autowired
 	private CreditDetailService creditService;
@@ -99,13 +73,10 @@ public class CustomerServiceImpl //
 	private PricingTypeService pricingService;
 
 	@Autowired
-	private ReadOnlyService<Customer> readOnlyService;
-
-	@Autowired
 	private RoutingService routingService;
 
 	@Autowired
-	private SavingService<Customer> savingService;
+	private RestClientService<Customer> restClientService;
 
 	@Autowired
 	private WeeklyVisitService visitService;
@@ -228,7 +199,8 @@ public class CustomerServiceImpl //
 
 	@Override
 	public Customer findNoContactDetails() {
-		List<CustomerEntity> l = repository.findByDeactivatedOnNullAndTypeAndContactNameNullAndCreditDetailsNotNull(OUTLET);
+		List<CustomerEntity> l =
+			repository.findByDeactivatedOnNullAndTypeAndContactNameNullAndCreditDetailsNotNull(OUTLET);
 		if (l == null)
 			l = repository.findByDeactivatedOnNullAndTypeAndContactNameNullAndCustomerDiscountsNotNull(OUTLET);
 		return filterBySeller(l, username());
@@ -239,13 +211,10 @@ public class CustomerServiceImpl //
 		return o.isPresent() ? idAndNameOnly(o.get()) : null;
 	}
 
-	private String username() {
-		return credentialService.username();
-	}
-
 	@Override
 	public Customer findNoDesignation() {
-		List<CustomerEntity> l = repository.findByDeactivatedOnNullAndTypeAndContactNameNotNullAndContactTitleNull(OUTLET);
+		List<CustomerEntity> l =
+			repository.findByDeactivatedOnNullAndTypeAndContactNameNotNullAndContactTitleNull(OUTLET);
 		return filterBySeller(l, username());
 	}
 
@@ -263,7 +232,8 @@ public class CustomerServiceImpl //
 
 	@Override
 	public Customer findNoSurname() {
-		List<CustomerEntity> l = repository.findByDeactivatedOnNullAndTypeAndContactNameNotNullAndContactSurnameNull(OUTLET);
+		List<CustomerEntity> l =
+			repository.findByDeactivatedOnNullAndTypeAndContactNameNotNullAndContactSurnameNull(OUTLET);
 		if (l == null) {
 			l = repository.findByDeactivatedOnNullAndContactNameNotNullAndContactSurnameNotNull(OUTLET);
 			l = l.stream().filter(u -> u.getContactName().equals(u.getContactSurname())).collect(Collectors.toList());
@@ -292,8 +262,10 @@ public class CustomerServiceImpl //
 	@Override
 	public Customer findDifferentVisitFrequencyAndSchedule() {
 		List<CustomerEntity> l = repository
-				.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNullOrderByVisitScheduleWeekNoAsc(OUTLET);
-		l = l.stream().filter(u -> count(u.getVisitFrequency()) != count(u.getVisitSchedule())).collect(Collectors.toList());
+			.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNullOrderByVisitScheduleWeekNoAsc(
+				OUTLET);
+		l = l.stream().filter(u -> count(u.getVisitFrequency()) != count(u.getVisitSchedule()))
+			.collect(Collectors.toList());
 		return filterBySeller(l, username());
 	}
 
@@ -338,14 +310,17 @@ public class CustomerServiceImpl //
 	@Override
 	public Customer findDifferentWeeksOneAndFiveVisitSchedule() {
 		List<CustomerEntity> l = repository
-				.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNullOrderByVisitScheduleWeekNoAsc(OUTLET);
-		l = l.stream().filter(v -> !v.getVisitSchedule().get(0).equals(v.getVisitSchedule().get(4))).collect(Collectors.toList());
+			.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNotNullAndVisitScheduleNotNullOrderByVisitScheduleWeekNoAsc(
+				OUTLET);
+		l = l.stream().filter(v -> !v.getVisitSchedule().get(0).equals(v.getVisitSchedule().get(4)))
+			.collect(Collectors.toList());
 		return filterBySeller(l, username());
 	}
 
 	@Override
 	public Customer findNoVisitSchedule() {
-		List<CustomerEntity> l = repository.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNull(OUTLET);
+		List<CustomerEntity> l =
+			repository.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitFrequencyNull(OUTLET);
 		if (l == null)
 			l = repository.findByDeactivatedOnNullAndTypeAndChannelVisitedTrueAndVisitScheduleNull(OUTLET);
 		return filterBySeller(l, username());
@@ -354,12 +329,12 @@ public class CustomerServiceImpl //
 	@Override
 	public List<Customer> findAllByScheduledRouteAndGoodCreditStanding(Long routeId) {
 		List<Customer> l = new ArrayList<>( //
-				repository.findByDeactivatedOnNullAndType(OUTLET).stream() //
-						.map(c -> toModel(c)) //
-						.filter(c -> isSelectedRouteOnSchedule(c, routeId)) //
-						.map(c -> addBadCreditTagToCustomersWithOverdue(c)) //
-						.sorted(comparing(Customer::getName)) //
-						.collect(toList()));
+			repository.findByDeactivatedOnNullAndType(OUTLET).stream() //
+				.map(c -> toModel(c)) //
+				.filter(c -> isSelectedRouteOnSchedule(c, routeId)) //
+				.map(c -> addBadCreditTagToCustomersWithOverdue(c)) //
+				.sorted(comparing(Customer::getName)) //
+				.collect(toList()));
 		l.addAll(fiveBlankCustomers());
 		return l;
 	}
@@ -373,11 +348,24 @@ public class CustomerServiceImpl //
 		return isSelectedRouteOnSchedule(c, getScheduleDate(r));
 	}
 
+	private Customer addBadCreditTagToCustomersWithOverdue(Customer c) {
+		if (doesCustomerHaveOverdues(c))
+			c.setName(c.getName() + HAS_OVERDUES);
+		return c;
+	}
+
+	private List<Customer> fiveBlankCustomers() {
+		List<Customer> l = new ArrayList<>();
+		for (int i = 0; i < 5; i++)
+			l.add(new Customer());
+		return l;
+	}
+
 	private Route getRoute(Customer c, LocalDate date) {
 		return c.getRouteHistory().stream() //
-				.filter(p -> !p.getStartDate().isAfter(date)) //
-				.max(comparing(Routing::getStartDate)) //
-				.orElse(new Routing()).getRoute();
+			.filter(p -> !p.getStartDate().isAfter(date)) //
+			.max(comparing(Routing::getStartDate)) //
+			.orElse(new Routing()).getRoute();
 	}
 
 	private boolean isSelectedRouteOnSchedule(Customer c, LocalDate date) {
@@ -385,6 +373,22 @@ public class CustomerServiceImpl //
 		if (visits == null || visits.isEmpty())
 			return false;
 		return isSelectedRouteOnSchedule(date.getDayOfWeek(), week(visits, date));
+	}
+
+	private LocalDate getScheduleDate(Route r) {
+		LocalDate date = holidayService.nextWorkDay(LocalDate.now());
+		if (r.getName().startsWith(PRE_SELL.toString()))
+			date = holidayService.nextWorkDay(date);
+		return date;
+	}
+
+	private boolean doesCustomerHaveOverdues(Customer c) {
+		try {
+			return doesCustomerHaveOverdues(c.getId());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	private boolean isSelectedRouteOnSchedule(DayOfWeek day, WeeklyVisit visit) {
@@ -405,23 +409,15 @@ public class CustomerServiceImpl //
 		return false;
 	}
 
-	private Customer addBadCreditTagToCustomersWithOverdue(Customer c) {
-		if (doesCustomerHaveOverdues(c))
-			c.setName(c.getName() + HAS_OVERDUES);
-		return c;
-	}
-
-	private boolean doesCustomerHaveOverdues(Customer c) {
-		try {
-			return doesCustomerHaveOverdues(c.getId());
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	private WeeklyVisit week(List<WeeklyVisit> visits, LocalDate date) {
+		return visits.stream() //
+			.filter(v -> v.getWeekNo() == DateTimeUtils.weekNo(date)) //
+			.findFirst().orElse(null);
 	}
 
 	private boolean doesCustomerHaveOverdues(Long id) throws Exception {
-		CustomerReceivableReport ar = customerReceivableService.generateCustomerReceivableReport(id, 1, daysFromGoLive());
+		CustomerReceivableReport ar = customerReceivableService.generateCustomerReceivableReport(id, 1, daysFromGoLive
+			());
 		BigDecimal unpaid = ar.getReceivables().stream().map(r -> r.getUnpaidValue()).reduce(ZERO, BigDecimal::add);
 		return isPositive(unpaid);
 	}
@@ -432,26 +428,6 @@ public class CustomerServiceImpl //
 
 	private LocalDate edmsGoLive() {
 		return toDate(edmsGoLive);
-	}
-
-	private List<Customer> fiveBlankCustomers() {
-		List<Customer> l = new ArrayList<>();
-		for (int i = 0; i < 5; i++)
-			l.add(new Customer());
-		return l;
-	}
-
-	private WeeklyVisit week(List<WeeklyVisit> visits, LocalDate date) {
-		return visits.stream() //
-				.filter(v -> v.getWeekNo() == DateTimeUtils.weekNo(date)) //
-				.findFirst().orElse(null);
-	}
-
-	private LocalDate getScheduleDate(Route r) {
-		LocalDate date = holidayService.nextWorkDay(LocalDate.now());
-		if (r.getName().startsWith(PRE_SELL.toString()))
-			date = holidayService.nextWorkDay(date);
-		return date;
 	}
 
 	@Override
@@ -502,9 +478,11 @@ public class CustomerServiceImpl //
 	}
 
 	@Override
-	public void cancelAllCustomerDiscountsIfMonthlyAverageIsLessthanRequired(BigDecimal noOfmonths, BigDecimal requiredQty) {
+	public void cancelAllCustomerDiscountsIfMonthlyAverageIsLessthanRequired(BigDecimal noOfmonths,
+	                                                                         BigDecimal requiredQty) {
 		List<BillableEntity> billings = billingService.findAllValidOutletBillingsBetweenDates(start(noOfmonths), now());
-		customerDiscountService.cancelDiscountsOfOutletsWithAverageMonthlySalesBelowRequiredQty(noOfmonths, requiredQty, billings);
+		customerDiscountService
+			.cancelDiscountsOfOutletsWithAverageMonthlySalesBelowRequiredQty(noOfmonths, requiredQty, billings);
 	}
 
 	private LocalDate start(BigDecimal noOfmonths) {
@@ -529,16 +507,28 @@ public class CustomerServiceImpl //
 		repository.save(c);
 	}
 
+	private void createBranches() {
+		for (int i = 0; i < branchNames.size(); i++)
+			createBranch(i);
+	}
+
+	private void importonAction() throws Exception {
+		importCustomers("/onAction");
+	}
+
+	private void createBanks() {
+		bankNames.forEach(b -> createBank(b));
+	}
+
+	private void importOutlets() throws Exception {
+		importCustomers("");
+	}
+
 	private CustomerEntity createCustomer(String name, PartnerType t) {
 		CustomerEntity c = new CustomerEntity();
 		c.setName(name);
 		c.setType(t);
 		return c;
-	}
-
-	private void createBranches() {
-		for (int i = 0; i < branchNames.size(); i++)
-			createBranch(i);
 	}
 
 	private void createBranch(int i) {
@@ -549,26 +539,14 @@ public class CustomerServiceImpl //
 		repository.save(c);
 	}
 
-	private void importonAction() throws Exception {
-		importCustomers("/onAction");
-	}
-
 	private void importCustomers(String endPt) throws Exception {
-		List<Customer> l = readOnlyService.module(CUSTOMER).getList(endPt);
+		List<Customer> l = restClientService.module(CUSTOMER).getList(endPt);
 		l.forEach(c -> repository.save(toEntity(c)));
-	}
-
-	private void createBanks() {
-		bankNames.forEach(b -> createBank(b));
 	}
 
 	private void createBank(String name) {
 		CustomerEntity c = createCustomer(name, FINANCIAL);
 		repository.save(c);
-	}
-
-	private void importOutlets() throws Exception {
-		importCustomers("");
 	}
 
 	@Override
@@ -588,7 +566,7 @@ public class CustomerServiceImpl //
 
 	@Override
 	public Customer saveToEdms(Customer c) throws Exception {
-		savingService.module(CUSTOMER).save(c);
+		restClientService.module(CUSTOMER).save(c);
 		return c;
 	}
 
@@ -602,26 +580,26 @@ public class CustomerServiceImpl //
 
 	private List<Long> inactiveOutletIds(List<BillableEntity> billings, BigDecimal noOfMonths) {
 		List<Long> outletIds = listOutletsCreatedBefore(noOfMonths).stream() //
-				.map(c -> c.getId()) //
-				.collect(toList());
+			.map(c -> c.getId()) //
+			.collect(toList());
 		List<Long> activeOutletIds = billings.stream() //
-				.map(b -> b.getCustomer().getId()) //
-				.distinct().collect(toList());
+			.map(b -> b.getCustomer().getId()) //
+			.distinct().collect(toList());
 		outletIds.removeAll(activeOutletIds);
 		return outletIds;
+	}
+
+	private void deactivateAllNonBuyingOutlets(List<Long> inactiveOutletIds) {
+		Iterable<CustomerEntity> inactiveOutlets = repository.findAll(inactiveOutletIds);
+		repository.save( //
+			stream(inactiveOutlets.spliterator(), false) //
+				.map(c -> deactivate(c, "INACTIVITY")) //
+				.collect(toList()));
 	}
 
 	private List<CustomerEntity> listOutletsCreatedBefore(BigDecimal noOfMonths) {
 		LocalDate start = start(noOfMonths);
 		ZonedDateTime creation = endOfDay(start);
 		return repository.findByDeactivatedOnNullAndTypeAndCreatedOnLessThan(OUTLET, creation);
-	}
-
-	private void deactivateAllNonBuyingOutlets(List<Long> inactiveOutletIds) {
-		Iterable<CustomerEntity> inactiveOutlets = repository.findAll(inactiveOutletIds);
-		repository.save( //
-				stream(inactiveOutlets.spliterator(), false) //
-						.map(c -> deactivate(c, "INACTIVITY")) //
-						.collect(toList()));
 	}
 }

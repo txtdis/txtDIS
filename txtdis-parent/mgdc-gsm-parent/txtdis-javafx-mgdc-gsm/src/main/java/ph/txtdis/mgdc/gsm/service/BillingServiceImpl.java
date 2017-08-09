@@ -1,20 +1,8 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.util.DateTimeUtils.toDate;
-import static ph.txtdis.util.TextUtils.blankIfNull;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.dto.Bom;
@@ -25,10 +13,23 @@ import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.type.UomType;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.PartnerType.EX_TRUCK;
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.DateTimeUtils.toDate;
+import static ph.txtdis.util.TextUtils.blankIfNull;
+import static ph.txtdis.util.UserUtils.isUser;
+
 @Service("billingService")
 public class BillingServiceImpl //
-		extends AbstractBillingService //
-		implements GsmBillingService {
+	extends AbstractBillingService //
+	implements GsmBillingService {
 
 	@Autowired
 	private CustomerValidationService customerValidationService;
@@ -53,8 +54,8 @@ public class BillingServiceImpl //
 	@Override
 	public boolean canEditInvoiceNo() {
 		return getIsValid() == null //
-				&& getBilledOn() != null //
-				&& isUser(MANAGER);
+			&& getBilledOn() != null //
+			&& isUser(MANAGER);
 	}
 
 	@Override
@@ -117,14 +118,13 @@ public class BillingServiceImpl //
 	}
 
 	@Override
-	public String getRemarks() {
-		String remarks = get().getRemarks();
-		return remarks == null ? "" : remarks;
+	public boolean isAppendable() {
+		return isNew() && isReferenceAnExTruckLoadOrder;
 	}
 
 	@Override
-	public boolean isAppendable() {
-		return isNew() && isReferenceAnExTruckLoadOrder;
+	public boolean isNew() {
+		return getBilledOn() == null;
 	}
 
 	@Override
@@ -134,9 +134,9 @@ public class BillingServiceImpl //
 		return super.isForDR(b);
 	}
 
-	@Override
-	public boolean isNew() {
-		return getBilledOn() == null;
+	private boolean isReferenceALoadOrder(Billable b) {
+		return isReferenceAnExTruckLoadOrder = //
+			b == null || b.getCustomerName() == null ? false : b.getCustomerName().startsWith(EX_TRUCK.toString());
 	}
 
 	@Override
@@ -166,13 +166,19 @@ public class BillingServiceImpl //
 
 	private boolean isBilledQtyMoreThanRemainingLoaded(BigDecimal qty) {
 		return exTruckDetails.stream() //
-				.anyMatch(d -> d.getId().equals(item.getId()) && d.getFinalQty().compareTo(qty) < 0);
+			.anyMatch(d -> d.getId().equals(item.getId()) && d.getFinalQty().compareTo(qty) < 0);
 	}
 
 	@Override
 	public void setOrderNoAndRemarksBeforeInvoiceNoEdit() {
 		oldOrderNo = getOrderNo();
 		remarks = getRemarks();
+	}
+
+	@Override
+	public String getRemarks() {
+		String remarks = get().getRemarks();
+		return remarks == null ? "" : remarks;
 	}
 
 	@Override
@@ -228,24 +234,19 @@ public class BillingServiceImpl //
 
 	private void verifyDeliveryIsScheduledToday(Customer c) throws InvalidException {
 		if (isNew() && isDroarLive() //
-				&& !customerService.areDeliveriesPickedUp(c, getOrderDate()) //
-				&& !customerService.isDeliveryScheduledOnThisDate(c, getOrderDate()))
+			&& !customerService.areDeliveriesPickedUp(c, getOrderDate()) //
+			&& !customerService.isDeliveryScheduledOnThisDate(c, getOrderDate()))
 			throw new InvalidException(c + "\nis not scheduled for delivery today");
 	}
 
 	private boolean isDroarLive() {
-		return !toDate(droarGoLive).isBefore(syncService.getServerDate());
+		return !toDate(droarGoLive).isBefore(getServerDate());
 	}
 
 	@Override
 	protected Billable validateBooking(String id) throws Exception {
 		Billable b = super.validateBooking(id);
 		return !isReferenceALoadOrder(b) ? b : updateUponLoadOrderValidation(b);
-	}
-
-	private boolean isReferenceALoadOrder(Billable b) {
-		return isReferenceAnExTruckLoadOrder = //
-				b == null || b.getCustomerName() == null ? false : b.getCustomerName().startsWith(EX_TRUCK.toString());
 	}
 
 	private Billable updateUponLoadOrderValidation(Billable b) throws Exception {
@@ -258,7 +259,7 @@ public class BillingServiceImpl //
 		if (isAnInvoice())
 			verifyPickedLoadOrderCanBeInvoiced(b);
 		else
-			verifyPickedLoadOrderCanBeDRdBecauseOfItemShortages(getReadOnlyService(), b.getBookingId());
+			verifyPickedLoadOrderCanBeDRdBecauseOfItemShortages(getRestClientService(), b.getBookingId());
 	}
 
 	private Billable setOrderDateAndBookingIdAndCreatedByAndOn(Billable old) {

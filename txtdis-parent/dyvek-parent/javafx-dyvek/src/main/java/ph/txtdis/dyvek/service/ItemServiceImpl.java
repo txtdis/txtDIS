@@ -1,53 +1,39 @@
 package ph.txtdis.dyvek.service;
 
-import static java.util.stream.Collectors.toList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dyvek.model.Item;
+import ph.txtdis.info.Information;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dyvek.model.Item;
-import ph.txtdis.info.Information;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.util.ClientTypeMap;
+import static java.util.stream.Collectors.toList;
 
 @Service("itemService")
 public class ItemServiceImpl //
-		implements ItemService {
+	implements ItemService {
 
 	@Autowired
-	private ReadOnlyService<Item> readOnlyService;
-
-	@Autowired
-	private SavingService<Item> savingService;
+	private RestClientService<Item> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
 
 	@Override
-	public ReadOnlyService<Item> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<Item> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
-	public String getModuleName() {
-		return "item";
+	public RestClientService<Item> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public ClientTypeMap getTypeMap() {
 		return typeMap;
-	}
-
-	@Override
-	public List<Item> list() {
-		try {
-			return getListedReadOnlyService().module(getModuleName()).getList("");
-		} catch (Exception e) {
-			return null;
-		}
 	}
 
 	@Override
@@ -60,6 +46,20 @@ public class ItemServiceImpl //
 	}
 
 	@Override
+	public List<Item> list() {
+		try {
+			return restClientService.module(getModuleName()).getList("");
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@Override
+	public String getModuleName() {
+		return "item";
+	}
+
+	@Override
 	public void reset() {
 	}
 
@@ -67,6 +67,6 @@ public class ItemServiceImpl //
 	public Item save(String name) throws Information, Exception {
 		Item i = new Item();
 		i.setName(name);
-		return savingService.module(getModuleName()).save(i);
+		return restClientService.module(getModuleName()).save(i);
 	}
 }

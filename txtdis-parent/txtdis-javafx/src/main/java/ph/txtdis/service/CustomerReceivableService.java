@@ -6,7 +6,7 @@ import java.util.List;
 import ph.txtdis.dto.CustomerReceivable;
 
 public interface CustomerReceivableService //
-		extends Spreadsheet<CustomerReceivable> {
+	extends Spreadsheet<CustomerReceivable> {
 
 	static final String AGED_COLUMN = "7";
 

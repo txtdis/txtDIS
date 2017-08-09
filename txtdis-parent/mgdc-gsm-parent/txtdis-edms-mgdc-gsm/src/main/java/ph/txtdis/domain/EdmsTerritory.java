@@ -12,7 +12,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "ref_territory")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsTerritory extends EdmsAbstractMaster implements Serializable {
+public class EdmsTerritory
+	extends EdmsAbstractMaster
+	implements Serializable {
 
 	private static final long serialVersionUID = 1429834151589755522L;
 }

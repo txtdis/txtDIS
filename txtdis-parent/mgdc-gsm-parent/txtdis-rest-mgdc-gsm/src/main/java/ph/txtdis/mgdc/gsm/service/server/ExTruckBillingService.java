@@ -1,23 +1,26 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-
-import java.math.BigDecimal;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.repository.BillableRepository;
 
+import java.math.BigDecimal;
+
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.PartnerType.EX_TRUCK;
+
 public interface ExTruckBillingService //
-		extends BillingDataService, QtyToLoadOrderDetailItemMappingService {
+	extends BillingDataService,
+	QtyToLoadOrderDetailItemMappingService {
 
 	default BillableEntity updateLoadOrderQtyAndNegateBookingIdIfFromLoadOrderThenSetBillingData( //
-			BillableRepository r, //
-			BillableEntity e, //
-			Billable b) {
+	                                                                                              BillableRepository r,
+	                                                                                              //
+	                                                                                              BillableEntity e,
+	                                                                                              //
+	                                                                                              Billable b) {
 		updateLoadOrderDetailQty(r, b);
 		if (isFromLoadOrder(e))
 			e.setBookingId(negateBookingId(e));
@@ -32,7 +35,8 @@ public interface ExTruckBillingService //
 		}
 	}
 
-	default BillableDetailEntity setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(BillableDetailEntity ed, BillableDetail bd) {
+	default BillableDetailEntity setTheTotalOfTheMappedEntityAndModelDetailsItemQuantities(BillableDetailEntity ed,
+	                                                                                       BillableDetail bd) {
 		ed.setSoldQty(getSoldQty(ed, bd));
 		return ed;
 	}
@@ -49,16 +53,16 @@ public interface ExTruckBillingService //
 		return QtyToLoadOrderDetailItemMappingService.super.updateDetailQty(e, b);
 	}
 
+	default boolean isInvalid(Billable b) {
+		return b.getIsValid() != null && b.getIsValid() == false;
+	}
+
 	default BillableEntity nullifyReceivingData(BillableEntity e) {
 		e.setReceivingId(null);
 		e.setReceivedBy(null);
 		e.setReceivedOn(null);
 		e.setDetails(e.getDetails().stream().map(d -> nullifyReturnedQty(d)).collect(toList()));
 		return e;
-	}
-
-	default boolean isInvalid(Billable b) {
-		return b.getIsValid() != null && b.getIsValid() == false;
 	}
 
 	default BillableDetailEntity nullifyReturnedQty(BillableDetailEntity ed) {

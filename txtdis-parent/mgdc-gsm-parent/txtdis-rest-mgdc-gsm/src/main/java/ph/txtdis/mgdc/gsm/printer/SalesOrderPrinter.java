@@ -1,25 +1,7 @@
 package ph.txtdis.mgdc.gsm.printer;
 
-import static java.lang.Integer.valueOf;
-import static java.math.BigDecimal.ZERO;
-import static org.apache.commons.lang3.StringUtils.center;
-import static org.apache.commons.lang3.StringUtils.leftPad;
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.rightPad;
-import static org.apache.commons.lang3.StringUtils.substring;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.NumberUtils.divide;
-import static ph.txtdis.util.NumberUtils.printDecimal;
-import static ph.txtdis.util.NumberUtils.toQuantityText;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.domain.CustomerDiscountEntity;
@@ -27,9 +9,20 @@ import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
 import ph.txtdis.mgdc.printer.AbstractPrinter;
 import ph.txtdis.util.NumberUtils;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static java.lang.Integer.valueOf;
+import static java.math.BigDecimal.ZERO;
+import static org.apache.commons.lang3.StringUtils.*;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.NumberUtils.*;
+
 @Component("salesOrderPrinter")
 public class SalesOrderPrinter //
-		extends AbstractPrinter<BillableEntity> {
+	extends AbstractPrinter<BillableEntity> {
 
 	private static final int HALF_COLUMN = (PAPER_WIDTH / 2) - 2;
 
@@ -44,39 +37,8 @@ public class SalesOrderPrinter //
 	@Value("${client.initials}")
 	private String clientInitials;
 
-	private String barangay() {
-		String s = customer().getBarangay() + ", " + customer().getCity();
-		return substring(s, 0, PAPER_WIDTH - SUBHEADER_LABEL_WIDTH);
-	}
-
-	private CustomerEntity customer() {
-		return entity.getCustomer();
-	}
-
-	private String customerName() {
-		String s = customer().getName();
-		return s.length() <= 21 ? s : substring(s, 0, 21);
-	}
-
-	private String discount() {
-		return NumberUtils.isZero(discountValue()) ? "--" : printDecimal(discountValue());
-	}
-
-	private BigDecimal discountValue() {
-		return entity.getGrossValue().subtract(entity.getTotalValue());
-	}
-
-	private String dueText() {
-		LocalDate d = entity.getDueDate();
-		return "DUE " + (d.isEqual(LocalDate.now()) ? "TODAY" : toDateDisplay(d));
-	}
-
 	private int getRemaingLines() {
 		return linesPerPage() - entity.getDetails().size();
-	}
-
-	private String grossText() {
-		return printDecimal(entity.getGrossValue());
 	}
 
 	private BigDecimal initialQty(BillableDetailEntity d) {
@@ -100,26 +62,12 @@ public class SalesOrderPrinter //
 		return initialQty(d).subtract(returnedQty(d));
 	}
 
-	private String percent() {
-		return percents("", entity.getCustomerDiscounts());
-	}
-
-	private String percents(String s, List<CustomerDiscountEntity> c) {
-		for (CustomerDiscountEntity d : c)
-			s += d.getValue() + "% * ";
-		return removeEnd(s, " * ");
-	}
-
 	private String price(BillableDetailEntity d) {
 		return leftPad(priceText(d) + "@", 8);
 	}
 
 	private String priceText(BillableDetailEntity d) {
 		return printDecimal(d.getPriceValue());
-	}
-
-	private void println(String s) {
-		printer.println(s);
 	}
 
 	private void printNothingFollowsFollowedByBlanks() {
@@ -145,28 +93,8 @@ public class SalesOrderPrinter //
 		return d.getPriceValue().multiply(netQty(d));
 	}
 
-	private String total() {
-		String s = printDecimal(entity.getTotalValue());
-		return leftPad(s, 9);
-	}
-
 	private String uom(BillableDetailEntity d) {
 		return d.getUom() + " ";
-	}
-
-	private String vat() {
-		BigDecimal vat = entity.getTotalValue().subtract(vatableValue());
-		String s = printDecimal(vat);
-		return leftPad(s, 9);
-	}
-
-	private String vatable() {
-		String s = printDecimal(vatableValue());
-		return leftPad(s, 9);
-	}
-
-	private BigDecimal vatableValue() {
-		return divide(entity.getTotalValue(), new BigDecimal("1." + vatValue));
 	}
 
 	@Override
@@ -196,6 +124,61 @@ public class SalesOrderPrinter //
 		printEndOfPage();
 	}
 
+	private void println(String s) {
+		printer.println(s);
+	}
+
+	private String grossText() {
+		return printDecimal(entity.getGrossValue());
+	}
+
+	private String percent() {
+		return percents("", entity.getCustomerDiscounts());
+	}
+
+	private String discount() {
+		return NumberUtils.isZero(discountValue()) ? "--" : printDecimal(discountValue());
+	}
+
+	private String vatable() {
+		String s = printDecimal(vatableValue());
+		return leftPad(s, 9);
+	}
+
+	private String vat() {
+		BigDecimal vat = entity.getTotalValue().subtract(vatableValue());
+		String s = printDecimal(vat);
+		return leftPad(s, 9);
+	}
+
+	private String total() {
+		String s = printDecimal(entity.getTotalValue());
+		return leftPad(s, 9);
+	}
+
+	private String customerName() {
+		String s = customer().getName();
+		return s.length() <= 21 ? s : substring(s, 0, 21);
+	}
+
+	private String percents(String s, List<CustomerDiscountEntity> c) {
+		for (CustomerDiscountEntity d : c)
+			s += d.getValue() + "% * ";
+		return removeEnd(s, " * ");
+	}
+
+	private BigDecimal discountValue() {
+		return entity.getGrossValue().subtract(entity.getTotalValue());
+	}
+
+	private BigDecimal vatableValue() {
+		return divide(entity.getTotalValue(), new BigDecimal("1." + vatValue));
+	}
+
+	private CustomerEntity customer() {
+		return entity.getCustomer();
+	}
+
 	@Override
 	protected void printSubheader() throws IOException {
 		println("DATE   : " + toDateDisplay(entity.getOrderDate()));
@@ -208,5 +191,15 @@ public class SalesOrderPrinter //
 		printDashes();
 		println(center("PARTICULARS", PAPER_WIDTH));
 		printDashes();
+	}
+
+	private String barangay() {
+		String s = customer().getBarangay() + ", " + customer().getCity();
+		return substring(s, 0, PAPER_WIDTH - SUBHEADER_LABEL_WIDTH);
+	}
+
+	private String dueText() {
+		LocalDate d = entity.getDueDate();
+		return "DUE " + (d.isEqual(LocalDate.now()) ? "TODAY" : toDateDisplay(d));
 	}
 }

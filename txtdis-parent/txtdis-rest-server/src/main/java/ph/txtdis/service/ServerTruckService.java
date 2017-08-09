@@ -4,7 +4,7 @@ import ph.txtdis.domain.TruckEntity;
 import ph.txtdis.dto.Truck;
 
 public interface ServerTruckService //
-		extends SavedNameListService<Truck> {
+	extends SavedNameListService<Truck> {
 
 	TruckEntity findEntityByName(String truck);
 

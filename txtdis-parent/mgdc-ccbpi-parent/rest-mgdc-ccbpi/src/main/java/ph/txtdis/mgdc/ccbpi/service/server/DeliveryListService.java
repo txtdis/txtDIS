@@ -8,7 +8,8 @@ import ph.txtdis.mgdc.ccbpi.domain.BillableDetailEntity;
 import ph.txtdis.mgdc.ccbpi.domain.BomEntity;
 
 public interface DeliveryListService //
-		extends QtyPerItemService, SpunSavedBillableService {
+	extends QtyPerItemService,
+	SpunSavedBillableService {
 
 	Billable find(LocalDate localDate, String route);
 

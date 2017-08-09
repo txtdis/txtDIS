@@ -4,5 +4,5 @@ import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.service.UniqueNamedService;
 
 public interface ItemFamilyService //
-		extends UniqueNamedService<ItemFamily> {
+	extends UniqueNamedService<ItemFamily> {
 }

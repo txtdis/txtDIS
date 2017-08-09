@@ -1,17 +1,8 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledField;
@@ -19,10 +10,16 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.mgdc.gsm.service.GsmBillingService;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
+
 @Scope("prototype")
 @Component("invoiceValueAdjustmentDialog")
 public class InvoiceValueAdjustmentDialog //
-		extends AbstractFieldDialog<Billable> {
+	extends AbstractFieldDialog<Billable> {
 
 	@Autowired
 	private GsmBillingService service;
@@ -39,9 +36,9 @@ public class InvoiceValueAdjustmentDialog //
 	@Override
 	protected List<InputNode<?>> addNodes() {
 		return asList(//
-				idField(), //
-				nameDisplay.name("Employee").readOnly().build(TEXT), //
-				adjustmentField.name("Adjustment").build(CURRENCY)); //
+			idField(), //
+			nameDisplay.name("Employee").readOnly().build(TEXT), //
+			adjustmentField.name("Adjustment").build(CURRENCY)); //
 	}
 
 	private LabeledField<Long> idField() {

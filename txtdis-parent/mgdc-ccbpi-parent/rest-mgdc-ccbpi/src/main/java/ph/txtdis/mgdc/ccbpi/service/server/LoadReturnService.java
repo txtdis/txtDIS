@@ -5,5 +5,5 @@ import ph.txtdis.mgdc.ccbpi.domain.PickListEntity;
 import ph.txtdis.mgdc.service.server.SpunSavedReferencedKeyedService;
 
 public interface LoadReturnService //
-		extends SpunSavedReferencedKeyedService<PickListEntity, PickList, Long> {
+	extends SpunSavedReferencedKeyedService<PickListEntity, PickList, Long> {
 }

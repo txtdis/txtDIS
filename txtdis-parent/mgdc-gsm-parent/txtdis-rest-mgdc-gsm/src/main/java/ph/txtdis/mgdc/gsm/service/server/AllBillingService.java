@@ -1,15 +1,15 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.RemittanceDetail;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.type.ModuleType;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface AllBillingService //
-		extends BillingService {
+	extends BillingService {
 
 	List<Billable> findAllAged(Long customerId);
 

@@ -10,8 +10,8 @@ import lombok.EqualsAndHashCode;
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class EdmsAbstractReferencedItemCodeIdDetail //
-		extends EdmsAbstractId //
-		implements Referenced {
+	extends EdmsAbstractId //
+	implements Referenced {
 
 	@Column(name = "refNo")
 	private String referenceNo;

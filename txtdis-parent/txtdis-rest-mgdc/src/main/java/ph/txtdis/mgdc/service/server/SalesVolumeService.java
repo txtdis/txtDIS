@@ -1,9 +1,9 @@
 package ph.txtdis.mgdc.service.server;
 
+import ph.txtdis.dto.SalesVolume;
+
 import java.time.LocalDate;
 import java.util.List;
-
-import ph.txtdis.dto.SalesVolume;
 
 public interface SalesVolumeService {
 

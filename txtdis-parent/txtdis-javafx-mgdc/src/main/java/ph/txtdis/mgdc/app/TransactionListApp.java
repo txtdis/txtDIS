@@ -2,7 +2,6 @@ package ph.txtdis.mgdc.app;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.app.AbstractExcelApp;
 import ph.txtdis.app.LaunchableApp;
 import ph.txtdis.app.SelectableListApp;
@@ -12,8 +11,10 @@ import ph.txtdis.mgdc.service.TransactionListService;
 
 @Scope("prototype")
 @Component("transactionListApp")
-public class TransactionListApp extends AbstractExcelApp<BillableListTable, TransactionListService, Billable>
-		implements SelectableListApp<Billable>, LaunchableApp {
+public class TransactionListApp
+	extends AbstractExcelApp<BillableListTable, TransactionListService, Billable>
+	implements SelectableListApp<Billable>,
+	LaunchableApp {
 
 	@Override
 	public Billable getSelection() {
@@ -29,13 +30,13 @@ public class TransactionListApp extends AbstractExcelApp<BillableListTable, Tran
 	}
 
 	@Override
-	protected String getHeaderText() {
-		return "Transaction List";
+	protected String getTitleText() {
+		return getHeaderText();
 	}
 
 	@Override
-	protected String getTitleText() {
-		return getHeaderText();
+	protected String getHeaderText() {
+		return "Transaction List";
 	}
 
 	@Override

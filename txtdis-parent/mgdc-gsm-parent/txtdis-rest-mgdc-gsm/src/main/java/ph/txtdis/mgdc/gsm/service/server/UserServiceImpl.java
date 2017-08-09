@@ -1,35 +1,30 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static ph.txtdis.type.UserType.DRIVER;
-import static ph.txtdis.type.UserType.HELPER;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import ph.txtdis.dto.Authority;
 import ph.txtdis.dto.User;
 import ph.txtdis.service.AbstractUserService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.UserType;
+
+import java.util.List;
+
+import static ph.txtdis.type.UserType.DRIVER;
+import static ph.txtdis.type.UserType.HELPER;
 
 @Service("userService")
 public class UserServiceImpl
-		extends AbstractUserService //
-		implements UserService {
+	extends AbstractUserService //
+	implements UserService {
 
 	@Autowired
-	private SavingService<User> savingService;
-
-	@Autowired
-	private ReadOnlyService<User> readOnlyService;
+	private RestClientService<User> restClientService;
 
 	@Override
 	public void importAll() throws Exception {
-		List<User> l = readOnlyService.module("user").getList();
+		List<User> l = restClientService.module("user").getList();
 		repository.save(toEntities(l));
 	}
 
@@ -59,11 +54,11 @@ public class UserServiceImpl
 
 	@Override
 	public void saveDriver(User u) throws Exception {
-		savingService.module("driver").save(u);
+		restClientService.module("driver").save(u);
 	}
 
 	@Override
 	public void saveHelper(User u) throws Exception {
-		savingService.module("helper").save(u);
+		restClientService.module("helper").save(u);
 	}
 }

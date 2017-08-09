@@ -1,20 +1,19 @@
 package ph.txtdis.mgdc.domain;
 
-import java.math.BigDecimal;
-
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractCreatedKeyedEntity;
 import ph.txtdis.type.UomType;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import java.math.BigDecimal;
+
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractQtyPerUomEntity //
-		extends AbstractCreatedKeyedEntity<Long> {
+	extends AbstractCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = 8164715573241790785L;
 

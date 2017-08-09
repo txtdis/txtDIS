@@ -1,16 +1,16 @@
 package ph.txtdis.repository;
 
-import java.util.List;
-
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import ph.txtdis.domain.UserEntity;
 import ph.txtdis.type.UserType;
 
+import java.util.List;
+
 @Repository("userRepository")
-public interface UserRepository extends CrudRepository<UserEntity, String> {
+public interface UserRepository
+	extends CrudRepository<UserEntity, String> {
 
 	UserEntity findByEmail(@Param("email") String e);
 

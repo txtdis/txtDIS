@@ -1,19 +1,18 @@
 package ph.txtdis.app;
 
-import static java.util.Arrays.asList;
+import javafx.scene.Node;
+import javafx.scene.layout.HBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.service.ListedAndResettableService;
+import ph.txtdis.service.TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import static java.util.Arrays.asList;
 
-import javafx.scene.Node;
-import javafx.scene.layout.HBox;
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.ListedAndResetableService;
-import ph.txtdis.service.TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService;
-
-public abstract class AbstractTableApp<AT extends AppTable<T>, AS extends ListedAndResetableService<T>, T> //
-		extends AbstractApp<AS> {
+public abstract class AbstractTableApp<AT extends AppTable<T>, AS extends ListedAndResettableService<T>, T> //
+	extends AbstractApp<AS> {
 
 	@Autowired
 	protected AT table;
@@ -62,6 +61,6 @@ public abstract class AbstractTableApp<AT extends AppTable<T>, AS extends Listed
 	}
 
 	protected HBox tablePane() {
-		return box.forHorizontalPane(table.build());
+		return pane.centeredHorizontal(table.build());
 	}
 }

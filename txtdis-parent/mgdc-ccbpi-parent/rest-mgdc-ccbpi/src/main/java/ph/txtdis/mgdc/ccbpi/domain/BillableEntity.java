@@ -24,20 +24,21 @@ import ph.txtdis.dto.Booked;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "billing", //
-		indexes = { //
-				@Index(columnList = "booking_id, is_rma, billed_on"), //
-				@Index(columnList = "receiving_id, is_rma"), //
-				@Index(columnList = "order_date, is_rma, picking_id"), //
-				@Index(columnList = "booking_id, created_on"), //
-				@Index(columnList = "booking_id, is_rma, created_on"), //
-				@Index(columnList = "receiving_id, created_on"), //
-				@Index(columnList = "is_rma, booking_id, created_on"), //
-				@Index(columnList = "is_rma, receiving_id, created_on"), //
-				@Index(columnList = "due_date, received_on"), //
-				@Index(columnList = "order_date, received_on") })
+	indexes = { //
+		@Index(columnList = "booking_id, is_rma, billed_on"), //
+		@Index(columnList = "receiving_id, is_rma"), //
+		@Index(columnList = "order_date, is_rma, picking_id"), //
+		@Index(columnList = "booking_id, created_on"), //
+		@Index(columnList = "booking_id, is_rma, created_on"), //
+		@Index(columnList = "receiving_id, created_on"), //
+		@Index(columnList = "is_rma, booking_id, created_on"), //
+		@Index(columnList = "is_rma, receiving_id, created_on"), //
+		@Index(columnList = "due_date, received_on"), //
+		@Index(columnList = "order_date, received_on")})
 public class BillableEntity //
-		extends AbstractCreatedKeyedEntity<Long> //
-		implements Booked, DetailedEntity {
+	extends AbstractCreatedKeyedEntity<Long> //
+	implements Booked,
+	DetailedEntity {
 
 	private static final long serialVersionUID = -4363805360652350591L;
 

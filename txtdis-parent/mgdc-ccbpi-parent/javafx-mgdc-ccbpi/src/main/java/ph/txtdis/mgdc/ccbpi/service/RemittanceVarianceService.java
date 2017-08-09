@@ -3,9 +3,11 @@ package ph.txtdis.mgdc.ccbpi.service;
 import java.math.BigDecimal;
 
 public interface RemittanceVarianceService //
-		extends SellerTrackedVarianceService {
+	extends SellerTrackedVarianceService {
 
 	String getCollector();
+
+	void setCollector(String name);
 
 	BigDecimal getLoadOutValue();
 
@@ -14,6 +16,4 @@ public interface RemittanceVarianceService //
 	BigDecimal getRemittanceVarianceValue();
 
 	BigDecimal getRemittedValue();
-
-	void setCollector(String name);
 }

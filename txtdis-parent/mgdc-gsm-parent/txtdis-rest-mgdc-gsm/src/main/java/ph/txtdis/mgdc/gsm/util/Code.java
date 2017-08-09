@@ -1,13 +1,12 @@
 package ph.txtdis.mgdc.gsm.util;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
-
 import ph.txtdis.dto.UnitMeasured;
 import ph.txtdis.type.UomType;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class Code {
 
@@ -147,22 +146,22 @@ public class Code {
 		return prefix(codes, index) + incrementThenPrependWithZeroesTo8Digits(l);
 	}
 
-	public static String padOnly(String code) {
-		String[] codes = StringUtils.split(code, "-");
-		int index = codes.length == 1 ? 0 : 1;
-		return prefix(codes, index) + addZeroes(codes[index]);
+	private static String prefix(String[] codes, int index) {
+		return index == 0 ? "" : codes[0] + "-";
 	}
 
 	private static String incrementThenPrependWithZeroesTo8Digits(long l) {
 		return addZeroes(String.valueOf(++l));
 	}
 
-	private static String prefix(String[] codes, int index) {
-		return index == 0 ? "" : codes[0] + "-";
-	}
-
 	public static String addZeroes(String l) {
 		return StringUtils.leftPad(l, 8, "0");
+	}
+
+	public static String padOnly(String code) {
+		String[] codes = StringUtils.split(code, "-");
+		int index = codes.length == 1 ? 0 : 1;
+		return prefix(codes, index) + addZeroes(codes[index]);
 	}
 
 	public static String getUomCode(UnitMeasured u) {

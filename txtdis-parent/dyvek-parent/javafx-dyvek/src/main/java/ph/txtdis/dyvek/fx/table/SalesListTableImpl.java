@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 @Component("salesListTable")
 public class SalesListTableImpl //
-		extends AbstractOrderListTable //
-		implements SalesListTable {
+	extends AbstractOrderListTable //
+	implements SalesListTable {
 
 	@Override
 	protected String customerColumnName() {

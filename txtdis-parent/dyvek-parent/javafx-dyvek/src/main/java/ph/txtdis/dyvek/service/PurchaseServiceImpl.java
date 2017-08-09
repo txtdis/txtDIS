@@ -15,32 +15,26 @@ import ph.txtdis.exception.UnauthorizedUserException;
 
 @Service("purchaseService")
 public class PurchaseServiceImpl //
-		extends AbstractOrderService<VendorService> //
-		implements PurchaseService {
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public Billable findByOrderNo(String no) throws Exception {
-		return findBillable("/purchase?no=" + no);
-	}
+	extends AbstractOrderService<VendorService> //
+	implements PurchaseService {
 
 	@Override
 	public List<Billable> findExpiringTheFollowingDayOrHaveExpired() {
 		try {
-			return getListedReadOnlyService().module(getModuleName()).getList("/expiringOrExpiredInTheNext2Days");
+			return getRestClientServiceForLists().module(getModuleName()).getList("/expiringOrExpiredInTheNext2Days");
 		} catch (Exception e) {
 			return null;
 		}
 	}
 
 	@Override
-	public String getAlternateName() {
-		return "P/O";
+	public String getModuleName() {
+		return "purchaseOrder";
 	}
 
 	@Override
-	public String getCustomer() {
-		return get().getVendor();
+	public String getAlternateName() {
+		return "P/O";
 	}
 
 	@Override
@@ -54,11 +48,6 @@ public class PurchaseServiceImpl //
 	}
 
 	@Override
-	public String getModuleName() {
-		return "purchaseOrder";
-	}
-
-	@Override
 	public String getOrderNo() {
 		return get().getPurchaseNo();
 	}
@@ -66,6 +55,11 @@ public class PurchaseServiceImpl //
 	@Override
 	public List<String> listCustomers() {
 		return isNew() ? customerService.listVendors() : asList(getCustomer());
+	}
+
+	@Override
+	public String getCustomer() {
+		return get().getVendor();
 	}
 
 	@Override
@@ -88,6 +82,12 @@ public class PurchaseServiceImpl //
 		if (b != null)
 			throw new DuplicateException("P/O No. " + no);
 		get().setPurchaseNo(no);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public Billable findByOrderNo(String no) throws Exception {
+		return findBillable("/purchase?no=" + no);
 	}
 
 	@Override

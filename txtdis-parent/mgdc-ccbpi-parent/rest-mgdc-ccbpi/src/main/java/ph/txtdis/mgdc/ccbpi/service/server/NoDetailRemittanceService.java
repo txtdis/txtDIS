@@ -8,8 +8,9 @@ import ph.txtdis.service.RemittanceService;
 import ph.txtdis.service.SpunSavedKeyedService;
 
 public interface NoDetailRemittanceService //
-		extends DecisionDataUpdate<RemittanceEntity, RemittanceRepository>, SpunSavedKeyedService<RemittanceEntity, Remittance, Long>,
-		RemittanceService {
+	extends DecisionDataUpdate<RemittanceEntity, RemittanceRepository>,
+	SpunSavedKeyedService<RemittanceEntity, Remittance, Long>,
+	RemittanceService {
 
 	RemittanceEntity findEntityByCheck(String bank, Long checkId);
 }

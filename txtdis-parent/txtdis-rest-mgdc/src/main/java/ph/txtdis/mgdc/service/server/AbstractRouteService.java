@@ -1,13 +1,6 @@
 package ph.txtdis.mgdc.service.server;
 
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-import static ph.txtdis.type.RouteType.PRE_SELL;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Account;
 import ph.txtdis.dto.Route;
 import ph.txtdis.dto.User;
@@ -18,9 +11,15 @@ import ph.txtdis.mgdc.repository.RouteRepository;
 import ph.txtdis.service.AbstractCreateNameListService;
 import ph.txtdis.service.ServerUserService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static ph.txtdis.type.PartnerType.EX_TRUCK;
+import static ph.txtdis.type.RouteType.PRE_SELL;
+
 public abstract class AbstractRouteService //
-		extends AbstractCreateNameListService<RouteRepository, RouteEntity, Route> //
-		implements RouteService {
+	extends AbstractCreateNameListService<RouteRepository, RouteEntity, Route> //
+	implements RouteService {
 
 	@Autowired
 	private AccountRepository accountRepository;
@@ -32,21 +31,6 @@ public abstract class AbstractRouteService //
 	public Route findByPrimaryKey(Long id) {
 		RouteEntity e = repository.findOne(id);
 		return toModel(e);
-	}
-
-	@Override
-	public List<Route> listExTruckRoutes() {
-		return list(EX_TRUCK.toString());
-	}
-
-	private List<Route> list(String name) {
-		List<RouteEntity> l = repository.findByNameStartingWith(name);
-		return toModels(l);
-	}
-
-	@Override
-	public List<Route> listPreSellRoutes() {
-		return list(PRE_SELL.toString());
 	}
 
 	@Override
@@ -84,6 +68,21 @@ public abstract class AbstractRouteService //
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	@Override
+	public List<Route> listExTruckRoutes() {
+		return list(EX_TRUCK.toString());
+	}
+
+	private List<Route> list(String name) {
+		List<RouteEntity> l = repository.findByNameStartingWith(name);
+		return toModels(l);
+	}
+
+	@Override
+	public List<Route> listPreSellRoutes() {
+		return list(PRE_SELL.toString());
 	}
 
 	@Override

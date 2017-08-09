@@ -25,8 +25,8 @@ import ph.txtdis.util.TypeStyle;
 @Scope("prototype")
 @SuppressWarnings("restriction")
 public class AppFieldImpl<T> //
-		extends TextField //
-		implements AppField<T> {
+	extends TextField //
+	implements AppField<T> {
 
 	private int length, width;
 
@@ -44,13 +44,13 @@ public class AppFieldImpl<T> //
 		addEventFilter(KEY_PRESSED, e -> traverseOnPressedEnterKey(e));
 	}
 
+	private void cancelEditOnLostFocus() {
+		focusedProperty().addListener((focus, outOfFocus, inFocus) -> cancelEditOnLostFocus(inFocus));
+	}
+
 	private void traverseOnPressedEnterKey(KeyEvent e) {
 		if (e.getCode() == ENTER)
 			((TextFieldSkin) getSkin()).getBehavior().traverseNext();
-	}
-
-	private void cancelEditOnLostFocus() {
-		focusedProperty().addListener((focus, outOfFocus, inFocus) -> cancelEditOnLostFocus(inFocus));
 	}
 
 	private void cancelEditOnLostFocus(Boolean inFocus) {
@@ -113,14 +113,14 @@ public class AppFieldImpl<T> //
 	}
 
 	@Override
-	public void handleError() {
-		clear();
-		requestFocus();
+	public void setValue(T value) {
+		style(type, this, value);
 	}
 
 	@Override
-	public BooleanBinding isEmpty() {
-		return textProperty().isEmpty();
+	public void handleError() {
+		clear();
+		requestFocus();
 	}
 
 	@Override
@@ -131,6 +131,11 @@ public class AppFieldImpl<T> //
 	@Override
 	public BooleanBinding isNotEmpty() {
 		return isEmpty().not();
+	}
+
+	@Override
+	public BooleanBinding isEmpty() {
+		return textProperty().isEmpty();
 	}
 
 	@Override
@@ -160,11 +165,6 @@ public class AppFieldImpl<T> //
 		disableProperty().unbind();
 		disableProperty().set(true);
 		return this;
-	}
-
-	@Override
-	public void setValue(T value) {
-		style(type, this, value);
 	}
 
 	@Override

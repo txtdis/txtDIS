@@ -1,26 +1,23 @@
 package ph.txtdis.salesforce;
 
-import static org.openqa.selenium.By.id;
-import static org.openqa.selenium.By.linkText;
-import static org.openqa.selenium.Keys.CONTROL;
-import static org.openqa.selenium.Keys.SPACE;
-import static org.openqa.selenium.Keys.TAB;
-import static org.openqa.selenium.Keys.chord;
-import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
-
-import java.time.ZonedDateTime;
-import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.SalesforceSalesInfo;
 import ph.txtdis.dto.SalesforceSalesInfoProduct;
 
+import java.time.ZonedDateTime;
+import java.util.List;
+
+import static org.openqa.selenium.By.id;
+import static org.openqa.selenium.By.linkText;
+import static org.openqa.selenium.Keys.*;
+import static org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable;
+
 @Component("salesInfoUploader")
-public class SalesInfoUploader extends AccountUploader {
+public class SalesInfoUploader
+	extends AccountUploader {
 
 	private List<SalesforceSalesInfo> invoices;
 
@@ -96,6 +93,16 @@ public class SalesInfoUploader extends AccountUploader {
 		}
 	}
 
+	private void clickProceedButton() {
+		By b = id("mainPage:mainForm:mainPageBlock:j_id5:j_id6");
+		driver.findElement(b).click();
+	}
+
+	private void clickSaveAndNewButton() {
+		By b = id("mainPage:mainForm:SelectedTablePageBlock:PageblockButtons:j_id69");
+		driver.findElement(b).click();
+	}
+
 	private void inputAccount(String s) {
 		By b = id("mainPage:mainForm:mainPageBlock:j_id7:j_id8");
 		driver.findElement(b).sendKeys(s, Keys.TAB);
@@ -115,7 +122,7 @@ public class SalesInfoUploader extends AccountUploader {
 
 	private void inputDSP(String s) {
 		findByButtonXPath(s, ".//*[@id='mainPage:mainForm:mainPageBlock:j_id7:j_id13_lkwgt']/img", //
-				".//*[@id='Contact_body']/table/tbody/tr[2]/th/a");
+			".//*[@id='Contact_body']/table/tbody/tr[2]/th/a");
 	}
 
 	private void searchSKU(String s) {
@@ -144,15 +151,5 @@ public class SalesInfoUploader extends AccountUploader {
 	private void inputPercentDiscount(String s) {
 		By b = id("mainPage:mainForm:mainPageBlock:productListTable:salesTable:0:dis");
 		driver.findElement(b).sendKeys(s);
-	}
-
-	private void clickProceedButton() {
-		By b = id("mainPage:mainForm:mainPageBlock:j_id5:j_id6");
-		driver.findElement(b).click();
-	}
-
-	private void clickSaveAndNewButton() {
-		By b = id("mainPage:mainForm:SelectedTablePageBlock:PageblockButtons:j_id69");
-		driver.findElement(b).click();
 	}
 }

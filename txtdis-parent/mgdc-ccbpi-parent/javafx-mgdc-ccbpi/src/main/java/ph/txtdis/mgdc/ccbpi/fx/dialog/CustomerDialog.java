@@ -1,9 +1,10 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import ph.txtdis.app.StartableApp;
+import ph.txtdis.app.App;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 
-public interface CustomerDialog extends StartableApp {
+public interface CustomerDialog
+	extends App {
 
 	Customer getCustomer();
 

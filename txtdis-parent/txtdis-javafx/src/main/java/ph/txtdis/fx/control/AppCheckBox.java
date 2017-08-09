@@ -18,11 +18,21 @@ import javafx.scene.control.CheckBox;
 @Component("appCheckBox")
 @SuppressWarnings("restriction")
 public class AppCheckBox //
-		extends CheckBox //
-		implements InputControl<Boolean> {
+	extends CheckBox //
+	implements InputControl<Boolean> {
 
 	public AppCheckBox() {
 		traverseOnPressedEnterKey();
+	}
+
+	private void traverseOnPressedEnterKey() {
+		addEventFilter(KEY_PRESSED, event -> {
+			if (event.getCode() == ENTER) {
+				CheckBoxSkin skin = (CheckBoxSkin) getSkin();
+				ButtonBehavior<CheckBox> behavior = skin.getBehavior();
+				behavior.traverseNext();
+			}
+		});
 	}
 
 	@Override
@@ -39,6 +49,11 @@ public class AppCheckBox //
 		return selectedProperty().get();
 	}
 
+	@Override
+	public void setValue(Boolean b) {
+		setSelected(b == null ? false : b);
+	}
+
 	public AppCheckBox label(String n) {
 		setText(n);
 		return this;
@@ -52,20 +67,5 @@ public class AppCheckBox //
 		disableProperty().unbind();
 		disableProperty().set(true);
 		return this;
-	}
-
-	@Override
-	public void setValue(Boolean b) {
-		setSelected(b == null ? false : b);
-	}
-
-	private void traverseOnPressedEnterKey() {
-		addEventFilter(KEY_PRESSED, event -> {
-			if (event.getCode() == ENTER) {
-				CheckBoxSkin skin = (CheckBoxSkin) getSkin();
-				ButtonBehavior<CheckBox> behavior = skin.getBehavior();
-				behavior.traverseNext();
-			}
-		});
 	}
 }

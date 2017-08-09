@@ -5,11 +5,11 @@ import org.springframework.data.repository.query.Param;
 
 @NoRepositoryBean
 public interface CodeNameRepository<T> //
-		extends NameListRepository<T> {
+	extends NameListRepository<T> {
 
 	T findByCodeIgnoreCase( //
-			@Param("code") String c);
+	                        @Param("code") String c);
 
 	T findByNameContainingIgnoreCase( //
-			@Param("name") String n);
+	                                  @Param("name") String n);
 }

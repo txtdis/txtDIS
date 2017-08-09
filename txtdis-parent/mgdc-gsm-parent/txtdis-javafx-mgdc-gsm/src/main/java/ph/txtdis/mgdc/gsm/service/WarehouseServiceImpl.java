@@ -1,36 +1,28 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.dto.Warehouse;
 import ph.txtdis.info.Information;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.util.ClientTypeMap;
+
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("warehouseService")
 public class WarehouseServiceImpl //
-		implements WarehouseService {
-
-	@Autowired
-	private CredentialService credentialService;
+	implements WarehouseService {
 
 	@Autowired
 	private ItemFamilyService familyService;
 
 	@Autowired
-	private ReadOnlyService<Warehouse> readOnlyService;
-
-	@Autowired
-	private SavingService<Warehouse> savingService;
+	private RestClientService<Warehouse> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -44,18 +36,18 @@ public class WarehouseServiceImpl //
 	}
 
 	@Override
-	public ReadOnlyService<Warehouse> getListedReadOnlyService() {
-		return readOnlyService;
-	}
-
-	@Override
-	public String getModuleName() {
-		return "warehouse";
-	}
-
-	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + WarehouseService.super.getTitleName();
+		return username() + "@" + modulePrefix + " " + WarehouseService.super.getTitleName();
+	}
+
+	@Override
+	public RestClientService<Warehouse> getRestClientService() {
+		return restClientService;
+	}
+
+	@Override
+	public RestClientService<Warehouse> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -81,6 +73,11 @@ public class WarehouseServiceImpl //
 	public Warehouse save(String name, ItemFamily family) throws Information, Exception {
 		Warehouse w = new Warehouse();
 		w.setName(name);
-		return savingService.module(getModuleName()).save(w);
+		return restClientService.module(getModuleName()).save(w);
+	}
+
+	@Override
+	public String getModuleName() {
+		return "warehouse";
 	}
 }

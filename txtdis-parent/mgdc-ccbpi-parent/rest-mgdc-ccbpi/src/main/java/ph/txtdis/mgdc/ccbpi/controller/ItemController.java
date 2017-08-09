@@ -18,7 +18,7 @@ import ph.txtdis.mgdc.ccbpi.service.server.ServerEmptiesItemService;
 @RequestMapping("/items")
 @RestController("itemController")
 public class ItemController //
-		extends AbstractSpunSavedKeyedController<ServerEmptiesItemService, ItemEntity, Item> {
+	extends AbstractSpunSavedKeyedController<ServerEmptiesItemService, ItemEntity, Item> {
 
 	@RequestMapping(path = "/empties", method = GET)
 	public ResponseEntity<?> empties() {

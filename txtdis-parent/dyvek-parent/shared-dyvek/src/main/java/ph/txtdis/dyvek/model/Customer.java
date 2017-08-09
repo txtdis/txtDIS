@@ -9,8 +9,8 @@ import ph.txtdis.type.PartnerType;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Customer //
-		extends AbstractCreationTracked<Long> //
-		implements Named {
+	extends AbstractCreationTracked<Long> //
+	implements Named {
 
 	private String name;
 

@@ -1,26 +1,25 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.mgdc.domain.PriceEntity;
 import ph.txtdis.mgdc.gsm.domain.BomEntity;
 import ph.txtdis.mgdc.gsm.domain.ItemEntity;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.service.server.ConvertibleItemFamilyService;
 
+import java.util.List;
+
 public abstract class AbstractPricedItemService //
-		extends AbstractItemService {
+	extends AbstractItemService {
+
+	@Autowired
+	protected PriceService priceService;
 
 	@Autowired
 	private BomService bomService;
 
 	@Autowired
 	private ConvertibleItemFamilyService familyService;
-
-	@Autowired
-	protected PriceService priceService;
 
 	@Override
 	protected ItemEntity newEntity(Item i) {

@@ -4,8 +4,6 @@ import java.time.LocalDate;
 
 public interface StartDated {
 
-	LocalDate getStartDate();
-
 	default int compareStartDates(StartDated d1, StartDated d2) {
 		if (isStartDateNull(d2))
 			return isStartDateNull(d1) ? 0 : 1;
@@ -15,5 +13,7 @@ public interface StartDated {
 	default boolean isStartDateNull(StartDated cd) {
 		return cd == null || cd.getStartDate() == null;
 	}
+
+	LocalDate getStartDate();
 
 }

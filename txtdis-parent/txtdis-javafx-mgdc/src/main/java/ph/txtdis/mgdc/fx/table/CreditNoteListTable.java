@@ -4,5 +4,5 @@ import ph.txtdis.dto.CreditNote;
 import ph.txtdis.fx.table.AppTable;
 
 public interface CreditNoteListTable //
-		extends AppTable<CreditNote> {
+	extends AppTable<CreditNote> {
 }

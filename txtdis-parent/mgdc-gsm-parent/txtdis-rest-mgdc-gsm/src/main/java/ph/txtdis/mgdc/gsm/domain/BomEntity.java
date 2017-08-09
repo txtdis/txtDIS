@@ -1,24 +1,23 @@
 package ph.txtdis.mgdc.gsm.domain;
 
-import static javax.persistence.CascadeType.ALL;
-
-import java.math.BigDecimal;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ph.txtdis.domain.AbstractCreatedKeyedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ph.txtdis.domain.AbstractCreatedKeyedEntity;
+import static javax.persistence.CascadeType.ALL;
 
 @Data
 @Entity
 @Table(name = "bom")
 @EqualsAndHashCode(callSuper = true)
 public class BomEntity //
-		extends AbstractCreatedKeyedEntity<Long> {
+	extends AbstractCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -86213987350272414L;
 

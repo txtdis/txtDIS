@@ -1,14 +1,14 @@
 package ph.txtdis.dto;
 
-import java.time.ZonedDateTime;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.ZonedDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractDecisionNeeded<PK> //
-		extends AbstractCreationTracked<PK> {
+	extends AbstractCreationTracked<PK> {
 
 	private Boolean isValid;
 

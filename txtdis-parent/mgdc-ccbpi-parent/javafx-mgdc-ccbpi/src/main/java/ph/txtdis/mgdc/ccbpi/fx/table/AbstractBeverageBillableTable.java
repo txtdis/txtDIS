@@ -13,10 +13,11 @@ import ph.txtdis.mgdc.ccbpi.service.BillableService;
 import ph.txtdis.mgdc.fx.dialog.BillableDialog;
 
 public class AbstractBeverageBillableTable<AS extends BillableService, BD extends BillableDialog> //
-		extends AbstractBillableTable<AS, BD> {
+	extends AbstractBillableTable<AS, BD> {
 
 	@Autowired
-	protected Column<BillableDetail, Fraction> bookedQtyInFractions, soldQtyInFractions, returnedQtyInFractions, netQtyInFractions;
+	protected Column<BillableDetail, Fraction> bookedQtyInFractions, soldQtyInFractions, returnedQtyInFractions,
+		netQtyInFractions;
 
 	@Autowired
 	protected Column<BillableDetail, String> itemVendorId;
@@ -35,25 +36,25 @@ public class AbstractBeverageBillableTable<AS extends BillableService, BD extend
 		return netQtyColumnName();
 	}
 
-	protected String returnedQtyColumnName() {
-		return netQtyColumnName();
+	protected String qtyInFractions(String type) {
+		return inFractions(type + "Qty");
 	}
 
 	protected String netQtyColumnName() {
 		return "Quantity";
 	}
 
-	protected String qtyInFractions(String type) {
-		return inFractions(type + "Qty");
+	@Override
+	public String netQty() {
+		return inFractions(super.netQty());
+	}
+
+	protected String returnedQtyColumnName() {
+		return netQtyColumnName();
 	}
 
 	private String inFractions(String qtyType) {
 		return qtyType + "InFractions";
-	}
-
-	@Override
-	public String netQty() {
-		return inFractions(super.netQty());
 	}
 
 	@Override

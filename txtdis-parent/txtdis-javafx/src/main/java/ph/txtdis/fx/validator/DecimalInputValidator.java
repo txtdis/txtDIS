@@ -5,10 +5,12 @@ import javafx.beans.value.ObservableValue;
 import ph.txtdis.fx.control.AppFieldImpl;
 
 public class DecimalInputValidator //
-		implements ChangeListener<String> {
+	implements ChangeListener<String> {
 
 	private boolean ignore;
+
 	private AppFieldImpl<?> input;
+
 	private String restrict;
 
 	public DecimalInputValidator(AppFieldImpl<?> input) {
@@ -21,7 +23,7 @@ public class DecimalInputValidator //
 		if (ignore || newValue == null)
 			return;
 		if (!newValue.matches(restrict + "*") || (oldValue.contains(".") && newValue.endsWith("."))
-				|| (newValue.length() > 1 && newValue.endsWith("-"))) {
+			|| (newValue.length() > 1 && newValue.endsWith("-"))) {
 			ignore = true;
 			input.setText(oldValue);
 			ignore = false;

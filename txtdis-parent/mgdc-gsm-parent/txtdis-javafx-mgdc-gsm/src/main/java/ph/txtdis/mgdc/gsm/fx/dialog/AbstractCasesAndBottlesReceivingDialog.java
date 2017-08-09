@@ -1,19 +1,18 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static org.apache.log4j.Logger.getLogger;
-
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.ReceivingDetail;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.mgdc.fx.dialog.QuantitiesInCasesAndBottlesDialogImpl;
 import ph.txtdis.mgdc.gsm.service.ReceivingService;
 
+import java.util.List;
+
+import static org.apache.log4j.Logger.getLogger;
+
 public abstract class AbstractCasesAndBottlesReceivingDialog<AS extends ReceivingService, T extends ReceivingDetail> //
-		extends AbstractReceivingDialog<AS, T> {
+	extends AbstractReceivingDialog<AS, T> {
 
 	private static Logger logger = getLogger(AbstractCasesAndBottlesReceivingDialog.class);
 

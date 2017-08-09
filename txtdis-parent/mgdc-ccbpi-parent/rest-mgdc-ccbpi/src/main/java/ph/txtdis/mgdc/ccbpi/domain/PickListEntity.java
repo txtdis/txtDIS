@@ -21,14 +21,15 @@ import ph.txtdis.mgdc.printer.Printed;
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "picking", //
-		indexes = { //
-				@Index(columnList = "pick_date, asst_helper"), //
-				@Index(columnList = "pick_date, truck_id"), //
-				@Index(columnList = "printed_on"), //
-				@Index(columnList = "received_on, id") })
+	indexes = { //
+		@Index(columnList = "pick_date, asst_helper"), //
+		@Index(columnList = "pick_date, truck_id"), //
+		@Index(columnList = "printed_on"), //
+		@Index(columnList = "received_on, id")})
 public class PickListEntity //
-		extends AbstractPickListEntity //
-		implements DetailedEntity, Printed {
+	extends AbstractPickListEntity //
+	implements DetailedEntity,
+	Printed {
 
 	private static final long serialVersionUID = -3835242947594550479L;
 

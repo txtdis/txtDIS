@@ -1,26 +1,26 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppCombo;
-import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.dialog.AbstractInputDialog;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.mgdc.ccbpi.service.ChannelService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.Collections.singletonList;
+
 @Scope("prototype")
 @Component("filterByRouteDialog")
 public class FilterByRouteDialog //
-		extends AbstractInputDialog {
+	extends AbstractInputDialog {
 
 	private static final String ALL = "ALL";
 
@@ -31,23 +31,15 @@ public class FilterByRouteDialog //
 	private AppGridPane grid;
 
 	@Autowired
-	private LabelFactory label;
-
-	@Autowired
 	private ChannelService channelService;
 
 	@Override
-	protected Button closeButton() {
+	protected AppButton closeButton() {
 		return closeButton("Generate");
 	}
 
 	public String getRoute() {
 		return routeCombo.getValue();
-	}
-
-	@Override
-	protected Label header() {
-		return label.dialog("Filter by Route");
 	}
 
 	@Override
@@ -64,8 +56,13 @@ public class FilterByRouteDialog //
 		return routeCombo;
 	}
 
+	@Override
+	protected Label header() {
+		return label.dialog("Filter by Route");
+	}
+
 	private List<String> routes() {
-		List<String> routes = new ArrayList<>(Arrays.asList(ALL));
+		ArrayList<String> routes = new ArrayList<>(singletonList(ALL));
 		routes.addAll(channelService.listNames());
 		return routes;
 	}

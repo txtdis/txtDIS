@@ -15,8 +15,8 @@ import ph.txtdis.mgdc.fx.table.BadRmaTable;
 @Scope("prototype")
 @Component("badRmaTable")
 public class BadRmaTableImpl //
-		extends AbstractBeverageBillableTable<BadRmaService, BadRmaDialog> //
-		implements BadRmaTable {
+	extends AbstractBeverageBillableTable<BadRmaService, BadRmaDialog> //
+	implements BadRmaTable {
 
 	@Override
 	protected List<TableColumn<BillableDetail, ?>> addColumns() {

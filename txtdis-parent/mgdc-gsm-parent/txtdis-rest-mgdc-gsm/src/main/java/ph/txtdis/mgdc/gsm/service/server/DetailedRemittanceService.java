@@ -1,7 +1,5 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.Remittance;
 import ph.txtdis.mgdc.gsm.domain.RemittanceDetailEntity;
@@ -11,9 +9,12 @@ import ph.txtdis.service.DecisionDataUpdate;
 import ph.txtdis.service.RemittanceService;
 import ph.txtdis.service.SpunSavedKeyedService;
 
+import java.util.List;
+
 public interface DetailedRemittanceService //
-		extends DecisionDataUpdate<RemittanceEntity, RemittanceRepository>, SpunSavedKeyedService<RemittanceEntity, Remittance, Long>,
-		RemittanceService {
+	extends DecisionDataUpdate<RemittanceEntity, RemittanceRepository>,
+	SpunSavedKeyedService<RemittanceEntity, Remittance, Long>,
+	RemittanceService {
 
 	List<Remittance> findAll(Billable b);
 

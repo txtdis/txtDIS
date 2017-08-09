@@ -12,70 +12,82 @@ import ph.txtdis.mgdc.ccbpi.domain.BillableEntity;
 
 @Repository("orderConfirmationRepository")
 public interface OrderConfirmationRepository //
-		extends CrudRepository<BillableEntity, Long> {
+	extends CrudRepository<BillableEntity, Long> {
 
 	BillableEntity findByBookingId( //
-			@Param("bookingId") Long id);
+	                                @Param("bookingId") Long id);
 
 	List<BillableEntity> findByCustomerNotNull( //
-			@Param("type") String t);
+	                                            @Param("type") String t);
 
 	List<BillableEntity> findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContaining( //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e, //
-			@Param("collector") String c);
+	                                                                                                  @Param("start")
+		                                                                                                  LocalDate s, //
+	                                                                                                  @Param("end")
+		                                                                                                  LocalDate e, //
+	                                                                                                  @Param
+		                                                                                                  ("receivedFrom")
+		                                                                                                  String c);
 
 	List<BillableEntity> findByCustomerNotNullAndDueDateBetweenAndPickingNull( //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e);
+	                                                                           @Param("start") LocalDate s, //
+	                                                                           @Param("end") LocalDate e);
 
 	List<BillableEntity> findByCustomerNotNullAndPrefixInAndDueDateAndPickingNull( //
-			@Param("ocsTypes") List<String> l, //
-			@Param("date") LocalDate d);
+	                                                                               @Param("ocsTypes") List<String> l, //
+	                                                                               @Param("date") LocalDate d);
 
 	List<BillableEntity> findByCustomerNotNullAndPrefixAndSuffixContainingAndDueDateBetween( //
-			@Param("ocsType") String d, //
-			@Param("route") String r, //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e);
+	                                                                                         @Param("ocsType") String d,
+	                                                                                         //
+	                                                                                         @Param("route") String r,
+	                                                                                         //
+	                                                                                         @Param("start")
+		                                                                                         LocalDate s,
+	                                                                                         //
+	                                                                                         @Param("end") LocalDate e);
 
 	List<BillableEntity> findByCustomerVendorId( //
-			@Param("vendorId") Long id);
+	                                             @Param("vendorId") Long id);
 
 	BillableEntity findByCustomerVendorIdAndOrderDateAndBookingId( //
-			@Param("outletId") Long id, //
-			@Param("date") LocalDate d, //
-			@Param("orderNo") Long no);
+	                                                               @Param("outletId") Long id, //
+	                                                               @Param("date") LocalDate d, //
+	                                                               @Param("orderNo") Long no);
 
 	List<BillableEntity> findByCustomerVendorIdAndPrefixAndOrderDate( //
-			@Param("partial") String p, //
-			@Param("outletId") Long id, //
-			@Param("orderDate") LocalDate d);
+	                                                                  @Param("partial") String p, //
+	                                                                  @Param("outletId") Long id, //
+	                                                                  @Param("orderDate") LocalDate d);
 
 	BillableEntity findFirstByCustomerNotNullAndIdGreaterThanOrderByIdAsc( //
-			@Param("id") Long id);
+	                                                                       @Param("id") Long id);
 
 	BillableEntity findFirstByCustomerNotNullAndIdLessThanOrderByIdDesc( //
-			@Param("id") Long id);
+	                                                                     @Param("id") Long id);
 
 	BillableEntity findFirstByCustomerNotNullAndOrderDateOrderByIdAsc( //
-			@Param("date") LocalDate d);
+	                                                                   @Param("date") LocalDate d);
 
 	BillableEntity findFirstByCustomerNotNullOrderByIdAsc();
 
 	BillableEntity findFirstByCustomerNotNullOrderByIdDesc();
 
 	BillableEntity findFirstByCustomerVendorIdAndOrderDateOrderByBookingIdDesc( //
-			@Param("outletId") Long id, //
-			@Param("date") LocalDate d);
+	                                                                            @Param("outletId") Long id, //
+	                                                                            @Param("date") LocalDate d);
 
 	BillableEntity findFirstByCustomerVendorIdAndPrefixOrderByOrderDateDesc( //
-			@Param("blanket") String b, //
-			@Param("outletId") Long id);
+	                                                                         @Param("blanket") String b, //
+	                                                                         @Param("outletId") Long id);
 
-	List<BillableEntity> findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContainingAndTotalValueGreaterThan( //
-			@Param("start") LocalDate s, //
-			@Param("end") LocalDate e, //
-			@Param("route") String r, //
-			@Param("total") BigDecimal o);
+	List<BillableEntity> findByCustomerNotNullAndDueDateBetweenAndPickingLeadAssistantNameContainingAndTotalValueGreaterThan(
+		//
+		@Param("start") LocalDate s,
+		//
+		@Param("end") LocalDate e,
+		//
+		@Param("route") String r,
+		//
+		@Param("total") BigDecimal o);
 }

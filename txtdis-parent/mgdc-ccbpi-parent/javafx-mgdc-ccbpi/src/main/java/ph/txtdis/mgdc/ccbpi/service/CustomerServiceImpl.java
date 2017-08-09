@@ -23,8 +23,8 @@ import ph.txtdis.util.DateTimeUtils;
 
 @Service("customerService")
 public class CustomerServiceImpl //
-		extends AbstractItemDeliveredCustomerService //
-		implements CokeCustomerService {
+	extends AbstractItemDeliveredCustomerService //
+	implements CokeCustomerService {
 
 	@Autowired
 	private ChannelService channelService;
@@ -42,10 +42,10 @@ public class CustomerServiceImpl //
 	public BigDecimal getCustomerDiscountValue(Long customerId, Long itemId, LocalDate dueDate) {
 		try {
 			return findByVendorId(customerId) //
-					.getDiscounts().stream() //
-					.filter(p -> !p.getStartDate().isAfter(dueDate) && p.getIsValid() == true) //
-					.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())) //
-					.get().getDiscount();
+				.getDiscounts().stream() //
+				.filter(p -> !p.getStartDate().isAfter(dueDate) && p.getIsValid() == true) //
+				.max((a, b) -> a.getStartDate().compareTo(b.getStartDate())) //
+				.get().getDiscount();
 		} catch (Exception e) {
 			return BigDecimal.ZERO;
 		}
@@ -62,7 +62,8 @@ public class CustomerServiceImpl //
 	}
 
 	@Override
-	public Customer save(Customer c, Long vendorId, String name, String vendorRoute, String deliveryRoute) throws Exception {
+	public Customer save(Customer c, Long vendorId, String name, String vendorRoute, String deliveryRoute)
+		throws Exception {
 		if (c == null)
 			c = newCustomer(vendorId, name, vendorRoute);
 		c.setRouteHistory(routes(deliveryRoute));
@@ -79,6 +80,13 @@ public class CustomerServiceImpl //
 		return c;
 	}
 
+	private List<Routing> routes(String name) throws Exception {
+		Routing r = new Routing();
+		r.setRoute(routeService.findByName(name));
+		r.setStartDate(goLive());
+		return Arrays.asList(r);
+	}
+
 	private Channel channel(String name) {
 		try {
 			return channelService.findByName(name);
@@ -87,29 +95,22 @@ public class CustomerServiceImpl //
 		}
 	}
 
-	private List<Routing> routes(String name) throws Exception {
-		Routing r = new Routing();
-		r.setRoute(routeService.findByName(name));
-		r.setStartDate(goLive());
-		return Arrays.asList(r);
+	private PricingType dealerPrice() throws Exception {
+		return pricingTypeService.findByName(DEALER.toString());
 	}
 
 	private LocalDate goLive() {
 		return DateTimeUtils.toDate(goLive);
 	}
 
-	private PricingType dealerPrice() throws Exception {
-		return pricingTypeService.findByName(DEALER.toString());
-	}
-
 	@Override
 	public List<Customer> search(String name) throws Exception {
 		List<Customer> l = super.search(name);
 		return l == null ? null //
-				: l.stream() //
-						.filter(c -> c.getVendorId() != null) //
-						.map(c -> setVendorIdAsId(c)) //
-						.collect(Collectors.toList());
+			: l.stream() //
+			.filter(c -> c.getVendorId() != null) //
+			.map(c -> setVendorIdAsId(c)) //
+			.collect(Collectors.toList());
 	}
 
 	private Customer setVendorIdAsId(Customer c) {
@@ -121,6 +122,6 @@ public class CustomerServiceImpl //
 	public List<Customer> list() {
 		List<Customer> l = super.list();
 		return l == null ? null : l.stream() //
-				.filter(c -> c.getVendorId() != null).collect(Collectors.toList());
+			.filter(c -> c.getVendorId() != null).collect(Collectors.toList());
 	}
 }

@@ -1,11 +1,12 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import ph.txtdis.mgdc.gsm.dto.Customer;
 
+import java.util.List;
+
 public interface CreditedAndDiscountedCustomerService //
-		extends CustomerValidationService, Imported {
+	extends CustomerValidationService,
+	Imported {
 
 	List<Customer> findAllByScheduledRouteAndGoodCreditStanding(Long id);
 

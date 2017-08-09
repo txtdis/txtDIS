@@ -62,21 +62,14 @@ public class OCPReader {
 		verifyThatRow4ContainsRoutesForMappingColumnsToDDLs(cell);
 	}
 
+	private void setDDLDetailsForEachRoute(Cell cell) throws Exception {
+		setItemUponValidation(cell);
+		setRouteItemQtyUponValidation(cell);
+	}
+
 	private void verifyCellB1ContainsClientName(Cell cell) throws Exception {
 		if (isAddress(cell, "B1"))
 			service.validateNameIsOfClient(text(cell, "the company's name"));
-	}
-
-	private String text(Cell cell, String required) throws Exception {
-		try {
-			return cell.getStringCellValue();
-		} catch (Exception e) {
-			throw new InvalidWorkBookFormatException(cell.getAddress().toString(), required);
-		}
-	}
-
-	private boolean isAddress(Cell cell, String address) {
-		return cell.getAddress().toString().equalsIgnoreCase(address);
 	}
 
 	private void verifyThatRow4ContainsRoutesForMappingColumnsToDDLs(Cell cell) throws Exception {
@@ -84,11 +77,6 @@ public class OCPReader {
 			service.mapIndexToDDL(cell.getColumnIndex(), text(cell, "a route name"));
 		if (isAddress(cell, "A5"))
 			service.validateNamesAreOfRoutes();
-	}
-
-	private void setDDLDetailsForEachRoute(Cell cell) throws Exception {
-		setItemUponValidation(cell);
-		setRouteItemQtyUponValidation(cell);
 	}
 
 	private void setItemUponValidation(Cell cell) throws Exception {
@@ -99,5 +87,17 @@ public class OCPReader {
 	private void setRouteItemQtyUponValidation(Cell cell) throws Exception {
 		if (cell.getColumnIndex() > 0 && cell.getCellTypeEnum() == CellType.NUMERIC)
 			service.setRouteItemQtyUponValidation(cell.getColumnIndex(), cell.getNumericCellValue());
+	}
+
+	private boolean isAddress(Cell cell, String address) {
+		return cell.getAddress().toString().equalsIgnoreCase(address);
+	}
+
+	private String text(Cell cell, String required) throws Exception {
+		try {
+			return cell.getStringCellValue();
+		} catch (Exception e) {
+			throw new InvalidWorkBookFormatException(cell.getAddress().toString(), required);
+		}
 	}
 }

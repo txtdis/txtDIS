@@ -12,7 +12,7 @@ import ph.txtdis.mgdc.ccbpi.service.ShippedBillableService;
 import ph.txtdis.mgdc.fx.table.BillableTable;
 
 public abstract class AbstractShippedBillableApp<AS extends ShippedBillableService, AT extends BillableTable> //
-		extends AbstractBillableApp<AS, AT, Long> {
+	extends AbstractBillableApp<AS, AT, Long> {
 
 	@Autowired
 	private TotaledTableApp<BillableDetail> totaledTableApp;
@@ -28,10 +28,10 @@ public abstract class AbstractShippedBillableApp<AS extends ShippedBillableServi
 	@Override
 	protected String getDialogInput() {
 		openByIdDialog //
-				.idPrompt(service.getOpenDialogKeyPrompt()) //
-				.header(service.getOpenDialogHeader()) //
-				.prompt(service.getOpenDialogPrompt()) //
-				.addParent(this).start();
+			.idPrompt(service.getOpenDialogKeyPrompt()) //
+			.header(service.getOpenDialogHeader()) //
+			.prompt(service.getOpenDialogPrompt()) //
+			.addParent(this).start();
 		return openByIdDialog.getKey();
 	}
 
@@ -39,9 +39,9 @@ public abstract class AbstractShippedBillableApp<AS extends ShippedBillableServi
 	protected List<Node> mainVerticalPaneNodes() {
 		buildFields();
 		return Arrays.asList( //
-				gridPane(), //
-				totaledTableApp.addNoSubHeadTablePane(table), //
-				trackedPane());
+			gridPane(), //
+			totaledTableApp.addNoSubHeadTablePane(table), //
+			trackedPane());
 	}
 
 	@Override

@@ -18,7 +18,7 @@ import ph.txtdis.type.UomType;
 
 @Service("qtyPerUomService")
 public class QtyPerUomServiceImpl //
-		implements QtyPerUomService {
+	implements QtyPerUomService {
 
 	@Autowired
 	private QtyPerUomRepository repository;
@@ -34,15 +34,6 @@ public class QtyPerUomServiceImpl //
 		return l == null ? null : l.stream().map(e -> toDTO(e)).collect(Collectors.toList());
 	}
 
-	@Override
-	public List<QtyPerUomEntity> toEntities(ItemEntity e, Item i) {
-		try {
-			return i.getQtyPerUomList().stream().map(q -> toEntity(e, q)).collect(Collectors.toList());
-		} catch (Exception x) {
-			return null;
-		}
-	}
-
 	private QtyPerUom toDTO(QtyPerUomEntity e) {
 		QtyPerUom q = new QtyPerUom();
 		q.setId(e.getId());
@@ -54,6 +45,15 @@ public class QtyPerUomServiceImpl //
 		q.setCreatedBy(e.getCreatedBy());
 		q.setCreatedOn(e.getCreatedOn());
 		return q;
+	}
+
+	@Override
+	public List<QtyPerUomEntity> toEntities(ItemEntity e, Item i) {
+		try {
+			return i.getQtyPerUomList().stream().map(q -> toEntity(e, q)).collect(Collectors.toList());
+		} catch (Exception x) {
+			return null;
+		}
 	}
 
 	private QtyPerUomEntity toEntity(ItemEntity i, QtyPerUom t) {

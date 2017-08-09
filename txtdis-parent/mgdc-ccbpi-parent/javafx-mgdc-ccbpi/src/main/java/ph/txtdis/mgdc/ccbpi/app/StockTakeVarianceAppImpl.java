@@ -8,5 +8,5 @@ import ph.txtdis.app.AbstractStockTakeVarianceApp;
 @Scope("prototype")
 @Component("stockTakeVarianceApp")
 public class StockTakeVarianceAppImpl //
-		extends AbstractStockTakeVarianceApp {
+	extends AbstractStockTakeVarianceApp {
 }

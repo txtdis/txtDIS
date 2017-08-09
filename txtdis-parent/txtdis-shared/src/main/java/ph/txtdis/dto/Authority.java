@@ -7,7 +7,7 @@ import ph.txtdis.type.UserType;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Authority //
-		extends AbstractKeyed<Long> {
+	extends AbstractKeyed<Long> {
 
 	private UserType authority;
 

@@ -1,26 +1,13 @@
 package ph.txtdis.mgdc.gsm.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-import static ph.txtdis.type.Type.TIMESTAMP;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.dto.CreditNote;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.mgdc.app.AbstractDecisionNeededApp;
@@ -28,13 +15,22 @@ import ph.txtdis.mgdc.fx.table.CreditNoteDataDumpTable;
 import ph.txtdis.mgdc.fx.table.CreditNotePaymentTable;
 import ph.txtdis.mgdc.service.CreditNoteService;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
+
 @Scope("prototype")
 @Component("creditNoteApp")
 public class CreditNoteAppImpl //
-		extends AbstractDecisionNeededApp<CreditNoteService, CreditNote, Long, Long> {
+	extends AbstractDecisionNeededApp<CreditNoteService, CreditNote, Long, Long> {
 
 	@Autowired
-	private AppButtonImpl unpaidListButton, unvalidatedListButton, dataDumpButton;
+	private AppButton unpaidListButton, unvalidatedListButton, dataDumpButton;
 
 	@Autowired
 	private AppFieldImpl<BigDecimal> balanceDisplay, totalPaymentDisplay, valueField;
@@ -61,8 +57,8 @@ public class CreditNoteAppImpl //
 	private UnvalidatedCreditNoteListApp unvalidatedListApp;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		b.add(unvalidatedListButton.icon("list").tooltip("Unvalidated...").build());
 		b.add(unpaidListButton.icon("credit").tooltip("Unpaid...").build());
 		b.add(dataDumpButton.icon("dataDump").tooltip("Datadump...").build());
@@ -104,22 +100,22 @@ public class CreditNoteAppImpl //
 	}
 
 	private HBox tablePane() {
-		return box.forHorizontalPane(paymentTable.build());
+		return pane.centeredHorizontal(paymentTable.build());
 	}
 
 	private Node paymentPane() {
-		return box.forHorizontalPane(asList(//
-				label.name("Balance"), balanceDisplay.readOnly().build(CURRENCY), //
-				label.name("Total"), totalPaymentDisplay.readOnly().build(CURRENCY)));
+		return pane.centeredHorizontal(asList(//
+			label.name("Balance"), balanceDisplay.readOnly().build(CURRENCY), //
+			label.name("Total"), totalPaymentDisplay.readOnly().build(CURRENCY)));
 	}
 
 	@Override
 	protected HBox trackedPane() {
 		List<Node> l = new ArrayList<>(creationNodes());
 		l.addAll(asList(//
-				label.name("Last Modified by"), lastModifiedByDisplay.readOnly().width(120).build(TEXT), //
-				label.name("on"), lastModifiedOnDisplay.readOnly().build(TIMESTAMP)));
-		return box.forHorizontalPane(l);
+			label.name("Last Modified by"), lastModifiedByDisplay.readOnly().width(120).build(TEXT), //
+			label.name("on"), lastModifiedOnDisplay.readOnly().build(TIMESTAMP)));
+		return pane.centeredHorizontal(l);
 	}
 
 	@Override
@@ -141,12 +137,12 @@ public class CreditNoteAppImpl //
 		setInputFieldBindings();
 		orderDateBinding();
 		valueField.disableIf(isPosted()//
-				.or(totalPaymentDisplay.isNotEmpty())//
-				.or(orderDatePicker.isEmpty()));
+			.or(totalPaymentDisplay.isNotEmpty())//
+			.or(orderDatePicker.isEmpty()));
 		referenceField.disableIf(isPosted()//
-				.or(valueField.isEmpty()));
+			.or(valueField.isEmpty()));
 		descriptionField.disableIf(isPosted()//
-				.or(referenceField.isEmpty()));
+			.or(referenceField.isEmpty()));
 		paymentTable.disableIf(noDescription());
 		saveButton.disableIf(noDescription());
 	}

@@ -20,7 +20,7 @@ import ph.txtdis.type.ModuleType;
 
 @Service("deliveryVarianceService")
 public class DeliveryVarianceServiceImpl //
-		implements DeliveryVarianceService {
+	implements DeliveryVarianceService {
 
 	@Autowired
 	private DeliveryListService deliveryListService;
@@ -48,9 +48,19 @@ public class DeliveryVarianceServiceImpl //
 		mapDeliveryListAndLoadManifestQty(start, end);
 	}
 
+	private List<SalesItemVariance> listOnlyItemsFoundOnDeliveryListOrLoadManifest() {
+		return map.values().stream().filter(v -> v.getActualCount() > 0 || v.getExpectedCount() > 0)
+			.collect(Collectors.toList());
+	}
+
 	private void mapAllItems() {
 		List<ItemEntity> items = itemService.listEntities();
 		items.stream().map(e -> toSalesItemVariance(e)).forEach(v -> map.put(v.getId().toString(), v));
+	}
+
+	private void mapDeliveryListAndLoadManifestQty(LocalDate start, LocalDate end) {
+		mapDeliveryListQty(start, end);
+		mapLoadManifestQty(start, end);
 	}
 
 	private SalesItemVariance toSalesItemVariance(ItemEntity e) {
@@ -62,14 +72,14 @@ public class DeliveryVarianceServiceImpl //
 		return v;
 	}
 
-	private void mapDeliveryListAndLoadManifestQty(LocalDate start, LocalDate end) {
-		mapDeliveryListQty(start, end);
-		mapLoadManifestQty(start, end);
-	}
-
 	private void mapDeliveryListQty(LocalDate start, LocalDate end) {
 		List<BomEntity> l = deliveryListService.getBomList("ALL", start, end);
 		l.forEach(b -> mapQty(DELIVERY_LIST, b));
+	}
+
+	private void mapLoadManifestQty(LocalDate start, LocalDate end) {
+		List<BomEntity> l = loadManifestService.getBomList(start, end);
+		l.forEach(b -> mapQty(LOAD_MANIFEST, b));
 	}
 
 	private void mapQty(ModuleType module, BomEntity bom) {
@@ -81,14 +91,5 @@ public class DeliveryVarianceServiceImpl //
 		else
 			variance.setExpectedCount(qty);
 		map.put(vendorId, variance);
-	}
-
-	private void mapLoadManifestQty(LocalDate start, LocalDate end) {
-		List<BomEntity> l = loadManifestService.getBomList(start, end);
-		l.forEach(b -> mapQty(LOAD_MANIFEST, b));
-	}
-
-	private List<SalesItemVariance> listOnlyItemsFoundOnDeliveryListOrLoadManifest() {
-		return map.values().stream().filter(v -> v.getActualCount() > 0 || v.getExpectedCount() > 0).collect(Collectors.toList());
 	}
 }

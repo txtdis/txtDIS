@@ -1,26 +1,26 @@
 package ph.txtdis.mgdc.gsm.fx.tab;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.PHONE;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.List;
-
+import javafx.scene.Node;
+import javafx.scene.layout.VBox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
-import javafx.scene.layout.VBox;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.tab.AbstractTab;
 import ph.txtdis.mgdc.gsm.fx.table.CreditTable;
 import ph.txtdis.mgdc.gsm.service.CreditGivenCustomerService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.PHONE;
+import static ph.txtdis.type.Type.TEXT;
+
 @Scope("prototype")
 @Component("creditTab")
-public class CreditTab extends AbstractTab {
+public class CreditTab
+	extends AbstractTab {
 
 	@Autowired
 	private CreditGivenCustomerService service;
@@ -60,21 +60,6 @@ public class CreditTab extends AbstractTab {
 		service.setCreditDetails(creditTable.getItems());
 	}
 
-	private VBox tablePane() {
-		return box.forVerticals(label.group("Approved Credit History"), creditTable.build());
-	}
-
-	private void validateMobileNo() {
-		String ph = mobileField.getValue();
-		if (!ph.isEmpty())
-			try {
-				service.validatePhoneNo(ph);
-			} catch (Exception e) {
-				mobileField.clear();
-				handleError(mobileField, e);
-			}
-	}
-
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
 		gridPane.getChildren().clear();
@@ -87,7 +72,11 @@ public class CreditTab extends AbstractTab {
 		gridPane.add(titleField.build(TEXT), 1, 2);
 		gridPane.add(label.field("Mobile No."), 2, 2);
 		gridPane.add(mobileField.build(PHONE), 3, 2);
-		return asList(gridPane, box.forHorizontalPane(tablePane()));
+		return asList(gridPane, pane.centeredHorizontal(tablePane()));
+	}
+
+	private VBox tablePane() {
+		return pane.vertical(label.group("Approved Credit History"), creditTable.build());
 	}
 
 	@Override
@@ -101,5 +90,16 @@ public class CreditTab extends AbstractTab {
 	@Override
 	protected void setListeners() {
 		mobileField.onAction(e -> validateMobileNo());
+	}
+
+	private void validateMobileNo() {
+		String ph = mobileField.getValue();
+		if (!ph.isEmpty())
+			try {
+				service.validatePhoneNo(ph);
+			} catch (Exception e) {
+				mobileField.clear();
+				handleError(mobileField, e);
+			}
 	}
 }

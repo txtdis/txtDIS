@@ -14,7 +14,10 @@ import ph.txtdis.dto.Keyed;
 @Entity
 @Table(name = "tr_dr_header")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsDelivery extends EdmsAbstractReferencedBookedPaidTransported implements Keyed<Long>, Serializable {
+public class EdmsDelivery
+	extends EdmsAbstractReferencedBookedPaidTransported
+	implements Keyed<Long>,
+	Serializable {
 
 	private static final long serialVersionUID = -433291482882125071L;
 

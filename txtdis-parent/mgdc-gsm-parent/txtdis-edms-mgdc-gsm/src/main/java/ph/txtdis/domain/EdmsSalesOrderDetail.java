@@ -15,8 +15,8 @@ import lombok.EqualsAndHashCode;
 @Table(name = "tr_so_details")
 @EqualsAndHashCode(callSuper = true)
 public class EdmsSalesOrderDetail //
-		extends EdmsAbstractBillableDetail //
-		implements Serializable {
+	extends EdmsAbstractBillableDetail //
+	implements Serializable {
 
 	private static final long serialVersionUID = 7265020548100099294L;
 

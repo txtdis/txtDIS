@@ -2,13 +2,12 @@ package ph.txtdis.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsWarehouse;
 import ph.txtdis.repository.EdmsWarehouseRepository;
 
 @Service("warehouseService")
 public class EdmsWarehouseServiceImpl //
-		implements EdmsWarehouseService {
+	implements EdmsWarehouseService {
 
 	@Autowired
 	private EdmsWarehouseRepository edmsWarehouseRepository;

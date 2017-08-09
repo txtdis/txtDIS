@@ -6,9 +6,9 @@ public interface EmptiesService {
 
 	boolean isEmpties();
 
+	void setEmpties(String empties);
+
 	List<String> listEmpties();
 
 	void setEmpties(boolean b);
-
-	void setEmpties(String empties);
 }

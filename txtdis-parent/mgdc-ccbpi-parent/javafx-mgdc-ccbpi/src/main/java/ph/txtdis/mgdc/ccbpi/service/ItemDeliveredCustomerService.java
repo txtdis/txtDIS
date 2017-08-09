@@ -8,7 +8,8 @@ import ph.txtdis.service.DateValidated;
 import ph.txtdis.service.SavableAsExcelService;
 
 public interface ItemDeliveredCustomerService //
-		extends DateValidated, SavableAsExcelService<Customer> {
+	extends DateValidated,
+	SavableAsExcelService<Customer> {
 
 	boolean areDeliveriesBooked(Customer c, LocalDate orderDate);
 

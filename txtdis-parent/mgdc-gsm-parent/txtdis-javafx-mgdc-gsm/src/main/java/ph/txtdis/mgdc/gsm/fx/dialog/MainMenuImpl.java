@@ -1,43 +1,32 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static ph.txtdis.type.ModuleType.DELIVERY_REPORT;
-import static ph.txtdis.type.ModuleType.EX_TRUCK;
-import static ph.txtdis.type.ModuleType.INVOICE;
-import static ph.txtdis.type.ModuleType.SALES_ORDER;
-
+import javafx.scene.layout.GridPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.layout.GridPane;
-import ph.txtdis.app.DeliveryReportApp;
-import ph.txtdis.app.PickListApp;
-import ph.txtdis.app.RemittanceApp;
-import ph.txtdis.app.StockTakeApp;
-import ph.txtdis.app.StockTakeVarianceApp;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.app.*;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.dialog.AbstractMainMenu;
 import ph.txtdis.fx.dialog.SettingsMenu;
-import ph.txtdis.mgdc.app.BadRmaApp;
-import ph.txtdis.mgdc.app.GoodRmaApp;
-import ph.txtdis.mgdc.app.InventoryApp;
-import ph.txtdis.mgdc.app.MultiTypeBillingApp;
-import ph.txtdis.mgdc.app.ReceivingReportApp;
-import ph.txtdis.mgdc.app.SalesOrderApp;
-import ph.txtdis.mgdc.app.SalesRevenueApp;
+import ph.txtdis.mgdc.app.*;
 import ph.txtdis.mgdc.gsm.app.AgingReceivableApp;
 import ph.txtdis.mgdc.gsm.app.CreditNoteAppImpl;
 import ph.txtdis.mgdc.gsm.app.SalesVolumeAppImpl;
 import ph.txtdis.mgdc.gsm.app.VatApp;
 
+import static ph.txtdis.type.ModuleType.*;
+
 @Scope("prototype")
 @Component("mainMenu")
-public class MainMenuImpl extends AbstractMainMenu {
+public class MainMenuImpl
+	extends AbstractMainMenu {
 
 	@Autowired
-	private AppButtonImpl agingReceivableButton, creditNoteButton, exTruckButton, sivButton, salesOrderButton, receivingReportButton, goodRmaButton,
-			badRmaButton, deliveryReportButton, invoiceButton, inventoryButton, salesRevenueButton, salesVolumeButton, settingsButton, pickListButton,
-			remittanceButton, stockTakeButton, stockTakeVarianceButton, vatButton, upButton, downButton;
+	private AppButton agingReceivableButton, creditNoteButton, exTruckButton, sivButton, salesOrderButton,
+		receivingReportButton, goodRmaButton,
+		badRmaButton, deliveryReportButton, invoiceButton, inventoryButton, salesRevenueButton, salesVolumeButton,
+		settingsButton, pickListButton,
+		remittanceButton, stockTakeButton, stockTakeVarianceButton, vatButton, upButton, downButton;
 
 	@Autowired
 	private AgingReceivableApp agingApp;

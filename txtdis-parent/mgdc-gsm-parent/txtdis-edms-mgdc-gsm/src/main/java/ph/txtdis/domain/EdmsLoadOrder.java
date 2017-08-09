@@ -12,7 +12,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "tr_logp_header")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsLoadOrder extends EdmsAbstractRemittanceVarianceBasisModifiedNotedTransported implements Serializable {
+public class EdmsLoadOrder
+	extends EdmsAbstractRemittanceVarianceBasisModifiedNotedTransported
+	implements Serializable {
 
 	private static final long serialVersionUID = -1666094162685643774L;
 

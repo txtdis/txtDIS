@@ -1,7 +1,7 @@
 package ph.txtdis.service;
 
 public interface OpenDialogHeaderTextService //
-		extends HeaderNameService {
+	extends HeaderNameService {
 
 	default String getOpenDialogHeader() {
 		return "Open a(n) " + getHeaderName();

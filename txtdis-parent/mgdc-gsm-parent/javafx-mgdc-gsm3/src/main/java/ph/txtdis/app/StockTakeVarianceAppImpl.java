@@ -5,12 +5,13 @@ import org.springframework.stereotype.Component;
 
 @Scope("prototype")
 @Component("stockTakeVarianceApp")
-public class StockTakeVarianceAppImpl extends AbstractStockTakeVarianceApp {
+public class StockTakeVarianceAppImpl
+	extends AbstractStockTakeVarianceApp {
 
 	@Override
 	public void start() {
 		super.start();
 		close();
-		dialog.showInfo("Please use GSM2 App").addParent(this).start();
+		messageDialog.showInfo("Please use GSM2 App").addParent(this).start();
 	}
 }

@@ -5,7 +5,8 @@ import java.time.LocalDate;
 import javafx.util.StringConverter;
 import ph.txtdis.util.DateTimeUtils;
 
-public class DateDisplayConverter extends StringConverter<LocalDate> {
+public class DateDisplayConverter
+	extends StringConverter<LocalDate> {
 
 	@Override
 	public String toString(LocalDate date) {

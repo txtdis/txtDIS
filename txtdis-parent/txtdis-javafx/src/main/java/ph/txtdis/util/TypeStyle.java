@@ -1,46 +1,22 @@
 package ph.txtdis.util;
 
-import static javafx.geometry.Pos.CENTER_LEFT;
-import static javafx.geometry.Pos.CENTER_RIGHT;
-import static org.apache.commons.lang3.StringUtils.trim;
-import static ph.txtdis.util.DateTimeUtils.toTime;
-import static ph.txtdis.util.NumberUtils.toBigDecimal;
-import static ph.txtdis.util.NumberUtils.toFraction;
-import static ph.txtdis.util.NumberUtils.toInteger;
-import static ph.txtdis.util.NumberUtils.toLong;
-import static ph.txtdis.util.Styled.for2Place;
-import static ph.txtdis.util.Styled.for4Place;
-import static ph.txtdis.util.Styled.for4PlacePercent;
-import static ph.txtdis.util.Styled.forBoolean;
-import static ph.txtdis.util.Styled.forCode;
-import static ph.txtdis.util.Styled.forCurrency;
-import static ph.txtdis.util.Styled.forDate;
-import static ph.txtdis.util.Styled.forEnum;
-import static ph.txtdis.util.Styled.forFraction;
-import static ph.txtdis.util.Styled.forIdNo;
-import static ph.txtdis.util.Styled.forInteger;
-import static ph.txtdis.util.Styled.forPercent;
-import static ph.txtdis.util.Styled.forPhone;
-import static ph.txtdis.util.Styled.forQuantity;
-import static ph.txtdis.util.Styled.forText;
-import static ph.txtdis.util.Styled.forTime;
-import static ph.txtdis.util.Styled.forTimestamp;
+import org.apache.commons.lang3.math.Fraction;
+import ph.txtdis.fx.control.AppFieldImpl;
+import ph.txtdis.fx.control.StylableTextField;
+import ph.txtdis.fx.validator.*;
+import ph.txtdis.type.Type;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 
-import org.apache.commons.lang3.math.Fraction;
-
-import ph.txtdis.fx.control.AppFieldImpl;
-import ph.txtdis.fx.control.StylableTextField;
-import ph.txtdis.fx.validator.AlphabetOnlyValidator;
-import ph.txtdis.fx.validator.DecimalInputValidator;
-import ph.txtdis.fx.validator.IntegerInputValidator;
-import ph.txtdis.fx.validator.PhoneInputValidator;
-import ph.txtdis.fx.validator.TextValidator;
-import ph.txtdis.type.Type;
+import static javafx.geometry.Pos.CENTER_LEFT;
+import static javafx.geometry.Pos.CENTER_RIGHT;
+import static org.apache.commons.lang3.StringUtils.trim;
+import static ph.txtdis.util.DateTimeUtils.toTime;
+import static ph.txtdis.util.NumberUtils.*;
+import static ph.txtdis.util.Styled.*;
 
 public class TypeStyle {
 

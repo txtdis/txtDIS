@@ -14,8 +14,8 @@ import ph.txtdis.mgdc.ccbpi.service.PaymentService;
 @Scope("prototype")
 @Component("paymentVarianceTable")
 public class PaymentVarianceTableImpl //
-		extends AbstractVarianceTable<PaymentService> //
-		implements PaymentVarianceTable {
+	extends AbstractVarianceTable<PaymentService> //
+	implements PaymentVarianceTable {
 
 	@Override
 	protected List<TableColumn<SalesItemVariance, ?>> addColumns() {

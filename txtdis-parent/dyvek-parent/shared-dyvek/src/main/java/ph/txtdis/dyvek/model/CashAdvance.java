@@ -1,21 +1,21 @@
 package ph.txtdis.dyvek.model;
 
-import static ph.txtdis.util.NumberUtils.zeroIfNull;
-import static ph.txtdis.util.TextUtils.blankIfNull;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.dto.AbstractKeyed;
 import ph.txtdis.dto.Keyed;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static ph.txtdis.util.NumberUtils.zeroIfNull;
+import static ph.txtdis.util.TextUtils.blankIfNull;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class CashAdvance //
-		extends AbstractKeyed<Long> //
-		implements Keyed<Long> {
+	extends AbstractKeyed<Long> //
+	implements Keyed<Long> {
 
 	private LocalDate checkDate;
 

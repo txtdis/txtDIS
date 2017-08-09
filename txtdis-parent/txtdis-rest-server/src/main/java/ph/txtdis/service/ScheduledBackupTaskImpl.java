@@ -5,7 +5,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component("scheduledBackupTask")
-public class ScheduledBackupTaskImpl implements ScheduledBackupTask {
+public class ScheduledBackupTaskImpl
+	implements ScheduledBackupTask {
 
 	@Autowired
 	private SyncService syncService;

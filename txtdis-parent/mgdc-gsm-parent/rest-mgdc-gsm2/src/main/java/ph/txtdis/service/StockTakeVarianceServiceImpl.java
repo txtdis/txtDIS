@@ -18,19 +18,20 @@ import org.springframework.stereotype.Service;
 import ph.txtdis.dto.Bom;
 import ph.txtdis.dto.StockTakeVariance;
 import ph.txtdis.mgdc.gsm.service.server.AbstractStockTakeVarianceService;
-import ph.txtdis.mgdc.gsm.service.server.InventoryReadOnlyService;
+import ph.txtdis.mgdc.gsm.service.server.InventoryRestClientService;
 
 @Service("stockTakeVarianceService")
-public class StockTakeVarianceServiceImpl extends AbstractStockTakeVarianceService {
-
-	private static Logger logger = getLogger(StockTakeVarianceServiceImpl.class);
+public class StockTakeVarianceServiceImpl
+	extends AbstractStockTakeVarianceService {
 
 	private static final String IN = "in";
 
 	private static final String OUT = "out";
 
+	private static Logger logger = getLogger(StockTakeVarianceServiceImpl.class);
+
 	@Autowired
-	private InventoryReadOnlyService<Bom> inventoryReadOnlyService;
+	private InventoryRestClientService<Bom> inventoryRestClientService;
 
 	private Map<String, StockTakeVariance> goodStockMap, badStockMap;
 
@@ -68,8 +69,8 @@ public class StockTakeVarianceServiceImpl extends AbstractStockTakeVarianceServi
 
 	private List<Bom> listBoms(String quality, String direction) {
 		try {
-			return inventoryReadOnlyService.module("bom").getList("/list?quality=" + quality + "&direction=" + direction
-					+ "&start=" + startDate + "&end=" + latestCountDate);
+			return inventoryRestClientService.module("bom").getList("/list?quality=" + quality + "&direction=" + direction
+				+ "&start=" + startDate + "&end=" + latestCountDate);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -91,7 +92,8 @@ public class StockTakeVarianceServiceImpl extends AbstractStockTakeVarianceServi
 			if (direction.equals(IN)) {
 				variance.setInQty(variance.getInQty().add(bom.getQty()));
 				logger.info("\n    ItemInQtyStockTakeVariance: " + variance);
-			} else {
+			}
+			else {
 				variance.setOutQty(variance.getOutQty().add(bom.getQty()));
 				logger.info("\n    ItemOutQtyStockTakeVariance: " + variance);
 			}

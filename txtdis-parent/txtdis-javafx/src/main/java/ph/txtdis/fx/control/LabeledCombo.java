@@ -18,7 +18,8 @@ import javafx.scene.Node;
 
 @Scope("prototype")
 @Component
-public class LabeledCombo<T> implements InputNode<T> {
+public class LabeledCombo<T>
+	implements InputNode<T> {
 
 	@Autowired
 	private LabelFactory label;
@@ -54,14 +55,14 @@ public class LabeledCombo<T> implements InputNode<T> {
 		return comboBox.isEmpty();
 	}
 
+	public LabeledCombo<T> items(T[] types) {
+		return items(Arrays.asList(types));
+	}
+
 	public LabeledCombo<T> items(List<T> items) {
 		comboBox.setItems(items == null ? emptyObservableList() : observableArrayList(items));
 		comboBox.select(null);
 		return this;
-	}
-
-	public LabeledCombo<T> items(T[] types) {
-		return items(Arrays.asList(types));
 	}
 
 	public LabeledCombo<T> name(String name) {

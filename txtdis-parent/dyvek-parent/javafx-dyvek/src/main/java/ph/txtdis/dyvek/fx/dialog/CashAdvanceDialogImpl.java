@@ -1,15 +1,8 @@
 package ph.txtdis.dyvek.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dyvek.model.CashAdvance;
 import ph.txtdis.dyvek.service.CashAdvanceService;
 import ph.txtdis.fx.control.InputNode;
@@ -17,11 +10,17 @@ import ph.txtdis.fx.control.LabeledCombo;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.info.Information;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.CURRENCY;
+
 @Scope("prototype")
 @Component("cashAdvanceDialog")
-public class CashAdvanceDialogImpl //
-		extends AbstractDatedCheckDialog<CashAdvance, CashAdvanceService> //
-		implements CashAdvanceDialog {
+public class CashAdvanceDialogImpl 
+	extends AbstractDatedCheckDialog<CashAdvance, CashAdvanceService> 
+	implements CashAdvanceDialog {
 
 	@Autowired
 	private LabeledCombo<String> customerCombo;
@@ -36,12 +35,12 @@ public class CashAdvanceDialogImpl //
 
 	@Override
 	protected List<InputNode<?>> addNodes() {
-		return asList( //
-				customerCombo.name("Partner").items(service.listCustomers()).build(), //
-				datePicker.name("Check Date"), //
-				bankCombo(), //
-				checkIdInput(), //
-				valueInput.name("Amount").build(CURRENCY));
+		return asList( 
+			customerCombo.name("Partner").items(service.listCustomers()).build(), 
+			datePicker.name("Check Date"), 
+			bankCombo(), 
+			checkIdInput(), 
+			valueInput.name("Amount").build(CURRENCY));
 	}
 
 	@Override

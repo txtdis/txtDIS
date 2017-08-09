@@ -1,65 +1,65 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>ph.txtdis</groupId>
-		<artifactId>mgdc-gsm-parent</artifactId>
-		<version>1.0.1.5</version>
-	</parent>
+    <parent>
+        <groupId>ph.txtdis</groupId>
+        <artifactId>mgdc-gsm-parent</artifactId>
+        <version>1.0.1.6</version>
+    </parent>
 
-	<artifactId>javafx-mgdc-gsm3</artifactId>
-	<name>txtDIS GSM3 Client</name>
+    <artifactId>javafx-mgdc-gsm3</artifactId>
+    <name>txtDIS GSM3 Client</name>
 
-	<properties>
-		<default.server>local.network</default.server>
-		<header.type>gui</header.type>
-		<host.type>${project.artifactId}</host.type>
-		<icon.name>txtdis-gsm3</icon.name>
-		<key.store>mgdc-gsm</key.store>
-		<start-class>ph.txtdis.App</start-class>
-	</properties>
+    <properties>
+        <default.server>local.network</default.server>
+        <header.type>gui</header.type>
+        <host.type>${project.artifactId}</host.type>
+        <icon.name>txtdis-gsm3</icon.name>
+        <key.store>mgdc-gsm</key.store>
+        <start-class>ph.txtdis.App</start-class>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>ph.txtdis</groupId>
-			<artifactId>txtdis-javafx-mgdc-gsm</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>ph.txtdis</groupId>
+            <artifactId>txtdis-javafx-mgdc-gsm</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
-	<profiles>
-		<profile>
-			<id>mgdc-gsm</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-assembly-plugin</artifactId>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jar-plugin</artifactId>
-						<configuration>
-							<archive>
-								<manifest>
-									<addClasspath>true</addClasspath>
-									<classpathPrefix>lib/</classpathPrefix>
-									<mainClass>${start-class}</mainClass>
-								</manifest>
-							</archive>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>com.akathist.maven.plugins.launch4j</groupId>
-						<artifactId>launch4j-maven-plugin</artifactId>
-					</plugin>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>mgdc-gsm</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <addClasspath>true</addClasspath>
+                                    <classpathPrefix>lib/</classpathPrefix>
+                                    <mainClass>${start-class}</mainClass>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                        <artifactId>launch4j-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

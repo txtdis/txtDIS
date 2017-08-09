@@ -16,7 +16,7 @@ import ph.txtdis.service.AppendableDetailService;
 import ph.txtdis.service.DateValidated;
 import ph.txtdis.service.DecisionNeededService;
 import ph.txtdis.service.LatestApproved;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 import ph.txtdis.service.MasterService;
 import ph.txtdis.service.SavableAsExcelService;
 import ph.txtdis.service.VendorIdBasedService;
@@ -25,43 +25,62 @@ import ph.txtdis.type.PriceType;
 import ph.txtdis.type.UomType;
 
 public interface BommedDiscountedPricedValidatedItemService //
-		extends DateValidated, DecisionNeededService, SavableAsExcelService<Item>, ItemBasedService<Bom>, MasterService<Item>, AppendableDetailService,
-		EmptiesService, ItemService, LatestApproved, ListedAndResetableService<Item>, ValidatedUomService, VendorIdBasedService {
+	extends DateValidated,
+	DecisionNeededService,
+	SavableAsExcelService<Item>,
+	ItemBasedService<Bom>,
+	MasterService<Item>,
+	AppendableDetailService,
+	EmptiesService,
+	ItemService,
+	LatestApproved,
+	ListedAndResettableService<Item>,
+	ValidatedUomService,
+	VendorIdBasedService {
 
 	Bom createBom(BigDecimal qty);
 
 	Price createPricingUponValidation( //
-			PricingType type, //
-			BigDecimal price, //
-			Channel channel, //
-			LocalDate startDate//
+	                                   PricingType type, //
+	                                   BigDecimal price, //
+	                                   Channel channel, //
+	                                   LocalDate startDate//
 	) throws Exception;
 
 	Item findByVendorNo( //
-			String id) throws Exception;
+	                     String id) throws Exception;
 
 	BigDecimal getCurrentPriceValue( //
-			Long id, //
-			LocalDate orderDate, //
-			PriceType type);
+	                                 Long id, //
+	                                 LocalDate orderDate, //
+	                                 PriceType type);
 
 	PricingType getDealerPricingType();
 
 	LocalDate getEndOfLife();
 
+	void setEndOfLife( //
+	                   LocalDate d);
+
 	List<Price> getPriceList();
+
+	void setPriceList( //
+	                   List<Price> l);
 
 	PricingType getPurchasePricingType();
 
 	BigDecimal getQtyPerUom( //
-			Item item, //
-			UomType uom);
+	                         Item item, //
+	                         UomType uom);
 
 	BigDecimal getRegularPriceValue( //
-			Long itemId, //
-			PriceType type);
+	                                 Long itemId, //
+	                                 PriceType type);
 
 	ItemType getType();
+
+	void setType( //
+	              ItemType t);
 
 	boolean hasReportUom();
 
@@ -74,13 +93,16 @@ public interface BommedDiscountedPricedValidatedItemService //
 
 	boolean isNotDiscounted();
 
+	void setNotDiscounted( //
+	                       boolean b);
+
 	boolean isNotDiscounted( //
-			String itemVendorNo);
+	                         String itemVendorNo);
 
 	List<Bom> listBoms();
 
 	List<UomType> listBuyingUoms( //
-			Item i) throws Exception;
+	                              Item i) throws Exception;
 
 	List<String> listNames();
 
@@ -89,29 +111,17 @@ public interface BommedDiscountedPricedValidatedItemService //
 	List<UomType> listSellingUoms();
 
 	List<UomType> listSellingUoms( //
-			Item i) throws Exception;
+	                               Item i) throws Exception;
 
 	List<ItemType> listTypes();
 
 	boolean noChangesNeedingApproval( //
-			String tab);
+	                                  String tab);
 
 	void setBoms(List<Bom> l);
 
-	void setEndOfLife( //
-			LocalDate d);
-
 	void setFamily(ItemFamily f);
 
-	void setNotDiscounted( //
-			boolean b);
-
 	void setPartUponValidation( //
-			Long id) throws Exception;
-
-	void setPriceList( //
-			List<Price> l);
-
-	void setType( //
-			ItemType t);
+	                            Long id) throws Exception;
 }

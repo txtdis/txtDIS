@@ -26,7 +26,7 @@ import ph.txtdis.type.QuantityType;
 
 @Service("remittanceVarianceService")
 public class RemittanceVarianceServiceImpl //
-		implements RemittanceVarianceService {
+	implements RemittanceVarianceService {
 
 	private static Logger logger = getLogger(RemittanceVarianceServiceImpl.class);
 
@@ -68,7 +68,7 @@ public class RemittanceVarianceServiceImpl //
 
 	private List<SalesItemVariance> toSalesItemVariance(List<BillableEntity> ocs, QuantityType type) {
 		return ocs == null ? null //
-				: ocs.stream().map(e -> toSalesItemVariance(e, type)).collect(Collectors.toList());
+			: ocs.stream().map(e -> toSalesItemVariance(e, type)).collect(Collectors.toList());
 	}
 
 	private SalesItemVariance toSalesItemVariance(BillableEntity e, QuantityType type) {
@@ -113,9 +113,9 @@ public class RemittanceVarianceServiceImpl //
 	private BigDecimal totalQty(BillableEntity e, QuantityType type) {
 		List<BillableDetailEntity> details = e.getDetails();
 		return details == null ? ZERO //
-				: details.stream() //
-						.map(d -> qtyInCases(d, type)) //
-						.reduce(ZERO, BigDecimal::add);
+			: details.stream() //
+			.map(d -> qtyInCases(d, type)) //
+			.reduce(ZERO, BigDecimal::add);
 	}
 
 	private BigDecimal qtyInCases(BillableDetailEntity d, QuantityType type) {

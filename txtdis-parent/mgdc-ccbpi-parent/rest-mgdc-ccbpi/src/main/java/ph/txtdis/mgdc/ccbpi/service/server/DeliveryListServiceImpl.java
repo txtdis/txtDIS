@@ -19,8 +19,8 @@ import ph.txtdis.mgdc.ccbpi.repository.DeliveryListRepository;
 
 @Service("deliveryListService")
 public class DeliveryListServiceImpl //
-		extends AbstractSpunSavedBillableService //
-		implements DeliveryListService {
+	extends AbstractSpunSavedBillableService //
+	implements DeliveryListService {
 
 	private static Logger logger = getLogger(DeliveryListServiceImpl.class);
 
@@ -32,7 +32,8 @@ public class DeliveryListServiceImpl //
 
 	@Override
 	public Billable find(LocalDate date, String route) {
-		BillableEntity b = ddlRepository.findFirstByCustomerNullAndOrderDateAndSuffixNotNullAndSuffixContaining(date, route);
+		BillableEntity b =
+			ddlRepository.findFirstByCustomerNullAndOrderDateAndSuffixNotNullAndSuffixContaining(date, route);
 		return toModel(b);
 	}
 
@@ -44,7 +45,7 @@ public class DeliveryListServiceImpl //
 
 	private List<BillableEntity> deliveryList(String route, LocalDate start, LocalDate end) {
 		return ddlRepository.findByCustomerNullAndSuffixNotNullAndSuffixContainingAndOrderDateBetween( //
-				routeName(route), start, end);
+			routeName(route), start, end);
 	}
 
 	private String routeName(String route) {
@@ -52,10 +53,14 @@ public class DeliveryListServiceImpl //
 	}
 
 	@Override
-	public List<BillableDetailEntity> getDetailEntityList(String itemVendorNo, String route, LocalDate start, LocalDate end) {
+	public List<BillableDetailEntity> getDetailEntityList(String itemVendorNo,
+	                                                      String route,
+	                                                      LocalDate start,
+	                                                      LocalDate end) {
 		List<BillableDetailEntity> list = detailRepository
-				.findByItemVendorIdAndBillingCustomerNullAndBillingSuffixNotNullAndBillingSuffixContainingAndBillingOrderDateBetween( //
-						itemVendorNo, routeName(route), start, end);
+			.findByItemVendorIdAndBillingCustomerNullAndBillingSuffixNotNullAndBillingSuffixContainingAndBillingOrderDateBetween(
+				//
+				itemVendorNo, routeName(route), start, end);
 		logger.info("\n    DeliveryListDetails = " + list);
 		return list == null ? Collections.emptyList() : list;
 	}

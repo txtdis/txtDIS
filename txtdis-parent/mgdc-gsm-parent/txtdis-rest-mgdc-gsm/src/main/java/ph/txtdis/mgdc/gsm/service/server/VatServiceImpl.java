@@ -1,24 +1,24 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.util.NumberUtils.divide;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
 import ph.txtdis.mgdc.gsm.dto.Vat;
 import ph.txtdis.mgdc.gsm.repository.BillableRepository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static java.math.BigDecimal.ZERO;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.util.NumberUtils.divide;
+
 @Service("vatService")
-public class VatServiceImpl implements VatService {
+public class VatServiceImpl
+	implements VatService {
 
 	private static final String CANCELLED = "CANCELLED";
 
@@ -39,11 +39,41 @@ public class VatServiceImpl implements VatService {
 		return v;
 	}
 
+	private BigDecimal vatValue(Vat vat) {
+		try {
+			return computeVat(vat(vat));
+		} catch (Exception e) {
+			return ZERO;
+		}
+	}
+
+	@Override
+	public BigDecimal computeVat(BigDecimal v) {
+		return v.subtract(vatable(v));
+	}
+
+	private BigDecimal vat(Vat vat) {
+		return vat.getValue();
+	}
+
+	private BigDecimal vatable(BigDecimal v) {
+		return divide(v, vatRate());
+	}
+
+	private BigDecimal vatRate() {
+		return new BigDecimal("1." + vatValue);
+	}
+
 	@Override
 	public List<Vat> list(LocalDate start, LocalDate end) {
 		List<BillableEntity> invoices = repository
-				.findByCustomerIdNotAndNumIdGreaterThanAndOrderDateBetweenOrderByOrderDateAscPrefixAscNumIdAscSuffixAsc(vendorId(), 0L, start, end);
+			.findByCustomerIdNotAndNumIdGreaterThanAndOrderDateBetweenOrderByOrderDateAscPrefixAscNumIdAscSuffixAsc(
+				vendorId(), 0L, start, end);
 		return vatList(invoices);
+	}
+
+	private Long vendorId() {
+		return Long.valueOf(vendorId);
 	}
 
 	private List<Vat> vatList(List<BillableEntity> invoices) {
@@ -76,34 +106,5 @@ public class VatServiceImpl implements VatService {
 	private BigDecimal totalValue(BillableEntity b) {
 		BigDecimal t = b.getTotalValue();
 		return t != null ? t : BigDecimal.ZERO;
-	}
-
-	private BigDecimal vatValue(Vat vat) {
-		try {
-			return computeVat(vat(vat));
-		} catch (Exception e) {
-			return ZERO;
-		}
-	}
-
-	private BigDecimal vat(Vat vat) {
-		return vat.getValue();
-	}
-
-	@Override
-	public BigDecimal computeVat(BigDecimal v) {
-		return v.subtract(vatable(v));
-	}
-
-	private BigDecimal vatable(BigDecimal v) {
-		return divide(v, vatRate());
-	}
-
-	private BigDecimal vatRate() {
-		return new BigDecimal("1." + vatValue);
-	}
-
-	private Long vendorId() {
-		return Long.valueOf(vendorId);
 	}
 }

@@ -1,8 +1,13 @@
 package ph.txtdis.service;
 
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.util.DateTimeUtils.toTimestampFilename;
-import static ph.txtdis.util.DateTimeUtils.toTimestampText;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import ph.txtdis.dto.AgingReceivable;
+import ph.txtdis.dto.AgingReceivableReport;
+import ph.txtdis.excel.ExcelReportWriter;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -11,25 +16,18 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.util.DateTimeUtils.toTimestampFilename;
+import static ph.txtdis.util.DateTimeUtils.toTimestampText;
+import static ph.txtdis.util.UserUtils.username;
 
-import ph.txtdis.dto.AgingReceivable;
-import ph.txtdis.dto.AgingReceivableReport;
-import ph.txtdis.excel.ExcelReportWriter;
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.util.ClientTypeMap;
-
-public abstract class AbstractAgingReceivableService implements AgingReceivableService {
+public abstract class AbstractAgingReceivableService
+	implements AgingReceivableService {
 
 	private static Logger logger = getLogger(AbstractAgingReceivableService.class);
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<AgingReceivableReport> readOnlyService;
+	private RestClientService<AgingReceivableReport> restClientService;
 
 	@Autowired
 	private ExcelReportWriter excel;
@@ -47,17 +45,17 @@ public abstract class AbstractAgingReceivableService implements AgingReceivableS
 	}
 
 	@Override
+	public void reset() {
+		report = null;
+	}
+
+	@Override
 	public String getHeaderName() {
 		return "Aging Receivable";
 	}
 
 	@Override
-	public String getModuleName() {
-		return "agingReceivable";
-	}
-
-	@Override
-	public ReadOnlyService<AgingReceivable> getListedReadOnlyService() {
+	public RestClientService<AgingReceivable> getRestClientServiceForLists() {
 		return null;
 	}
 
@@ -75,7 +73,7 @@ public abstract class AbstractAgingReceivableService implements AgingReceivableS
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " Aging A/R";
+		return username() + "@" + modulePrefix + " Aging A/R";
 	}
 
 	@Override
@@ -96,24 +94,24 @@ public abstract class AbstractAgingReceivableService implements AgingReceivableS
 		return list != null ? list : new ArrayList<>();
 	}
 
+	private AgingReceivableReport generateReport() {
+		try {
+			return restClientService.module(getModuleName()).getOne("");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new AgingReceivableReport();
+		}
+	}
+
 	@Override
-	public void reset() {
-		report = null;
+	public String getModuleName() {
+		return "agingReceivable";
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void saveAsExcel(AppTable<AgingReceivable>... tables) throws IOException {
 		excel.table(tables).filename(excelName()).sheetname(getExcelSheetName()).write();
-	}
-
-	private AgingReceivableReport generateReport() {
-		try {
-			return readOnlyService.module(getModuleName()).getOne("");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new AgingReceivableReport();
-		}
 	}
 
 	private String excelName() {

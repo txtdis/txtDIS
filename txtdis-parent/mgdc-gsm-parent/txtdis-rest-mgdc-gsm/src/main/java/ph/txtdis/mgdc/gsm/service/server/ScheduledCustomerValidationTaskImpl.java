@@ -1,15 +1,15 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.math.BigDecimal;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component("scheduledCustomerValidationTask")
 public class ScheduledCustomerValidationTaskImpl //
-		implements ScheduledCustomerValidationTask {
+	implements ScheduledCustomerValidationTask {
 
 	@Autowired
 	private CustomerValidationService service;
@@ -30,7 +30,7 @@ public class ScheduledCustomerValidationTaskImpl //
 	public void cancelAllCustomerDiscountsIfMonthlyAverageIsLessThanRequired() {
 		if (!updatedCustomerDiscounts) {
 			service.cancelAllCustomerDiscountsIfMonthlyAverageIsLessthanRequired( //
-					customerDiscountComputationNoOfMonths, customerDiscountRequiredAvgMonthlyQty);
+				customerDiscountComputationNoOfMonths, customerDiscountRequiredAvgMonthlyQty);
 			updatedCustomerDiscounts = true;
 		}
 	}

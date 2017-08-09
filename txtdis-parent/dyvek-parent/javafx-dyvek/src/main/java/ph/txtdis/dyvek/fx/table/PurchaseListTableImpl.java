@@ -1,25 +1,24 @@
 package ph.txtdis.dyvek.fx.table;
 
-import static ph.txtdis.type.Type.DATE;
-import static ph.txtdis.type.Type.ENUM;
+import javafx.scene.control.TableColumn;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.dyvek.model.Billable;
+import ph.txtdis.fx.table.Column;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
-import ph.txtdis.dyvek.model.Billable;
-import ph.txtdis.fx.table.Column;
+import static ph.txtdis.type.Type.DATE;
+import static ph.txtdis.type.Type.ENUM;
 
 @Scope("prototype")
 @Component("purchaseListTable")
 public class PurchaseListTableImpl //
-		extends AbstractOrderListTable //
-		implements PurchaseListTable {
+	extends AbstractOrderListTable //
+	implements PurchaseListTable {
 
 	@Autowired
 	private Column<Billable, LocalDate> endDate;

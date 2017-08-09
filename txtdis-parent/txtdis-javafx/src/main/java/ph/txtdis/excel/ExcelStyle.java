@@ -1,17 +1,11 @@
 package ph.txtdis.excel;
 
-import static org.apache.poi.ss.usermodel.IndexedColors.GREY_50_PERCENT;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.DataFormat;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Component;
+
+import static org.apache.poi.ss.usermodel.IndexedColors.GREY_50_PERCENT;
 
 @Component("excelStyle")
 public class ExcelStyle {
@@ -20,8 +14,9 @@ public class ExcelStyle {
 
 	private Font normalFont, redFont, boldFont;
 
-	private CellStyle bool, center, currency, currencySum, date, decimal, decimalSum, falseBool, fraction, header, id, integer, left, red, right,
-			title, trueBool, verticalHeader, strikeout;
+	private CellStyle bool, center, currency, currencySum, date, decimal, decimalSum, falseBool, fraction, header, id,
+		integer, left, red, right,
+		title, trueBool, verticalHeader, strikeout;
 
 	private DataFormat format;
 
@@ -86,6 +81,14 @@ public class ExcelStyle {
 	private CellStyle normal() {
 		CellStyle s = workbook.createCellStyle();
 		s.setFont(normalFont());
+		return s;
+	}
+
+	private CellStyle fullThinBorder(CellStyle s) {
+		s.setBorderTop(BorderStyle.THIN);
+		s.setBorderRight(BorderStyle.THIN);
+		s.setBorderLeft(BorderStyle.THIN);
+		s.setBorderBottom(BorderStyle.THIN);
 		return s;
 	}
 
@@ -274,12 +277,15 @@ public class ExcelStyle {
 		return s;
 	}
 
-	private CellStyle fullThinBorder(CellStyle s) {
-		s.setBorderTop(BorderStyle.THIN);
-		s.setBorderRight(BorderStyle.THIN);
-		s.setBorderLeft(BorderStyle.THIN);
-		s.setBorderBottom(BorderStyle.THIN);
-		return s;
+	private Font boldFont() {
+		if (boldFont == null)
+			setBoldFont();
+		return boldFont;
+	}
+
+	private void setBoldFont() {
+		boldFont = normalFont();
+		boldFont.setBold(true);
 	}
 
 	public CellStyle id() {
@@ -412,16 +418,5 @@ public class ExcelStyle {
 		verticalHeader.setVerticalAlignment(VerticalAlignment.BOTTOM);
 		verticalHeader.setWrapText(false);
 		verticalHeader.setRotation((short) 90);
-	}
-
-	private Font boldFont() {
-		if (boldFont == null)
-			setBoldFont();
-		return boldFont;
-	}
-
-	private void setBoldFont() {
-		boldFont = normalFont();
-		boldFont.setBold(true);
 	}
 }

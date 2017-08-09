@@ -12,7 +12,7 @@ import ph.txtdis.mgdc.service.SellerLessPickListService;
 @Scope("prototype")
 @Component("pickListApp")
 public class PickListAppImpl //
-		extends AbstractPickListApp<SellerLessPickListService> {
+	extends AbstractPickListApp<SellerLessPickListService> {
 
 	@Autowired
 	private AppCombo<String> collectorCombo;
@@ -49,7 +49,7 @@ public class PickListAppImpl //
 		super.setBindings();
 		collectorCombo.disableIf(truckCombo.isEmpty());
 		driverCombo.disableIf(truckCombo.isEmpty() //
-				.or(isPickup()));
+			.or(isPickup()));
 		remarksDisplay.editableIf(collectorCombo.isNotEmpty());
 		table.disableIf(collectorCombo.isEmpty());
 	}

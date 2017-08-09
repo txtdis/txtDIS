@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class AlreadyAssignedPersonException extends Exception {
+public class AlreadyAssignedPersonException
+	extends Exception {
 
 	private static final long serialVersionUID = -2596273848835338308L;
 

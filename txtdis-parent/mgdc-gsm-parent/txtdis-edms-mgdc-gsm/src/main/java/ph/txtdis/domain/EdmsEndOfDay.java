@@ -16,7 +16,7 @@ import ph.txtdis.dto.Keyed;
 @Entity
 @Table(name = "sys_eod")
 public class EdmsEndOfDay //
-		implements Keyed<Integer> {
+	implements Keyed<Integer> {
 
 	@Id
 	@Column(name = "id")

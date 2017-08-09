@@ -4,5 +4,5 @@ import ph.txtdis.dto.SalesItemVariance;
 import ph.txtdis.service.VarianceService;
 
 public interface DeliveryVarianceService //
-		extends VarianceService<SalesItemVariance> {
+	extends VarianceService<SalesItemVariance> {
 }

@@ -1,18 +1,17 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.fx.dialog.InputtedDialog;
 import ph.txtdis.service.ItemInputtedService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractAllItemInputDialog<AS extends ItemInputtedService<T>, T> //
-		extends AbstractFieldDialog<T> //
-		implements InputtedDialog<T> {
+	extends AbstractFieldDialog<T> //
+	implements InputtedDialog<T> {
 
 	@Autowired
 	protected ItemInputtedDialog itemInputtedDialog;

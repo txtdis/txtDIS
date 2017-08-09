@@ -28,7 +28,7 @@ import ph.txtdis.type.QuantityType;
 
 @Service("detailsToVarianceService")
 public class DetailsToVarianceServiceImpl //
-		implements DetailsToVarianceService {
+	implements DetailsToVarianceService {
 
 	private static Logger logger = getLogger(DetailsToVarianceServiceImpl.class);
 
@@ -88,9 +88,23 @@ public class DetailsToVarianceServiceImpl //
 		mapQty(filter, start, end);
 	}
 
+	private List<SalesItemVariance> listOnlyItemsWithQty() {
+		return map.values().stream() //
+			.filter(v -> v.getOtherCount() > 0 || v.getExpectedCount() > 0 || v.getActualCount() > 0 ||
+				v.getReturnedCount() > 0) //
+			.collect(toList());
+	}
+
 	private void mapItems() {
 		List<ItemEntity> items = itemService.listEntities();
 		items.stream().map(e -> toSalesItemVariance(e)).forEach(v -> map.put(v.getId().toString(), v));
+	}
+
+	private void mapQty(String filter, LocalDate start, LocalDate end) {
+		mapQty(OTHER, filter, start, end);
+		mapQty(EXPECTED, filter, start, end);
+		mapQty(ACTUAL, filter, start, end);
+		mapQty(RETURNED, filter, start, end);
 	}
 
 	private SalesItemVariance toSalesItemVariance(ItemEntity e) {
@@ -99,13 +113,6 @@ public class DetailsToVarianceServiceImpl //
 		v.setItem(e.getName());
 		v.setQtyPerCase(itemService.getCountPerCase(e));
 		return v;
-	}
-
-	private void mapQty(String filter, LocalDate start, LocalDate end) {
-		mapQty(OTHER, filter, start, end);
-		mapQty(EXPECTED, filter, start, end);
-		mapQty(ACTUAL, filter, start, end);
-		mapQty(RETURNED, filter, start, end);
 	}
 
 	private void mapQty(QuantityType type, String filter, LocalDate start, LocalDate end) {
@@ -153,6 +160,13 @@ public class DetailsToVarianceServiceImpl //
 		return currentPrice(item, start).add(getEmptiesPrice(item, start));
 	}
 
+	private BigDecimal currentPrice(ItemEntity item, LocalDate start) {
+		BigDecimal price = priceService.getLatestValue(DEALER.toString(), item, start);
+		logger.info(
+			"\n    ItemPrice@currentPrice = " + item + " @ " + toCurrencyText(price) + " on " + toDateDisplay(start));
+		return price;
+	}
+
 	private BigDecimal getEmptiesPrice(ItemEntity item, LocalDate start) {
 		ItemEntity empties = item.getEmpties();
 		return isAnEmpty(item) || empties == null ? BigDecimal.ZERO : currentPrice(empties, start);
@@ -163,20 +177,8 @@ public class DetailsToVarianceServiceImpl //
 		return b != null && b == true;
 	}
 
-	private BigDecimal currentPrice(ItemEntity item, LocalDate start) {
-		BigDecimal price = priceService.getLatestValue(DEALER.toString(), item, start);
-		logger.info("\n    ItemPrice@currentPrice = " + item + " @ " + toCurrencyText(price) + " on " + toDateDisplay(start));
-		return price;
-	}
-
 	@SuppressWarnings("unused")
 	private BigDecimal regularPrice(ItemEntity item) {
 		return priceService.getRegularValue(DEALER.toString(), item);
-	}
-
-	private List<SalesItemVariance> listOnlyItemsWithQty() {
-		return map.values().stream() //
-				.filter(v -> v.getOtherCount() > 0 || v.getExpectedCount() > 0 || v.getActualCount() > 0 || v.getReturnedCount() > 0) //
-				.collect(toList());
 	}
 }

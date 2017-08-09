@@ -15,8 +15,8 @@ import ph.txtdis.mgdc.ccbpi.service.DeliveryListService;
 @Scope("prototype")
 @Component("deliveryListTable")
 public class DeliveryListTableImpl //
-		extends AbstractBeverageBillableTable<DeliveryListService, DeliveryListDialog> //
-		implements DeliveryListTable {
+	extends AbstractBeverageBillableTable<DeliveryListService, DeliveryListDialog> //
+	implements DeliveryListTable {
 
 	@Override
 	protected List<TableColumn<BillableDetail, ?>> addColumns() {

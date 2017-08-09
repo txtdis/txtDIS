@@ -25,7 +25,7 @@ import ph.txtdis.util.DateTimeUtils;
 
 @Service("bookingVarianceService")
 public class BookingVarianceServiceImpl //
-		implements BookingVarianceService {
+	implements BookingVarianceService {
 
 	@Autowired
 	private DeliveryListService deliveryListService;

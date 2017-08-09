@@ -1,6 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
 import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.UserUtils.isUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,8 +22,8 @@ import ph.txtdis.type.QualityType;
 
 @Service("badRmaService")
 public class BadRmaServiceImpl //
-		extends AbstractBillableService //
-		implements BadRmaService {
+	extends AbstractBillableService //
+	implements BadRmaService {
 
 	@Autowired
 	private TotaledBillableService totalService;
@@ -39,13 +41,13 @@ public class BadRmaServiceImpl //
 	}
 
 	@Override
-	public String getAlternateName() {
-		return "Bad RMA";
+	public String getHeaderName() {
+		return getAlternateName();
 	}
 
 	@Override
-	public String getHeaderName() {
-		return getAlternateName();
+	public String getAlternateName() {
+		return "Bad RMA";
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class BadRmaServiceImpl //
 	@Override
 	public LocalDate getOrderDate() {
 		if (get().getOrderDate() == null)
-			setOrderDate(syncService.getServerDate());
+			setOrderDate(getServerDate());
 		return get().getOrderDate();
 	}
 
@@ -91,15 +93,15 @@ public class BadRmaServiceImpl //
 	}
 
 	@Override
-	public void save() throws Information, Exception {
-		get().setIsRma(false);
-		super.save();
-	}
-
-	@Override
 	public void saveReturnReceiptData() throws Information, Exception {
 		setReceivedByUser();
 		save();
+	}
+
+	@Override
+	public void save() throws Information, Exception {
+		get().setIsRma(false);
+		super.save();
 	}
 
 	@Override
@@ -112,13 +114,6 @@ public class BadRmaServiceImpl //
 	}
 
 	@Override
-	public void setCustomerData(Customer c) {
-		get().setCustomerId(c.getId());
-		get().setCustomerName(c.getName());
-		get().setCustomerAddress(c.getAddress());
-	}
-
-	@Override
 	public void updateSummaries(List<BillableDetail> items) {
 		super.updateSummaries(items);
 		set(totalService.updateInitialTotals(get()));
@@ -128,6 +123,13 @@ public class BadRmaServiceImpl //
 	public void updateUponCustomerIdValidation(Long id) throws Exception {
 		Customer c = customerService.findActive(id);
 		setCustomerData(c);
+	}
+
+	@Override
+	public void setCustomerData(Customer c) {
+		get().setCustomerId(c.getId());
+		get().setCustomerName(c.getName());
+		get().setCustomerAddress(c.getAddress());
 	}
 
 	@Override

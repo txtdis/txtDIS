@@ -7,9 +7,9 @@ import ph.txtdis.dyvek.service.ClientBillAssignmentService;
 
 @Scope("prototype")
 @Component("unassignedClientDeliveryListApp")
-public class UnassignedClientDeliveryListAppImpl //
-		extends AbstractDeliveryListApp<ClientBillAssignmentService> //
-		implements UnassignedClientDeliveryListApp {
+public class UnassignedClientDeliveryListAppImpl
+	extends AbstractDeliveryListApp<ClientBillAssignmentService>
+	implements UnassignedClientDeliveryListApp {
 
 	@Override
 	protected String headerAndTitleTextPrefix() {

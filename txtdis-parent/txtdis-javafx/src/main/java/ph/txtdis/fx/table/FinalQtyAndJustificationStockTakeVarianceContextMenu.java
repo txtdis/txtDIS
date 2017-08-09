@@ -35,11 +35,20 @@ public class FinalQtyAndJustificationStockTakeVarianceContextMenu {
 		table.setRowFactory(t -> createRowMenu(t));
 	}
 
-	private void addRowMenuItem(ContextMenu cm, MenuItem tableItem) {
-		MenuItem rowItem = new MenuItem(tableItem.getText());
-		rowItem.setGraphic(tableItem.getGraphic());
-		rowItem.setOnAction(tableItem.getOnAction());
-		cm.getItems().add(rowItem);
+	private TableRow<StockTakeVariance> createRowMenu(TableView<StockTakeVariance> t) {
+		TableRow<StockTakeVariance> r = new TableRow<>();
+		r.contextMenuProperty()
+			.bind(when(r.itemProperty().isNotNull()) //
+				.then(createRowMenu(t, r)) //
+				.otherwise((ContextMenu) null));
+		return r;
+	}
+
+	private ContextMenu createRowMenu(TableView<StockTakeVariance> t, TableRow<StockTakeVariance> r) {
+		ContextMenu cm = new ContextMenu();
+		addTableMenuItemsToRowMenu(t, cm);
+		cm.getItems().add(createInputFinalQtyAndJusticationRowMenuItem(r));
+		return cm;
 	}
 
 	private void addTableMenuItemsToRowMenu(TableView<StockTakeVariance> t, ContextMenu cm) {
@@ -53,20 +62,11 @@ public class FinalQtyAndJustificationStockTakeVarianceContextMenu {
 		return mi;
 	}
 
-	private TableRow<StockTakeVariance> createRowMenu(TableView<StockTakeVariance> t) {
-		TableRow<StockTakeVariance> r = new TableRow<>();
-		r.contextMenuProperty()
-				.bind(when(r.itemProperty().isNotNull()) //
-						.then(createRowMenu(t, r)) //
-						.otherwise((ContextMenu) null));
-		return r;
-	}
-
-	private ContextMenu createRowMenu(TableView<StockTakeVariance> t, TableRow<StockTakeVariance> r) {
-		ContextMenu cm = new ContextMenu();
-		addTableMenuItemsToRowMenu(t, cm);
-		cm.getItems().add(createInputFinalQtyAndJusticationRowMenuItem(r));
-		return cm;
+	private void addRowMenuItem(ContextMenu cm, MenuItem tableItem) {
+		MenuItem rowItem = new MenuItem(tableItem.getText());
+		rowItem.setGraphic(tableItem.getGraphic());
+		rowItem.setOnAction(tableItem.getOnAction());
+		cm.getItems().add(rowItem);
 	}
 
 	private void inputFinalQtyAndJustication(TableRow<StockTakeVariance> r) {

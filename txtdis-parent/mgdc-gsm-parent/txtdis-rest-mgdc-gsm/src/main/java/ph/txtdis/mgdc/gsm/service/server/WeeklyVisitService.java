@@ -1,9 +1,9 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dto.WeeklyVisit;
 import ph.txtdis.mgdc.gsm.domain.WeeklyVisitEntity;
+
+import java.util.List;
 
 public interface WeeklyVisitService {
 

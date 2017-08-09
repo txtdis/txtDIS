@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class DuplicateCheckException extends Exception {
+public class DuplicateCheckException
+	extends Exception {
 
 	private static final long serialVersionUID = -4008903600748202903L;
 

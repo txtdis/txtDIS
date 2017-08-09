@@ -16,7 +16,8 @@ import javafx.scene.Node;
 
 @Component
 @Scope("prototype")
-public class LabeledCheckBox implements InputNode<Boolean> {
+public class LabeledCheckBox
+	implements InputNode<Boolean> {
 
 	@Autowired
 	private LabelFactory label;

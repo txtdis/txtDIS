@@ -1,12 +1,12 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
+import ph.txtdis.dto.Billable;
+
 import java.time.LocalDate;
 import java.util.List;
 
-import ph.txtdis.dto.Billable;
-
 public interface LoadOrderService //
-		extends BookingService {
+	extends BookingService {
 
 	Billable findAsReference(Long id);
 

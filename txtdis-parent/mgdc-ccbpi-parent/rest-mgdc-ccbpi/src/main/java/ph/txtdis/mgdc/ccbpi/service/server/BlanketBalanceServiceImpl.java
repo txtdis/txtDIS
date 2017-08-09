@@ -22,7 +22,7 @@ import ph.txtdis.type.QuantityType;
 
 @Service("blanketBalanceService")
 public class BlanketBalanceServiceImpl //
-		implements BlanketBalanceService {
+	implements BlanketBalanceService {
 
 	@Autowired
 	private ItemService itemService;

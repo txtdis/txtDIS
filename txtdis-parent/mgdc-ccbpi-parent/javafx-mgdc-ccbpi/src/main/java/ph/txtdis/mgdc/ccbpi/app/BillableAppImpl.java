@@ -69,7 +69,8 @@ public class BillableAppImpl {//
 	
 		@Override
 		protected String openByIdDialogPrompt() {
-			return FORMAT_IS + CUSTOMER_ID + "-20080808/1" + FOR + CUSTOMER_NO + CUSTOMER_ID + ", " + ORDER_DATE + "8/8/08 & "
+			return FORMAT_IS + CUSTOMER_ID + "-20080808/1" + FOR + CUSTOMER_NO + CUSTOMER_ID + ", " + ORDER_DATE +
+			"8/8/08 & "
 					+ ORDER_NO + "1";
 		}
 	
@@ -110,7 +111,8 @@ public class BillableAppImpl {//
 			dueDatePicker.visibleProperty().bind(isPosted().not());
 			dueDateDisplay.visibleProperty().bind(dueDatePicker.visibleProperty().not());
 			// TODO customerIdInput.disableProperty().unbind();
-			// TODO customerIdInput.disableIf(dueDatePicker.isEmpty().or(isPosted()).or(customerNameDisplay.isNotEmpty()));
+			// TODO customerIdInput.disableIf(dueDatePicker.isEmpty().or(isPosted()).or(customerNameDisplay.isNotEmpty
+			()));
 		}
 	
 		@Override
@@ -156,7 +158,8 @@ public class BillableAppImpl {//
 	
 		@Override
 		protected void setTableBindings() {
-			// TODO table.disableIf(when(isAnOrderReturn()).then(orderDateDisplay.isEmpty()).otherwise(customerNameDisplay.isEmpty()));
+			// TODO table.disableIf(when(isAnOrderReturn()).then(orderDateDisplay.isEmpty()).otherwise
+			(customerNameDisplay.isEmpty()));
 		}
 	
 		@Override
@@ -190,15 +193,15 @@ public class BillableAppImpl {//
 		}
 	
 		private void showCreateNewOutletOrExitDialog(Exception x, Long id) {
-			dialog.showOption(x.getMessage(), "Create", "Exit");
-			dialog.setOnOptionSelection(e -> openAddNewOutletDialog(id));
-			// TODO dialog.setOnDefaultSelection(e -> resetCustomerData());
-			dialog.addParent(this).start();
+			messageDialog.showOption(x.getMessage(), "Create", "Exit");
+			messageDialog.setOnOptionSelection(e -> openAddNewOutletDialog(id));
+			// TODO messageDialog.setOnDefaultSelection(e -> resetCustomerData());
+			messageDialog.addParent(this).start();
 		}
 	
 		private void openAddNewOutletDialog(Long id) {
 			newCustomerDialog.vendorId(id).addParent(this).start();
-			dialog.close();
+			messageDialog.close();
 			// TODO service.setCustomer(newCustomerDialog.getCustomer());
 			// TODO service.setCustomerRelatedData();
 		}
@@ -212,7 +215,8 @@ public class BillableAppImpl {//
 	
 		// TODO  @Override
 		protected void updateUponDateValidation(LocalDate d) {
-			// TODO if (isNew() && d != null && (service.isADeliveryListOrAnOrderConfirmationOrALoadManifest())) setOrderDateUponValidation(d);
+			// TODO if (isNew() && d != null && (service.isADeliveryListOrAnOrderConfirmationOrALoadManifest()))
+			setOrderDateUponValidation(d);
 		}
 	*/
 }

@@ -1,12 +1,20 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.ZERO;
-import static java.time.ZonedDateTime.now;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
-import static java.util.stream.Collectors.reducing;
-import static java.util.stream.Collectors.toList;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.domain.TruckEntity;
+import ph.txtdis.domain.UserEntity;
+import ph.txtdis.dto.Booking;
+import ph.txtdis.dto.PickList;
+import ph.txtdis.dto.PickListDetail;
+import ph.txtdis.exception.FailedPrintingException;
+import ph.txtdis.mgdc.domain.ItemFamilyEntity;
+import ph.txtdis.mgdc.domain.RouteEntity;
+import ph.txtdis.mgdc.gsm.domain.*;
+import ph.txtdis.mgdc.gsm.printer.PickListPrinter;
+import ph.txtdis.mgdc.gsm.repository.PickListRepository;
+import ph.txtdis.service.AbstractSpunSavedKeyedService;
+import ph.txtdis.service.ServerTruckService;
+import ph.txtdis.service.ServerUserService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,39 +26,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import ph.txtdis.domain.TruckEntity;
-import ph.txtdis.domain.UserEntity;
-import ph.txtdis.dto.Booking;
-import ph.txtdis.dto.PickList;
-import ph.txtdis.dto.PickListDetail;
-import ph.txtdis.exception.FailedPrintingException;
-import ph.txtdis.mgdc.domain.ItemFamilyEntity;
-import ph.txtdis.mgdc.domain.RouteEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.BillableEntity;
-import ph.txtdis.mgdc.gsm.domain.BomEntity;
-import ph.txtdis.mgdc.gsm.domain.CustomerEntity;
-import ph.txtdis.mgdc.gsm.domain.ItemEntity;
-import ph.txtdis.mgdc.gsm.domain.PickListDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.PickListEntity;
-import ph.txtdis.mgdc.gsm.printer.PickListPrinter;
-import ph.txtdis.mgdc.gsm.repository.PickListRepository;
-import ph.txtdis.service.AbstractSpunSavedKeyedService;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ServerTruckService;
-import ph.txtdis.service.ServerUserService;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+import static java.time.ZonedDateTime.now;
+import static java.util.stream.Collectors.*;
+import static ph.txtdis.util.UserUtils.username;
 
 public abstract class AbstractPickListService<BS extends BookingService> //
-		extends AbstractSpunSavedKeyedService<PickListRepository, PickListEntity, PickList, Long> //
-		implements PickListService {
+	extends AbstractSpunSavedKeyedService<PickListRepository, PickListEntity, PickList, Long> //
+	implements PickListService {
+
+	@Autowired
+	protected BomService bomService;
 
 	@Autowired
 	private BS bookingService;
-
-	@Autowired
-	private CredentialService credentialService;
 
 	@Autowired
 	private ItemService itemService;
@@ -63,9 +53,6 @@ public abstract class AbstractPickListService<BS extends BookingService> //
 
 	@Autowired
 	private PickListPrinter pickListPrinter;
-
-	@Autowired
-	protected BomService bomService;
 
 	@Override
 	public List<PickList> findAllByDate(LocalDate d) {
@@ -89,12 +76,85 @@ public abstract class AbstractPickListService<BS extends BookingService> //
 		}
 	}
 
+	@Override
+	public PickList toModel(PickListEntity e) {
+		return e == null ? null : newPickList(e);
+	}
+
 	private PickListEntity printLoadOrder(PickListEntity p) throws Exception {
 		if (!p.getPickDate().isBefore(LocalDate.now()))
 			pickListPrinter.print(p);
-		p.setPrintedBy(credentialService.username());
+		p.setPrintedBy(username());
 		p.setPrintedOn(now());
 		return repository.save(p);
+	}
+
+	private PickList newPickList(PickListEntity e) {
+		PickList p = new PickList();
+		p.setId(e.getId());
+		p.setTruck(toName(e.getTruck()));
+		p.setDriver(toName(e.getDriver()));
+		p.setLeadAssistant(toName(e.getLeadAssistant()));
+		p.setAssistant(toName(e.getAssistant()));
+		p.setRemarks(e.getRemarks());
+		p.setPrintedBy(e.getPrintedBy());
+		p.setPickDate(e.getPickDate());
+		p.setBookings(toBookings(e));
+		p.setDetails(toDetails(e));
+		p.setPrintedOn(e.getPrintedOn());
+		p.setCreatedBy(e.getCreatedBy());
+		p.setCreatedOn(e.getCreatedOn());
+		return p;
+	}
+
+	private String toName(TruckEntity t) {
+		return t == null ? null : t.getName();
+	}
+
+	private String toName(UserEntity u) {
+		return u == null ? null : u.getName();
+	}
+
+	private List<Booking> toBookings(PickListEntity p) {
+		List<BillableEntity> l = p.getBillings();
+		return l == null ? null : toBookings(l);
+	}
+
+	protected List<PickListDetail> toDetails(PickListEntity e) {
+		List<PickListDetailEntity> l = e.getDetails();
+		return l == null ? null : l.stream().map(d -> toDetail(d)).collect(Collectors.toList());
+	}
+
+	protected List<Booking> toBookings(List<BillableEntity> s) {
+		return s.stream().map(b -> toBooking(b)).collect(Collectors.toList());
+	}
+
+	protected PickListDetail toDetail(PickListDetailEntity e) {
+		PickListDetail d = new PickListDetail();
+		ItemEntity i = e.getItem();
+		d.setId(i.getId());
+		d.setItemName(i.getName());
+		d.setItemVendorNo(i.getVendorId());
+		d.setQtyPerCase(itemService.getCountPerCase(i));
+		d.setPickedQty(e.getInitialQty());
+		d.setReturnedQty(e.getReturnedQty());
+		return d;
+	}
+
+	protected Booking toBooking(BillableEntity e) {
+		Booking b = new Booking();
+		CustomerEntity c = e.getCustomer();
+		b.setId(e.getId());
+		b.setBookingId(e.getBookingId());
+		b.setCustomer(c.getName());
+		b.setLocation(c.getLocation());
+		b.setRoute(routeName(c));
+		return b;
+	}
+
+	protected String routeName(CustomerEntity c) {
+		RouteEntity r = c.getRoute();
+		return r == null ? null : r.getName();
 	}
 
 	@Override
@@ -175,32 +235,24 @@ public abstract class AbstractPickListService<BS extends BookingService> //
 	@Override
 	public List<BomEntity> summaryOfQuantitiesPerItem(PickListEntity p) {
 		return p.getBillings().stream() //
-				.flatMap(b -> b.getDetails().stream())//
-				.flatMap(d -> toBoms(d).stream())//
-				.collect(groupingBy( //
-						BomEntity::getPart, //
-						mapping( //
-								BomEntity::getQty, //
-								reducing( //
-										ZERO, //
-										BigDecimal::add)))) //
-				.entrySet().stream()//
-				.map(e -> toBom(e)) //
-				.sorted((a, b) -> familyId(a).compareTo(familyId(b))) //
-				.collect(Collectors.toList());
+			.flatMap(b -> b.getDetails().stream())//
+			.flatMap(d -> toBoms(d).stream())//
+			.collect(groupingBy( //
+				BomEntity::getPart, //
+				mapping( //
+					BomEntity::getQty, //
+					reducing( //
+						ZERO, //
+						BigDecimal::add)))) //
+			.entrySet().stream()//
+			.map(e -> toBom(e)) //
+			.sorted((a, b) -> familyId(a).compareTo(familyId(b))) //
+			.collect(Collectors.toList());
 	}
 
 	private List<BomEntity> toBoms(BillableDetailEntity d) {
 		List<BomEntity> l = bomService.extractAll(d.getItem(), ONE);
 		return toQtyMultipliedBoms(l, d.getInitialQty());
-	}
-
-	private List<BomEntity> toQtyMultipliedBoms(List<BomEntity> boms, BigDecimal qty) {
-		return boms.stream().map(b -> multiplyQtyPerBom(b, qty)).collect(toList());
-	}
-
-	private BomEntity multiplyQtyPerBom(BomEntity b, BigDecimal qty) {
-		return bomService.createComponentOnly(b.getPart(), b.getQty().multiply(qty));
 	}
 
 	private BomEntity toBom(Entry<ItemEntity, BigDecimal> e) {
@@ -212,6 +264,14 @@ public abstract class AbstractPickListService<BS extends BookingService> //
 		return family == null ? 0L : family.getId();
 	}
 
+	private List<BomEntity> toQtyMultipliedBoms(List<BomEntity> boms, BigDecimal qty) {
+		return boms.stream().map(b -> multiplyQtyPerBom(b, qty)).collect(toList());
+	}
+
+	private BomEntity multiplyQtyPerBom(BomEntity b, BigDecimal qty) {
+		return bomService.createComponentOnly(b.getPart(), b.getQty().multiply(qty));
+	}
+
 	@Override
 	public PickList save(PickList p) {
 		PickListEntity b = post(p);
@@ -220,78 +280,5 @@ public abstract class AbstractPickListService<BS extends BookingService> //
 
 	protected PickListEntity post(PickList p) {
 		return post(toEntity(p));
-	}
-
-	@Override
-	public PickList toModel(PickListEntity e) {
-		return e == null ? null : newPickList(e);
-	}
-
-	private PickList newPickList(PickListEntity e) {
-		PickList p = new PickList();
-		p.setId(e.getId());
-		p.setTruck(toName(e.getTruck()));
-		p.setDriver(toName(e.getDriver()));
-		p.setLeadAssistant(toName(e.getLeadAssistant()));
-		p.setAssistant(toName(e.getAssistant()));
-		p.setRemarks(e.getRemarks());
-		p.setPrintedBy(e.getPrintedBy());
-		p.setPickDate(e.getPickDate());
-		p.setBookings(toBookings(e));
-		p.setDetails(toDetails(e));
-		p.setPrintedOn(e.getPrintedOn());
-		p.setCreatedBy(e.getCreatedBy());
-		p.setCreatedOn(e.getCreatedOn());
-		return p;
-	}
-
-	private String toName(TruckEntity t) {
-		return t == null ? null : t.getName();
-	}
-
-	private String toName(UserEntity u) {
-		return u == null ? null : u.getName();
-	}
-
-	private List<Booking> toBookings(PickListEntity p) {
-		List<BillableEntity> l = p.getBillings();
-		return l == null ? null : toBookings(l);
-	}
-
-	protected List<Booking> toBookings(List<BillableEntity> s) {
-		return s.stream().map(b -> toBooking(b)).collect(Collectors.toList());
-	}
-
-	protected Booking toBooking(BillableEntity e) {
-		Booking b = new Booking();
-		CustomerEntity c = e.getCustomer();
-		b.setId(e.getId());
-		b.setBookingId(e.getBookingId());
-		b.setCustomer(c.getName());
-		b.setLocation(c.getLocation());
-		b.setRoute(routeName(c));
-		return b;
-	}
-
-	protected String routeName(CustomerEntity c) {
-		RouteEntity r = c.getRoute();
-		return r == null ? null : r.getName();
-	}
-
-	protected List<PickListDetail> toDetails(PickListEntity e) {
-		List<PickListDetailEntity> l = e.getDetails();
-		return l == null ? null : l.stream().map(d -> toDetail(d)).collect(Collectors.toList());
-	}
-
-	protected PickListDetail toDetail(PickListDetailEntity e) {
-		PickListDetail d = new PickListDetail();
-		ItemEntity i = e.getItem();
-		d.setId(i.getId());
-		d.setItemName(i.getName());
-		d.setItemVendorNo(i.getVendorId());
-		d.setQtyPerCase(itemService.getCountPerCase(i));
-		d.setPickedQty(e.getInitialQty());
-		d.setReturnedQty(e.getReturnedQty());
-		return d;
 	}
 }

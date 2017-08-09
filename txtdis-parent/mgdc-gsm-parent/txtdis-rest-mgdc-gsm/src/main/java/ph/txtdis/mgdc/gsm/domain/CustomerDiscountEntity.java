@@ -1,26 +1,21 @@
 package ph.txtdis.mgdc.gsm.domain;
 
-import static ph.txtdis.util.NumberUtils.toCurrencyText;
-
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.mgdc.domain.AbstractCustomerDiscountEntity;
+
+import javax.persistence.*;
+
+import static ph.txtdis.util.NumberUtils.toCurrencyText;
 
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "customer_discount", //
-		indexes = { @Index(columnList = "customer_id, start_date") }, //
-		uniqueConstraints = { @UniqueConstraint(columnNames = { "customer_id", "start_date", "item_id" }) })
+	indexes = {@Index(columnList = "customer_id, start_date")}, //
+	uniqueConstraints = {@UniqueConstraint(columnNames = {"customer_id", "start_date", "item_id"})})
 public class CustomerDiscountEntity //
-		extends AbstractCustomerDiscountEntity {
+	extends AbstractCustomerDiscountEntity {
 
 	private static final long serialVersionUID = -455882680349394952L;
 

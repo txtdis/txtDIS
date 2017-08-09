@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 
 @Service("loadVarianceService")
 public class LoadVarianceServiceImpl //
-		extends AbstractSalesItemVarianceService //
-		implements LoadVarianceService {
+	extends AbstractSalesItemVarianceService //
+	implements LoadVarianceService {
 
 	@Override
 	public String getActualColumnName() {

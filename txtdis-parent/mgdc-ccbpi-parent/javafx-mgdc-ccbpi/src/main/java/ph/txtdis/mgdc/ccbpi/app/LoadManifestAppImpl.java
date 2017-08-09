@@ -9,8 +9,8 @@ import ph.txtdis.mgdc.ccbpi.service.LoadManifestService;
 @Scope("prototype")
 @Component("loadManifestApp")
 public class LoadManifestAppImpl //
-		extends AbstractShippedBillableApp<LoadManifestService, LoadManifestTable> //
-		implements LoadManifestApp {
+	extends AbstractShippedBillableApp<LoadManifestService, LoadManifestTable> //
+	implements LoadManifestApp {
 
 	@Override
 	protected void setListeners() {
@@ -20,8 +20,8 @@ public class LoadManifestAppImpl //
 
 	private void setShipmentDateAndId() {
 		service.setShipmentDateAndId( //
-				orderDatePicker.getValue(), //
-				referenceIdInput.getValue());
+			orderDatePicker.getValue(), //
+			referenceIdInput.getValue());
 	}
 
 	@Override

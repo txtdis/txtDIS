@@ -15,7 +15,8 @@ import ph.txtdis.fx.dialog.StockTakeDialog;
 import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;
 
-public abstract class AbstractStockTakeTable extends AbstractTable<StockTakeDetail> {
+public abstract class AbstractStockTakeTable
+	extends AbstractTable<StockTakeDetail> {
 
 	@Autowired
 	private AppendContextMenu<StockTakeDetail> append;
@@ -41,11 +42,11 @@ public abstract class AbstractStockTakeTable extends AbstractTable<StockTakeDeta
 	@Override
 	protected List<TableColumn<StockTakeDetail, ?>> addColumns() {
 		return asList( //
-				id.ofType(ID).build("ID No.", "id"), //
-				name.ofType(TEXT).width(180).build("Name", "name"), //
-				uom.ofType(ENUM).build("UOM", "uom"), //
-				quality.ofType(ENUM).build("Quality", "quality"), //
-				quantityColumn()); //
+			id.ofType(ID).build("ID No.", "id"), //
+			name.ofType(TEXT).width(180).build("Name", "name"), //
+			uom.ofType(ENUM).build("UOM", "uom"), //
+			quality.ofType(ENUM).build("Quality", "quality"), //
+			quantityColumn()); //
 	}
 
 	protected abstract Column<StockTakeDetail, ?> quantityColumn();

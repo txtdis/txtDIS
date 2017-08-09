@@ -1,15 +1,15 @@
 package ph.txtdis.app;
 
-import java.util.List;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.stage.Stage;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.service.DecisionNeededService;
+
+import java.util.List;
 
 public interface DecisionNeededApp {
 
@@ -17,7 +17,7 @@ public interface DecisionNeededApp {
 
 	List<Node> addAuditNodes();
 
-	AppButtonImpl addDecisionButton();
+	AppButton addDecisionButton();
 
 	void showDecisionNodesIf(ObservableBooleanValue b);
 

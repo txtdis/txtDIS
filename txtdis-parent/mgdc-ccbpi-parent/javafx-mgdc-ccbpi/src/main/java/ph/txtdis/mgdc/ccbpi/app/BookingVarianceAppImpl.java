@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import javafx.scene.control.TableColumn;
 import ph.txtdis.app.AbstractTotaledReportApp;
 import ph.txtdis.dto.SalesItemVariance;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.mgdc.ccbpi.fx.dialog.FilterByRouteDialog;
 import ph.txtdis.mgdc.ccbpi.fx.table.BookingVarianceTable;
 import ph.txtdis.mgdc.ccbpi.service.BookingVarianceService;
@@ -21,18 +21,18 @@ import ph.txtdis.type.ModuleType;
 @Scope("prototype")
 @Component("bookingVarianceApp")
 public class BookingVarianceAppImpl //
-		extends AbstractTotaledReportApp<BookingVarianceTable, BookingVarianceService, SalesItemVariance> //
-		implements BookingVarianceApp {
+	extends AbstractTotaledReportApp<BookingVarianceTable, BookingVarianceService, SalesItemVariance> //
+	implements BookingVarianceApp {
 
 	@Autowired
-	private AppButtonImpl routeButton;
+	private AppButton routeButton;
 
 	@Autowired
 	private FilterByRouteDialog routeDialog;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> buttons = new ArrayList<>(asList(routeButton));
+	protected List<AppButton> addButtons() {
+		List<AppButton> buttons = new ArrayList<>(asList(routeButton));
 		buttons.addAll(super.addButtons());
 		return buttons;
 	}
@@ -49,17 +49,6 @@ public class BookingVarianceAppImpl //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void refresh() {
-		super.refresh();
-		table.getColumns().forEach(c -> ((TableColumn<SalesItemVariance, ?>) c).setUserData(moduleAndRouteAndDates()));
-	}
-
-	private String moduleAndRouteAndDates() {
-		return ModuleType.SALES_ORDER + "$" + service.getRoute() + "|" + service.getStartDate() + "|" + service.getEndDate();
-	}
-
-	@Override
 	protected void setOnButtonClick() {
 		super.setOnButtonClick();
 		routeButton.onAction(e -> filterByRoute());
@@ -69,5 +58,17 @@ public class BookingVarianceAppImpl //
 		routeDialog.addParent(this).start();
 		service.setRoute(routeDialog.getRoute());
 		refresh();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void refresh() {
+		super.refresh();
+		table.getColumns().forEach(c -> ((TableColumn<SalesItemVariance, ?>) c).setUserData(moduleAndRouteAndDates()));
+	}
+
+	private String moduleAndRouteAndDates() {
+		return ModuleType.SALES_ORDER + "$" + service.getRoute() + "|" + service.getStartDate() + "|" +
+			service.getEndDate();
 	}
 }

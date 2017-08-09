@@ -1,12 +1,12 @@
 package ph.txtdis.dyvek.service;
 
+import ph.txtdis.info.Information;
+
 import java.math.BigDecimal;
 import java.util.List;
 
-import ph.txtdis.info.Information;
-
 public interface ClientBillAssignmentService //
-		extends BillingService {
+	extends BillingService {
 
 	void setAdjustments(List<BigDecimal> adjustments) throws Information, Exception;
 }

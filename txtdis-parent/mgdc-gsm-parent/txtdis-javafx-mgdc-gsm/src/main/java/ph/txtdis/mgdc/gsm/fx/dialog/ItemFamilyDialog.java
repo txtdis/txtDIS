@@ -1,14 +1,8 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.ItemTier.values;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCombo;
@@ -17,9 +11,15 @@ import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.gsm.service.ItemFamilyService;
 import ph.txtdis.type.ItemTier;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.ItemTier.values;
+
 @Scope("prototype")
 @Component("itemFamilyDialog")
-public class ItemFamilyDialog extends AbstractNameListDialog<ItemFamily, ItemFamilyService> {
+public class ItemFamilyDialog
+	extends AbstractNameListDialog<ItemFamily, ItemFamilyService> {
 
 	@Autowired
 	private LabeledCombo<ItemTier> tierCombo;

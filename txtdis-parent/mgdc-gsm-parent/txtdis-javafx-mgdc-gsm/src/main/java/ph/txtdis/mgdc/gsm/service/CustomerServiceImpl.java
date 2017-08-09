@@ -1,29 +1,9 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.util.Collections.emptyList;
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.maxBy;
-import static java.util.stream.Collectors.toCollection;
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.util.DateTimeUtils.toDate;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.NumberUtils.isPositive;
-import static ph.txtdis.util.Util.areEqual;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
+import javafx.collections.ObservableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import javafx.collections.ObservableList;
 import ph.txtdis.dto.CreditDetail;
 import ph.txtdis.dto.Route;
 import ph.txtdis.dto.WeeklyVisit;
@@ -38,10 +18,27 @@ import ph.txtdis.mgdc.gsm.dto.ItemStartDate;
 import ph.txtdis.type.PartnerType;
 import ph.txtdis.type.UomType;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.*;
+import static ph.txtdis.type.PartnerType.EX_TRUCK;
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.DateTimeUtils.*;
+import static ph.txtdis.util.NumberUtils.isPositive;
+import static ph.txtdis.util.UserUtils.isUser;
+import static ph.txtdis.util.Util.areEqual;
+
 @Service("customerService")
 public class CustomerServiceImpl //
-		extends AbstractCreditAndDiscountGivenCustomerService //
-		implements CustomerService {
+	extends AbstractCreditAndDiscountGivenCustomerService //
+	implements CustomerService {
 
 	@Autowired
 	private BommedDiscountedPricedValidatedItemService itemService;
@@ -66,24 +63,21 @@ public class CustomerServiceImpl //
 	}
 
 	@Override
-	public CustomerDiscount createDiscountUponValidation(Item item, BigDecimal discount, LocalDate start) throws Exception {
+	public CustomerDiscount createDiscountUponValidation(Item item, BigDecimal discount, LocalDate start)
+		throws Exception {
 		validateItemAndStartDate(getCustomerDiscounts(), item, start);
 		return createCustomerDiscount(item, discount, start);
 	}
 
-	private void validateItemAndStartDate(List<? extends ItemStartDate> list, Item item, LocalDate startDate) throws Exception {
+	private void validateItemAndStartDate(List<? extends ItemStartDate> list, Item item, LocalDate startDate)
+		throws Exception {
 		confirmDateIsNotInThePast(startDate);
 		confirmItemAndStartDateAreUnique(list, item, startDate);
 	}
 
-	private void confirmItemAndStartDateAreUnique(List<? extends ItemStartDate> list, Item item, LocalDate startDate) throws Exception {
-		if (list.stream().anyMatch(exist(item, startDate)))
-			throw new DuplicateException("Discount for " + item + " of start date " + toDateDisplay(startDate));
-	}
-
-	private Predicate<ItemStartDate> exist(Item item, LocalDate startDate) {
-		return d -> areEqual(d.getItem(), item) //
-				&& areEqual(d.getStartDate(), startDate);
+	@Override
+	public List<CustomerDiscount> getCustomerDiscounts() {
+		return get().getDiscounts();
 	}
 
 	private CustomerDiscount createCustomerDiscount(Item item, BigDecimal discount, LocalDate startDate) {
@@ -94,14 +88,25 @@ public class CustomerServiceImpl //
 		return d;
 	}
 
-	@Override
-	public Customer findEmployee(Long id) throws Exception {
-		return findByEndPt("/employee?id=" + id);
+	private void confirmItemAndStartDateAreUnique(List<? extends ItemStartDate> list, Item item, LocalDate startDate)
+		throws Exception {
+		if (list.stream().anyMatch(exist(item, startDate)))
+			throw new DuplicateException("Discount for " + item + " of start date " + toDateDisplay(startDate));
+	}
+
+	private Predicate<ItemStartDate> exist(Item item, LocalDate startDate) {
+		return d -> areEqual(d.getItem(), item) //
+			&& areEqual(d.getStartDate(), startDate);
 	}
 
 	@Override
-	public List<CustomerDiscount> getCustomerDiscounts() {
-		return get().getDiscounts();
+	public void setCustomerDiscounts(List<CustomerDiscount> discounts) {
+		get().setDiscounts(discounts);
+	}
+
+	@Override
+	public Customer findEmployee(Long id) throws Exception {
+		return findByEndPt("/employee?id=" + id);
 	}
 
 	@Override
@@ -120,13 +125,13 @@ public class CustomerServiceImpl //
 
 	private boolean hasDiscountBeenGiven(List<CustomerDiscount> discounts) {
 		return discounts.isEmpty() ? false
-				: discounts.stream() //
-						.filter(d -> d.getIsValid() != null || d.getIsValid() == true).collect(groupingBy( //
-								CustomerDiscount::getItem, //
-								maxBy(comparing(CustomerDiscount::getStartDate)))) //
-						.entrySet().stream() //
-						.map(d -> d.getValue().orElse(new CustomerDiscount()).getDiscount()) //
-						.anyMatch(d -> isPositive(d));
+			: discounts.stream() //
+			.filter(d -> d.getIsValid() != null || d.getIsValid() == true).collect(groupingBy( //
+				CustomerDiscount::getItem, //
+				maxBy(comparing(CustomerDiscount::getStartDate)))) //
+			.entrySet().stream() //
+			.map(d -> d.getValue().orElse(new CustomerDiscount()).getDiscount()) //
+			.anyMatch(d -> isPositive(d));
 	}
 
 	@Override
@@ -150,11 +155,6 @@ public class CustomerServiceImpl //
 	public void reset() {
 		super.reset();
 		item = null;
-	}
-
-	@Override
-	public void setCustomerDiscounts(List<CustomerDiscount> discounts) {
-		get().setDiscounts(discounts);
 	}
 
 	@Override
@@ -188,13 +188,15 @@ public class CustomerServiceImpl //
 	}
 
 	@Override
-	public void verifyUserIsAllowedToChangeSchedule(ObservableList<WeeklyVisit> old, ObservableList<WeeklyVisit> changed) throws Exception {
+	public void verifyUserIsAllowedToChangeSchedule(ObservableList<WeeklyVisit> old, ObservableList<WeeklyVisit>
+		changed)
+		throws Exception {
 		if (isDroarLive() && isFromTheSameOutlet(old, changed) && !old.equals(changed) && !isUser(MANAGER))
 			throw new UnauthorizedUserException("Managers Only");
 	}
 
 	private boolean isDroarLive() {
-		return !toDate(droarGoLive).isBefore(syncService.getServerDate());
+		return !toDate(droarGoLive).isBefore(getServerDate());
 	}
 
 	private boolean isFromTheSameOutlet(ObservableList<WeeklyVisit> old, ObservableList<WeeklyVisit> changed) {

@@ -10,8 +10,8 @@ import ph.txtdis.dto.SalesItemVariance;
 
 @Service("bookingVarianceService")
 public class BookingVarianceServiceImpl //
-		extends AbstractSalesItemVarianceService //
-		implements BookingVarianceService {
+	extends AbstractSalesItemVarianceService //
+	implements BookingVarianceService {
 
 	private String route;
 
@@ -21,8 +21,8 @@ public class BookingVarianceServiceImpl //
 	}
 
 	@Override
-	public String getModuleName() {
-		return "bookingVariance";
+	public String getSubhead() {
+		return getRoute() + " on " + super.getSubhead();
 	}
 
 	@Override
@@ -31,28 +31,28 @@ public class BookingVarianceServiceImpl //
 	}
 
 	@Override
-	public String getSubhead() {
-		return getRoute() + " on " + super.getSubhead();
+	public void setRoute(String name) {
+		route = name;
 	}
 
 	@Override
 	public List<SalesItemVariance> list() {
 		try {
 			String endPt = "/list?route=" + getRoute() + "&start=" + getStartDate() + "&end=" + getEndDate();
-			return getListedReadOnlyService().module(getModuleName()).getList(endPt);
+			return getRestClientServiceForLists().module(getModuleName()).getList(endPt);
 		} catch (Exception e) {
 			return emptyList();
 		}
 	}
 
 	@Override
-	public void reset() {
-		super.reset();
-		route = null;
+	public String getModuleName() {
+		return "bookingVariance";
 	}
 
 	@Override
-	public void setRoute(String name) {
-		route = name;
+	public void reset() {
+		super.reset();
+		route = null;
 	}
 }

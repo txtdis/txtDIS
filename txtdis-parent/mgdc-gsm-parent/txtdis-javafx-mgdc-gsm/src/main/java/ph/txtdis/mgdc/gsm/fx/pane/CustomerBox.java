@@ -1,12 +1,5 @@
 package ph.txtdis.mgdc.gsm.fx.pane;
 
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
@@ -14,26 +7,32 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import ph.txtdis.fx.control.AppButtonImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.FocusRequested;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.fx.dialog.SearchDialog;
-import ph.txtdis.fx.pane.AppBoxPaneFactory;
+import ph.txtdis.fx.pane.PaneFactory;
 import ph.txtdis.mgdc.gsm.app.CustomerListApp;
 import ph.txtdis.mgdc.gsm.dto.Customer;
 import ph.txtdis.service.CustomerIdAndNameService;
 import ph.txtdis.service.CustomerSearchableService;
+
+import static ph.txtdis.type.Type.ID;
+import static ph.txtdis.type.Type.TEXT;
 
 @Scope("prototype")
 @Component("customerBox")
 public class CustomerBox {
 
 	@Autowired
-	private AppBoxPaneFactory box;
+	private PaneFactory pane;
 
 	@Autowired
-	private AppButtonImpl customerSearchButton;
+	private AppButton customerSearchButton;
 
 	@Autowired
 	private AppFieldImpl<Long> customerIdInput;
@@ -80,7 +79,7 @@ public class CustomerBox {
 		customerIdInput.width(140).build(ID);
 		customerNameDisplay.readOnly().width(420).build(TEXT);
 		buildSearchButton();
-		return hbox = box.forHorizontals(customerIdInput, customerNameDisplay, customerSearchButton);
+		return hbox = pane.horizontal(customerIdInput, customerNameDisplay, customerSearchButton);
 	}
 
 	private void buildSearchButton() {
@@ -118,6 +117,14 @@ public class CustomerBox {
 		customerIdInput.requestFocus();
 	}
 
+	public void handleError(Exception e) {
+		e.printStackTrace();
+		dialog.show(e).addParent(stage).start();
+		customerIdInput.setValue(null);
+		customerNameDisplay.setValue(null);
+		customerIdInput.requestFocus();
+	}
+
 	private Customer getSelectionFromSearchResults() {
 		customerListApp.addParent(stage).start();
 		return customerListApp.getSelection();
@@ -127,12 +134,8 @@ public class CustomerBox {
 		return customerIdInput.getValue();
 	}
 
-	public void handleError(Exception e) {
-		e.printStackTrace();
-		dialog.show(e).addParent(stage).start();
-		customerIdInput.setValue(null);
-		customerNameDisplay.setValue(null);
-		customerIdInput.requestFocus();
+	public void setId(Long id) {
+		customerIdInput.setValue(id);
 	}
 
 	public void hideSearchButton() {
@@ -162,10 +165,6 @@ public class CustomerBox {
 
 	public void onAction(EventHandler<ActionEvent> e) {
 		customerIdInput.onAction(e);
-	}
-
-	public void setId(Long id) {
-		customerIdInput.setValue(id);
 	}
 
 	public void setSearchButtonVisibleIfNot(BooleanBinding b) {

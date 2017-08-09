@@ -13,7 +13,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "master_customerlist_foc")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsWeeklyVisit extends EdmsAbstractCodedId implements Serializable {
+public class EdmsWeeklyVisit
+	extends EdmsAbstractCodedId
+	implements Serializable {
 
 	private static final long serialVersionUID = 5318747057659803871L;
 

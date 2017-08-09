@@ -26,8 +26,9 @@ import javafx.scene.control.ComboBox;
 @Component("appCombo")
 @SuppressWarnings("restriction")
 public class AppCombo<T> //
-		extends ComboBox<T> //
-		implements ErrorHandling, InputControl<T> {
+	extends ComboBox<T> //
+	implements ErrorHandling,
+	InputControl<T> {
 
 	private boolean singleItemIsNotAutoSelected;
 
@@ -48,6 +49,11 @@ public class AppCombo<T> //
 		});
 	}
 
+	@SuppressWarnings("unchecked")
+	public BooleanBinding are(T... items) {
+		return are(asList(items));
+	}
+
 	public BooleanBinding are(List<T> items) {
 		BooleanBinding b = Bindings.not(new SimpleBooleanProperty(false));
 		if (items == null || items.isEmpty())
@@ -58,9 +64,8 @@ public class AppCombo<T> //
 		return b;
 	}
 
-	@SuppressWarnings("unchecked")
-	public BooleanBinding are(T... items) {
-		return are(asList(items));
+	public BooleanBinding is(T item) {
+		return getSelectionModel().selectedItemProperty().isEqualTo(item);
 	}
 
 	public BooleanBinding areOfText(List<String> texts) {
@@ -70,9 +75,8 @@ public class AppCombo<T> //
 		return b;
 	}
 
-	@Override
-	public void clear() {
-		setValue(null);
+	public BooleanBinding isOfText(String text) {
+		return Bindings.convert(getSelectionModel().selectedItemProperty()).isEqualTo(text);
 	}
 
 	public void disable() {
@@ -100,6 +104,11 @@ public class AppCombo<T> //
 		requestFocus();
 	}
 
+	@Override
+	public void clear() {
+		setValue(null);
+	}
+
 	public boolean hasItems() {
 		return getItems() != null && getItems().size() > 1;
 	}
@@ -108,16 +117,12 @@ public class AppCombo<T> //
 		return isEmpty().not().get();
 	}
 
-	public BooleanBinding is(T item) {
-		return getSelectionModel().selectedItemProperty().isEqualTo(item);
+	public BooleanBinding isEmpty() {
+		return getSelectionModel().selectedItemProperty().isNull();
 	}
 
 	public ObservableBooleanValue isCurrentlyDisabled() {
 		return disabledProperty();
-	}
-
-	public BooleanBinding isEmpty() {
-		return getSelectionModel().selectedItemProperty().isNull();
 	}
 
 	public BooleanBinding isNot(T item) {
@@ -132,8 +137,8 @@ public class AppCombo<T> //
 		return isOfText(text).not();
 	}
 
-	public BooleanBinding isOfText(String text) {
-		return Bindings.convert(getSelectionModel().selectedItemProperty()).isEqualTo(text);
+	public AppCombo<T> items(T[] items) {
+		return items(asList(items));
 	}
 
 	public AppCombo<T> items(List<T> items) {
@@ -147,24 +152,33 @@ public class AppCombo<T> //
 		if (size() == 1 && !singleItemIsNotAutoSelected) {
 			select(0);
 			focusTraversableProperty().set(false);
-		} else {
+		}
+		else {
 			select(null);
 			focusTraversableProperty().set(true);
 		}
 	}
 
-	public AppCombo<T> items(T[] items) {
-		return items(asList(items));
+	public int size() {
+		return getItems().size();
+	}
+
+	public void select(int index) {
+		getSelectionModel().select(index);
+	}
+
+	public void select(T selection) {
+		getSelectionModel().select(selection);
+	}
+
+	public AppCombo<T> itemsSelectingFirst(T[] items) {
+		return itemsSelectingFirst(asList(items));
 	}
 
 	public AppCombo<T> itemsSelectingFirst(List<T> items) {
 		items(items);
 		select(0);
 		return this;
-	}
-
-	public AppCombo<T> itemsSelectingFirst(T[] items) {
-		return itemsSelectingFirst(asList(items));
 	}
 
 	public AppCombo<T> noAutoSelectSingleItem() {
@@ -180,18 +194,6 @@ public class AppCombo<T> //
 		focusTraversableProperty().set(false);
 		width(width);
 		return this;
-	}
-
-	public void select(int index) {
-		getSelectionModel().select(index);
-	}
-
-	public void select(T selection) {
-		getSelectionModel().select(selection);
-	}
-
-	public int size() {
-		return getItems().size();
 	}
 
 	public AppCombo<T> width(int width) {

@@ -18,7 +18,9 @@ import ph.txtdis.mgdc.ccbpi.service.BookingVarianceService;
 
 @Scope("prototype")
 @Component("bookingVarianceTable")
-public class BookingVarianceTableImpl extends AbstractVarianceTable<BookingVarianceService> implements BookingVarianceTable {
+public class BookingVarianceTableImpl
+	extends AbstractVarianceTable<BookingVarianceService>
+	implements BookingVarianceTable {
 
 	@Autowired
 	private DeliveryListListApp ddlApp;

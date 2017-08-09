@@ -1,23 +1,22 @@
 package ph.txtdis.mgdc.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static org.apache.log4j.Logger.getLogger;
-
-import java.math.BigDecimal;
-import java.util.List;
-
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.service.QtyPerUomService;
 import ph.txtdis.type.Type;
 import ph.txtdis.type.UomType;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.apache.log4j.Logger.getLogger;
 
 @Scope("prototype")
 @Component("quantitiesInCasesAndBottlesDialog")
@@ -56,7 +55,8 @@ public class QuantitiesInCasesAndBottlesDialogImpl {
 	public BigDecimal totalQtyInPieces() {
 		BigDecimal unitQtyOfCases = qtyInCases().multiply(qtyPerCase());
 		BigDecimal totalUnitQty = unitQtyOfCases.add(qtyInPieces());
-		logger.info("\n    UnitQtyOfCases" + prefix + "= " + unitQtyOfCases + ", TotalUnitQty" + prefix + "= " + totalUnitQty);
+		logger.info(
+			"\n    UnitQtyOfCases" + prefix + "= " + unitQtyOfCases + ", TotalUnitQty" + prefix + "= " + totalUnitQty);
 		return totalUnitQty;
 	}
 

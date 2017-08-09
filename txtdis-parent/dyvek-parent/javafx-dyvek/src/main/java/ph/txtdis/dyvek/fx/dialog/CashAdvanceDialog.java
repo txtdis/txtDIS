@@ -4,5 +4,5 @@ import ph.txtdis.dyvek.model.CashAdvance;
 import ph.txtdis.fx.dialog.InputtedDialog;
 
 public interface CashAdvanceDialog //
-		extends InputtedDialog<CashAdvance> {
+	extends InputtedDialog<CashAdvance> {
 }

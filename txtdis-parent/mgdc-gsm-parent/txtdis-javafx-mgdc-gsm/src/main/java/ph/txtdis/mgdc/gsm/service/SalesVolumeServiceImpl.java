@@ -1,10 +1,16 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.SalesVolume;
+import ph.txtdis.excel.ExcelReportWriter;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.mgdc.service.HolidayService;
+import ph.txtdis.mgdc.service.SalesVolumeService;
+import ph.txtdis.mgdc.type.SalesVolumeReportType;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -14,26 +20,20 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.SalesVolume;
-import ph.txtdis.excel.ExcelReportWriter;
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.mgdc.service.HolidayService;
-import ph.txtdis.mgdc.service.SalesVolumeService;
-import ph.txtdis.mgdc.type.SalesVolumeReportType;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SyncService;
-import ph.txtdis.util.ClientTypeMap;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("salesVolumeService")
-public class SalesVolumeServiceImpl implements SalesVolumeService {
+public class SalesVolumeServiceImpl
+	implements SalesVolumeService {
 
 	@Autowired
-	private CredentialService credentialService;
+	public ClientTypeMap typeMap;
 
 	@Autowired
 	private CustomerService customerService;
@@ -42,24 +42,13 @@ public class SalesVolumeServiceImpl implements SalesVolumeService {
 	private HolidayService holidayService;
 
 	@Autowired
-	private ReadOnlyService<SalesVolume> readOnlyService;
-
-	@Autowired
-	private SyncService syncService;
+	private RestClientService<SalesVolume> restClientService;
 
 	@Autowired
 	private ExcelReportWriter excel;
 
-	@Autowired
-	public ClientTypeMap typeMap;
-
 	@Value("${prefix.module}")
 	private String modulePrefix;
-
-	@Override
-	public ClientTypeMap getTypeMap() {
-		return typeMap;
-	}
 
 	private List<SalesVolume> list;
 
@@ -70,6 +59,11 @@ public class SalesVolumeServiceImpl implements SalesVolumeService {
 	private String customer;
 
 	@Override
+	public ClientTypeMap getTypeMap() {
+		return typeMap;
+	}
+
+	@Override
 	public List<SalesVolume> dataDump() {
 		customer = null;
 		if (list == null || list.isEmpty())
@@ -78,18 +72,45 @@ public class SalesVolumeServiceImpl implements SalesVolumeService {
 	}
 
 	@Override
-	public List<SalesVolume> filterByCustomer(long id) throws Exception {
-		customer = customerService.findById(id).toString();
-		List<SalesVolume> l = list.stream()//
-				.filter(r -> customer.equals(r.getCustomer()))//
-				.collect(toList());
-		return listPerType(l);
+	public List<SalesVolume> list() {
+		try {
+			customer = null;
+			list =
+				restClientService.module(getModuleName()).getList("/list?start=" + getStartDate() + "&end=" + getEndDate
+					());
+			return listPerType(list);
+		} catch (Exception e) {
+			return list = emptyList();
+		}
+	}
+
+	@Override
+	public String getModuleName() {
+		return "salesVolume";
+	}
+
+	@Override
+	public LocalDate getStartDate() {
+		if (start == null)
+			start = yesterday();
+		return start;
+	}
+
+	@Override
+	public LocalDate getEndDate() {
+		if (end == null)
+			end = yesterday();
+		return end;
 	}
 
 	private List<SalesVolume> listPerType(List<SalesVolume> l) {
 		return l.stream().collect(groupingBy(group(type)))//
-				.entrySet().stream().map(d -> toSalesVolume(d))//
-				.sorted(sort(type)).collect(toList());
+			.entrySet().stream().map(d -> toSalesVolume(d))//
+			.sorted(sort(type)).collect(toList());
+	}
+
+	private LocalDate yesterday() {
+		return holidayService.previousWorkDay(getServerDate());
 	}
 
 	private Function<SalesVolume, String> group(SalesVolumeReportType t) {
@@ -120,14 +141,6 @@ public class SalesVolumeServiceImpl implements SalesVolumeService {
 		return v;
 	}
 
-	private BigDecimal volume(Entry<String, List<SalesVolume>> d) {
-		return d.getValue().stream().map(SalesVolume::getVol).reduce(ZERO, BigDecimal::add);
-	}
-
-	private BigDecimal quantity(Entry<String, List<SalesVolume>> d) {
-		return d.getValue().stream().map(SalesVolume::getQty).reduce(ZERO, BigDecimal::add);
-	}
-
 	private Comparator<SalesVolume> sort(SalesVolumeReportType t) {
 		switch (t) {
 			case CATEGORY:
@@ -139,37 +152,45 @@ public class SalesVolumeServiceImpl implements SalesVolumeService {
 		}
 	}
 
-	@Override
-	public LocalDate getEndDate() {
-		if (end == null)
-			end = yesterday();
-		return end;
+	private BigDecimal volume(Entry<String, List<SalesVolume>> d) {
+		return d.getValue().stream().map(SalesVolume::getVol).reduce(ZERO, BigDecimal::add);
 	}
 
-	private LocalDate yesterday() {
-		return holidayService.previousWorkDay(syncService.getServerDate());
+	private BigDecimal quantity(Entry<String, List<SalesVolume>> d) {
+		return d.getValue().stream().map(SalesVolume::getQty).reduce(ZERO, BigDecimal::add);
 	}
 
 	@Override
-	public String getHeaderName() {
-		return "Sales Volume";
+	public void setEndDate(LocalDate d) {
+		end = d;
 	}
 
 	@Override
-	public String getModuleName() {
-		return "salesVolume";
+	public void setStartDate(LocalDate d) {
+		start = d;
 	}
 
 	@Override
-	public ReadOnlyService<SalesVolume> getListedReadOnlyService() {
-		return readOnlyService;
+	public List<SalesVolume> filterByCustomer(long id) throws Exception {
+		customer = customerService.findById(id).toString();
+		List<SalesVolume> l = list.stream()//
+			.filter(r -> customer.equals(r.getCustomer()))//
+			.collect(toList());
+		return listPerType(l);
 	}
 
 	@Override
-	public LocalDate getStartDate() {
-		if (start == null)
-			start = yesterday();
-		return start;
+	public RestClientService<SalesVolume> getRestClientServiceForLists() {
+		return restClientService;
+	}
+
+	@Override
+	public String getTitleText() {
+		return username() + "@" + modulePrefix + " " + sheetname() + ": " + getSubhead();
+	}
+
+	private String sheetname() {
+		return "STT";
 	}
 
 	@Override
@@ -181,26 +202,6 @@ public class SalesVolumeServiceImpl implements SalesVolumeService {
 		if (!start.isEqual(getEndDate()))
 			s += " - " + toDateDisplay(end);
 		return s;
-	}
-
-	@Override
-	public String getTitleText() {
-		return credentialService.username() + "@" + modulePrefix + " " + sheetname() + ": " + getSubhead();
-	}
-
-	private String sheetname() {
-		return "STT";
-	}
-
-	@Override
-	public List<SalesVolume> list() {
-		try {
-			customer = null;
-			list = readOnlyService.module(getModuleName()).getList("/list?start=" + getStartDate() + "&end=" + getEndDate());
-			return listPerType(list);
-		} catch (Exception e) {
-			return list = emptyList();
-		}
 	}
 
 	@Override
@@ -242,16 +243,12 @@ public class SalesVolumeServiceImpl implements SalesVolumeService {
 	}
 
 	private String filename() {
-		return getHeaderName().replace(" ", ".") + "." + getSubhead().replace(" ", "").replace(":", ".").replace("-", ".to.").replace("/", "-");
+		return getHeaderName().replace(" ", ".") + "." +
+			getSubhead().replace(" ", "").replace(":", ".").replace("-", ".to.").replace("/", "-");
 	}
 
 	@Override
-	public void setEndDate(LocalDate d) {
-		end = d;
-	}
-
-	@Override
-	public void setStartDate(LocalDate d) {
-		start = d;
+	public String getHeaderName() {
+		return "Sales Volume";
 	}
 }

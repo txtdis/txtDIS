@@ -15,7 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.control.TableColumn;
 import ph.txtdis.app.AbstractTotaledReportApp;
 import ph.txtdis.dto.SalesItemVariance;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.mgdc.ccbpi.fx.dialog.FilterByCollectorDialog;
@@ -26,14 +26,15 @@ import ph.txtdis.type.ModuleType;
 @Scope("prototype")
 @Component("remittanceVarianceApp")
 public class RemittanceVarianceAppImpl //
-		extends AbstractTotaledReportApp<RemittanceVarianceTable, RemittanceVarianceService, SalesItemVariance> //
-		implements RemittanceVarianceApp {
+	extends AbstractTotaledReportApp<RemittanceVarianceTable, RemittanceVarianceService, SalesItemVariance> //
+	implements RemittanceVarianceApp {
 
 	@Autowired
-	private AppButtonImpl collectorButton;
+	private AppButton collectorButton;
 
 	@Autowired
-	private AppFieldImpl<BigDecimal> actualRemittanceDisplay, loadOutValueDisplay, returnedValueDisplay, remittanceVarianceDisplay;
+	private AppFieldImpl<BigDecimal> actualRemittanceDisplay, loadOutValueDisplay, returnedValueDisplay,
+		remittanceVarianceDisplay;
 
 	@Autowired
 	private FilterByCollectorDialog collectorDialog;
@@ -42,15 +43,15 @@ public class RemittanceVarianceAppImpl //
 	private LabelFactory label;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> buttons = new ArrayList<>(asList(collectorButton));
+	protected List<AppButton> addButtons() {
+		List<AppButton> buttons = new ArrayList<>(asList(collectorButton));
 		buttons.addAll(super.addButtons());
 		return buttons;
 	}
 
 	@Override
 	protected void createButtons() {
-		collectorButton.icon("user").tooltip("Filter collector").build();
+		collectorButton.icon("user").tooltip("Filter receivedFrom").build();
 		super.createButtons();
 	}
 
@@ -65,7 +66,7 @@ public class RemittanceVarianceAppImpl //
 		l.addAll(loadVarianceNodes());
 		l.addAll(actualRemittanceNodes());
 		l.addAll(remittanceVarianceNodes());
-		return box.forHorizontalPane(l);
+		return pane.centeredHorizontal(l);
 	}
 
 	private List<Node> deliveredValueNodes() {
@@ -90,21 +91,6 @@ public class RemittanceVarianceAppImpl //
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void refresh() {
-		super.refresh();
-		loadOutValueDisplay.setValue(service.getLoadOutValue());
-		returnedValueDisplay.setValue(service.getReturnedValue());
-		actualRemittanceDisplay.setValue(service.getRemittedValue());
-		remittanceVarianceDisplay.setValue(service.getRemittanceVarianceValue());
-		table.getColumns().forEach(c -> ((TableColumn<SalesItemVariance, ?>) c).setUserData(moduleAndCollectorAndDates()));
-	}
-
-	private String moduleAndCollectorAndDates() {
-		return ModuleType.REMITTANCE + "$" + service.getCollector() + "|" + service.getStartDate() + "|" + service.getEndDate();
-	}
-
-	@Override
 	protected void setOnButtonClick() {
 		super.setOnButtonClick();
 		collectorButton.onAction(e -> filterByCollector());
@@ -114,5 +100,22 @@ public class RemittanceVarianceAppImpl //
 		collectorDialog.addParent(this).start();
 		service.setCollector(collectorDialog.getCollector());
 		refresh();
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void refresh() {
+		super.refresh();
+		loadOutValueDisplay.setValue(service.getLoadOutValue());
+		returnedValueDisplay.setValue(service.getReturnedValue());
+		actualRemittanceDisplay.setValue(service.getRemittedValue());
+		remittanceVarianceDisplay.setValue(service.getRemittanceVarianceValue());
+		table.getColumns()
+			.forEach(c -> ((TableColumn<SalesItemVariance, ?>) c).setUserData(moduleAndCollectorAndDates()));
+	}
+
+	private String moduleAndCollectorAndDates() {
+		return ModuleType.REMITTANCE + "$" + service.getCollector() + "|" + service.getStartDate() + "|" +
+			service.getEndDate();
 	}
 }

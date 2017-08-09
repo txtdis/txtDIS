@@ -32,8 +32,8 @@ import ph.txtdis.mgdc.printer.AbstractPrinter;
 import ph.txtdis.mgdc.printer.NotPrintedException;
 
 public abstract class AbstractPickListPrinter //
-		extends AbstractPrinter<PickListEntity> //
-		implements PickListPrinter {
+	extends AbstractPrinter<PickListEntity> //
+	implements PickListPrinter {
 
 	private static Logger logger = getLogger(AbstractPickListPrinter.class);
 
@@ -113,8 +113,10 @@ public abstract class AbstractPickListPrinter //
 	}
 
 	private List<BillableEntity> returnOrders() {
-		List<CustomerEntity> customers = entity.getBillings().stream().map(BillableEntity::getCustomer).distinct().collect(toList());
-		List<BillableEntity> billings = repository.findByPickingPrintedOnNullAndRmaNotNullAndOrderDateNullAndCustomerIn(customers);
+		List<CustomerEntity> customers =
+			entity.getBillings().stream().map(BillableEntity::getCustomer).distinct().collect(toList());
+		List<BillableEntity> billings =
+			repository.findByPickingPrintedOnNullAndRmaNotNullAndOrderDateNullAndCustomerIn(customers);
 		return billings != null ? billings : emptyList();
 	}
 

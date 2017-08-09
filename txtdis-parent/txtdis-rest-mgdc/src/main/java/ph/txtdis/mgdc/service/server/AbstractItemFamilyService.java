@@ -6,8 +6,8 @@ import ph.txtdis.mgdc.repository.ItemFamilyRepository;
 import ph.txtdis.service.AbstractCreateNameListService;
 
 public abstract class AbstractItemFamilyService //
-		extends AbstractCreateNameListService<ItemFamilyRepository, ItemFamilyEntity, ItemFamily> //
-		implements ConvertibleItemFamilyService {
+	extends AbstractCreateNameListService<ItemFamilyRepository, ItemFamilyEntity, ItemFamily> //
+	implements ConvertibleItemFamilyService {
 
 	@Override
 	public ItemFamily toModel(ItemFamilyEntity e) {

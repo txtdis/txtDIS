@@ -15,7 +15,7 @@ import ph.txtdis.type.Type;
 @Scope("prototype")
 @Component("itemListTable")
 public class ItemListTableImpl //
-		extends AbstractItemListTable {
+	extends AbstractItemListTable {
 
 	@Autowired
 	private Column<Item, String> id;

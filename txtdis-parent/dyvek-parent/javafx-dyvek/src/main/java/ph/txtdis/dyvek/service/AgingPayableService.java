@@ -1,8 +1,8 @@
 package ph.txtdis.dyvek.service;
 
 import ph.txtdis.dyvek.model.Aging;
-import ph.txtdis.service.ListedAndResetableService;
+import ph.txtdis.service.ListedAndResettableService;
 
 public interface AgingPayableService //
-		extends ListedAndResetableService<Aging> {
+	extends ListedAndResettableService<Aging> {
 }

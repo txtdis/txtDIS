@@ -1,17 +1,16 @@
 package ph.txtdis.mgdc.domain;
 
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ph.txtdis.domain.AbstractCreatedKeyedEntity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -19,9 +18,9 @@ import ph.txtdis.domain.AbstractCreatedKeyedEntity;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "account", //
-		uniqueConstraints = @UniqueConstraint(columnNames = { "route_id", "start_date" }))
+	uniqueConstraints = @UniqueConstraint(columnNames = {"route_id", "start_date"}))
 public class AccountEntity //
-		extends AbstractCreatedKeyedEntity<Long> {
+	extends AbstractCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -3816774251745575218L;
 

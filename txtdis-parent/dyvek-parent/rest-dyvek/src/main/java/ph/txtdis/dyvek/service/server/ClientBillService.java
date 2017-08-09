@@ -4,7 +4,7 @@ import ph.txtdis.dyvek.domain.BillableEntity;
 import ph.txtdis.dyvek.model.Billable;
 
 public interface ClientBillService //
-		extends OpenListedSearchedSpunSavedOrderService<BillableEntity, Billable> {
+	extends OpenListedSearchedSpunSavedOrderService<BillableEntity, Billable> {
 
 	Billable findByBillId(String no);
 

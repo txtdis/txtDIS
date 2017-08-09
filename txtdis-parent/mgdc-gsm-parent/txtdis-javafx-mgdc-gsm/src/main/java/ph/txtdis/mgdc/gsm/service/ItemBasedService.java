@@ -1,27 +1,17 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static ph.txtdis.type.ItemType.FREE;
-import static ph.txtdis.util.Util.areEqual;
-
-import java.util.List;
-
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.NotSellableItemException;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.type.UomType;
 
+import java.util.List;
+
+import static ph.txtdis.type.ItemType.FREE;
+import static ph.txtdis.util.Util.areEqual;
+
 public interface ItemBasedService<T extends Keyed<Long>> {
-
-	default Item confirmItemExistsAndIsNotDeactivated(Long id) throws Exception {
-		return getItemService().findById(id);
-	}
-
-	default void confirmItemIsNotOnList(Item i) throws DuplicateException {
-		if (getDetails() != null)
-			if (getDetails().stream().filter(d -> d != null).anyMatch(d -> areEqual(d.getId(), i.getId())))
-				throw new DuplicateException(i.getName());
-	}
 
 	default List<UomType> getBuyingUoms() {
 		try {
@@ -32,15 +22,13 @@ public interface ItemBasedService<T extends Keyed<Long>> {
 		}
 	}
 
-	List<T> getDetails();
+	BommedDiscountedPricedValidatedItemService getItemService();
 
 	Item getItem();
 
 	default String getItemName() {
 		return getItem() == null ? null : getItem().getDescription();
 	}
-
-	BommedDiscountedPricedValidatedItemService getItemService();
 
 	default List<UomType> getSellingUoms() {
 		try {
@@ -58,4 +46,16 @@ public interface ItemBasedService<T extends Keyed<Long>> {
 			throw new NotSellableItemException(i.getName());
 		return i;
 	}
+
+	default Item confirmItemExistsAndIsNotDeactivated(Long id) throws Exception {
+		return getItemService().findById(id);
+	}
+
+	default void confirmItemIsNotOnList(Item i) throws DuplicateException {
+		if (getDetails() != null)
+			if (getDetails().stream().filter(d -> d != null).anyMatch(d -> areEqual(d.getId(), i.getId())))
+				throw new DuplicateException(i.getName());
+	}
+
+	List<T> getDetails();
 }

@@ -1,22 +1,21 @@
 package ph.txtdis.mgdc.fx.tab;
 
-import java.util.Arrays;
-import java.util.List;
-
+import javafx.beans.binding.BooleanBinding;
+import javafx.scene.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.beans.binding.BooleanBinding;
-import javafx.scene.Node;
 import ph.txtdis.fx.pane.BommedItemPane;
 import ph.txtdis.fx.tab.AbstractTab;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Scope("prototype")
 @Component("itemTab")
 public class ItemTabImpl //
-		extends AbstractTab //
-		implements ItemTab {
+	extends AbstractTab //
+	implements ItemTab {
 
 	@Autowired
 	private BommedItemPane itemPane;

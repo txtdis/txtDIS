@@ -1,15 +1,5 @@
 package ph.txtdis.app;
 
-import static javafx.geometry.Pos.TOP_RIGHT;
-import static javafx.scene.layout.HBox.setHgrow;
-import static javafx.scene.layout.Priority.ALWAYS;
-import static javafx.stage.Modality.WINDOW_MODAL;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
@@ -21,26 +11,35 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import ph.txtdis.fx.control.AppButtonImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.dialog.MessageDialog;
-import ph.txtdis.fx.pane.AppBoxPaneFactory;
+import ph.txtdis.fx.pane.PaneFactory;
 import ph.txtdis.service.ResettableService;
 import ph.txtdis.util.FontIcon;
 import ph.txtdis.util.TypeMap;
 
-public abstract class AbstractApp<RS extends ResettableService> //
-		extends Stage //
-		implements StartableApp {
+import java.util.ArrayList;
+import java.util.List;
+
+import static javafx.geometry.Pos.TOP_RIGHT;
+import static javafx.scene.layout.HBox.setHgrow;
+import static javafx.scene.layout.Priority.ALWAYS;
+import static javafx.stage.Modality.WINDOW_MODAL;
+
+public abstract class AbstractApp<RS extends ResettableService>
+	extends Stage
+	implements App {
 
 	@Autowired
-	protected MessageDialog dialog;
+	protected MessageDialog messageDialog;
 
 	@Autowired
 	protected LabelFactory label;
 
 	@Autowired
-	protected AppBoxPaneFactory box;
+	protected PaneFactory pane;
 
 	@Autowired
 	protected TypeMap typeMap;
@@ -74,21 +73,15 @@ public abstract class AbstractApp<RS extends ResettableService> //
 	}
 
 	@Override
-	public void refresh() {
-		refreshTitleAndHeader();
-		goToDefaultFocus();
-	}
-
-	@Override
 	public void start() {
 		initialize();
 		show();
 	}
 
-	protected void setStage(VBox box) {
+	protected void setStage(VBox pane) {
 		getIcons().add(icon());
 		refreshTitleAndHeader();
-		setScene(scene(box));
+		setScene(scene(pane));
 		setBounds();
 	}
 
@@ -98,18 +91,8 @@ public abstract class AbstractApp<RS extends ResettableService> //
 
 	protected abstract String getFontIcon();
 
-	protected void refreshTitleAndHeader() {
-		setTitle(getTitleText());
-		if (header != null)
-			header.setText(getHeaderText());
-	}
-
-	protected abstract String getTitleText();
-
-	protected abstract String getHeaderText();
-
-	private Scene scene(VBox box) {
-		Scene scene = new Scene(box);
+	private Scene scene(VBox pane) {
+		Scene scene = new Scene(pane);
 		scene.getStylesheets().addAll("/css/base.css");
 		return scene;
 	}
@@ -121,14 +104,14 @@ public abstract class AbstractApp<RS extends ResettableService> //
 	}
 
 	protected final VBox mainVerticalPane() {
-		VBox vbox = box.forVerticals(headerPane());
+		VBox vbox = pane.vertical(headerPane());
 		vbox.getChildren().add(mainVerticalCenteredPane());
 		return vbox;
 	}
 
 	private HBox headerPane() {
 		setButtonPane();
-		HBox hBox = box.forHorizontals(header(), buttons);
+		HBox hBox = pane.horizontal(header(), buttons);
 		setHgrow(buttons, ALWAYS);
 		hBox.setPadding(new Insets(10, 10, 0, 10));
 		return hBox;
@@ -141,7 +124,7 @@ public abstract class AbstractApp<RS extends ResettableService> //
 		buttons.setAlignment(TOP_RIGHT);
 	}
 
-	protected List<AppButtonImpl> addButtons() {
+	protected List<AppButton> addButtons() {
 		return new ArrayList<>();
 	}
 
@@ -152,7 +135,7 @@ public abstract class AbstractApp<RS extends ResettableService> //
 	}
 
 	private VBox mainVerticalCenteredPane() {
-		return box.forVerticalPane(mainVerticalPaneNodes());
+		return pane.topCenteredVertical(mainVerticalPaneNodes());
 	}
 
 	protected abstract List<Node> mainVerticalPaneNodes();
@@ -174,8 +157,24 @@ public abstract class AbstractApp<RS extends ResettableService> //
 		refresh();
 	}
 
+	@Override
+	public void refresh() {
+		refreshTitleAndHeader();
+		goToDefaultFocus();
+	}
+
+	protected void refreshTitleAndHeader() {
+		setTitle(getTitleText());
+		if (header != null)
+			header.setText(getHeaderText());
+	}
+
+	protected abstract String getTitleText();
+
+	protected abstract String getHeaderText();
+
 	protected void showErrorDialog(Exception e) {
 		e.printStackTrace();
-		dialog.show(e).addParent(this).start();
+		messageDialog.show(e).addParent(this).start();
 	}
 }

@@ -1,22 +1,22 @@
 package ph.txtdis.mgdc.gsm.fx.table;
 
-import static java.util.Arrays.asList;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.mgdc.gsm.fx.dialog.SalesOrderDialog;
 import ph.txtdis.mgdc.gsm.service.GsmBookingService;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Scope("prototype")
 @Component("salesOrderTable")
 public class SalesOrderTableImpl //
-		extends AbstractBeverageBillableTable<GsmBookingService, SalesOrderDialog> implements SalesOrderTable {
+	extends AbstractBeverageBillableTable<GsmBookingService, SalesOrderDialog>
+	implements SalesOrderTable {
 
 	@Override
 	protected String bookedQtyColumnName() {
@@ -36,17 +36,17 @@ public class SalesOrderTableImpl //
 	}
 
 	@Override
-	protected String netQtyColumnName() {
-		if (service.isLoadOrder())
-			return "Variance";
-		return super.netQtyColumnName();
-	}
-
-	@Override
 	protected String returnedQtyColumnName() {
 		if (service.isLoadOrder())
 			return "Returned";
 		return netQtyColumnName();
+	}
+
+	@Override
+	protected String netQtyColumnName() {
+		if (service.isLoadOrder())
+			return "Variance";
+		return super.netQtyColumnName();
 	}
 
 	@Override

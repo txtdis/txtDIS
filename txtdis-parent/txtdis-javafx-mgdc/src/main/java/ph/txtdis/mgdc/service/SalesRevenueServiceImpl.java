@@ -1,43 +1,41 @@
 package ph.txtdis.mgdc.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.SalesRevenue;
+import ph.txtdis.excel.ExcelReportWriter;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.service.SyncService;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.SalesRevenue;
-import ph.txtdis.excel.ExcelReportWriter;
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SyncService;
-import ph.txtdis.util.ClientTypeMap;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("salesRevenueService")
-public class SalesRevenueServiceImpl implements SalesRevenueService {
+public class SalesRevenueServiceImpl
+	implements SalesRevenueService {
 
 	private static Logger logger = getLogger(SalesRevenueServiceImpl.class);
 
 	@Autowired
-	private CredentialService credentialService;
+	protected RestClientService<SalesRevenue> restClientService;
 
 	@Autowired
 	private HolidayService holidayService;
 
 	@Autowired
 	private SyncService syncService;
-
-	@Autowired
-	protected ReadOnlyService<SalesRevenue> readOnlyService;
 
 	@Autowired
 	private ExcelReportWriter excel;
@@ -56,36 +54,13 @@ public class SalesRevenueServiceImpl implements SalesRevenueService {
 	}
 
 	@Override
-	public LocalDate getEndDate() {
-		if (end == null)
-			end = yesterday();
-		return end;
-	}
-
-	private LocalDate yesterday() {
-		return holidayService.previousWorkDay(syncService.getServerDate());
+	public RestClientService<SalesRevenue> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
-	public String getHeaderName() {
-		return "Sales Revenue";
-	}
-
-	@Override
-	public ReadOnlyService<SalesRevenue> getListedReadOnlyService() {
-		return readOnlyService;
-	}
-
-	@Override
-	public String getModuleName() {
-		return "salesRevenue";
-	}
-
-	@Override
-	public LocalDate getStartDate() {
-		if (start == null)
-			start = yesterday();
-		return start;
+	public String getTitleName() {
+		return username() + "@" + modulePrefix + " Revenue: " + getSubhead();
 	}
 
 	@Override
@@ -97,8 +72,31 @@ public class SalesRevenueServiceImpl implements SalesRevenueService {
 	}
 
 	@Override
-	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " Revenue: " + getSubhead();
+	public LocalDate getStartDate() {
+		if (start == null)
+			start = yesterday();
+		return start;
+	}
+
+	@Override
+	public LocalDate getEndDate() {
+		if (end == null)
+			end = yesterday();
+		return end;
+	}
+
+	private LocalDate yesterday() {
+		return holidayService.previousWorkDay(getServerDate());
+	}
+
+	@Override
+	public void setEndDate(LocalDate d) {
+		end = d;
+	}
+
+	@Override
+	public void setStartDate(LocalDate d) {
+		start = d;
 	}
 
 	@Override
@@ -111,10 +109,16 @@ public class SalesRevenueServiceImpl implements SalesRevenueService {
 	@Override
 	public List<SalesRevenue> list() {
 		try {
-			return readOnlyService.module(getModuleName()).getList("/list?start=" + getStartDate() + "&end=" + getEndDate());
+			return restClientService.module(getModuleName())
+				.getList("/list?start=" + getStartDate() + "&end=" + getEndDate());
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	@Override
+	public String getModuleName() {
+		return "salesRevenue";
 	}
 
 	@Override
@@ -141,16 +145,12 @@ public class SalesRevenueServiceImpl implements SalesRevenueService {
 	}
 
 	private String excelName() {
-		return getHeaderName().replace(" ", ".") + "." + getSubhead().replace(" ", "").replace(":", ".").replace("-", ".to.").replace("/", "-");
+		return getHeaderName().replace(" ", ".") + "." +
+			getSubhead().replace(" ", "").replace(":", ".").replace("-", ".to.").replace("/", "-");
 	}
 
 	@Override
-	public void setEndDate(LocalDate d) {
-		end = d;
-	}
-
-	@Override
-	public void setStartDate(LocalDate d) {
-		start = d;
+	public String getHeaderName() {
+		return "Sales Revenue";
 	}
 }

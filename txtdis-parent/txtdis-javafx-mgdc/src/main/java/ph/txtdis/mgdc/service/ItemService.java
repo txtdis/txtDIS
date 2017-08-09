@@ -1,16 +1,20 @@
 package ph.txtdis.mgdc.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.QtyPerUom;
+
+import java.util.List;
 
 public interface ItemService {
 
 	String getDescription();
 
+	void setDescription(String text);
+
 	Long getId();
 
 	String getName();
+
+	void setName(String name);
 
 	String getVendorNo();
 
@@ -19,10 +23,6 @@ public interface ItemService {
 	boolean isNew();
 
 	List<QtyPerUom> listQtyPerUom();
-
-	void setDescription(String text);
-
-	void setName(String name);
 
 	void setNameIfUnique(String name) throws Exception;
 

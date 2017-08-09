@@ -1,20 +1,26 @@
 package ph.txtdis.mgdc.fx.table;
 
-import static ph.txtdis.mgdc.type.SalesVolumeReportType.ITEM;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.mgdc.type.SalesVolumeReportType;
+
+import static ph.txtdis.mgdc.type.SalesVolumeReportType.ITEM;
 
 @Scope("prototype")
 @Component("salesVolumeTable")
 public class SalesVolumeTable //
-		extends AbstractSalesVolumeTable {
+	extends AbstractSalesVolumeTable {
 
 	@Autowired
 	private SalesVolumeContextMenu menu;
+
+	@Override
+	protected void addProperties() {
+		setId(ITEM.name());
+		setTableColumnVisibility(ITEM);
+		menu.addMenu(this);
+	}
 
 	public void setTableColumnVisibility(SalesVolumeReportType t) {
 		hideGroupColumns();
@@ -46,12 +52,5 @@ public class SalesVolumeTable //
 		customerStartDate.setVisible(false);
 		prodLine.setVisible(false);
 		item.setVisible(false);
-	}
-
-	@Override
-	protected void addProperties() {
-		setId(ITEM.name());
-		setTableColumnVisibility(ITEM);
-		menu.addMenu(this);
 	}
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import ph.txtdis.dyvek.model.BillableDetail;
 
 public interface BillingService //
-		extends OrderService {
+	extends OrderService {
 
 	boolean areAssignedAndDeliverQtyDifferent();
 

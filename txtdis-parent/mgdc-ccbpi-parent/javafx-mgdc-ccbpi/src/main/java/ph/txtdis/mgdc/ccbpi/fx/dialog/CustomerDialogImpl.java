@@ -1,5 +1,6 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
+import static java.util.Arrays.asList;
 import static ph.txtdis.type.Type.TEXT;
 
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import ph.txtdis.exception.DuplicateException;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LabelFactory;
@@ -25,11 +26,8 @@ import ph.txtdis.type.Type;
 @Scope("prototype")
 @Component("customerDialog")
 public class CustomerDialogImpl //
-		extends AbstractInputDialog //
-		implements CustomerDialog {
-
-	@Autowired
-	private AppButtonImpl saveButton;
+	extends AbstractInputDialog //
+	implements CustomerDialog {
 
 	@Autowired
 	private AppCombo<String> routeCombo, deliveryCombo;
@@ -44,9 +42,6 @@ public class CustomerDialogImpl //
 	private AppGridPane grid;
 
 	@Autowired
-	private LabelFactory label;
-
-	@Autowired
 	private CokeCustomerService service;
 
 	private Customer customer;
@@ -56,12 +51,12 @@ public class CustomerDialogImpl //
 	private String name;
 
 	@Override
-	protected Button[] buttons() {
-		return new Button[] { saveButton(), closeButton() };
+	protected List<AppButton> buttons() {
+		return asList(saveButton(), closeButton());
 	}
 
-	private Button saveButton() {
-		saveButton.large("Save").build();
+	private AppButton saveButton() {
+		AppButton saveButton = button.large("Save").build();
 		saveButton.onAction(event -> save());
 		saveButton.disableIf(nameField.isEmpty());
 		return saveButton;
@@ -77,14 +72,38 @@ public class CustomerDialogImpl //
 	}
 
 	private Customer saveCustomer() throws Exception {
-		if (customer != null)
+		if (customer == null)
 			return null;
 		return service.save(customer, vendorId, nameField.getText(), routeCombo.getValue(), deliveryCombo.getValue());
 	}
 
 	private void handleError(Exception e) {
-		dialog.show(e).addParent(this).start();
+		messageDialog().show(e).addParent(this).start();
 		refresh();
+	}
+
+	@Override
+	public void refresh() {
+		idDisplay.setValue(vendorId);
+		refreshName();
+		refreshRoute();
+		customer = null;
+		super.refresh();
+	}
+
+	private void refreshName() {
+		if (name != null) {
+			nameField.setValue(name);
+			nameField.readOnly();
+		}
+		else
+			nameField.clear();
+
+	}
+
+	private void refreshRoute() {
+		if (name != null && customer != null && customer.getChannel() != null)
+			routeCombo.select(customer.getChannel().getName());
 	}
 
 	@Override
@@ -99,10 +118,10 @@ public class CustomerDialogImpl //
 
 	@Override
 	protected List<Node> nodes() {
-		return Arrays.asList(header(), grid(), buttonBox());
+		return asList(header(), grid(), buttonBox());
 	}
 
-	protected AppGridPane grid() {
+	private AppGridPane grid() {
 		grid.getChildren().clear();
 		grid.add(label.field("Vendor ID"), 0, 0);
 		grid.add(idField(), 1, 0);
@@ -127,22 +146,6 @@ public class CustomerDialogImpl //
 		return nameField;
 	}
 
-	private void validateName() {
-		try {
-			validateName(nameField.getText());
-		} catch (Exception e) {
-			dialog.show(e).addParent(this).start();
-			refresh();
-		}
-	}
-
-	private void validateName(String name) throws Exception {
-		Customer customer = service.findByName(name);
-		if (name == null && customer != null)
-			throw new DuplicateException(name);
-		this.customer = customer;
-	}
-
 	private Node routeCombo() {
 		routeCombo.items(service.listRoutes());
 		return routeCombo;
@@ -151,6 +154,21 @@ public class CustomerDialogImpl //
 	private Node deliveryCombo() {
 		deliveryCombo.items(service.listTruckRoutes());
 		return deliveryCombo;
+	}
+
+	private void validateName() {
+		try {
+			validateName(nameField.getText());
+		} catch (Exception e) {
+			messageDialog().show(e).addParent(this).start();
+			refresh();
+		}
+	}
+
+	private void validateName(String name) throws Exception {
+		Customer customer = service.findByName(name);
+		if (customer != null)
+			throw new DuplicateException(name);
 	}
 
 	@Override
@@ -170,29 +188,6 @@ public class CustomerDialogImpl //
 	public CustomerDialog outletName(String name) {
 		this.name = name;
 		return this;
-	}
-
-	@Override
-	public void refresh() {
-		idDisplay.setValue(vendorId);
-		refreshName();
-		refreshRoute();
-		customer = null;
-		super.refresh();
-	}
-
-	private void refreshName() {
-		if (name != null) {
-			nameField.setValue(name);
-			nameField.readOnly();
-		} else
-			nameField.clear();
-
-	}
-
-	private void refreshRoute() {
-		if (name != null && customer != null && customer.getChannel() != null)
-			routeCombo.select(customer.getChannel().getName());
 	}
 
 	@Override

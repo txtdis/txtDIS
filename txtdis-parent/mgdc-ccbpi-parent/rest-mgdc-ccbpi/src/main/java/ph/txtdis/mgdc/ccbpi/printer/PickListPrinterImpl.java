@@ -26,8 +26,8 @@ import ph.txtdis.util.NumberUtils;
 
 @Component("pickListPrinter")
 public class PickListPrinterImpl //
-		extends AbstractPickListPrinter //
-		implements QtyInFraction {
+	extends AbstractPickListPrinter //
+	implements QtyInFraction {
 
 	private static Logger logger = getLogger(PickListPrinterImpl.class);
 

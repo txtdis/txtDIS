@@ -7,7 +7,7 @@ import ph.txtdis.dyvek.service.ClientBillAssignmentService;
 
 @Scope("prototype")
 @Component("salesAssignedDeliveryListApp")
-public class SalesAssignedDeliveryListAppImpl //
-		extends AbstractAssignedDeliveryListApp<ClientBillAssignmentService> //
-		implements SalesAssignedDeliveryListApp {
+public class SalesAssignedDeliveryListAppImpl
+	extends AbstractAssignedDeliveryListApp<ClientBillAssignmentService>
+	implements SalesAssignedDeliveryListApp {
 }

@@ -17,11 +17,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.control.PasswordInput;
-import ph.txtdis.fx.pane.AppBoxPaneFactory;
+import ph.txtdis.fx.pane.PaneFactory;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.service.LoginService;
 import ph.txtdis.service.RestServerService;
@@ -30,19 +30,20 @@ import ph.txtdis.util.FontIcon;
 
 @Scope("prototype")
 @Component("loginDialog")
-public class LoginDialog extends Stage {
+public class LoginDialog
+	extends Stage {
 
 	private static final String STYLE = "-fx-font-size: 11pt; -fx-base: #6a5acd; -fx-accent: -fx-base;"
-			+ " -fx-focus-color: white; -fx-faint-focus-color: #ffffff22; ";
+		+ " -fx-focus-color: white; -fx-faint-focus-color: #ffffff22; ";
 
 	@Autowired
-	private AppBoxPaneFactory box;
+	private PaneFactory pane;
 
 	@Autowired
 	private AppGridPane grid;
 
 	@Autowired
-	private AppButtonImpl loginButton, passwordButton, serverButton;
+	private AppButton loginButton, passwordButton, serverButton;
 
 	@Autowired
 	private AppFieldImpl<String> userField;
@@ -85,26 +86,11 @@ public class LoginDialog extends Stage {
 		super.showAndWait();
 	}
 
-	private Node buttons() {
-		HBox hb = box.forHorizontals(loginButton(), passwordButton(), serverButton());
-		hb.setAlignment(Pos.CENTER);
-		return hb;
-	}
-
-	private void changePassword() {
-		passwordDialog.updateStyle(STYLE).addParent(this).start();
-	}
-
-	private void changePasswordIfAuthenticated() throws Exception {
-		validate();
-		changePassword();
-		clearFields();
-	}
-
-	private void changeServer() {
-		serverDialog.updateStyle(STYLE).addParent(this).start();
+	private void setScene() {
+		getIcons().add(new FontIcon("\ue945"));
 		setTitle();
-		clearFields();
+		initModality(Modality.APPLICATION_MODAL);
+		setScene(scene());
 	}
 
 	private void clearFields() {
@@ -113,9 +99,16 @@ public class LoginDialog extends Stage {
 		userField.requestFocus();
 	}
 
-	private void closeOnError(Exception e) {
-		dialog.show(e).updateStyle(STYLE).addParent(this).start();
-		Platform.exit();
+	private void setTitle() {
+		setTitle("Welcome to txtDIS@" + serverService.getLocation() + "!");
+	}
+
+	private Scene scene() {
+		VBox vb = pane.vertical(gridPane(), buttons());
+		vb.setAlignment(Pos.CENTER);
+		vb.setPadding(new Insets(20));
+		vb.setStyle(STYLE);
+		return new Scene(vb);
 	}
 
 	private Node gridPane() {
@@ -127,16 +120,22 @@ public class LoginDialog extends Stage {
 		return grid;
 	}
 
+	private Node buttons() {
+		HBox hb = pane.horizontal(loginButton(), passwordButton(), serverButton());
+		hb.setAlignment(Pos.CENTER);
+		return hb;
+	}
+
+	private Node passwordField() {
+		passwordField.disableProperty().bind(userField.isEmpty());
+		return passwordField;
+	}
+
 	private Node loginButton() {
 		loginButton.text("Log-in").build();
 		loginButton.disableIf(passwordField.isEmpty());
 		loginButton.onAction(event -> tryLoggingInUponVerification());
 		return loginButton;
-	}
-
-	private void logInIfAuthenticated() throws Exception {
-		validate();
-		validateVersionIsLatest_AndServerAndClientDatesAreInSync();
 	}
 
 	private Node passwordButton() {
@@ -146,34 +145,18 @@ public class LoginDialog extends Stage {
 		return passwordButton;
 	}
 
-	private Node passwordField() {
-		passwordField.disableProperty().bind(userField.isEmpty());
-		return passwordField;
-	}
-
-	private Scene scene() {
-		VBox vb = box.forVerticals(gridPane(), buttons());
-		vb.setAlignment(Pos.CENTER);
-		vb.setPadding(new Insets(20));
-		vb.setStyle(STYLE);
-		return new Scene(vb);
-	}
-
 	private Node serverButton() {
 		serverButton.text("Change Server").build();
 		serverButton.onAction(event -> changeServer());
 		return serverButton;
 	}
 
-	private void setScene() {
-		getIcons().add(new FontIcon("\ue945"));
-		setTitle();
-		initModality(Modality.APPLICATION_MODAL);
-		setScene(scene());
-	}
-
-	private void setTitle() {
-		setTitle("Welcome to txtDIS@" + serverService.getLocation() + "!");
+	private void tryLoggingInUponVerification() {
+		try {
+			logInIfAuthenticated();
+		} catch (Exception e) {
+			closeOnError(e);
+		}
 	}
 
 	private void tryChangingPasswordUponVerification() {
@@ -184,12 +167,26 @@ public class LoginDialog extends Stage {
 		}
 	}
 
-	private void tryLoggingInUponVerification() {
-		try {
-			logInIfAuthenticated();
-		} catch (Exception e) {
-			closeOnError(e);
-		}
+	private void changeServer() {
+		serverDialog.updateStyle(STYLE).addParent(this).start();
+		setTitle();
+		clearFields();
+	}
+
+	private void logInIfAuthenticated() throws Exception {
+		validate();
+		validateVersionIsLatest_AndServerAndClientDatesAreInSync();
+	}
+
+	private void closeOnError(Exception e) {
+		dialog.show(e).updateStyle(STYLE).addParent(this).start();
+		Platform.exit();
+	}
+
+	private void changePasswordIfAuthenticated() throws Exception {
+		validate();
+		changePassword();
+		clearFields();
 	}
 
 	private void validate() throws Exception {
@@ -205,5 +202,9 @@ public class LoginDialog extends Stage {
 		} catch (Exception e) {
 			closeOnError(e);
 		}
+	}
+
+	private void changePassword() {
+		passwordDialog.updateStyle(STYLE).addParent(this).start();
 	}
 }

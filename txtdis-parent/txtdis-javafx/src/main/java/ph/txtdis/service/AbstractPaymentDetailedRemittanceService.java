@@ -1,14 +1,14 @@
 package ph.txtdis.service;
 
+import ph.txtdis.dto.RemittanceDetail;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import ph.txtdis.dto.RemittanceDetail;
-
-public abstract class AbstractPaymentDetailedRemittanceService //
-		extends AbstractRemittanceService //
-		implements PaymentDetailedRemittanceService {
+public abstract class AbstractPaymentDetailedRemittanceService
+	extends AbstractRemittanceService
+	implements PaymentDetailedRemittanceService {
 
 	private BigDecimal remaining;
 

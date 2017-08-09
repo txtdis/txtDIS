@@ -1,16 +1,8 @@
 package ph.txtdis.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.domain.EdmsInvoice;
 import ph.txtdis.domain.EdmsRemittance;
 import ph.txtdis.dto.Billable;
@@ -19,9 +11,16 @@ import ph.txtdis.dto.RemittanceDetail;
 import ph.txtdis.repository.EdmsRemittanceRepository;
 import ph.txtdis.util.Code;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 @Service("remittanceService")
 public class EdmsRemittanceServiceImpl //
-		implements EdmsRemittanceService {
+	implements EdmsRemittanceService {
 
 	@Autowired
 	private EdmsRemittanceRepository edmsRemittanceRepository;
@@ -138,15 +137,11 @@ public class EdmsRemittanceServiceImpl //
 			return i.getTotalValue();
 		BigDecimal paymentDue = i.getTotalValue();
 		BigDecimal totalPayment = l.stream()//
-				.filter(r -> isValid(r))//
-				.map(r -> sumPayment(r))//
-				.reduce(BigDecimal.ZERO, BigDecimal::add);
+			.filter(r -> isValid(r))//
+			.map(r -> sumPayment(r))//
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
 		BigDecimal balance = paymentDue.subtract(totalPayment);
 		return isFullyPaid(balance) ? BigDecimal.ZERO : balance;
-	}
-
-	private Boolean isFullyPaid(BigDecimal balance) {
-		return balance == null ? null : balance.compareTo(BigDecimal.ZERO) <= 0;
 	}
 
 	private boolean isValid(EdmsRemittance e) {
@@ -173,24 +168,28 @@ public class EdmsRemittanceServiceImpl //
 		return isFullyPaid(b.getUnpaidValue());
 	}
 
+	private Boolean isFullyPaid(BigDecimal balance) {
+		return balance == null ? null : balance.compareTo(BigDecimal.ZERO) <= 0;
+	}
+
 	@Override
 	public List<Remittance> list() {
 		return StreamSupport.stream(edmsRemittanceRepository.findAll().spliterator(), false)//
-				.collect(Collectors.groupingBy(EdmsRemittance::getReferenceNo))//
-				.entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey()))//
-				.map(i -> convert(i)).filter(r -> r != null).collect(Collectors.toList());
+			.collect(Collectors.groupingBy(EdmsRemittance::getReferenceNo))//
+			.entrySet().stream().sorted((a, b) -> a.getKey().compareTo(b.getKey()))//
+			.map(i -> convert(i)).filter(r -> r != null).collect(Collectors.toList());
 	}
 
 	private Remittance convert(Entry<String, List<EdmsRemittance>> l) {
 		List<EdmsRemittance> remittances = l.getValue().stream()//
-				.filter(r -> isValid(r))//
-				.collect(Collectors.toList());
+			.filter(r -> isValid(r))//
+			.collect(Collectors.toList());
 		if (remittances == null || remittances.isEmpty())
 			return null;
 		EdmsRemittance e = remittances.get(0);
 		Remittance r = new Remittance();
 		r.setCheckId(toChequeId(e));
-		r.setCollector(toCollector(e));
+		r.setReceivedFrom(toCollector(e));
 		r.setDraweeBank(getBank(e));
 		r.setPaymentDate(toPaymentDate(e));
 		r.setValue(sumPayments(remittances));
@@ -243,9 +242,9 @@ public class EdmsRemittanceServiceImpl //
 
 	private List<RemittanceDetail> toDetails(List<EdmsRemittance> l) {
 		return l == null ? null
-				: l.stream().map(i -> convert(i))//
-						.filter(d -> d.getPaymentValue().compareTo(BigDecimal.ZERO) > 0)//
-						.collect(Collectors.toList());
+			: l.stream().map(i -> convert(i))//
+			.filter(d -> d.getPaymentValue().compareTo(BigDecimal.ZERO) > 0)//
+			.collect(Collectors.toList());
 	}
 
 	private RemittanceDetail convert(EdmsRemittance e) {

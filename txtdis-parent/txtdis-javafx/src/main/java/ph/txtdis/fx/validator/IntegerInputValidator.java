@@ -5,7 +5,7 @@ import javafx.beans.value.ObservableValue;
 import ph.txtdis.fx.control.AppFieldImpl;
 
 public class IntegerInputValidator //
-		implements ChangeListener<String> {
+	implements ChangeListener<String> {
 
 	private boolean ignore;
 
@@ -26,7 +26,8 @@ public class IntegerInputValidator //
 			ignore = true;
 			input.setText(oldValue);
 			ignore = false;
-		} else if (newValue.length() > 11) {
+		}
+		else if (newValue.length() > 11) {
 			ignore = true;
 			input.setText(newValue.substring(0, 11));
 			ignore = false;

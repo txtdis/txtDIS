@@ -1,19 +1,18 @@
 package ph.txtdis.dyvek.app;
 
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
 import ph.txtdis.app.AbstractApp;
 import ph.txtdis.dyvek.service.TruckLogService;
 
+import java.util.List;
+
 @Scope("prototype")
 @Component("truckLogApp")
-public class TruckLogAppImpl //
-		extends AbstractApp<TruckLogService>//
-		implements TruckLogApp {
+public class TruckLogAppImpl
+	extends AbstractApp<TruckLogService>
+	implements TruckLogApp {
 
 	@Override
 	public void goToDefaultFocus() {

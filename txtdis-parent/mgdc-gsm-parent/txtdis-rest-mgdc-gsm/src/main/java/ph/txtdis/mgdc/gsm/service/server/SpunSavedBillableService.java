@@ -1,13 +1,13 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.math.BigDecimal;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.service.server.SpunSavedReferencedKeyedService;
 
+import java.math.BigDecimal;
+
 public interface SpunSavedBillableService //
-		extends SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
+	extends SpunSavedReferencedKeyedService<BillableEntity, Billable, Long> {
 
 	Billable toBookingIdOnlyBillable(BillableEntity e);
 

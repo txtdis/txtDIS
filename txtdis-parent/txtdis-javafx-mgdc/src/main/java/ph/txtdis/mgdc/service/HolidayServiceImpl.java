@@ -1,34 +1,28 @@
 package ph.txtdis.mgdc.service;
 
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.Holiday;
+import ph.txtdis.exception.DuplicateException;
+import ph.txtdis.info.Information;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.service.SyncService;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.Holiday;
-import ph.txtdis.exception.DuplicateException;
-import ph.txtdis.info.Information;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.service.SyncService;
-import ph.txtdis.util.ClientTypeMap;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("holidayService")
-public class HolidayServiceImpl implements HolidayService {
+public class HolidayServiceImpl
+	implements HolidayService {
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<Holiday> readOnlyService;
-
-	@Autowired
-	private SavingService<Holiday> savingService;
+	private RestClientService<Holiday> restClientService;
 
 	@Autowired
 	private SyncService syncService;
@@ -40,23 +34,33 @@ public class HolidayServiceImpl implements HolidayService {
 	private String modulePrefix;
 
 	@Override
-	public String getModuleName() {
-		return "holiday";
-	}
-
-	@Override
-	public ReadOnlyService<Holiday> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<Holiday> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + HolidayService.super.getTitleName();
+		return username() + "@" + modulePrefix + " " + HolidayService.super.getTitleName();
 	}
 
 	@Override
 	public ClientTypeMap getTypeMap() {
 		return typeMap;
+	}
+
+	@Override
+	public LocalDate previousWorkDay(LocalDate date) {
+		do {
+			date = todayIfNull(date);
+			date = date.minusDays(1L);
+		} while (date.getDayOfWeek() == DayOfWeek.SUNDAY || isAHoliday(date));
+		return date;
+	}
+
+	private LocalDate todayIfNull(LocalDate date) {
+		if (date == null)
+			date = getServerDate();
+		return date;
 	}
 
 	@Override
@@ -71,22 +75,16 @@ public class HolidayServiceImpl implements HolidayService {
 	}
 
 	private Holiday holiday(LocalDate d) throws Exception {
-		return readOnlyService.module(getModuleName()).getOne("/find?date=" + d);
+		return holidayService().getOne("/find?date=" + d);
+	}
+
+	private RestClientService<Holiday> holidayService() {
+		return restClientService.module(getModuleName());
 	}
 
 	@Override
-	public LocalDate previousWorkDay(LocalDate date) {
-		do {
-			date = todayIfNull(date);
-			date = date.minusDays(1L);
-		} while (date.getDayOfWeek() == DayOfWeek.SUNDAY || isAHoliday(date));
-		return date;
-	}
-
-	private LocalDate todayIfNull(LocalDate date) {
-		if (date == null)
-			date = syncService.getServerDate();
-		return date;
+	public String getModuleName() {
+		return "holiday";
 	}
 
 	@Override
@@ -107,7 +105,7 @@ public class HolidayServiceImpl implements HolidayService {
 		Holiday h = new Holiday();
 		h.setDeclaredDate(date);
 		h.setName(name);
-		return savingService.module(getModuleName()).save(h);
+		return holidayService().save(h);
 	}
 
 	@Override

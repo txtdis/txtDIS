@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 @Component("stockTakeApp")
 public class StockTakeAppImpl //
-		extends AbstractStockTakeApp {
+	extends AbstractStockTakeApp {
 }

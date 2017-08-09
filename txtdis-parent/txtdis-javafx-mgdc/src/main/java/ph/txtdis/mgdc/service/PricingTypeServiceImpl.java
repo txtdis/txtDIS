@@ -1,34 +1,27 @@
 package ph.txtdis.mgdc.service;
 
-import static java.util.stream.Collectors.toList;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.PricingType;
 import ph.txtdis.info.Information;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.util.ClientTypeMap;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.util.UserUtils.username;
+
 @Service("pricingTypeService")
-public class PricingTypeServiceImpl implements PricingTypeService {
-
-	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<PricingType> readOnlyService;
-
-	@Autowired
-	private SavingService<PricingType> savingService;
+public class PricingTypeServiceImpl
+	implements PricingTypeService {
 
 	@Autowired
 	public ClientTypeMap typeMap;
+
+	@Autowired
+	private RestClientService<PricingType> restClientService;
 
 	@Value("${prefix.module}")
 	private String modulePrefix;
@@ -39,23 +32,23 @@ public class PricingTypeServiceImpl implements PricingTypeService {
 	}
 
 	@Override
-	public String getHeaderName() {
-		return "Pricing Type";
+	public RestClientService<PricingType> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
-	public String getModuleName() {
-		return "pricingType";
-	}
-
-	@Override
-	public ReadOnlyService<PricingType> getListedReadOnlyService() {
-		return readOnlyService;
+	public RestClientService<PricingType> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + getHeaderName();
+		return username() + "@" + modulePrefix + " " + getHeaderName();
+	}
+
+	@Override
+	public String getHeaderName() {
+		return "Pricing Type";
 	}
 
 	@Override
@@ -75,6 +68,11 @@ public class PricingTypeServiceImpl implements PricingTypeService {
 	public PricingType save(String name) throws Information, Exception {
 		PricingType entity = new PricingType();
 		entity.setName(name);
-		return savingService.module(getModuleName()).save(entity);
+		return restClientService.module(getModuleName()).save(entity);
+	}
+
+	@Override
+	public String getModuleName() {
+		return "pricingType";
 	}
 }

@@ -1,12 +1,11 @@
 package ph.txtdis.mgdc.gsm.printer;
 
-import static org.apache.commons.lang3.StringUtils.leftPad;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.Fraction;
-
 import ph.txtdis.mgdc.gsm.domain.ItemEntity;
 import ph.txtdis.mgdc.gsm.service.server.ItemService;
+
+import static org.apache.commons.lang3.StringUtils.leftPad;
 
 public interface QtyInFraction {
 

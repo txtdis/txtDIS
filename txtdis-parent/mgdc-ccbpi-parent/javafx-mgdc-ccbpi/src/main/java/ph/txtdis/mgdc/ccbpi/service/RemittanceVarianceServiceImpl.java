@@ -17,8 +17,8 @@ import ph.txtdis.type.BeverageType;
 
 @Service("remittanceVarianceService")
 public class RemittanceVarianceServiceImpl //
-		extends AbstractSalesItemVarianceService //
-		implements RemittanceVarianceService {
+	extends AbstractSalesItemVarianceService //
+	implements RemittanceVarianceService {
 
 	private static Logger logger = getLogger(RemittanceVarianceServiceImpl.class);
 
@@ -46,13 +46,14 @@ public class RemittanceVarianceServiceImpl //
 		collector = "ALL";
 	}
 
-	private String collector() {
-		return collector.equals("ALL") ? "" : collector;
-	}
-
 	@Override
 	public String getCollector() {
 		return collector;
+	}
+
+	@Override
+	public void setCollector(String name) {
+		collector = name;
 	}
 
 	@Override
@@ -85,9 +86,8 @@ public class RemittanceVarianceServiceImpl //
 		return loadOutValue = orderConfirmationService.getDeliveredValue(collector(), getStartDate(), getEndDate());
 	}
 
-	@Override
-	public String getModuleName() {
-		return "remittanceVariance";
+	private String collector() {
+		return collector.equals("ALL") ? "" : collector;
 	}
 
 	@Override
@@ -102,7 +102,8 @@ public class RemittanceVarianceServiceImpl //
 
 	@Override
 	public BigDecimal getReturnedValue() {
-		return returnedValue = itemVariances.stream().map(v -> v.getReturnedValue()).reduce(BigDecimal.ZERO, BigDecimal::add);
+		return returnedValue =
+			itemVariances.stream().map(v -> v.getReturnedValue()).reduce(BigDecimal.ZERO, BigDecimal::add);
 	}
 
 	@Override
@@ -121,14 +122,25 @@ public class RemittanceVarianceServiceImpl //
 
 	@Override
 	protected BigDecimal returnedQty(List<SalesItemVariance> l) {
-		return l.stream().filter(v -> isFullGoods(v)).map(SalesItemVariance::getReturnedQty).reduce(ZERO, BigDecimal::add);
+		return l.stream().filter(v -> isFullGoods(v)).map(SalesItemVariance::getReturnedQty)
+			.reduce(ZERO, BigDecimal::add);
+	}
+
+	@Override
+	protected BigDecimal varianceQty(List<SalesItemVariance> l) {
+		return bookedQty(l).subtract(returnedQty(l));
+	}
+
+	@Override
+	protected BigDecimal value(List<SalesItemVariance> l) {
+		return total(l, SalesItemVariance::getReturnedValue);
 	}
 
 	private boolean isFullGoods(SalesItemVariance v) {
 		try {
 			return itemService.findByName(v.getItem()) //
-					.getFamily().getName() //
-					.equalsIgnoreCase(BeverageType.FULL_GOODS.toString());
+				.getFamily().getName() //
+				.equalsIgnoreCase(BeverageType.FULL_GOODS.toString());
 		} catch (Exception e) {
 			return false;
 		}
@@ -137,26 +149,16 @@ public class RemittanceVarianceServiceImpl //
 	@Override
 	public List<SalesItemVariance> list() {
 		try {
-			String endPt = "/list?collector=" + collector() + "&start=" + getStartDate() + "&end=" + getEndDate();
+			String endPt = "/list?receivedFrom=" + collector() + "&start=" + getStartDate() + "&end=" + getEndDate();
 			logger.info("\n    endPoint = " + endPt);
-			return itemVariances = getListedReadOnlyService().module(getModuleName()).getList(endPt);
+			return itemVariances = getRestClientServiceForLists().module(getModuleName()).getList(endPt);
 		} catch (Exception e) {
 			return emptyList();
 		}
 	}
 
 	@Override
-	public void setCollector(String name) {
-		collector = name;
-	}
-
-	@Override
-	protected BigDecimal value(List<SalesItemVariance> l) {
-		return total(l, SalesItemVariance::getReturnedValue);
-	}
-
-	@Override
-	protected BigDecimal varianceQty(List<SalesItemVariance> l) {
-		return bookedQty(l).subtract(returnedQty(l));
+	public String getModuleName() {
+		return "remittanceVariance";
 	}
 }

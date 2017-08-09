@@ -51,6 +51,27 @@ public class TextAreaDisplay {
 		return textArea;
 	}
 
+	private void changeEditProperties() {
+		if (textArea.editableProperty().get())
+			setEditableProperties();
+	}
+
+	private void setEditableProperties() {
+		textArea.setFocusTraversable(true);
+		textArea.addEventFilter(KEY_PRESSED, e -> traverseOnPressedEnterKey(e));
+		textArea.textProperty().addListener((text, oldText, newText) -> toUpperCase(newText));
+	}
+
+	private void traverseOnPressedEnterKey(KeyEvent e) {
+		if (e.getCode() == ENTER)
+			((TextAreaSkin) textArea.getSkin()).getBehavior().traverseNext();
+	}
+
+	private void toUpperCase(String text) {
+		if (text != null)
+			textArea.setText(text.toUpperCase());
+	}
+
 	public BooleanBinding doesNotContain(String text) {
 		boolean b = textArea.textProperty().getValue().contains(text);
 		return new SimpleBooleanProperty(b).not();
@@ -68,29 +89,8 @@ public class TextAreaDisplay {
 		return this;
 	}
 
-	private void setEditableProperties() {
-		textArea.setFocusTraversable(true);
-		textArea.addEventFilter(KEY_PRESSED, e -> traverseOnPressedEnterKey(e));
-		textArea.textProperty().addListener((text, oldText, newText) -> toUpperCase(newText));
-	}
-
 	public void requestFocus() {
 		textArea.requestFocus();
-	}
-
-	private void changeEditProperties() {
-		if (textArea.editableProperty().get())
-			setEditableProperties();
-	}
-
-	private void traverseOnPressedEnterKey(KeyEvent e) {
-		if (e.getCode() == ENTER)
-			((TextAreaSkin) textArea.getSkin()).getBehavior().traverseNext();
-	}
-
-	private void toUpperCase(String text) {
-		if (text != null)
-			textArea.setText(text.toUpperCase());
 	}
 
 	public ScrollPane get() {
@@ -101,32 +101,32 @@ public class TextAreaDisplay {
 		return textArea.textProperty().get();
 	}
 
-	public BooleanBinding is(String text) {
-		return textArea.textProperty().isEqualTo(text.trim());
+	public void setValue(String value) {
+		textArea.setText(value);
 	}
 
 	public BooleanProperty isEditable() {
 		return textArea.editableProperty();
 	}
 
-	public BooleanBinding isEmpty() {
-		return textArea.textProperty().isEmpty();
-	}
-
 	public BooleanBinding isNot(String text) {
 		return is(text).not();
+	}
+
+	public BooleanBinding is(String text) {
+		return textArea.textProperty().isEqualTo(text.trim());
 	}
 
 	public BooleanBinding isNotEmpty() {
 		return isEmpty().not();
 	}
 
-	public void onAction(EventHandler<InputMethodEvent> e) {
-		textArea.setOnInputMethodTextChanged(e);
+	public BooleanBinding isEmpty() {
+		return textArea.textProperty().isEmpty();
 	}
 
-	public void setValue(String value) {
-		textArea.setText(value);
+	public void onAction(EventHandler<InputMethodEvent> e) {
+		textArea.setOnInputMethodTextChanged(e);
 	}
 
 	public TextAreaDisplay width(int width) {

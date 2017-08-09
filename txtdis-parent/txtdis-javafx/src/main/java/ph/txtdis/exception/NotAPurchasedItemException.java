@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class NotAPurchasedItemException extends Exception {
+public class NotAPurchasedItemException
+	extends Exception {
 
 	private static final long serialVersionUID = 710144457878059025L;
 

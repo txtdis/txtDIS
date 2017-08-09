@@ -18,10 +18,12 @@ import ph.txtdis.type.Type;
 
 @Component
 @Scope("prototype")
-public class LabeledField<T> implements InputControl<T>, InputNode<T> {
+public class LabeledField<T>
+	implements InputControl<T>,
+	InputNode<T> {
 
 	@Autowired
-	private AppButtonImpl searchButton;
+	private AppButton searchButton;
 
 	@Autowired
 	private AppFieldImpl<T> textField;
@@ -40,9 +42,18 @@ public class LabeledField<T> implements InputControl<T>, InputNode<T> {
 		return this;
 	}
 
-	@Override
-	public void clear() {
-		textField.clear();
+	private Node searchableField(Type type) {
+		return new HBox(textField(type), searchButton());
+	}
+
+	private AppFieldImpl<T> textField(Type type) {
+		return textField.build(type);
+	}
+
+	private AppButton searchButton() {
+		searchButton.fontSize(16).icon("search").build();
+		searchButton.focusTraversableProperty().set(false);
+		return searchButton;
 	}
 
 	public void disableIf(ObservableBooleanValue b) {
@@ -57,6 +68,11 @@ public class LabeledField<T> implements InputControl<T>, InputNode<T> {
 	@Override
 	public T getValue() {
 		return textField.getValue();
+	}
+
+	@Override
+	public void setValue(T value) {
+		textField.setValue(value);
 	}
 
 	@Override
@@ -89,6 +105,11 @@ public class LabeledField<T> implements InputControl<T>, InputNode<T> {
 		clear();
 	}
 
+	@Override
+	public void clear() {
+		textField.clear();
+	}
+
 	public void onAction(EventHandler<ActionEvent> e) {
 		textField.setOnAction(e);
 	}
@@ -97,27 +118,8 @@ public class LabeledField<T> implements InputControl<T>, InputNode<T> {
 		searchButton.onAction(e);
 	}
 
-	@Override
-	public void setValue(T value) {
-		textField.setValue(value);
-	}
-
 	public LabeledField<T> width(int width) {
 		textField.width(width);
 		return this;
-	}
-
-	private Node searchableField(Type type) {
-		return new HBox(textField(type), searchButton());
-	}
-
-	private AppButtonImpl searchButton() {
-		searchButton.fontSize(16).icon("search").build();
-		searchButton.focusTraversableProperty().set(false);
-		return searchButton;
-	}
-
-	private AppFieldImpl<T> textField(Type type) {
-		return textField.build(type);
 	}
 }

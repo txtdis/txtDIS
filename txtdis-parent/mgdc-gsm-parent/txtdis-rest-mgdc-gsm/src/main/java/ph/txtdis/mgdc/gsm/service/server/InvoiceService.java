@@ -1,12 +1,14 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 
+import java.util.List;
+
 public interface InvoiceService //
-		extends ExTruckBillingService, ImportedBillingService, InvoiceInvalidationService {
+	extends ExTruckBillingService,
+	ImportedBillingService,
+	InvoiceInvalidationService {
 
 	List<Billable> findAllBilledButUnpicked();
 

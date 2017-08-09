@@ -1,28 +1,14 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.DATE;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-import static ph.txtdis.type.Type.TIMESTAMP;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.app.BillableApp;
 import ph.txtdis.dto.Billable;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.pane.AppGridPane;
@@ -31,19 +17,28 @@ import ph.txtdis.mgdc.ccbpi.fx.pane.CustomerBox;
 import ph.txtdis.mgdc.ccbpi.service.BillableService;
 import ph.txtdis.mgdc.fx.table.BillableTable;
 
-public abstract class AbstractBillableApp< //
-		BS extends BillableService, //
-		BT extends BillableTable, //
-		PK> //
-		extends AbstractDecisionNeededApp<BS, Billable, Long, PK> //
-		implements BillableApp {
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
+
+public abstract class AbstractBillableApp<
+	BS extends BillableService,
+	BT extends BillableTable,
+	PK>
+	extends AbstractDecisionNeededApp<BS, Billable, Long, PK>
+	implements BillableApp {
 
 	protected static final String PROMPT = "Select date whose first entry will opened";
 
 	protected static final String ON = "on";
 
 	@Autowired
-	protected AppButtonImpl invalidateButton;
+	protected AppButton invalidateButton;
 
 	@Autowired
 	protected AppCombo<String> paymentCombo;
@@ -58,11 +53,13 @@ public abstract class AbstractBillableApp< //
 	protected AppFieldImpl<Long> receivingIdDisplay, referenceIdInput;
 
 	@Autowired
-	protected AppFieldImpl<String> customerAddressDisplay, afterReceivingActionByDisplay, billedByDisplay, orderNoDisplay, printedByDisplay,
-			receivedByDisplay;
+	protected AppFieldImpl<String> customerAddressDisplay, afterReceivingActionByDisplay, billedByDisplay,
+		orderNoDisplay, printedByDisplay,
+		receivedByDisplay;
 
 	@Autowired
-	protected AppFieldImpl<ZonedDateTime> afterReceivingActionOnDisplay, billedOnDisplay, printedOnDisplay, receivedOnDisplay;
+	protected AppFieldImpl<ZonedDateTime> afterReceivingActionOnDisplay, billedOnDisplay, printedOnDisplay,
+		receivedOnDisplay;
 
 	@Autowired
 	protected CustomerBox customerBox;
@@ -74,6 +71,23 @@ public abstract class AbstractBillableApp< //
 	protected void buildButttons() {
 		super.buildButttons();
 		invalidateButton.icon("deactivate").tooltip("Invalidate...").build();
+	}
+
+	@Override
+	protected void clear() {
+		super.clear();
+		table.removeListener();
+	}
+
+	@Override
+	protected String createdByLabelName() {
+		return "Booked by";
+	}
+
+	@Override
+	protected List<Node> mainVerticalPaneNodes() {
+		buildFields();
+		return asList(gridPane(), tablePane());
 	}
 
 	@Override
@@ -99,29 +113,16 @@ public abstract class AbstractBillableApp< //
 		vatDisplay.readOnly().build(CURRENCY);
 	}
 
-	@Override
-	protected void clear() {
-		super.clear();
-		table.removeListener();
-	}
-
-	@Override
-	protected String createdByLabelName() {
-		return "Booked by";
-	}
-
-	@Override
-	protected List<Node> mainVerticalPaneNodes() {
-		buildFields();
-		return asList(gridPane(), tablePane());
-	}
-
 	protected AppGridPane gridPane() {
 		gridPane.getChildren().clear();
 		topGridLine();
 		secondGridLine();
 		addressAndOrRemarksGridLine();
 		return gridPane;
+	}
+
+	protected HBox tablePane() {
+		return pane.centeredHorizontal(table.build());
 	}
 
 	protected abstract void topGridLine();
@@ -138,10 +139,6 @@ public abstract class AbstractBillableApp< //
 		gridPane.add(customerAddressDisplay, 1, lineId, columnSpan, 1);
 	}
 
-	protected HBox tablePane() {
-		return box.forHorizontalPane(table.build());
-	}
-
 	protected void customerWithDueDateGridLine() {
 		dueDateGridNodes(1);
 		customerGridNodes(1);
@@ -152,13 +149,13 @@ public abstract class AbstractBillableApp< //
 		gridPane.add(dueDateNode(), 1, row);
 	}
 
-	protected Node dueDateNode() {
-		return dueDateDisplay;
-	}
-
 	protected void customerGridNodes(int row) {
 		gridPane.add(customerLabel(), 2, row, 2, 1);
 		gridPane.add(customerBox(), 4, row, 8, 1);
+	}
+
+	protected Node dueDateNode() {
+		return dueDateDisplay;
 	}
 
 	private Label customerLabel() {
@@ -231,6 +228,10 @@ public abstract class AbstractBillableApp< //
 		table.items(service.getDetails());
 	}
 
+	protected void refreshSummaryPane() {
+		totalDisplay.setValue(service.getTotalValue());
+	}
+
 	@Override
 	protected void setBindings() {
 		setBooleanProperties();
@@ -248,29 +249,29 @@ public abstract class AbstractBillableApp< //
 		setSaveButtonBinding();
 	}
 
-	protected void setSaveButtonBinding() {
-		saveButton.disableIf(saveButtonDisableBinding());
-	}
-
-	protected ObservableBooleanValue saveButtonDisableBinding() {
-		return isPosted() //
-				.or(table.isEmpty());
-	}
-
 	@Override
 	protected void setInputFieldBindings() {
 		orderDateBinding();
 		setReferenceIdBindings();
-		remarksDisplay.editableIf(isNew() //
-				.and(customerBox.isEmpty().not()));
+		remarksDisplay.editableIf(isNew()
+			.and(customerBox.isEmpty().not()));
+	}
+
+	protected void setTableBindings() {
+		table.disableIf(customerBox.isEmpty());
+	}
+
+	protected void setSaveButtonBinding() {
+		saveButton.disableIf(saveButtonDisableBinding());
 	}
 
 	protected void setReferenceIdBindings() {
 		referenceIdInput.disableIf(isPosted());
 	}
 
-	protected void setTableBindings() {
-		table.disableIf(customerBox.isEmpty());
+	protected ObservableBooleanValue saveButtonDisableBinding() {
+		return isPosted()
+			.or(table.isEmpty());
 	}
 
 	@Override
@@ -289,34 +290,20 @@ public abstract class AbstractBillableApp< //
 		refreshSummaryPane();
 	}
 
-	protected void refreshSummaryPane() {
-		totalDisplay.setValue(service.getTotalValue());
-	}
-
 	protected HBox actionAfterReceivingPane(String prompt) {
-		return box.forHorizontalPane(actionAfterReceivingNodes(prompt));
+		return pane.centeredHorizontal(actionAfterReceivingNodes(prompt));
 	}
 
 	protected List<Control> actionAfterReceivingNodes(String prompt) {
-		return asList(//
-				label.name(prompt + " by"), afterReceivingActionByDisplay, //
-				label.name(ON), afterReceivingActionOnDisplay);
-	}
-
-	protected List<Node> vatNodes() {
-		return asList(//
-				label.name("VATable"), vatableDisplay, //
-				label.name("VAT"), vatDisplay);
-	}
-
-	protected List<Node> totalNodes() {
-		return asList(label.name("Total"), totalDisplay);
+		return asList(
+			label.name(prompt + " by"), afterReceivingActionByDisplay,
+			label.name(ON), afterReceivingActionOnDisplay);
 	}
 
 	protected List<Node> billingNodes(String prompt) {
-		return asList( //
-				label.name(prompt + " by"), billedByDisplay, //
-				label.name(ON), billedOnDisplay);
+		return asList(
+			label.name(prompt + " by"), billedByDisplay,
+			label.name(ON), billedOnDisplay);
 	}
 
 	protected void customerWithoutDueDateGridLine(int row, int columnSpan) {
@@ -325,9 +312,9 @@ public abstract class AbstractBillableApp< //
 	}
 
 	protected List<Node> printNodes() {
-		return new ArrayList<>(asList(//
-				label.name("Printed by"), printedByDisplay, //
-				label.name(ON), printedOnDisplay));
+		return new ArrayList<>(asList(
+			label.name("Printed by"), printedByDisplay,
+			label.name(ON), printedOnDisplay));
 	}
 
 	protected void receivingGridNodes(String rrPrompt, int column) {
@@ -336,19 +323,29 @@ public abstract class AbstractBillableApp< //
 	}
 
 	protected List<Node> receivingNodes() {
-		return asList(//
-				label.name("Received by"), receivedByDisplay, //
-				label.name(ON), receivedOnDisplay);
+		return asList(
+			label.name("Received by"), receivedByDisplay,
+			label.name(ON), receivedOnDisplay);
 	}
 
 	protected Node vatAndTotalPane() {
 		List<Node> l = vatAndTotalNodes();
-		return box.forHorizontalPane(l);
+		return pane.centeredHorizontal(l);
 	}
 
 	protected List<Node> vatAndTotalNodes() {
 		List<Node> l = new ArrayList<>(vatNodes());
 		l.addAll(totalNodes());
 		return l;
+	}
+
+	protected List<Node> vatNodes() {
+		return asList(
+			label.name("VATable"), vatableDisplay,
+			label.name("VAT"), vatDisplay);
+	}
+
+	protected List<Node> totalNodes() {
+		return asList(label.name("Total"), totalDisplay);
 	}
 }

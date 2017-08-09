@@ -1,18 +1,17 @@
 package ph.txtdis.mgdc.domain;
 
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ph.txtdis.domain.AbstractCreatedKeyedEntity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.time.LocalDate;
+
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
 
 @Data
 @Entity
@@ -20,7 +19,8 @@ import ph.txtdis.domain.AbstractCreatedKeyedEntity;
 @AllArgsConstructor
 @Table(name = "holiday")
 @EqualsAndHashCode(callSuper = true)
-public class HolidayEntity extends AbstractCreatedKeyedEntity<Long> {
+public class HolidayEntity
+	extends AbstractCreatedKeyedEntity<Long> {
 
 	private static final long serialVersionUID = 8041194797982340862L;
 

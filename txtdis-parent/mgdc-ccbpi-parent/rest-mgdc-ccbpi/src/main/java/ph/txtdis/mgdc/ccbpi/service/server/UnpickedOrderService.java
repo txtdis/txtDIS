@@ -6,7 +6,7 @@ import java.util.List;
 import ph.txtdis.mgdc.ccbpi.domain.BillableEntity;
 
 public interface UnpickedOrderService //
-		extends FilteredListService {
+	extends FilteredListService {
 
 	@Override
 	List<BillableEntity> list(String collector, LocalDate start, LocalDate end);

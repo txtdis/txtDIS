@@ -1,7 +1,7 @@
 package ph.txtdis.app;
 
 public interface SelectableListApp<T> //
-		extends StartableApp {
+	extends App {
 
 	T getSelection();
 }

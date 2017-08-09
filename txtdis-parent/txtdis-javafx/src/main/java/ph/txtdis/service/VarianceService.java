@@ -3,7 +3,7 @@ package ph.txtdis.service;
 import ph.txtdis.dto.Keyed;
 
 public interface VarianceService<T extends Keyed<Long>> //
-		extends ReportService<T> {
+	extends ReportService<T> {
 
 	default String getActualColumnName() {
 		return "DDL";

@@ -1,22 +1,7 @@
 package ph.txtdis.mgdc.service;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.type.UserType.DRIVER;
-import static ph.txtdis.type.UserType.HELPER;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.STOCK_CHECKER;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Booking;
 import ph.txtdis.exception.NothingToPickException;
 import ph.txtdis.exception.UnauthorizedUserException;
@@ -24,30 +9,37 @@ import ph.txtdis.service.TruckService;
 import ph.txtdis.service.UserService;
 import ph.txtdis.type.DeliveryType;
 
-public abstract class AbstractPickListService //
-		extends AbstractLoadingService //
-		implements PickListService {
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-	private static Logger logger = getLogger(AbstractPickListService.class);
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.UserUtils.isUser;
+
+public abstract class AbstractPickListService //
+	extends AbstractLoadingService //
+	implements PickListService {
 
 	private static final String PICK_UP = DeliveryType.PICK_UP.toString();
 
-	@Autowired
-	private TruckService truckService;
+	private static Logger logger = getLogger(AbstractPickListService.class);
 
 	@Autowired
 	protected UserService userService;
 
 	protected List<Booking> unpickedBookings;
 
+	@Autowired
+	private TruckService truckService;
+
 	@Override
 	public String getAlternateName() {
 		return "Pick List";
-	}
-
-	@Override
-	public List<Booking> getBookings() {
-		return get().getBookings();
 	}
 
 	@Override
@@ -58,16 +50,6 @@ public abstract class AbstractPickListService //
 	@Override
 	public ZonedDateTime getCreatedOn() {
 		return get().getCreatedOn();
-	}
-
-	@Override
-	public String getModuleName() {
-		return "pickList";
-	}
-
-	@Override
-	public LocalDate getPickDate() {
-		return get().getPickDate();
 	}
 
 	@Override
@@ -111,9 +93,14 @@ public abstract class AbstractPickListService //
 
 	private List<String> unpickedRoutes() {
 		return unpickedBookings.stream() //
-				.map(b -> routeName(b))//
-				.filter(n -> n != null) //
-				.distinct().sorted().collect(toList());
+			.map(b -> routeName(b))//
+			.filter(n -> n != null) //
+			.distinct().sorted().collect(toList());
+	}
+
+	@Override
+	public List<Booking> getBookings() {
+		return get().getBookings();
 	}
 
 	private List<String> unpickedRouteNames(List<String> unpickedList) {
@@ -123,6 +110,16 @@ public abstract class AbstractPickListService //
 			unpickedList.removeAll(pickedList);
 		logger.info("\n    Unpicked@unpickedRouteNames = " + unpickedList);
 		return unpickedList;
+	}
+
+	protected String routeName(Booking b) {
+		String route = b.getRoute();
+		return route != null ? route : PICK_UP.toString();
+	}
+
+	@Override
+	public void setBookings(List<Booking> bookings) {
+		get().setBookings(bookings);
 	}
 
 	@Override
@@ -147,14 +144,14 @@ public abstract class AbstractPickListService //
 		return unpickedBookings.stream().filter(b -> route.equals(routeName(b))).collect(toList());
 	}
 
-	protected String routeName(Booking b) {
-		String route = b.getRoute();
-		return route != null ? route : PICK_UP.toString();
+	@Override
+	public void print() throws Exception {
+		set(getRestClientService().module(getModuleName()).getOne("/print?id=" + getId()));
 	}
 
 	@Override
-	public void print() throws Exception {
-		set(readOnlyService.module(getModuleName()).getOne("/print?id=" + getId()));
+	public String getModuleName() {
+		return "pickList";
 	}
 
 	@Override
@@ -174,11 +171,6 @@ public abstract class AbstractPickListService //
 	}
 
 	@Override
-	public void setBookings(List<Booking> bookings) {
-		get().setBookings(bookings);
-	}
-
-	@Override
 	public void setDriverUponValidation(String d) throws Exception {
 		if (d != null && !d.isEmpty() && isNew())
 			setDriver(d);
@@ -192,7 +184,7 @@ public abstract class AbstractPickListService //
 	public void setPickDateUponValidation(LocalDate d) throws Exception {
 		if (d == null || !isNew())
 			return;
-		if (!credentialService.isUser(MANAGER) && !credentialService.isUser(STOCK_CHECKER))
+		if (!isUser(MANAGER) && !isUser(STOCK_CHECKER))
 			throw new UnauthorizedUserException("Stock Checkers Only");
 		get().setPickDate(d);
 	}
@@ -215,13 +207,18 @@ public abstract class AbstractPickListService //
 			throw new NothingToPickException(getPickDate());
 	}
 
-	protected abstract List<Booking> listUnpicked();
-
 	private void noTruckAndDriverAndHelperForPickUp(String t) {
 		get().setTruck(t.equals(PICK_UP) ? null : t);
 		setDriver(null);
 		setLeadAssistant(null);
 		setAssistant(null);
+	}
+
+	protected abstract List<Booking> listUnpicked();
+
+	@Override
+	public LocalDate getPickDate() {
+		return get().getPickDate();
 	}
 
 	private void setLeadAssistant(String h) {

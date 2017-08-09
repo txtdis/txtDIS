@@ -4,7 +4,8 @@ import ph.txtdis.dto.User;
 import ph.txtdis.service.ServerUserService;
 
 public interface UserService
-		extends ServerUserService, Imported {
+	extends ServerUserService,
+	Imported {
 
 	void saveDriver(User u) throws Exception;
 

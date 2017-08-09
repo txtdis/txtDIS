@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 @Component("salesVolumeDataDumpTable")
 public class SalesVolumeDataDumpTableImpl
-		extends AbstractSalesVolumeTable {
+	extends AbstractSalesVolumeTable {
 }

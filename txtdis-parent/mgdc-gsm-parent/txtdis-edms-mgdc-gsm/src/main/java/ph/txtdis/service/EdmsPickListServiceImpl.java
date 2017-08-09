@@ -1,32 +1,10 @@
 package ph.txtdis.service;
 
-import static java.math.BigDecimal.valueOf;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-import static ph.txtdis.util.Code.PICKING_PREFIX;
-import static ph.txtdis.util.Code.RECEIVING_PREFIX;
-import static ph.txtdis.util.DateTimeUtils.toTimestampWithSecondText;
-import static ph.txtdis.util.NumberUtils.divide;
-import static ph.txtdis.util.NumberUtils.isPositive;
-import static ph.txtdis.util.NumberUtils.remainder;
-import static ph.txtdis.util.NumberUtils.toWholeNo;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import ph.txtdis.domain.EdmsIncomingLoad;
-import ph.txtdis.domain.EdmsIncomingLoadDetail;
-import ph.txtdis.domain.EdmsItem;
-import ph.txtdis.domain.EdmsLoadOrder;
-import ph.txtdis.domain.EdmsLoadOrderDetail;
-import ph.txtdis.domain.EdmsSeller;
-import ph.txtdis.domain.EdmsTruck;
+import ph.txtdis.domain.*;
 import ph.txtdis.dto.PickList;
 import ph.txtdis.dto.PickListDetail;
 import ph.txtdis.repository.EdmsIncomingLoadDetailRepository;
@@ -35,10 +13,22 @@ import ph.txtdis.repository.EdmsLoadOrderDetailRepository;
 import ph.txtdis.repository.EdmsLoadOrderRepository;
 import ph.txtdis.util.Code;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import static java.math.BigDecimal.valueOf;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static ph.txtdis.util.Code.PICKING_PREFIX;
+import static ph.txtdis.util.Code.RECEIVING_PREFIX;
+import static ph.txtdis.util.DateTimeUtils.toTimestampWithSecondText;
+import static ph.txtdis.util.NumberUtils.*;
+
 @Transactional
 @Service("pickListService")
 public class EdmsPickListServiceImpl //
-		implements EdmsPickListService {
+	implements EdmsPickListService {
 
 	@Autowired
 	private EdmsIncomingLoadRepository incomingLoadRepository;
@@ -229,7 +219,8 @@ public class EdmsPickListServiceImpl //
 	}
 
 	private void updateIncomingLoadReport(List<EdmsIncomingLoadDetail> l, PickList p) {
-		Map<String, EdmsIncomingLoadDetail> m = l.stream().collect(toMap(EdmsIncomingLoadDetail::getItemCode, identity()));
+		Map<String, EdmsIncomingLoadDetail> m =
+			l.stream().collect(toMap(EdmsIncomingLoadDetail::getItemCode, identity()));
 		for (PickListDetail d : p.getDetails())
 			updateQty(m, d);
 	}

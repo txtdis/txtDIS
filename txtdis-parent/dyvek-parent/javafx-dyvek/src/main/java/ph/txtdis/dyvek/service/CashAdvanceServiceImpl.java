@@ -1,36 +1,31 @@
 package ph.txtdis.dyvek.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dyvek.model.CashAdvance;
+import ph.txtdis.exception.NotFoundException;
+import ph.txtdis.info.Information;
+import ph.txtdis.service.RemittanceService;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.type.PartnerType;
+import ph.txtdis.util.ClientTypeMap;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dyvek.model.CashAdvance;
-import ph.txtdis.exception.NotFoundException;
-import ph.txtdis.info.Information;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.RemittanceService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.type.PartnerType;
-import ph.txtdis.util.ClientTypeMap;
-
 @Service("cashAdvanceService")
 public class CashAdvanceServiceImpl //
-		implements CashAdvanceService {
+	implements CashAdvanceService {
 
 	@Autowired
 	private VendorService customerService;
 
 	@Autowired
-	private ReadOnlyService<CashAdvance> readOnlyService;
-
-	@Autowired
 	private RemittanceService remitService;
 
 	@Autowired
-	private SavingService<CashAdvance> savingService;
+	private RestClientService<CashAdvance> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -38,10 +33,6 @@ public class CashAdvanceServiceImpl //
 	private CashAdvance cashAdvance;
 
 	private List<CashAdvance> cashAdvances;
-
-	private ReadOnlyService<CashAdvance> findCashAdvance() {
-		return getListedReadOnlyService().module(getModuleName());
-	}
 
 	@Override
 	public void verifyCheck(String bank, Long checkId) throws Exception {
@@ -54,14 +45,18 @@ public class CashAdvanceServiceImpl //
 		return findCashAdvance().getOne("/check?bank=" + bank + "&id=" + checkId);
 	}
 
-	@Override
-	public ReadOnlyService<CashAdvance> getListedReadOnlyService() {
-		return readOnlyService;
+	private RestClientService<CashAdvance> findCashAdvance() {
+		return restClientService.module(getModuleName());
 	}
 
 	@Override
 	public String getModuleName() {
 		return "cashAdvance";
+	}
+
+	@Override
+	public RestClientService<CashAdvance> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
@@ -72,11 +67,6 @@ public class CashAdvanceServiceImpl //
 	@Override
 	public ClientTypeMap getTypeMap() {
 		return typeMap;
-	}
-
-	@Override
-	public List<CashAdvance> list() {
-		return cashAdvances;
 	}
 
 	@Override
@@ -95,23 +85,23 @@ public class CashAdvanceServiceImpl //
 		setList(null);
 	}
 
+	private CashAdvance set(CashAdvance cashAdvance) {
+		return this.cashAdvance = cashAdvance;
+	}
+
 	private void setList(List<CashAdvance> l) {
 		cashAdvances = l;
 	}
 
 	@Override
 	public CashAdvance save() throws Information, Exception {
-		return set(savingService.module(getModuleName()).save(get()));
+		return set(restClientService.module(getModuleName()).save(get()));
 	}
 
 	private CashAdvance get() {
 		if (cashAdvance == null)
 			set(new CashAdvance());
 		return cashAdvance;
-	}
-
-	private CashAdvance set(CashAdvance cashAdvance) {
-		return this.cashAdvance = cashAdvance;
 	}
 
 	@Override
@@ -145,5 +135,10 @@ public class CashAdvanceServiceImpl //
 		setList(findCashAdvance().getList("/customer?type=" + type + "&name=" + customer));
 		if (list() == null || list().isEmpty())
 			throw new NotFoundException("Cash advance for\n" + customer);
+	}
+
+	@Override
+	public List<CashAdvance> list() {
+		return cashAdvances;
 	}
 }

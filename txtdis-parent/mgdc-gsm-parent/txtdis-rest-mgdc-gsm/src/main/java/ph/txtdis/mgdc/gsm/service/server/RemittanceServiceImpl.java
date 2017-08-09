@@ -1,10 +1,15 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.ZERO;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.util.NumberUtils.isNegative;
-import static ph.txtdis.util.NumberUtils.isZero;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ph.txtdis.dto.Remittance;
+import ph.txtdis.dto.RemittanceDetail;
+import ph.txtdis.mgdc.gsm.domain.BillableEntity;
+import ph.txtdis.mgdc.gsm.domain.RemittanceDetailEntity;
+import ph.txtdis.mgdc.gsm.domain.RemittanceEntity;
+import ph.txtdis.service.RestClientService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,32 +18,23 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import ph.txtdis.dto.Remittance;
-import ph.txtdis.dto.RemittanceDetail;
-import ph.txtdis.mgdc.gsm.domain.BillableEntity;
-import ph.txtdis.mgdc.gsm.domain.RemittanceDetailEntity;
-import ph.txtdis.mgdc.gsm.domain.RemittanceEntity;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.util.NumberUtils.isNegative;
+import static ph.txtdis.util.NumberUtils.isZero;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("remittanceService")
 public class RemittanceServiceImpl //
-		extends AbstractRemittanceService //
-		implements GsmRemittanceService {
+	extends AbstractRemittanceService //
+	implements GsmRemittanceService {
 
 	@Autowired
 	private AllBillingService billingService;
 
 	@Autowired
-	private CredentialService userService;
-
-	@Autowired
-	private ReadOnlyService<Remittance> readOnlyService;
+	private RestClientService<Remittance> restClientService;
 
 	@Value("#{'${adjusting.accounts}'.split(',')}")
 	private List<String> adjustingAccounts;
@@ -67,7 +63,7 @@ public class RemittanceServiceImpl //
 	}
 
 	private List<Remittance> remittances() throws Exception {
-		return readOnlyService.module("remittance").getList();
+		return restClientService.module("remittance").getList();
 	}
 
 	@Override
@@ -79,9 +75,15 @@ public class RemittanceServiceImpl //
 
 	private List<RemittanceDetailEntity> details(RemittanceEntity e, Remittance r) {
 		return r.getDetails().stream() //
-				.map(d -> detail(d, r, e)) //
-				.filter(d -> d.getBilling() != null) //
-				.collect(toList());
+			.map(d -> detail(d, r, e)) //
+			.filter(d -> d.getBilling() != null) //
+			.collect(toList());
+	}
+
+	private RemittanceEntity autoValidateAdjustmentPayments(RemittanceEntity e, Remittance r) {
+		if (adjustingAccounts.contains(r.getDraweeBank()))
+			return updateValidity(e, r, true, username());
+		return e;
 	}
 
 	private RemittanceDetailEntity detail(RemittanceDetail d, Remittance r, RemittanceEntity e) {
@@ -114,11 +116,6 @@ public class RemittanceServiceImpl //
 		return bal.compareTo(ONE) <= 0 ? ZERO : bal;
 	}
 
-	private BigDecimal unpaid(BillableEntity b) {
-		BigDecimal u = b.getUnpaidValue();
-		return u == null ? ZERO : u;
-	}
-
 	private boolean noBalanceAndPaidInCashOrDatedCheck(Remittance r, BillableEntity b, BigDecimal bal) {
 		if (!isZero(bal))
 			return false;
@@ -127,10 +124,9 @@ public class RemittanceServiceImpl //
 		return true;
 	}
 
-	private RemittanceEntity autoValidateAdjustmentPayments(RemittanceEntity e, Remittance r) {
-		if (adjustingAccounts.contains(r.getDraweeBank()))
-			return updateValidity(e, r, true, userService.username());
-		return e;
+	private BigDecimal unpaid(BillableEntity b) {
+		BigDecimal u = b.getUnpaidValue();
+		return u == null ? ZERO : u;
 	}
 
 	@Override

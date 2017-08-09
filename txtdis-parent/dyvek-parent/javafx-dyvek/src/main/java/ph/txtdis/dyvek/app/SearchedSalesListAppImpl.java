@@ -8,7 +8,7 @@ import ph.txtdis.dyvek.service.SalesService;
 
 @Scope("prototype")
 @Component("searchedSalesListApp")
-public class SearchedSalesListAppImpl //
-		extends AbstractSearchedOrderListApp<SalesListTable, SalesService> //
-		implements SearchedSalesListApp {
+public class SearchedSalesListAppImpl
+	extends AbstractSearchedOrderListApp<SalesListTable, SalesService>
+	implements SearchedSalesListApp {
 }

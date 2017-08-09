@@ -1,34 +1,27 @@
 package ph.txtdis.mgdc.gsm.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.info.Information;
+import ph.txtdis.mgdc.gsm.dto.Channel;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.type.BillingType;
+import ph.txtdis.util.ClientTypeMap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.info.Information;
-import ph.txtdis.mgdc.gsm.dto.Channel;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
-import ph.txtdis.type.BillingType;
-import ph.txtdis.util.ClientTypeMap;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("channelService")
 public class ChannelServiceImpl //
-		implements ChannelService {
+	implements ChannelService {
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<Channel> readOnlyService;
-
-	@Autowired
-	private SavingService<Channel> savingService;
+	private RestClientService<Channel> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -37,23 +30,18 @@ public class ChannelServiceImpl //
 	private String modulePrefix;
 
 	@Override
-	public Channel getChannelForAll() {
-		return newChannel("ALL");
+	public RestClientService<Channel> getRestClientService() {
+		return restClientService;
 	}
 
 	@Override
-	public ReadOnlyService<Channel> getListedReadOnlyService() {
-		return readOnlyService;
-	}
-
-	@Override
-	public String getModuleName() {
-		return "channel";
+	public RestClientService<Channel> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " " + ChannelService.super.getTitleName();
+		return username() + "@" + modulePrefix + " " + ChannelService.super.getTitleName();
 	}
 
 	@Override
@@ -70,6 +58,17 @@ public class ChannelServiceImpl //
 	}
 
 	@Override
+	public Channel getChannelForAll() {
+		return newChannel("ALL");
+	}
+
+	private Channel newChannel(String name) {
+		Channel c = new Channel();
+		c.setName(name);
+		return c;
+	}
+
+	@Override
 	public List<String> listNames() {
 		try {
 			return list().stream().map(u -> u.getName()).sorted().collect(Collectors.toList());
@@ -81,11 +80,16 @@ public class ChannelServiceImpl //
 	@Override
 	public List<Channel> listVisitedChannels() {
 		try {
-			return readOnlyService.module(getModuleName()).getList("/visited");
+			return restClientService.module(getModuleName()).getList("/visited");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	public String getModuleName() {
+		return "channel";
 	}
 
 	@Override
@@ -104,12 +108,6 @@ public class ChannelServiceImpl //
 		Channel c = newChannel(name);
 		c.setBillingType(type);
 		c.setVisited(visited);
-		return savingService.module(getModuleName()).save(c);
-	}
-
-	private Channel newChannel(String name) {
-		Channel c = new Channel();
-		c.setName(name);
-		return c;
+		return restClientService.module(getModuleName()).save(c);
 	}
 }

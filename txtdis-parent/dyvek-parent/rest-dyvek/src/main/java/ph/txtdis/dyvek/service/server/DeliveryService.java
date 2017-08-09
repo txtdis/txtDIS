@@ -1,12 +1,12 @@
 package ph.txtdis.dyvek.service.server;
 
-import java.util.List;
-
 import ph.txtdis.dyvek.domain.BillableEntity;
 import ph.txtdis.dyvek.model.Billable;
 
+import java.util.List;
+
 public interface DeliveryService //
-		extends SearchedSpunSavedOrderService<BillableEntity, Billable> {
+	extends SearchedSpunSavedOrderService<BillableEntity, Billable> {
 
 	Billable findByVendorDeliveryNo(String vendor, String dr);
 

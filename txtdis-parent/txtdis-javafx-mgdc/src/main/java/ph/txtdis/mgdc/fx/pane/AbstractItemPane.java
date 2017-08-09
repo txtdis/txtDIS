@@ -1,9 +1,5 @@
 package ph.txtdis.mgdc.fx.pane;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -12,25 +8,25 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.ErrorHandling;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.dialog.MessageDialog;
-import ph.txtdis.fx.pane.AppBoxPaneFactory;
+import ph.txtdis.fx.pane.PaneFactory;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.fx.pane.ItemPane;
 import ph.txtdis.mgdc.fx.table.QtyPerUomTable;
 import ph.txtdis.mgdc.service.ItemService;
 
+import java.util.List;
+
 public abstract class AbstractItemPane<AS extends ItemService> //
-		extends Pane //
-		implements ItemPane {
+	extends Pane //
+	implements ItemPane {
 
 	@Autowired
-	private MessageDialog dialog;
-
-	@Autowired
-	protected AppBoxPaneFactory box;
+	protected PaneFactory pane;
 
 	@Autowired
 	protected AppFieldImpl<Long> idDisplay;
@@ -52,6 +48,9 @@ public abstract class AbstractItemPane<AS extends ItemService> //
 
 	protected BooleanProperty hasNeededPurchaseUom, hasVendorId;
 
+	@Autowired
+	private MessageDialog dialog;
+
 	@Override
 	public Pane get() {
 		getChildren().setAll(verticalPane());
@@ -59,7 +58,7 @@ public abstract class AbstractItemPane<AS extends ItemService> //
 	}
 
 	protected VBox verticalPane() {
-		return box.forVerticalPane(gridPane(), tableBox());
+		return pane.topCenteredVertical(gridPane(), tableBox());
 	}
 
 	protected GridPane gridPane() {
@@ -68,7 +67,7 @@ public abstract class AbstractItemPane<AS extends ItemService> //
 	}
 
 	protected HBox tableBox() {
-		return box.forHorizontalPane(tablePanes());
+		return pane.centeredHorizontal(tablePanes());
 	}
 
 	protected abstract List<? extends Node> tablePanes();
@@ -109,7 +108,7 @@ public abstract class AbstractItemPane<AS extends ItemService> //
 		hasVendorId = new SimpleBooleanProperty(false);
 		nameField.disableIf(isPosted());
 		descriptionField.disableIf(nameField.isEmpty()//
-				.or(isPosted()));
+			.or(isPosted()));
 	}
 
 	protected BooleanBinding isPosted() {
@@ -131,14 +130,14 @@ public abstract class AbstractItemPane<AS extends ItemService> //
 			}
 	}
 
-	protected void handleError(ErrorHandling control, Exception e) {
-		dialog.show(e).addParent(this).start();
-		control.handleError();
-	}
-
 	protected void updateQtyPerUom() {
 		service.setQtyPerUomList(qtyPerUomTable.getItems());
 		hasNeededPurchaseUom.set(service.hasPurchaseUom());
+	}
+
+	protected void handleError(ErrorHandling control, Exception e) {
+		dialog.show(e).addParent(this).start();
+		control.handleError();
 	}
 
 	protected BooleanBinding isNew() {
@@ -146,8 +145,8 @@ public abstract class AbstractItemPane<AS extends ItemService> //
 	}
 
 	protected VBox qtyPerUomTablePane() {
-		return box.forVerticals( //
-				label.group("Qty per UOM of Smallest SKU"), //
-				qtyPerUomTable.build());
+		return pane.vertical( //
+			label.group("Qty per UOM of Smallest SKU"), //
+			qtyPerUomTable.build());
 	}
 }

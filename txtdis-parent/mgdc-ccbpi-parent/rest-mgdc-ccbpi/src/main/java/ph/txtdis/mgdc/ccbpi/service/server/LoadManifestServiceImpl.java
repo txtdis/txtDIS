@@ -17,8 +17,8 @@ import ph.txtdis.type.TransactionDirectionType;
 
 @Service("loadManifestService")
 public class LoadManifestServiceImpl //
-		extends AbstractSpunSavedBillableService //
-		implements LoadManifestService {
+	extends AbstractSpunSavedBillableService //
+	implements LoadManifestService {
 
 	private static Logger logger = getLogger(LoadManifestServiceImpl.class);
 
@@ -40,7 +40,8 @@ public class LoadManifestServiceImpl //
 
 	@Override
 	public List<BillableEntity> list(LocalDate start, LocalDate end) {
-		List<BillableEntity> l = loadManifestRepository.findByCustomerNullAndBookingIdNotNullAndSuffixNullAndOrderDateBetween( //
+		List<BillableEntity> l =
+			loadManifestRepository.findByCustomerNullAndBookingIdNotNullAndSuffixNullAndOrderDateBetween( //
 				start, end);
 		logger.info("\n    LoadManifestList = " + l);
 		return l;
@@ -53,7 +54,8 @@ public class LoadManifestServiceImpl //
 
 	@Override
 	protected BillableEntity nextEntity(Long id) {
-		return loadManifestRepository.findFirstByCustomerNullAndBookingIdNotNullAndSuffixNullAndIdGreaterThanOrderByIdAsc(id);
+		return loadManifestRepository
+			.findFirstByCustomerNullAndBookingIdNotNullAndSuffixNullAndIdGreaterThanOrderByIdAsc(id);
 	}
 
 	@Override
@@ -63,6 +65,7 @@ public class LoadManifestServiceImpl //
 
 	@Override
 	protected BillableEntity previousEntity(Long id) {
-		return loadManifestRepository.findFirstByCustomerNullAndBookingIdNotNullAndSuffixNullAndIdLessThanOrderByIdDesc(id);
+		return loadManifestRepository
+			.findFirstByCustomerNullAndBookingIdNotNullAndSuffixNullAndIdLessThanOrderByIdDesc(id);
 	}
 }

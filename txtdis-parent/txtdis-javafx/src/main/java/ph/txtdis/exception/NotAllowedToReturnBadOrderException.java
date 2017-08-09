@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class NotAllowedToReturnBadOrderException extends Exception {
+public class NotAllowedToReturnBadOrderException
+	extends Exception {
 
 	private static final long serialVersionUID = -3135096519524601477L;
 

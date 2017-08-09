@@ -2,7 +2,7 @@ package ph.txtdis.mgdc.util;
 
 public interface TextStyled {
 
-    void setText(String text);
+	void setText(String text);
 
-    void setStyle(String style);
+	void setStyle(String style);
 }

@@ -11,8 +11,8 @@ import ph.txtdis.mgdc.ccbpi.service.ItemDeliveredCustomerService;
 @Scope("prototype")
 @Component("customerListApp")
 public class CustomerListAppImpl //
-		extends AbstractExcelApp<CustomerListTable, ItemDeliveredCustomerService, Customer> //
-		implements CustomerListApp {
+	extends AbstractExcelApp<CustomerListTable, ItemDeliveredCustomerService, Customer> //
+	implements CustomerListApp {
 
 	@Override
 	public Customer getSelection() {
@@ -28,12 +28,12 @@ public class CustomerListAppImpl //
 	}
 
 	@Override
-	protected String getHeaderText() {
-		return "Customer List";
+	protected String getTitleText() {
+		return getHeaderText();
 	}
 
 	@Override
-	protected String getTitleText() {
-		return getHeaderText();
+	protected String getHeaderText() {
+		return "Customer List";
 	}
 }

@@ -1,22 +1,19 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static javafx.stage.Modality.WINDOW_MODAL;
-
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
-import ph.txtdis.app.CustomerApp;
 import ph.txtdis.app.ItemApp;
-import ph.txtdis.app.TruckAppImpl;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.app.TruckApp;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.dialog.AbstractMenu;
 import ph.txtdis.fx.dialog.SettingsMenu;
 import ph.txtdis.fx.dialog.StyleApp;
 import ph.txtdis.fx.dialog.UserApp;
 import ph.txtdis.mgdc.app.HolidayApp;
+import ph.txtdis.mgdc.app.LaunchableCustomerApp;
 import ph.txtdis.mgdc.app.PricingTypeApp;
 import ph.txtdis.mgdc.app.RouteApp;
 import ph.txtdis.mgdc.gsm.app.ChannelApp;
@@ -25,21 +22,24 @@ import ph.txtdis.mgdc.gsm.app.ItemTreeApp;
 import ph.txtdis.mgdc.gsm.app.WarehouseApp;
 import ph.txtdis.util.FontIcon;
 
+import static javafx.stage.Modality.WINDOW_MODAL;
+import static ph.txtdis.util.UserUtils.username;
+
 @Scope("prototype")
 @Component("settingsMenu")
 public class SettingsMenuImpl //
-		extends AbstractMenu //
-		implements SettingsMenu {
+	extends AbstractMenu //
+	implements SettingsMenu {
 
 	@Autowired
-	private AppButtonImpl channelButton, customerButton, holidayButton, itemButton, familyButton, treeButton, pricingTypeButton, routeButton,
-			styleButton, truckButton, userButton, warehouseButton;
+	private AppButton channelButton, customerButton, holidayButton, itemButton, familyButton, treeButton,
+		pricingTypeButton, routeButton, styleButton, truckButton, userButton, warehouseButton;
 
 	@Autowired
 	private ChannelApp channelApp;
 
 	@Autowired
-	private CustomerApp customerApp;
+	private LaunchableCustomerApp customerApp;
 
 	@Autowired
 	private HolidayApp holidayApp;
@@ -63,7 +63,7 @@ public class SettingsMenuImpl //
 	private StyleApp styleDialog;
 
 	@Autowired
-	private TruckAppImpl truckApp;
+	private TruckApp truckApp;
 
 	@Autowired
 	private UserApp userDialog;
@@ -76,13 +76,6 @@ public class SettingsMenuImpl //
 		initOwner(stage);
 		initModality(WINDOW_MODAL);
 		return this;
-	}
-
-	@Override
-	public void initialize() {
-		getIcons().add(new FontIcon("\ue92a"));
-		setTitle(credentialService.username() + "@" + modulePrefix + " Settings Menu");
-		setScene(createScene());
 	}
 
 	@Override
@@ -99,6 +92,13 @@ public class SettingsMenuImpl //
 	public void start() {
 		initialize();
 		show();
+	}
+
+	@Override
+	public void initialize() {
+		getIcons().add(new FontIcon("\ue92a"));
+		setTitle(username() + "@" + modulePrefix + " Settings Menu");
+		setScene(createScene());
 	}
 
 	@Override

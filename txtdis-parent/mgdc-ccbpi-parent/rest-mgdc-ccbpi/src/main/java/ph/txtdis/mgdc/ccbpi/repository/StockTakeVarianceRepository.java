@@ -11,11 +11,11 @@ import ph.txtdis.mgdc.ccbpi.domain.StockTakeVarianceEntity;
 
 @Repository("stockTakeVarianceRepository")
 public interface StockTakeVarianceRepository //
-		extends CrudRepository<StockTakeVarianceEntity, Long> {
+	extends CrudRepository<StockTakeVarianceEntity, Long> {
 
 	List<StockTakeVarianceEntity> findByCountDate( //
-			@Param("countDate") LocalDate d);
+	                                               @Param("countDate") LocalDate d);
 
 	StockTakeVarianceEntity findFirstByCountDateLessThanEqualOrderByCountDateDesc( //
-			@Param("countDate") LocalDate d);
+	                                                                               @Param("countDate") LocalDate d);
 }

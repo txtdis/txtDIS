@@ -1,16 +1,9 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CODE;
-import static ph.txtdis.type.Type.ID;
-
-import java.util.List;
-
+import javafx.beans.binding.BooleanBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.beans.binding.BooleanBinding;
 import ph.txtdis.dto.Billable;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledField;
@@ -18,10 +11,16 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.gsm.service.GsmBillingService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.CODE;
+import static ph.txtdis.type.Type.ID;
+
 @Scope("prototype")
 @Component("invoiceNoEditorDialog")
-public class InvoiceNoEditorDialog //
-		extends AbstractFieldDialog<Billable> {
+public class InvoiceNoEditorDialog
+	extends AbstractFieldDialog<Billable> {
 
 	@Autowired
 	private GsmBillingService service;
@@ -34,10 +33,10 @@ public class InvoiceNoEditorDialog //
 
 	@Override
 	protected List<InputNode<?>> addNodes() {
-		return asList(//
-				prefixField.name("S/I Code").build(CODE), //
-				idField.name("S/I No.").build(ID), //
-				suffixField()); //
+		return asList(
+			prefixField.name("S/I Code").build(CODE),
+			idField.name("S/I No.").build(ID),
+			suffixField());
 	}
 
 	private LabeledField<String> suffixField() {
@@ -61,7 +60,7 @@ public class InvoiceNoEditorDialog //
 			service.updateRemarksAfterInvoiceNoEdit();
 			service.save();
 		} catch (Information e) {
-			dialog.show(e).addParent(this).start();
+			messageDialog().show(e).addParent(this).start();
 		} catch (Exception e) {
 			resetNodesOnError(e);
 		}

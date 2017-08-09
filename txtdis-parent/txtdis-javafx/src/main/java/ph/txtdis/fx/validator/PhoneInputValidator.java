@@ -5,10 +5,12 @@ import javafx.beans.value.ObservableValue;
 import ph.txtdis.fx.control.AppFieldImpl;
 
 public class PhoneInputValidator //
-		implements ChangeListener<String> {
+	implements ChangeListener<String> {
 
 	private boolean ignore;
+
 	private AppFieldImpl<?> input;
+
 	private String restrict;
 
 	public PhoneInputValidator(AppFieldImpl<?> input) {
@@ -24,7 +26,8 @@ public class PhoneInputValidator //
 			ignore = true;
 			input.setText(oldValue);
 			ignore = false;
-		} else if (newValue.length() > 13) {
+		}
+		else if (newValue.length() > 13) {
 			ignore = true;
 			input.setText(newValue.substring(0, 13));
 			ignore = false;

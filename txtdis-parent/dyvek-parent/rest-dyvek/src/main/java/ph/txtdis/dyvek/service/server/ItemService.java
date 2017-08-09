@@ -5,7 +5,7 @@ import ph.txtdis.dyvek.model.Item;
 import ph.txtdis.service.SavedNameListService;
 
 public interface ItemService //
-		extends SavedNameListService<Item> {
+	extends SavedNameListService<Item> {
 
 	ItemEntity findEntityByName(String item);
 }

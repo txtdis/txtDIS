@@ -1,7 +1,7 @@
 package ph.txtdis.mgdc.gsm.service;
 
 public interface NoPurchaseOrderReceiptService //
-		extends BillableService {
+	extends BillableService {
 
 	void updateUponReferenceIdValidation(Long id) throws Exception;
 }

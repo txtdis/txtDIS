@@ -15,7 +15,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.app.BadRmaApp;
 import ph.txtdis.mgdc.ccbpi.service.BadRmaService;
@@ -24,19 +24,19 @@ import ph.txtdis.mgdc.fx.table.BadRmaTable;
 @Scope("prototype")
 @Component("badRmaApp")
 public class BadRmaAppImpl //
-		extends AbstractBillableApp<BadRmaService, BadRmaTable, Long> //
-		implements BadRmaApp {
+	extends AbstractBillableApp<BadRmaService, BadRmaTable, Long> //
+	implements BadRmaApp {
 
 	protected static final int WIDTH = 120;
 
 	@Autowired
-	private AppButtonImpl receiptButton;
+	private AppButton receiptButton;
 
 	private BooleanProperty returnIsValid;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = new ArrayList<>(super.addButtons());
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = new ArrayList<>(super.addButtons());
 		b.addAll(asList(invalidateButton, receiptButton));
 		return b;
 	}
@@ -80,14 +80,15 @@ public class BadRmaAppImpl //
 		return l;
 	}
 
-	private HBox receivingPane() {
-		return box.forHorizontalPane(receivingNodes());
+	@Override
+	protected HBox trackedPane() {
+		List<Node> l = new ArrayList<>(super.trackedPane().getChildren());
+		l.addAll(decisionNeededApp.addApprovalNodes());
+		return pane.centeredHorizontal(l);
 	}
 
-	@Override
-	public void refresh() {
-		super.refresh();
-		returnIsValid.set(service.isReturnValid());
+	private HBox receivingPane() {
+		return pane.centeredHorizontal(receivingNodes());
 	}
 
 	@Override
@@ -100,12 +101,16 @@ public class BadRmaAppImpl //
 	protected void setButtonBindings() {
 		super.setButtonBindings();
 		saveButton.disableIf(isPosted() //
-				.or(table.isEmpty()));
+			.or(table.isEmpty()));
 		receiptButton.disableIf(notValidReturn() //
-				.or(receivedOnDisplay.isNotEmpty()) //
-				.or(decisionNeededApp.isAudited().not()));
+			.or(receivedOnDisplay.isNotEmpty()) //
+			.or(decisionNeededApp.isAudited().not()));
 		invalidateButton.disableIf(isNew() //
-				.or(notValidReturn()));
+			.or(notValidReturn()));
+	}
+
+	protected BooleanBinding notValidReturn() {
+		return returnIsValid.not();
 	}
 
 	@Override
@@ -119,10 +124,6 @@ public class BadRmaAppImpl //
 		referenceIdInput.readOnly();
 		customerBox.disableIdInputIf(isPosted());
 		customerBox.setSearchButtonVisibleIfNot(isPosted());
-	}
-
-	protected BooleanBinding notValidReturn() {
-		return returnIsValid.not();
 	}
 
 	@Override
@@ -147,7 +148,7 @@ public class BadRmaAppImpl //
 		try {
 			service.saveReturnReceiptData();
 		} catch (Information i) {
-			dialog.show(i).addParent(this).start();
+			messageDialog.show(i).addParent(this).start();
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {
@@ -168,18 +169,17 @@ public class BadRmaAppImpl //
 			}
 	}
 
+	@Override
+	public void refresh() {
+		super.refresh();
+		returnIsValid.set(service.isReturnValid());
+	}
+
 	private void setFocusAfterCustomerValidation() {
 		if (customerBox.isEmpty().get())
 			customerBox.requestFocus();
 		else
 			table.requestFocus();
-	}
-
-	@Override
-	protected HBox trackedPane() {
-		List<Node> l = new ArrayList<>(super.trackedPane().getChildren());
-		l.addAll(decisionNeededApp.addApprovalNodes());
-		return box.forHorizontalPane(l);
 	}
 
 	@Override

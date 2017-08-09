@@ -11,7 +11,8 @@ import java.util.List;
 import ph.txtdis.info.Information;
 import ph.txtdis.type.ModuleType;
 
-public class ToDoReminder extends Information {
+public class ToDoReminder
+	extends Information {
 
 	private static final long serialVersionUID = -1793071904017277L;
 

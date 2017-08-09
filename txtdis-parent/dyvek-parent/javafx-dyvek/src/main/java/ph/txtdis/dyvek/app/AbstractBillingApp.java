@@ -1,32 +1,30 @@
 package ph.txtdis.dyvek.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.Node;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.dyvek.fx.table.AssignmentTable;
+import ph.txtdis.dyvek.model.BillableDetail;
+import ph.txtdis.dyvek.service.BillingService;
+import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.control.AppFieldImpl;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.CURRENCY;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.Node;
-import ph.txtdis.dyvek.fx.table.AssignmentTable;
-import ph.txtdis.dyvek.model.BillableDetail;
-import ph.txtdis.dyvek.service.BillingService;
-import ph.txtdis.fx.control.AppButtonImpl;
-import ph.txtdis.fx.control.AppFieldImpl;
+public abstract class AbstractBillingApp< 
+	OLA extends OpenOrderListApp, 
+	LA extends OrderListApp, 
+	S extends BillingService> 
+	extends AbstractTabledOpenListedOrderApp<OLA, LA, AssignmentTable, S> {
 
-public abstract class AbstractBillingApp< //
-		OLA extends OpenOrderListApp, //
-		LA extends OrderListApp, //
-		S extends BillingService> //
-		extends AbstractTabledOpenListedOrderApp<OLA, LA, AssignmentTable, S> {
-
-	@Autowired
-	protected AppButtonImpl billActionButton;
+	protected AppButton billActionButton;
 
 	@Autowired
 	protected AppFieldImpl<BigDecimal> adjustmentQtyDisplay, adjustmentPriceDisplay, adjustmentValueDisplay, netDisplay;
@@ -40,8 +38,8 @@ public abstract class AbstractBillingApp< //
 	private BooleanProperty assignedAndDeliverQtyDiffer;
 
 	@Override
-	protected List<AppButtonImpl> addButtons() {
-		List<AppButtonImpl> b = super.addButtons();
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = super.addButtons();
 		b.removeAll(asList(newButton, openOrderButton));
 		b.add(0, openOrderButton);
 		return b;
@@ -80,11 +78,11 @@ public abstract class AbstractBillingApp< //
 
 	@Override
 	protected void thirdGridLine() {
-		gridLine3Billing();
+		billingGridNodes();
 		remarksGridNodes(3, 8);
 	}
 
-	protected void gridLine3Billing() {
+	protected void billingGridNodes() {
 		labelGridNode("Adjustment", 0, 2);
 		qtyDisplayGridNodes("Quantity", adjustmentQtyDisplay, 1, 2);
 		currencyDisplayGridNodes("Price", adjustmentPriceDisplay, 110, 3, 2);
@@ -92,18 +90,18 @@ public abstract class AbstractBillingApp< //
 
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
-		return asList( //
-				gridPane(), //
-				box.forHorizontalPane(table.build()), //
-				box.forHorizontalPane(totalNodes()), //
-				trackedPane());
+		return asList( 
+			gridPane(), 
+			pane.centeredHorizontal(table.build()),
+			pane.centeredHorizontal(totalNodes()),
+			trackedPane());
 	}
 
 	private List<Node> totalNodes() {
-		return asList(//
-				label.name("Gross"), totalDisplay.readOnly().build(CURRENCY), //
-				label.name("Adjustment"), adjustmentValueDisplay.readOnly().build(CURRENCY), //
-				label.name("Net"), netDisplay.readOnly().build(CURRENCY));
+		return asList(
+			label.name("Gross"), totalDisplay.readOnly().build(CURRENCY), 
+			label.name("Adjustment"), adjustmentValueDisplay.readOnly().build(CURRENCY), 
+			label.name("Net"), netDisplay.readOnly().build(CURRENCY));
 	}
 
 	@Override
@@ -129,14 +127,6 @@ public abstract class AbstractBillingApp< //
 	}
 
 	@Override
-	protected void refreshTotals() {
-		super.refreshTotals();
-		adjustmentValueDisplay.setValue(service.getAdjustmentValue());
-		netDisplay.setValue(service.getNetValue());
-		assignedAndDeliverQtyDiffer.set(service.areAssignedAndDeliverQtyDifferent());
-	}
-
-	@Override
 	protected void remarksBinding() {
 		if (remarksDisplay != null)
 			remarksDisplay.editableIf(isNew());
@@ -152,8 +142,8 @@ public abstract class AbstractBillingApp< //
 	protected void saveBinding() {
 		assignedAndDeliverQtyDiffer = new SimpleBooleanProperty(service.areAssignedAndDeliverQtyDifferent());
 		if (saveButton != null)
-			saveButton.disableIf(isPosted() //
-					.or(assignedAndDeliverQtyDiffer));
+			saveButton.disableIf(isPosted() 
+				.or(assignedAndDeliverQtyDiffer));
 	}
 
 	@Override
@@ -163,20 +153,27 @@ public abstract class AbstractBillingApp< //
 		table.editableIf(isNew());
 	}
 
-	protected void billActionButtonBinding() {
-		billActionButton.disableIf(isNew() //
-				.or(billActedOnDisplay.isNotEmpty()));
+	private void billActionButtonBinding() {
+		billActionButton.disableIf(isNew() 
+			.or(billActedOnDisplay.isNotEmpty()));
 	}
 
 	@Override
 	protected void setListeners() {
 		super.setListeners();
-		openOrderButton.onAction(e -> startOpenOrderListApp());
 		table.setOnItemChange(e -> updateTotals(table.getItems()));
 	}
 
 	private void updateTotals(List<BillableDetail> items) {
 		service.updateTotals(items);
 		refreshTotals();
+	}
+
+	@Override
+	protected void refreshTotals() {
+		super.refreshTotals();
+		adjustmentValueDisplay.setValue(service.getAdjustmentValue());
+		netDisplay.setValue(service.getNetValue());
+		assignedAndDeliverQtyDiffer.set(service.areAssignedAndDeliverQtyDifferent());
 	}
 }

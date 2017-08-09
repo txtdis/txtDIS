@@ -153,18 +153,12 @@ public class Code {
 		return prefix(codes, index) + incrementThenPrependWithZeroesTo8Digits(l);
 	}
 
-	public static String padOnly(String code) {
-		String[] codes = StringUtils.split(code, "-");
-		int index = codes.length == 1 ? 0 : 1;
-		return prefix(codes, index) + addZeroes(codes[index]);
+	private static String prefix(String[] codes, int index) {
+		return index == 0 ? "" : codes[0] + "-";
 	}
 
 	private static String incrementThenPrependWithZeroesTo8Digits(long l) {
 		return addZeroes(String.valueOf(++l));
-	}
-
-	private static String prefix(String[] codes, int index) {
-		return index == 0 ? "" : codes[0] + "-";
 	}
 
 	public static String addZeroes(String no) {
@@ -173,6 +167,12 @@ public class Code {
 
 	public static String addZeroes(int count, String no) {
 		return StringUtils.leftPad(no, count, "0");
+	}
+
+	public static String padOnly(String code) {
+		String[] codes = StringUtils.split(code, "-");
+		int index = codes.length == 1 ? 0 : 1;
+		return prefix(codes, index) + addZeroes(codes[index]);
 	}
 
 	public static String getUomCode(UnitMeasured u) {

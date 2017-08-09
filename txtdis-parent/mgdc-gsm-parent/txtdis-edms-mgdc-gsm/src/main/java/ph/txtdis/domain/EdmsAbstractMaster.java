@@ -11,8 +11,8 @@ import ph.txtdis.dto.Named;
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class EdmsAbstractMaster //
-		extends EdmsAbstractModifiedCreatedId //
-		implements Named {
+	extends EdmsAbstractModifiedCreatedId //
+	implements Named {
 
 	@Column(name = "xCode")
 	private String code;

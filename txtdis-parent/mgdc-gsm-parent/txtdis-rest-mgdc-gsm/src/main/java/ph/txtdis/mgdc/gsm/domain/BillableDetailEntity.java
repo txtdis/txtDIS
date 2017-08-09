@@ -1,15 +1,5 @@
 package ph.txtdis.mgdc.gsm.domain;
 
-import static java.math.BigDecimal.ZERO;
-
-import java.math.BigDecimal;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractKeyedEntity;
@@ -17,14 +7,19 @@ import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;
 import ph.txtdis.util.NumberUtils;
 
+import javax.persistence.*;
+import java.math.BigDecimal;
+
+import static java.math.BigDecimal.ZERO;
+
 @Data
 @Entity
 @Table(name = "billing_detail", //
-		uniqueConstraints = @UniqueConstraint(columnNames = { "billing_id", "item_id", "uom", "price" }))
+	uniqueConstraints = @UniqueConstraint(columnNames = {"billing_id", "item_id", "uom", "price"}))
 @EqualsAndHashCode(callSuper = true)
 public class BillableDetailEntity //
-		extends AbstractKeyedEntity<Long> //
-		implements ItemQuantifiedEntityDetail {
+	extends AbstractKeyedEntity<Long> //
+	implements ItemQuantifiedEntityDetail {
 
 	private static final long serialVersionUID = 257754573072417395L;
 
@@ -55,13 +50,22 @@ public class BillableDetailEntity //
 	@Override
 	public BigDecimal getFinalQty() {
 		return getInitialQty() //
-				.subtract(getSoldQty()) //
-				.subtract(getReturnedQty());
+			.subtract(getSoldQty()) //
+			.subtract(getReturnedQty());
 	}
 
 	@Override
 	public BigDecimal getInitialQty() {
 		return initialQty == null ? ZERO : initialQty;
+	}
+
+	public BigDecimal getSoldQty() {
+		return soldQty == null ? ZERO : soldQty;
+	}
+
+	@Override
+	public BigDecimal getReturnedQty() {
+		return returnedQty == null ? ZERO : returnedQty;
 	}
 
 	public Long getItemId() {
@@ -73,20 +77,11 @@ public class BillableDetailEntity //
 	}
 
 	@Override
-	public BigDecimal getReturnedQty() {
-		return returnedQty == null ? ZERO : returnedQty;
-	}
-
-	public BigDecimal getSoldQty() {
-		return soldQty == null ? ZERO : soldQty;
-	}
-
-	@Override
 	public String toString() {
 		return "\n" + billing.getOrderNo() + ": " + item //
-				+ " -i=" + getInitialQty() //
-				+ " -r=" + returnedQty //
-				+ " -s=" + getSoldQty() //
-				+ NumberUtils.toCurrencyText(priceValue);
+			+ " -i=" + getInitialQty() //
+			+ " -r=" + returnedQty //
+			+ " -s=" + getSoldQty() //
+			+ NumberUtils.toCurrencyText(priceValue);
 	}
 }

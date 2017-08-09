@@ -4,5 +4,5 @@ import ph.txtdis.dyvek.model.BillableDetail;
 import ph.txtdis.fx.table.AppTable;
 
 public interface AssignmentTable //
-		extends AppTable<BillableDetail> {
+	extends AppTable<BillableDetail> {
 }

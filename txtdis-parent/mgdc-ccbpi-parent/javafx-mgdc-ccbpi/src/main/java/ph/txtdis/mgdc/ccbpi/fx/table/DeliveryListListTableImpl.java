@@ -21,7 +21,9 @@ import ph.txtdis.mgdc.ccbpi.app.DeliveryListApp;
 
 @Scope("prototype")
 @Component("deliveryListListTable")
-public class DeliveryListListTableImpl extends AbstractTable<SalesItemVariance> implements DeliveryListListTable {
+public class DeliveryListListTableImpl
+	extends AbstractTable<SalesItemVariance>
+	implements DeliveryListListTable {
 
 	@Autowired
 	private Column<SalesItemVariance, String> route, shipment;
@@ -38,9 +40,9 @@ public class DeliveryListListTableImpl extends AbstractTable<SalesItemVariance> 
 	@Override
 	protected List<TableColumn<SalesItemVariance, ?>> addColumns() {
 		return Arrays.asList(//
-				route.ofType(TEXT).launches(app).width(80).build("Route", "seller"), //
-				shipment.ofType(TEXT).launches(app).width(120).build("Shipment No.", "orderNo"), //
-				qty.ofType(FRACTION).launches(app).build("Quantity", "varianceQtyInFractions"), //
-				value.ofType(CURRENCY).launches(app).build("Amount", "value"));
+			route.ofType(TEXT).launches(app).width(80).build("Route", "seller"), //
+			shipment.ofType(TEXT).launches(app).width(120).build("Shipment No.", "orderNo"), //
+			qty.ofType(FRACTION).launches(app).build("Quantity", "varianceQtyInFractions"), //
+			value.ofType(CURRENCY).launches(app).build("Amount", "value"));
 	}
 }

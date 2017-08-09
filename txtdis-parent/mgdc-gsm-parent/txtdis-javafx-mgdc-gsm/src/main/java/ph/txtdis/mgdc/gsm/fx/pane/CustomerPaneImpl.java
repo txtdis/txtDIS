@@ -1,14 +1,14 @@
 package ph.txtdis.mgdc.gsm.fx.pane;
 
-import static ph.txtdis.type.PartnerType.EX_TRUCK;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import static ph.txtdis.type.PartnerType.EX_TRUCK;
 
 @Scope("prototype")
 @Component("customerPane")
 public class CustomerPaneImpl //
-		extends AbstractCustomerPane {
+	extends AbstractCustomerPane {
 
 	@Override
 	public void refresh() {

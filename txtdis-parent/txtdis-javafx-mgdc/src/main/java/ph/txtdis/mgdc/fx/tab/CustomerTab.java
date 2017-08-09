@@ -4,7 +4,8 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ObservableBooleanValue;
 import ph.txtdis.fx.tab.InputTab;
 
-public interface CustomerTab extends InputTab {
+public interface CustomerTab
+	extends InputTab {
 
 	InputTab build();
 

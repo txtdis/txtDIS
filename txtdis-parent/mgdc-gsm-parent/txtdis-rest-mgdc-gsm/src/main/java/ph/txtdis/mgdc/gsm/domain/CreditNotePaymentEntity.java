@@ -1,24 +1,23 @@
 package ph.txtdis.mgdc.gsm.domain;
 
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import ph.txtdis.domain.AbstractKeyedEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import ph.txtdis.domain.AbstractKeyedEntity;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
 
 @Data
 @Entity
 @Table(name = "credit_note_payment")
 @EqualsAndHashCode(callSuper = true)
 public class CreditNotePaymentEntity //
-		extends AbstractKeyedEntity<Long> {
+	extends AbstractKeyedEntity<Long> {
 
 	private static final long serialVersionUID = -5312616572994985321L;
 

@@ -11,8 +11,8 @@ import ph.txtdis.dto.SalesItemVariance;
 import ph.txtdis.service.AbstractVarianceService;
 
 public abstract class AbstractSalesItemVarianceService //
-		extends AbstractVarianceService<SalesItemVariance> //
-		implements SellerTrackedVarianceService {
+	extends AbstractVarianceService<SalesItemVariance> //
+	implements SellerTrackedVarianceService {
 
 	@Override
 	public List<BigDecimal> getTotals(List<SalesItemVariance> l) {
@@ -21,10 +21,6 @@ public abstract class AbstractSalesItemVarianceService //
 
 	protected BigDecimal bookedQty(List<SalesItemVariance> l) {
 		return total(l, SalesItemVariance::getExpectedQty);
-	}
-
-	protected BigDecimal total(List<SalesItemVariance> l, Function<SalesItemVariance, BigDecimal> qty) {
-		return l.stream().map(qty).reduce(ZERO, BigDecimal::add);
 	}
 
 	private BigDecimal deliveredQty(List<SalesItemVariance> l) {
@@ -41,5 +37,9 @@ public abstract class AbstractSalesItemVarianceService //
 
 	protected BigDecimal value(List<SalesItemVariance> l) {
 		return total(l, SalesItemVariance::getValue);
+	}
+
+	protected BigDecimal total(List<SalesItemVariance> l, Function<SalesItemVariance, BigDecimal> qty) {
+		return l.stream().map(qty).reduce(ZERO, BigDecimal::add);
 	}
 }

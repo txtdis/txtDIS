@@ -1,42 +1,28 @@
 package ph.txtdis;
 
-import static ph.txtdis.type.PriceType.DEALER;
-import static ph.txtdis.type.PriceType.PURCHASE;
-import static ph.txtdis.type.PriceType.RETAIL;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-
 import ph.txtdis.domain.SyncEntity;
 import ph.txtdis.dto.PickList;
 import ph.txtdis.dto.Warehouse;
 import ph.txtdis.mgdc.domain.HolidayEntity;
 import ph.txtdis.mgdc.domain.PricingTypeEntity;
-import ph.txtdis.mgdc.gsm.service.server.CreditedAndDiscountedCustomerService;
-import ph.txtdis.mgdc.gsm.service.server.GsmRemittanceService;
-import ph.txtdis.mgdc.gsm.service.server.GsmRouteService;
-import ph.txtdis.mgdc.gsm.service.server.ImportedBillingService;
-import ph.txtdis.mgdc.gsm.service.server.ImportedChannelService;
-import ph.txtdis.mgdc.gsm.service.server.ImportedItemService;
-import ph.txtdis.mgdc.gsm.service.server.ImportedLeveledItemFamilyService;
-import ph.txtdis.mgdc.gsm.service.server.ImportedLocationService;
-import ph.txtdis.mgdc.gsm.service.server.ImportedTruckService;
-import ph.txtdis.mgdc.gsm.service.server.PickListService;
-import ph.txtdis.mgdc.gsm.service.server.UserService;
+import ph.txtdis.mgdc.gsm.service.server.*;
 import ph.txtdis.mgdc.repository.HolidayRepository;
 import ph.txtdis.mgdc.repository.PricingTypeRepository;
 import ph.txtdis.mgdc.service.server.WarehouseService;
 import ph.txtdis.repository.SyncRepository;
 import ph.txtdis.type.SyncType;
 import ph.txtdis.util.DateTimeUtils;
+
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
+
+import static ph.txtdis.type.PriceType.*;
 
 @Configuration("persistenceConfiguration")
 public class PersistenceConfiguration {
@@ -119,31 +105,21 @@ public class PersistenceConfiguration {
 
 	private List<HolidayEntity> philippineHolidays2016() {
 		return Arrays.asList(//
-				newHoliday("AQUINO", 2016, 8, 21), //
-				newHoliday("HALLOWEEN", 2016, 10, 31), //
-				newHoliday("ALL SAINTS", 2016, 11, 1), //
-				newHoliday("BONIFACIO", 2016, 10, 30), //
-				newHoliday("CHRISTMAS EVE", 2016, 12, 24), //
-				newHoliday("CHRISTMAS", 2016, 12, 25), //
-				newHoliday("RIZAL", 2016, 12, 30), //
-				newHoliday("NEW YEAR'S EVE", 2016, 12, 31));
-	}
-
-	private HolidayEntity newHoliday(String name, int year, int month, int day) {
-		return new HolidayEntity(name, LocalDate.of(year, month, day));
+			newHoliday("AQUINO", 2016, 8, 21), //
+			newHoliday("HALLOWEEN", 2016, 10, 31), //
+			newHoliday("ALL SAINTS", 2016, 11, 1), //
+			newHoliday("BONIFACIO", 2016, 10, 30), //
+			newHoliday("CHRISTMAS EVE", 2016, 12, 24), //
+			newHoliday("CHRISTMAS", 2016, 12, 25), //
+			newHoliday("RIZAL", 2016, 12, 30), //
+			newHoliday("NEW YEAR'S EVE", 2016, 12, 31));
 	}
 
 	private List<PricingTypeEntity> pricings() {
 		return Arrays.asList(//
-				newPricing(PURCHASE.toString()), //
-				newPricing(DEALER.toString()), //
-				newPricing(RETAIL.toString()));
-	}
-
-	private PricingTypeEntity newPricing(String name) {
-		PricingTypeEntity e = new PricingTypeEntity();
-		e.setName(name);
-		return e;
+			newPricing(PURCHASE.toString()), //
+			newPricing(DEALER.toString()), //
+			newPricing(RETAIL.toString()));
 	}
 
 	private Warehouse warehouse() {
@@ -160,18 +136,28 @@ public class PersistenceConfiguration {
 		return p;
 	}
 
+	private SyncEntity sync() {
+		SyncEntity s = new SyncEntity();
+		s.setLastSync(DateTimeUtils.toUtilDate("2009-03-05"));
+		s.setType(SyncType.VERSION);
+		return s;
+	}
+
+	private HolidayEntity newHoliday(String name, int year, int month, int day) {
+		return new HolidayEntity(name, LocalDate.of(year, month, day));
+	}
+
+	private PricingTypeEntity newPricing(String name) {
+		PricingTypeEntity e = new PricingTypeEntity();
+		e.setName(name);
+		return e;
+	}
+
 	private LocalDate goLiveDate() {
 		return DateTimeUtils.toDate(goLive);
 	}
 
 	private ZonedDateTime goLiveTimestamp() {
 		return DateTimeUtils.toZonedDateTime(goLiveDate());
-	}
-
-	private SyncEntity sync() {
-		SyncEntity s = new SyncEntity();
-		s.setLastSync(DateTimeUtils.toUtilDate("2009-03-05"));
-		s.setType(SyncType.VERSION);
-		return s;
 	}
 }

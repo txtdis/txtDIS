@@ -1,17 +1,16 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.mgdc.gsm.domain.BillableEntity;
 import ph.txtdis.mgdc.gsm.domain.RemittanceDetailEntity;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service("postDatedChequeUpdateService")
 public class PostDatedChequeUpdateServiceImpl //
-		implements PostDatedChequeUpdateService {
+	implements PostDatedChequeUpdateService {
 
 	@Autowired
 	private GsmRemittanceService service;

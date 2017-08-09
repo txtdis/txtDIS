@@ -19,29 +19,29 @@ import ph.txtdis.mgdc.controller.AbstractSpunSavedReferencedKeyedController;
 @RequestMapping("/orderConfirmations")
 @RestController("orderConfirmationController")
 public class OrderConfirmationController //
-		extends AbstractSpunSavedReferencedKeyedController<OrderConfirmationService, BillableEntity, Billable> {
+	extends AbstractSpunSavedReferencedKeyedController<OrderConfirmationService, BillableEntity, Billable> {
 
 	@RequestMapping(path = "/deliveredValue", method = GET)
 	public ResponseEntity<?> deliveredValue( //
-			@RequestParam("collector") String collector, //
-			@RequestParam("start") Date start, //
-			@RequestParam("end") Date end) {
+	                                         @RequestParam("receivedFrom") String collector, //
+	                                         @RequestParam("start") Date start, //
+	                                         @RequestParam("end") Date end) {
 		Billable b = service.getWithDeliveredValue(collector, start.toLocalDate(), end.toLocalDate());
 		return new ResponseEntity<>(b, OK);
 	}
 
 	@RequestMapping(path = "/ocs", method = GET)
 	public ResponseEntity<?> ocs( //
-			@RequestParam("date") Date d, //
-			@RequestParam("outletId") Long customerVendorId, //
-			@RequestParam("count") Long count) {
+	                              @RequestParam("date") Date d, //
+	                              @RequestParam("outletId") Long customerVendorId, //
+	                              @RequestParam("count") Long count) {
 		Billable b = service.find(d.toLocalDate(), customerVendorId, count);
 		return new ResponseEntity<>(b, OK);
 	}
 
 	@RequestMapping(path = "/unpicked", method = GET)
 	public ResponseEntity<?> unpicked( //
-			@RequestParam("date") Date d) {
+	                                   @RequestParam("date") Date d) {
 		List<Billable> l = service.findAllUnpicked(d.toLocalDate());
 		return new ResponseEntity<>(l, OK);
 	}

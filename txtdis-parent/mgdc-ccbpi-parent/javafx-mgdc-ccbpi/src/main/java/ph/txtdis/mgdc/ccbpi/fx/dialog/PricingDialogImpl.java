@@ -24,14 +24,15 @@ import ph.txtdis.util.DateTimeUtils;
 @Scope("prototype")
 @Component("pricingDialog")
 public class PricingDialogImpl //
-		extends AbstractFieldDialog<Price> //
-		implements PricingDialog {
+	extends AbstractFieldDialog<Price> //
+	implements PricingDialog {
 
 	@Autowired
 	private LabeledDatePicker endDatePicker, startDatePicker;
 
 	@Autowired
-	private LabeledField<BigDecimal> dealerPriceAfterEndField, dealerPriceAtStartField, purchasePriceAfterEndField, purchasePriceAtStartField;
+	private LabeledField<BigDecimal> dealerPriceAfterEndField, dealerPriceAtStartField, purchasePriceAfterEndField,
+		purchasePriceAtStartField;
 
 	@Autowired
 	private BommedDiscountedPricedValidatedItemService itemService;
@@ -41,11 +42,11 @@ public class PricingDialogImpl //
 	@Override
 	protected List<InputNode<?>> addNodes() {
 		return asList(startDatePicker(), //
-				purchasePriceOnStartField(), //
-				dealerPriceOnStartField(), //
-				endDatePicker(), //
-				purchasePriceAfterEndField(), //
-				dealerPriceAfterEndField()); //
+			purchasePriceOnStartField(), //
+			dealerPriceOnStartField(), //
+			endDatePicker(), //
+			purchasePriceAfterEndField(), //
+			dealerPriceAfterEndField()); //
 	}
 
 	private LabeledDatePicker startDatePicker() {
@@ -61,9 +62,9 @@ public class PricingDialogImpl //
 
 	private void createPurchasePriceAtStartUponValidation() {
 		purchasePriceAtStart = createPricingUponValidation( //
-				itemService.getPurchasePricingType(), //
-				startDatePicker.getValue(), //
-				purchasePriceAtStartField.getValue());
+			itemService.getPurchasePricingType(), //
+			startDatePicker.getValue(), //
+			purchasePriceAtStartField.getValue());
 	}
 
 	private Price createPricingUponValidation(PricingType type, LocalDate date, BigDecimal value) {
@@ -84,9 +85,9 @@ public class PricingDialogImpl //
 
 	private void createDealerPriceAtStartUponValidation() {
 		dealerPriceAtStart = createPricingUponValidation( //
-				itemService.getDealerPricingType(), //
-				startDatePicker.getValue(), //
-				dealerPriceAtStartField.getValue());
+			itemService.getDealerPricingType(), //
+			startDatePicker.getValue(), //
+			dealerPriceAtStartField.getValue());
 	}
 
 	private LabeledDatePicker endDatePicker() {
@@ -118,9 +119,9 @@ public class PricingDialogImpl //
 
 	private void createPurchasePriceAfterEndUponValidation() {
 		purchasePriceAfterEnd = createPricingUponValidation( //
-				itemService.getPurchasePricingType(), //
-				dateAfterEnd(), //
-				purchasePriceAfterEndField.getValue());
+			itemService.getPurchasePricingType(), //
+			dateAfterEnd(), //
+			purchasePriceAfterEndField.getValue());
 	}
 
 	private LocalDate dateAfterEnd() {
@@ -136,9 +137,9 @@ public class PricingDialogImpl //
 
 	private void createDealerPriceAfterEndUponValidation() {
 		dealerPriceAfterEnd = createPricingUponValidation( //
-				itemService.getDealerPricingType(), //
-				dateAfterEnd(), //
-				dealerPriceAfterEndField.getValue());
+			itemService.getDealerPricingType(), //
+			dateAfterEnd(), //
+			dealerPriceAfterEndField.getValue());
 	}
 
 	@Override

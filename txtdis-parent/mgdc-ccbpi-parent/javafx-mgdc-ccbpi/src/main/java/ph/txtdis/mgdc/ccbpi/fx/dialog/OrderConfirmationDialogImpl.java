@@ -9,6 +9,6 @@ import ph.txtdis.mgdc.ccbpi.service.OrderConfirmationService;
 @Scope("prototype")
 @Component("orderConfirmationDialog")
 public class OrderConfirmationDialogImpl //
-		extends AbstractAllItemInCasesAndBottlesInputDialog<OrderConfirmationService, BillableDetail> //
-		implements OrderConfirmationDialog {
+	extends AbstractAllItemInCasesAndBottlesInputDialog<OrderConfirmationService, BillableDetail> //
+	implements OrderConfirmationDialog {
 }

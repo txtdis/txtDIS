@@ -1,6 +1,7 @@
 package ph.txtdis.exception;
 
-public class UnauthorizedUserException extends Exception {
+public class UnauthorizedUserException
+	extends Exception {
 
 	private static final long serialVersionUID = -8431370059178958748L;
 

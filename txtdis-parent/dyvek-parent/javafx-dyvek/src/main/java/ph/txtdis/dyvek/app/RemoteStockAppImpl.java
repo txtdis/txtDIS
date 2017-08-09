@@ -1,19 +1,18 @@
 package ph.txtdis.dyvek.app;
 
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
 import ph.txtdis.app.AbstractApp;
 import ph.txtdis.dyvek.service.RemoteStockService;
 
+import java.util.List;
+
 @Scope("prototype")
 @Component("remoteStockApp")
-public class RemoteStockAppImpl //
-		extends AbstractApp<RemoteStockService>//
-		implements RemoteStockApp {
+public class RemoteStockAppImpl
+	extends AbstractApp<RemoteStockService>
+	implements RemoteStockApp {
 
 	@Override
 	public void goToDefaultFocus() {

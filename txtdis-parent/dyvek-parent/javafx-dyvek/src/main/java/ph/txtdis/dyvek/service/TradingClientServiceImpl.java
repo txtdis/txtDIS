@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 
 @Service("tradingClientService")
 public class TradingClientServiceImpl //
-		extends AbstractCustomerService //
-		implements TradingClientService {
+	extends AbstractCustomerService //
+	implements TradingClientService {
 
 	@Override
 	public String getHeaderName() {

@@ -5,9 +5,10 @@ import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.service.HeaderNameService;
 import ph.txtdis.service.SavableAsExcelService;
 
-public abstract class AbstractListApp<AT extends AppTable<T>, AS extends SavableAsExcelService<T>, T extends Keyed<Long>> //
-		extends AbstractExcelApp<AT, AS, T> //
-		implements KeySelectableListApp {
+public abstract class AbstractListApp<AT extends AppTable<T>, AS extends SavableAsExcelService<T>, T extends
+	Keyed<Long>> //
+	extends AbstractExcelApp<AT, AS, T> //
+	implements KeySelectableListApp {
 
 	@Override
 	public Long getSelectedKey() {
@@ -23,12 +24,12 @@ public abstract class AbstractListApp<AT extends AppTable<T>, AS extends Savable
 	}
 
 	@Override
-	protected String getHeaderText() {
-		return ((HeaderNameService) service).getHeaderName() + " List";
+	protected String getTitleText() {
+		return getHeaderText();
 	}
 
 	@Override
-	protected String getTitleText() {
-		return getHeaderText();
+	protected String getHeaderText() {
+		return ((HeaderNameService) service).getHeaderName() + " List";
 	}
 }

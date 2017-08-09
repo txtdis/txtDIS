@@ -6,5 +6,5 @@ import ph.txtdis.mgdc.service.server.AbstractItemFamilyService;
 
 @Service("itemFamilyService")
 public class ItemFamilyServiceImpl //
-		extends AbstractItemFamilyService {
+	extends AbstractItemFamilyService {
 }

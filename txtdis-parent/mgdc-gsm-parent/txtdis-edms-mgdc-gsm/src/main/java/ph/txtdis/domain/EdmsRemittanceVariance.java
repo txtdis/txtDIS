@@ -14,7 +14,9 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "tr_rsr_header")
 @EqualsAndHashCode(callSuper = true)
-public class EdmsRemittanceVariance extends EdmsAbstractDatedRemarkedReferencedStatusCreatedId implements Serializable {
+public class EdmsRemittanceVariance
+	extends EdmsAbstractDatedRemarkedReferencedStatusCreatedId
+	implements Serializable {
 
 	private static final long serialVersionUID = -2518161128745571598L;
 

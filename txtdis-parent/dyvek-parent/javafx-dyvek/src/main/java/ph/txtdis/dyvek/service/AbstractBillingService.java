@@ -1,19 +1,19 @@
 package ph.txtdis.dyvek.service;
 
-import static java.math.BigDecimal.ZERO;
-import static ph.txtdis.util.NumberUtils.isZero;
-import static ph.txtdis.util.NumberUtils.zeroIfNull;
+import ph.txtdis.dyvek.model.BillableDetail;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import ph.txtdis.dyvek.model.BillableDetail;
+import static java.math.BigDecimal.ZERO;
+import static ph.txtdis.util.NumberUtils.isZero;
+import static ph.txtdis.util.NumberUtils.zeroIfNull;
 
-public abstract class AbstractBillingService //
-		extends AbstractOrderService<VendorService> //
-		implements BillingService {
+public abstract class AbstractBillingService
+	extends AbstractOrderService<VendorService>
+	implements BillingService {
 
 	@Override
 	public boolean areAssignedAndDeliverQtyDifferent() {
@@ -21,24 +21,9 @@ public abstract class AbstractBillingService //
 	}
 
 	private BigDecimal totalAssignedQty() {
-		return getDetails().stream() //
-				.map(BillableDetail::getAssignedQty) //
-				.reduce(ZERO, BigDecimal::add);
-	}
-
-	@Override
-	public BigDecimal getAdjustmentPrice() {
-		return zeroIfNull(get().getAdjustmentPriceValue());
-	}
-
-	@Override
-	public BigDecimal getAdjustmentQty() {
-		return zeroIfNull(get().getAdjustmentQty());
-	}
-
-	@Override
-	public BigDecimal getAdjustmentValue() {
-		return getAdjustmentPrice().multiply(getAdjustmentQty());
+		return getDetails().stream()
+			.map(BillableDetail::getAssignedQty)
+			.reduce(ZERO, BigDecimal::add);
 	}
 
 	@Override
@@ -87,13 +72,13 @@ public abstract class AbstractBillingService //
 	}
 
 	@Override
-	public BigDecimal getNetValue() {
-		return getTotalValue().subtract(getAdjustmentValue());
+	public void setCustomer(String name) {
+		get().setVendor(name);
 	}
 
 	@Override
-	public String getOrderNo() {
-		return get().getDeliveryNo();
+	public BigDecimal getNetValue() {
+		return getTotalValue().subtract(getAdjustmentValue());
 	}
 
 	@Override
@@ -102,13 +87,28 @@ public abstract class AbstractBillingService //
 	}
 
 	@Override
-	public List<String> listCustomers() {
-		return null;
+	public BigDecimal getAdjustmentValue() {
+		return getAdjustmentPrice().multiply(getAdjustmentQty());
 	}
 
 	@Override
-	public void setCustomer(String name) {
-		get().setVendor(name);
+	public BigDecimal getAdjustmentPrice() {
+		return zeroIfNull(get().getAdjustmentPriceValue());
+	}
+
+	@Override
+	public BigDecimal getAdjustmentQty() {
+		return zeroIfNull(get().getAdjustmentQty());
+	}
+
+	@Override
+	public String getOrderNo() {
+		return get().getDeliveryNo();
+	}
+
+	@Override
+	public List<String> listCustomers() {
+		return null;
 	}
 
 	@Override
@@ -117,9 +117,9 @@ public abstract class AbstractBillingService //
 
 	@Override
 	public void updateTotals(List<BillableDetail> items) {
-		get().setTotalValue(items //
-				.stream() //
-				.map(d -> zeroIfNull(d.getAssignedQty()).multiply(zeroIfNull(d.getPriceValue()))) //
-				.reduce(ZERO, BigDecimal::add));
+		get().setTotalValue(items
+			.stream()
+			.map(d -> zeroIfNull(d.getAssignedQty()).multiply(zeroIfNull(d.getPriceValue())))
+			.reduce(ZERO, BigDecimal::add));
 	}
 }

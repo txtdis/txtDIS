@@ -5,13 +5,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javafx.scene.layout.GridPane;
-import ph.txtdis.app.ItemApp;
-import ph.txtdis.app.PickListApp;
-import ph.txtdis.app.RemittanceApp;
-import ph.txtdis.app.StockTakeApp;
-import ph.txtdis.app.StockTakeVarianceApp;
-import ph.txtdis.app.TruckAppImpl;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.app.*;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.dialog.AbstractMainMenu;
 import ph.txtdis.fx.dialog.StyleApp;
@@ -33,13 +28,18 @@ import ph.txtdis.mgdc.ccbpi.app.RemittanceVarianceApp;
 @Scope("prototype")
 @Component("mainMenu")
 public class MainMenuImpl //
-		extends AbstractMainMenu {
+	extends AbstractMainMenu {
 
 	@Autowired
-	private AppButtonImpl deliveryListButton, loadManifestButton, orderConfirmationButton, pickListButton, orderReturnButton, loadReturnButton,
-			bookingVarianceButton, //
-			badRmaButton, blanketBalanceButton, remittanceButton, remittanceVarianceButton, deliveryReturnButton, paymentButton, inventoryButton, // 
-			stockTakeButton, stockTakeVarianceButton, itemButton, routeButton, truckButton, userButton, styleButton;
+	private AppButton deliveryListButton, loadManifestButton, orderConfirmationButton, pickListButton,
+		orderReturnButton,
+		loadReturnButton,
+		bookingVarianceButton, //
+
+		badRmaButton, blanketBalanceButton, remittanceButton, remittanceVarianceButton, deliveryReturnButton,
+		paymentButton, inventoryButton, //
+
+		stockTakeButton, stockTakeVarianceButton, itemButton, routeButton, truckButton, userButton, styleButton;
 
 	@Autowired
 	private LabelFactory label;
@@ -102,7 +102,7 @@ public class MainMenuImpl //
 	private StyleApp styleDialog;
 
 	@Autowired
-	private TruckAppImpl truckApp;
+	private TruckApp truckApp;
 
 	@Autowired
 	private UserApp userDialog;

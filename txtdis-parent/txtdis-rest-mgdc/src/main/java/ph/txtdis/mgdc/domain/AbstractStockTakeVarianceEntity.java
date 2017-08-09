@@ -1,22 +1,21 @@
 package ph.txtdis.mgdc.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import ph.txtdis.domain.AbstractKeyedEntity;
 import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Data
 @MappedSuperclass
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractStockTakeVarianceEntity //
-		extends AbstractKeyedEntity<Long> {
+	extends AbstractKeyedEntity<Long> {
 
 	private static final long serialVersionUID = 6477056826796440763L;
 

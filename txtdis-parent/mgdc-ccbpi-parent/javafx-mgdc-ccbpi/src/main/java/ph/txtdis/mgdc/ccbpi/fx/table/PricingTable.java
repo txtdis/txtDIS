@@ -4,5 +4,5 @@ import ph.txtdis.dto.Price;
 import ph.txtdis.fx.table.AppTable;
 
 public interface PricingTable //
-		extends AppTable<Price> {
+	extends AppTable<Price> {
 }

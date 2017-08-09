@@ -7,5 +7,5 @@ import ph.txtdis.repository.SpunRepository;
 
 @Repository("pickListDetailRepository")
 public interface PickListDetailRepository //
-		extends SpunRepository<PickListDetailEntity, Long> {
+	extends SpunRepository<PickListDetailEntity, Long> {
 }

@@ -1,34 +1,26 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import static ph.txtdis.type.ItemTier.PRODUCT;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.gsm.dto.Item;
-import ph.txtdis.service.CredentialService;
-import ph.txtdis.service.ReadOnlyService;
-import ph.txtdis.service.SavingService;
+import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.ItemTier;
 import ph.txtdis.util.ClientTypeMap;
 
+import java.util.List;
+
+import static ph.txtdis.type.ItemTier.PRODUCT;
+import static ph.txtdis.util.UserUtils.username;
+
 @Service("itemFamilyService")
 public class ItemFamilyServiceImpl //
-		implements ItemFamilyService {
+	implements ItemFamilyService {
 
 	@Autowired
-	private CredentialService credentialService;
-
-	@Autowired
-	private ReadOnlyService<ItemFamily> readOnlyService;
-
-	@Autowired
-	private SavingService<ItemFamily> savingService;
+	private RestClientService<ItemFamily> restClientService;
 
 	@Autowired
 	private ClientTypeMap typeMap;
@@ -43,12 +35,7 @@ public class ItemFamilyServiceImpl //
 
 	@Override
 	public List<ItemFamily> getItemAncestry(Item item) throws Exception {
-		return readOnlyService.module(getModuleName()).getList("/ancestry?family=" + item.getFamily());
-	}
-
-	@Override
-	public String getHeaderName() {
-		return "Item Family";
+		return restClientService.module(getModuleName()).getList("/ancestry?family=" + item.getFamily());
 	}
 
 	@Override
@@ -57,23 +44,33 @@ public class ItemFamilyServiceImpl //
 	}
 
 	@Override
-	public String getTitleName() {
-		return credentialService.username() + "@" + modulePrefix + " Item Families";
+	public String getHeaderName() {
+		return "Item Family";
 	}
 
 	@Override
-	public ReadOnlyService<ItemFamily> getListedReadOnlyService() {
-		return readOnlyService;
+	public String getTitleName() {
+		return username() + "@" + modulePrefix + " Item Families";
+	}
+
+	@Override
+	public RestClientService<ItemFamily> getRestClientService() {
+		return restClientService;
+	}
+
+	@Override
+	public RestClientService<ItemFamily> getRestClientServiceForLists() {
+		return restClientService;
 	}
 
 	@Override
 	public List<ItemFamily> listItemFamily(ItemTier t) throws Exception {
-		return readOnlyService.module(getModuleName()).getList("/perTier?tier=" + t);
+		return restClientService.module(getModuleName()).getList("/perTier?tier=" + t);
 	}
 
 	@Override
 	public List<ItemFamily> listItemParents() throws Exception {
-		return readOnlyService.module(getModuleName()).getList("/parents");
+		return restClientService.module(getModuleName()).getList("/parents");
 	}
 
 	@Override
@@ -90,6 +87,6 @@ public class ItemFamilyServiceImpl //
 		ItemFamily entity = new ItemFamily();
 		entity.setName(name);
 		entity.setTier(tier);
-		return savingService.module(getModuleName()).save(entity);
+		return restClientService.module(getModuleName()).save(entity);
 	}
 }

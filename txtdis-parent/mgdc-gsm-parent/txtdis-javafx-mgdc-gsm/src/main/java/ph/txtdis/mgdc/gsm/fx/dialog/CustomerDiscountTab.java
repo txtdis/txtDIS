@@ -1,23 +1,23 @@
 package ph.txtdis.mgdc.gsm.fx.dialog;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.fx.tab.AbstractTab;
 import ph.txtdis.mgdc.gsm.fx.table.CustomerDiscountTable;
 import ph.txtdis.mgdc.gsm.service.ValueBasedCustomerDiscountService;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Scope("prototype")
 @Component("customerDiscountTab")
-public class CustomerDiscountTab extends AbstractTab {
+public class CustomerDiscountTab
+	extends AbstractTab {
 
 	@Autowired
 	private ValueBasedCustomerDiscountService service;
@@ -53,7 +53,7 @@ public class CustomerDiscountTab extends AbstractTab {
 
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
-		return asList(box.forHorizontalPane(customerDiscountTable.build()));
+		return asList(pane.centeredHorizontal(customerDiscountTable.build()));
 	}
 
 	@Override

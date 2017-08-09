@@ -1,23 +1,22 @@
 package ph.txtdis.mgdc.gsm.service.server;
 
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import static java.time.LocalDate.parse;
 import static org.apache.log4j.Logger.getLogger;
 import static ph.txtdis.type.UomType.CS;
 import static ph.txtdis.util.NumberUtils.divide;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.mgdc.gsm.domain.BillableDetailEntity;
-
 @Service("salesVolumeService")
 public class SalesVolumeServiceImpl //
-		extends AbstractSalesVolumeService {
+	extends AbstractSalesVolumeService {
 
 	private static Logger logger = getLogger(SalesVolumeServiceImpl.class);
 

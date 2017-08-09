@@ -15,7 +15,7 @@ import lombok.Getter;
 @Getter
 @Service("restServerService")
 public class RestServerServiceImpl //
-		implements RestServerService {
+	implements RestServerService {
 
 	private static Logger logger = getLogger(RestServerServiceImpl.class);
 
@@ -40,16 +40,20 @@ public class RestServerServiceImpl //
 	private String location;
 
 	@Override
-	public String address() {
-		return addresses.get(index());
+	public String getKeystore() {
+		logger.info("\n    Keystore = " + keystores.get(index()) + ".p12");
+		logger.info("\n    Address = " + getAddress());
+		logger.info("\n    Port = " + port);
+		return keystores.get(index()) + ".p12";
+	}
+
+	private int index() {
+		return locations.indexOf(getLocation());
 	}
 
 	@Override
-	public String getKeystore() {
-		logger.info("\n    Keystore = " + keystores.get(index()) + ".p12");
-		logger.info("\n    Address = " + address());
-		logger.info("\n    Port = " + port);
-		return keystores.get(index()) + ".p12";
+	public String getAddress() {
+		return addresses.get(index());
 	}
 
 	@Override
@@ -62,9 +66,5 @@ public class RestServerServiceImpl //
 	@Override
 	public void setLocation(String location) {
 		this.location = location;
-	}
-
-	private int index() {
-		return locations.indexOf(getLocation());
 	}
 }

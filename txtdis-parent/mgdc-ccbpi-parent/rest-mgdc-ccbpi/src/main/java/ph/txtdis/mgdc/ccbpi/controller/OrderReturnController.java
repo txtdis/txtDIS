@@ -19,7 +19,7 @@ import ph.txtdis.mgdc.controller.AbstractSpunSavedReferencedKeyedController;
 @RequestMapping("/orderReturns")
 @RestController("orderReturnController")
 public class OrderReturnController //
-		extends AbstractSpunSavedReferencedKeyedController<OrderReturnService, BillableEntity, Billable> {
+	extends AbstractSpunSavedReferencedKeyedController<OrderReturnService, BillableEntity, Billable> {
 
 	@RequestMapping(path = "/orderReturn", method = GET)
 	public ResponseEntity<?> orderReturn(@RequestParam("id") Long id) throws NotFoundException {
@@ -29,9 +29,9 @@ public class OrderReturnController //
 
 	@RequestMapping(path = "/rr", method = GET)
 	public ResponseEntity<?> rr( //
-			@RequestParam("date") Date d, //
-			@RequestParam("outletId") Long customerVendorId, //
-			@RequestParam("count") Long count) {
+	                             @RequestParam("date") Date d, //
+	                             @RequestParam("outletId") Long customerVendorId, //
+	                             @RequestParam("count") Long count) {
 		Billable i = service.find(d.toLocalDate(), customerVendorId, count);
 		return new ResponseEntity<>(i, OK);
 	}

@@ -14,14 +14,15 @@ import ph.txtdis.mgdc.fx.table.AbstractPickListTable;
 
 @Scope("prototype")
 @Component("pickListTable")
-public class PickListTableImpl extends AbstractPickListTable {
+public class PickListTableImpl
+	extends AbstractPickListTable {
 
 	@Override
 	protected List<TableColumn<Booking, ?>> addColumns() {
 		return Arrays.asList(//
-				location.launches(app).ofType(TEXT).width(180).build("Order No.", "location"), //
-				name.launches(app).ofType(TEXT).width(240).build("Outlet", "customer"), //
-				route.launches(app).ofType(TEXT).width(60).build("Route", "route"), //
-				delivery.launches(app).ofType(TEXT).width(100).build("Delivery", "deliveryRoute")); //
+			location.launches(app).ofType(TEXT).width(180).build("Order No.", "location"), //
+			name.launches(app).ofType(TEXT).width(240).build("Outlet", "customer"), //
+			route.launches(app).ofType(TEXT).width(60).build("Route", "route"), //
+			delivery.launches(app).ofType(TEXT).width(100).build("Delivery", "deliveryRoute")); //
 	}
 }

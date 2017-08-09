@@ -1,16 +1,18 @@
 package ph.txtdis.mgdc.gsm.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.Booking;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.service.VerifiedSalesOrderService;
 import ph.txtdis.service.CustomerSearchableService;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
 public interface BookingService //
-		extends BillableService, CustomerSearchableService, VerifiedSalesOrderService {
+	extends BillableService,
+	CustomerSearchableService,
+	VerifiedSalesOrderService {
 
 	boolean canInvalidSalesOrderBeOverriden();
 

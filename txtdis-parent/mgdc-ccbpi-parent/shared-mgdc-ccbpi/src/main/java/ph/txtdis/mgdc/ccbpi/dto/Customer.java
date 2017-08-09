@@ -19,7 +19,7 @@ import ph.txtdis.type.PartnerType;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Customer //
-		extends AbstractModificationTracked<Long> {
+	extends AbstractModificationTracked<Long> {
 
 	private Channel channel;
 
@@ -63,9 +63,9 @@ public class Customer //
 
 	public Route getRoute(LocalDate date) {
 		return getRouteHistory().stream() //
-				.filter(p -> !p.getStartDate().isAfter(date)) //
-				.collect(maxBy(comparing(Routing::getStartDate)))//
-				.orElse(new Routing()).getRoute();
+			.filter(p -> !p.getStartDate().isAfter(date)) //
+			.collect(maxBy(comparing(Routing::getStartDate)))//
+			.orElse(new Routing()).getRoute();
 	}
 
 	public List<Routing> getRouteHistory() {

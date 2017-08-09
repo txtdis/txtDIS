@@ -1,25 +1,25 @@
 package ph.txtdis.domain;
 
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.DateTimeUtils.toLocalDate;
-
-import java.io.Serializable;
-import java.util.Date;
+import lombok.Data;
+import ph.txtdis.dto.Keyed;
+import ph.txtdis.type.SyncType;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
+import java.util.Date;
 
-import lombok.Data;
-import ph.txtdis.dto.Keyed;
-import ph.txtdis.type.SyncType;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.DateTimeUtils.toLocalDate;
 
 @Data
 @Entity
 @Table(name = "sync")
 public class SyncEntity //
-		implements Serializable, Keyed<SyncType> {
+	implements Serializable,
+	Keyed<SyncType> {
 
 	private static final long serialVersionUID = 4934707118618469477L;
 

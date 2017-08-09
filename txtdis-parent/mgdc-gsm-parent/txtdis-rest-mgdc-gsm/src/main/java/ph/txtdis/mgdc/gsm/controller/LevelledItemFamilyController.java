@@ -1,25 +1,24 @@
 package ph.txtdis.mgdc.gsm.controller;
 
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import ph.txtdis.dto.ItemFamily;
 import ph.txtdis.mgdc.controller.AbstractItemFamilyController;
 import ph.txtdis.mgdc.gsm.service.server.ImportedLeveledItemFamilyService;
 
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 @RequestMapping("/itemFamilies")
 @RestController("itemFamilyController")
 public class LevelledItemFamilyController //
-		extends AbstractItemFamilyController<ImportedLeveledItemFamilyService> {
+	extends AbstractItemFamilyController<ImportedLeveledItemFamilyService> {
 
 	@RequestMapping(path = "/ancestry", method = GET)
 	public ResponseEntity<?> ancestry(@RequestParam("family") String f) {
