@@ -1,29 +1,36 @@
 package ph.txtdis.dyvek.app;
 
+import javafx.scene.Node;
+import org.springframework.beans.factory.annotation.Autowired;
+import ph.txtdis.dyvek.model.BillableDetail;
+import ph.txtdis.dyvek.service.OrderService;
+import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.fx.control.AppFieldImpl;
+import ph.txtdis.fx.table.AppTable;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javafx.scene.Node;
-import ph.txtdis.dyvek.model.BillableDetail;
-import ph.txtdis.dyvek.service.OrderService;
-import ph.txtdis.fx.control.AppFieldImpl;
-import ph.txtdis.fx.table.AppTable;
-
-public abstract class AbstractTabledOpenListedOrderApp< //
-		OLA extends OpenOrderListApp, //
-		LA extends OrderListApp, //
-		AT extends AppTable<BillableDetail>, //
-		S extends OrderService> //
-		extends AbstractOpenListedOrderApp<OLA, LA, S> {
+public abstract class AbstractTabledOpenListedOrderApp<
+	OLA extends OpenOrderListApp,
+	LA extends OrderListApp,
+	AT extends AppTable<BillableDetail>,
+	S extends OrderService>
+	extends AbstractOpenListedOrderApp<OLA, LA, S> {
 
 	@Autowired
 	protected AppFieldImpl<BigDecimal> balanceDisplay, priceInput, totalDisplay;
 
 	@Autowired
 	protected AT table;
+
+	@Override
+	protected List<AppButton> addButtons() {
+		List<AppButton> b = super.addButtons();
+		b.add(decisionButton = decisionNeededApp.addDecisionButton());
+		return b;
+	}
 
 	@Override
 	protected void clear() {
@@ -34,7 +41,7 @@ public abstract class AbstractTabledOpenListedOrderApp< //
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
 		List<Node> l = new ArrayList<>(super.mainVerticalPaneNodes());
-		l.add(1, box.forHorizontalPane(table.build()));
+		l.add(1, pane.centeredHorizontal(table.build()));
 		return l;
 	}
 
@@ -57,12 +64,12 @@ public abstract class AbstractTabledOpenListedOrderApp< //
 			totalDisplay.setValue(service.getTotalValue());
 	}
 
-	protected void refreshTable() {
+	private void refreshTable() {
 		if (table != null)
 			table.items(service.getDetails());
 	}
 
-	protected void refreshBalance() {
+	private void refreshBalance() {
 		if (balanceDisplay != null)
 			balanceDisplay.setValue(service.getBalanceQty());
 	}
@@ -83,30 +90,31 @@ public abstract class AbstractTabledOpenListedOrderApp< //
 		qtyBinding();
 		priceBinding();
 		remarksBinding();
+		decisionButton.disableIf(isNew());
 	}
 
 	protected void saveBinding() {
 		if (saveButton != null && priceInput != null)
-			saveButton.disableIf(isPosted() //
-					.or(priceInput.isEmpty()));
+			saveButton.disableIf(isPosted()
+				.or(priceInput.isEmpty()));
 	}
 
 	private void qtyBinding() {
 		if (qtyInput != null && itemCombo != null)
-			qtyInput.disableIf(isPosted() //
-					.or(itemCombo.isEmpty()));
+			qtyInput.disableIf(isPosted()
+				.or(itemCombo.isEmpty()));
 	}
 
 	private void priceBinding() {
 		if (priceInput != null && qtyInput != null)
-			priceInput.disableIf(isPosted() //
-					.or(qtyInput.isEmpty()));
+			priceInput.disableIf(isPosted()
+				.or(qtyInput.isEmpty()));
 	}
 
 	protected void remarksBinding() {
 		if (remarksDisplay != null && priceInput != null)
-			remarksDisplay.editableIf(isNew() //
-					.and(priceInput.isNotEmpty()));
+			remarksDisplay.editableIf(isNew()
+				.and(priceInput.isNotEmpty()));
 	}
 
 	@Override

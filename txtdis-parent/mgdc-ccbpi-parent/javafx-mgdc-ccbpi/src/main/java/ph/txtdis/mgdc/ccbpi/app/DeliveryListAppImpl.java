@@ -1,17 +1,16 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import java.io.File;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.ccbpi.excel.OCPReader;
 import ph.txtdis.mgdc.ccbpi.fx.dialog.OCPChooser;
 import ph.txtdis.mgdc.ccbpi.fx.table.DeliveryListTable;
 import ph.txtdis.mgdc.ccbpi.service.DeliveryListService;
+
+import java.io.File;
 
 @Scope("prototype")
 @Component("deliveryListApp")
@@ -53,7 +52,7 @@ public class DeliveryListAppImpl //
 			try {
 				updateBasedOnRouteSelection(route);
 			} catch (Information i) {
-				messageDialog.show(i).addParent(this).start();
+				showInfoDialog(i);
 				refresh();
 			} catch (Exception e) {
 				showErrorDialog(e);

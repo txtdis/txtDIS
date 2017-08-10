@@ -1,31 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.type.ItemType.FREE;
-import static ph.txtdis.type.ItemType.PURCHASED;
-import static ph.txtdis.util.DateTimeUtils.getServerDate;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.DateTimeUtils.toHypenatedYearMonthDay;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import ph.txtdis.dto.AbstractDecisionNeeded;
-import ph.txtdis.dto.Bom;
-import ph.txtdis.dto.ItemFamily;
-import ph.txtdis.dto.Price;
-import ph.txtdis.dto.PricingType;
-import ph.txtdis.dto.QtyPerUom;
+import ph.txtdis.dto.*;
 import ph.txtdis.excel.ExcelReportWriter;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.NotAPurchasedItemException;
@@ -35,9 +12,23 @@ import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.ccbpi.dto.Channel;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.service.PricingTypeService;
-import ph.txtdis.service.SyncService;
 import ph.txtdis.type.ItemType;
 import ph.txtdis.type.UomType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
+
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.type.ItemType.FREE;
+import static ph.txtdis.type.ItemType.PURCHASED;
+import static ph.txtdis.util.DateTimeUtils.*;
 
 public abstract class AbstractBommedDiscountedPricedValidatedItemService //
 	extends AbstractItemService //

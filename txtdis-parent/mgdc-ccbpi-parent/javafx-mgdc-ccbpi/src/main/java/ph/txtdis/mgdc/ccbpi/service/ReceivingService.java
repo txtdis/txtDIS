@@ -1,14 +1,14 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.util.stream.Collectors.toList;
-
-import java.math.BigDecimal;
-import java.util.List;
-
 import ph.txtdis.dto.ReceivingDetail;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.service.QtyPerUomService;
 import ph.txtdis.type.UomType;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 public interface ReceivingService //
 	extends QtyPerUomService {

@@ -1,65 +1,19 @@
 package ph.txtdis;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.PriceType.DEALER;
-import static ph.txtdis.type.PriceType.PURCHASE;
-import static ph.txtdis.type.SyncType.BACKUP;
-import static ph.txtdis.type.SyncType.VERSION;
-import static ph.txtdis.type.UserType.CASHIER;
-import static ph.txtdis.type.UserType.COLLECTOR;
-import static ph.txtdis.type.UserType.DRIVER;
-import static ph.txtdis.type.UserType.HEAD_CASHIER;
-import static ph.txtdis.type.UserType.HELPER;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.SALES_ENCODER;
-import static ph.txtdis.type.UserType.SELLER;
-import static ph.txtdis.type.UserType.STOCK_CHECKER;
-import static ph.txtdis.type.UserType.STOCK_TAKER;
-import static ph.txtdis.type.UserType.STORE_KEEPER;
-import static ph.txtdis.type.UserType.SYSGEN;
-import static ph.txtdis.util.DateTimeUtils.epochDate;
-import static ph.txtdis.util.DateTimeUtils.toDate;
-import static ph.txtdis.util.DateTimeUtils.toUtilDate;
-import static ph.txtdis.util.UserUtils.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
-
 import ph.txtdis.domain.AuthorityEntity;
 import ph.txtdis.domain.SyncEntity;
 import ph.txtdis.domain.TruckEntity;
 import ph.txtdis.domain.UserEntity;
-import ph.txtdis.mgdc.ccbpi.domain.CustomerEntity;
-import ph.txtdis.mgdc.ccbpi.domain.ItemEntity;
-import ph.txtdis.mgdc.ccbpi.domain.PickListDetailEntity;
-import ph.txtdis.mgdc.ccbpi.domain.PickListEntity;
-import ph.txtdis.mgdc.ccbpi.domain.QtyPerUomEntity;
-import ph.txtdis.mgdc.ccbpi.domain.RoutingEntity;
+import ph.txtdis.mgdc.ccbpi.domain.*;
 import ph.txtdis.mgdc.ccbpi.repository.CustomerRepository;
 import ph.txtdis.mgdc.ccbpi.repository.ItemRepository;
 import ph.txtdis.mgdc.ccbpi.repository.PickListDetailRepository;
 import ph.txtdis.mgdc.ccbpi.repository.PickListRepository;
-import ph.txtdis.mgdc.domain.AccountEntity;
-import ph.txtdis.mgdc.domain.HolidayEntity;
-import ph.txtdis.mgdc.domain.PriceEntity;
-import ph.txtdis.mgdc.domain.PricingTypeEntity;
-import ph.txtdis.mgdc.domain.RouteEntity;
-import ph.txtdis.mgdc.domain.WarehouseEntity;
+import ph.txtdis.mgdc.domain.*;
 import ph.txtdis.mgdc.repository.HolidayRepository;
 import ph.txtdis.mgdc.repository.PricingTypeRepository;
 import ph.txtdis.mgdc.repository.RouteRepository;
@@ -67,13 +21,28 @@ import ph.txtdis.mgdc.repository.WarehouseRepository;
 import ph.txtdis.repository.SyncRepository;
 import ph.txtdis.repository.TruckRepository;
 import ph.txtdis.repository.UserRepository;
-import ph.txtdis.type.ItemType;
-import ph.txtdis.type.PartnerType;
-import ph.txtdis.type.SyncType;
-import ph.txtdis.type.UomType;
-import ph.txtdis.type.UserType;
+import ph.txtdis.type.*;
 import ph.txtdis.util.DateTimeUtils;
-import ph.txtdis.util.UserUtils;
+
+import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.singletonList;
+import static ph.txtdis.type.PriceType.DEALER;
+import static ph.txtdis.type.PriceType.PURCHASE;
+import static ph.txtdis.type.SyncType.BACKUP;
+import static ph.txtdis.type.SyncType.VERSION;
+import static ph.txtdis.type.UserType.*;
+import static ph.txtdis.util.DateTimeUtils.*;
+import static ph.txtdis.util.UserUtils.encode;
 
 @Configuration("persistenceConfiguration")
 public class PersistenceConfiguration {
@@ -148,33 +117,33 @@ public class PersistenceConfiguration {
 	}
 
 	private List<UserEntity> users() {
-		return Arrays.asList(//
-			newUser("LAYCO", "GERALD", "password", null, null, DRIVER, COLLECTOR), //
-			newUser("CERNA", "ROMMEL", "password", null, null, DRIVER, COLLECTOR), //
-			newUser("LAYCO", "JEROME", "password", null, null, DRIVER, COLLECTOR), //
-			newUser("GURION", "VANS", "password", null, null, DRIVER, COLLECTOR), //
-			newUser("DANCEL", "MARVIN", "password", null, null, DRIVER), //
-			newUser("UBIÑA", "MARCIAL", "password", null, null, DRIVER), //
-			newUser("CLAVE", "RYAN", "password", null, null, DRIVER), //
-			newUser("VILLALINO", "ALJON", "password", null, null, COLLECTOR), //
-			newUser("CORDA", "AISON", "password", null, null, HELPER), //
-			newUser("TORIO", "JERRY", "password", null, null, HELPER), //
-			newUser("UBIÑA", "MARNEL", "password", null, null, HELPER), //
-			newUser("GUMABAY", "JAYJAY", "password", null, null, HELPER), //
-			newUser("REPUELA", "FRANK", "password", null, null, STORE_KEEPER), //
-			newUser("GUAÑIZO", "RONNAVIE", "password", null, null, STOCK_CHECKER), //
-			newUser("GUILLERMO", "MARIBEL", "password", null, null, SALES_ENCODER), //
-			newUser("TISADO", "KENNETH", "password", null, null, STOCK_TAKER), //
-			newUser("ABASCAN", "GELYN", "password", null, null, CASHIER), //
-			newUser("FAURA", "EDISON", "password", null, null, SELLER), //
-			newUser("SAN DIEGO", "KATRINA", "password", null, null, SELLER), //
-			newUser("BASILIO", "RAYMOND", "password", null, null, SELLER), //
-			newUser("CALAYAN", "BERCIE", "password", null, null, SELLER), //
-			newUser("DE LEON", "JOHN", "password", null, null, SELLER), //
-			newUser("DOPAN", "MARIVIC", "marvic", null, null, HEAD_CASHIER), //
-			newUser("SO", "JACKIE", "robbie", "917 568 2168", "manila12@gmail.com", MANAGER), //
-			newUser("SO", "RONALD", "alphacowboy", "917 895 8268", "ronaldallanso@yahoo.com", MANAGER), //
-			newUser(null, "SYSGEN", "Vierski@1", "949 859 2927", "txtdis.erp@gmail.com", MANAGER) //
+		return Arrays.asList(
+			newUser("LAYCO", "GERALD", "password", null, null, DRIVER, COLLECTOR), 
+			newUser("CERNA", "ROMMEL", "password", null, null, DRIVER, COLLECTOR), 
+			newUser("LAYCO", "JEROME", "password", null, null, DRIVER, COLLECTOR), 
+			newUser("GURION", "VANS", "password", null, null, DRIVER, COLLECTOR), 
+			newUser("DANCEL", "MARVIN", "password", null, null, DRIVER), 
+			newUser("UBIÑA", "MARCIAL", "password", null, null, DRIVER), 
+			newUser("CLAVE", "RYAN", "password", null, null, DRIVER), 
+			newUser("VILLALINO", "ALJON", "password", null, null, COLLECTOR), 
+			newUser("CORDA", "AISON", "password", null, null, HELPER), 
+			newUser("TORIO", "JERRY", "password", null, null, HELPER), 
+			newUser("UBIÑA", "MARNEL", "password", null, null, HELPER), 
+			newUser("GUMABAY", "JAYJAY", "password", null, null, HELPER), 
+			newUser("REPUELA", "FRANK", "password", null, null, STORE_KEEPER), 
+			newUser("GUAÑIZO", "RONNAVIE", "password", null, null, STOCK_CHECKER), 
+			newUser("GUILLERMO", "MARIBEL", "password", null, null, SALES_ENCODER), 
+			newUser("TISADO", "KENNETH", "password", null, null, STOCK_TAKER), 
+			newUser("ABASCAN", "GELYN", "password", null, null, CASHIER), 
+			newUser("FAURA", "EDISON", "password", null, null, SELLER), 
+			newUser("SAN DIEGO", "KATRINA", "password", null, null, SELLER), 
+			newUser("BASILIO", "RAYMOND", "password", null, null, SELLER), 
+			newUser("CALAYAN", "BERCIE", "password", null, null, SELLER), 
+			newUser("DE LEON", "JOHN", "password", null, null, SELLER), 
+			newUser("DOPAN", "MARIVIC", "marvic", null, null, HEAD_CASHIER), 
+			newUser("SO", "JACKIE", "robbie", "917 568 2168", "manila12@gmail.com", MANAGER), 
+			newUser("SO", "RONALD", "alphacowboy", "917 895 8268", "ronaldallanso@yahoo.com", MANAGER), 
+			newUser(null, "SYSGEN", "Vierski@1", "949 859 2927", "txtdis.erp@gmail.com", MANAGER) 
 		);
 	}
 
@@ -196,7 +165,7 @@ public class PersistenceConfiguration {
 	}
 
 	private List<AuthorityEntity> roles(UserEntity u, UserType[] roles) {
-		return Arrays.asList(roles).stream().map(r -> newRole(u, r)).collect(Collectors.toList());
+		return stream(roles).map(r -> newRole(u, r)).collect(Collectors.toList());
 	}
 
 	private AuthorityEntity newRole(UserEntity u, UserType role) {
@@ -217,13 +186,13 @@ public class PersistenceConfiguration {
 	}
 
 	private List<TruckEntity> trucks() {
-		return Arrays.asList( //
-			newTruck("RCJ419"), //
-			newTruck("RAK213"), //
-			newTruck("XPC508"), //
-			newTruck("RGH556"), //
-			newTruck("SQ1377"), //
-			newTruck("NC79034") //
+		return Arrays.asList( 
+			newTruck("RCJ419"), 
+			newTruck("RAK213"), 
+			newTruck("XPC508"), 
+			newTruck("RGH556"), 
+			newTruck("SQ1377"), 
+			newTruck("NC79034") 
 		);
 	}
 
@@ -234,16 +203,16 @@ public class PersistenceConfiguration {
 	}
 
 	private List<HolidayEntity> philippineHolidays2017() {
-		return Arrays.asList( //
-			newHoliday("NEW YEAR", 2017, 1, 1), //
-			newHoliday("AFTER NEW YEAR", 2017, 1, 2), //
-			newHoliday("AQUINO", 2017, 8, 21), //
-			newHoliday("BONIFACIO", 2017, 10, 30), //
-			newHoliday("HALLOWEEN", 2017, 10, 31), //
-			newHoliday("ALL SAINTS", 2017, 11, 1), //
-			newHoliday("CHRISTMAS EVE", 2017, 12, 24), //
-			newHoliday("CHRISTMAS", 2017, 12, 25), //
-			newHoliday("RIZAL", 2017, 12, 30), //
+		return Arrays.asList( 
+			newHoliday("NEW YEAR", 2017, 1, 1), 
+			newHoliday("AFTER NEW YEAR", 2017, 1, 2), 
+			newHoliday("AQUINO", 2017, 8, 21), 
+			newHoliday("BONIFACIO", 2017, 10, 30), 
+			newHoliday("HALLOWEEN", 2017, 10, 31), 
+			newHoliday("ALL SAINTS", 2017, 11, 1), 
+			newHoliday("CHRISTMAS EVE", 2017, 12, 24), 
+			newHoliday("CHRISTMAS", 2017, 12, 25), 
+			newHoliday("RIZAL", 2017, 12, 30), 
 			newHoliday("NEW YEAR'S EVE", 2017, 12, 31));
 	}
 
@@ -269,8 +238,8 @@ public class PersistenceConfiguration {
 	}
 
 	private List<ItemEntity> empties() {
-		return Arrays.asList( //
-			newItem(147, "CASE237", "237 CASE FULL", 24, 90.00, 90.00, null), //
+		return Arrays.asList( 
+			newItem(147, "CASE237", "237 CASE FULL", 24, 90.00, 90.00, null), 
 			newItem(156, "CASE355", "355 CASE FULL", 24, 90.00, 90.00, null),
 			newItem(290, "CASE237RTOUG", "237 CASE FULL ULTRAGLS RTO", 24, 90.00, 90.00, null),
 			newItem(291, "CASE237SPRUG", "237 CASE FULL ULTRAGLS SPRITE", 24, 90.00, 90.00, null),
@@ -288,13 +257,13 @@ public class PersistenceConfiguration {
 			newItem(180, "CASE240POPUG", "240 CASE FULL ULTRAGLS POP", 1, 90.00, 90.00, null),
 			newItem(82, "CASESHELL1.0", "1.0 SHELL PLASTIC", 1, 52.00, 52.00, null),
 			newItem(353, "CASE240SARUG", "240 CASE FULL SARSI ULTRAGLASS", 1, 90.00, 90.00, null),
-			newItem(78, "CASESHELL355", "355 SHELL PLASTIC", 1, 42.00, 42.00, null), //
-			newItem(176, "CASE1.0COKE", "1.0 CASE FULL ULTRA GLASS COKE", 1, 172.00, 172.00, null) //
+			newItem(78, "CASESHELL355", "355 SHELL PLASTIC", 1, 42.00, 42.00, null), 
+			newItem(176, "CASE1.0COKE", "1.0 CASE FULL ULTRA GLASS COKE", 1, 172.00, 172.00, null) 
 		);
 	}
 
 	private List<ItemEntity> items() {
-		return Arrays.asList( //
+		return Arrays.asList( 
 			newItem(101620, "COK330X24", "330MLALCNN1X24 COKE", 24, 492.00, 480.00, null),
 			newItem(101621, "RTO330X24", "330MLALCNN1X24 ROYAL TRU ORG", 24, 492.00, 480.00, null),
 			newItem(101622, "SPR330X24", "330MLALCNN1X24 SPRITE", 24, 492.00, 480.00, null),
@@ -419,9 +388,9 @@ public class PersistenceConfiguration {
 	}
 
 	private List<QtyPerUomEntity> newQtyPerUomList(ItemEntity item, int qtyPerCase) {
-		return Arrays.asList( //
-			newQtyPerUom(item, 1, UomType.EA), //
-			newQtyPerUom(item, qtyPerCase, UomType.CS) //
+		return Arrays.asList( 
+			newQtyPerUom(item, 1, UomType.EA), 
+			newQtyPerUom(item, qtyPerCase, UomType.CS) 
 		);
 	}
 
@@ -437,9 +406,9 @@ public class PersistenceConfiguration {
 	}
 
 	private List<PriceEntity> newPriceList(double sellingPrice, double purchasePrice) {
-		return Arrays.asList( //
-			newPrice(sellingPrice, dealer), //
-			newPrice(purchasePrice, purchase) //
+		return Arrays.asList( 
+			newPrice(sellingPrice, dealer), 
+			newPrice(purchasePrice, purchase) 
 		);
 	}
 
@@ -486,327 +455,327 @@ public class PersistenceConfiguration {
 		AccountEntity a = new AccountEntity();
 		a.setSeller(seller);
 		a.setStartDate(goLiveDate());
-		return Arrays.asList(a);
+		return singletonList(a);
 	}
 
 	private List<CustomerEntity> banks() {
-		return Arrays.asList( //
-			newBank("EWT"), //
-			newBank("CREDIT MEMO"), //
-			newBank("ASIA UNITED BANK"), //
-			newBank("BANK OF COMMERCE"), //
-			newBank("BANK ONE"), //
-			newBank("BDO"), //
-			newBank("BPI"), //
-			newBank("CHINABANK"), //
-			newBank("CITYSTATE BANK"), //
-			newBank("EASTWEST BANK"), //
-			newBank("MALAYAN BANK"), //
-			newBank("METROBANK"), //
-			newBank("PNB"), //
-			newBank("PSB"), //
-			newBank("RCBC"), //
-			newBank("SECURITY BANK"), //
-			newBank("UCPB"), //
-			newBank("UNIONBANK"), //
-			newBank("ALLIED BANK"), //
-			newBank("BANK OF JACKIE"), //
+		return Arrays.asList( 
+			newBank("EWT"), 
+			newBank("CREDIT MEMO"), 
+			newBank("ASIA UNITED BANK"), 
+			newBank("BANK OF COMMERCE"), 
+			newBank("BANK ONE"), 
+			newBank("BDO"), 
+			newBank("BPI"), 
+			newBank("CHINABANK"), 
+			newBank("CITYSTATE BANK"), 
+			newBank("EASTWEST BANK"), 
+			newBank("MALAYAN BANK"), 
+			newBank("METROBANK"), 
+			newBank("PNB"), 
+			newBank("PSB"), 
+			newBank("RCBC"), 
+			newBank("SECURITY BANK"), 
+			newBank("UCPB"), 
+			newBank("UNIONBANK"), 
+			newBank("ALLIED BANK"), 
+			newBank("BANK OF JACKIE"), 
 			newBank("BANK OF RONALD"));
 	}
 
 	private List<CustomerEntity> customers() {
-		return asList( //
-			newOutlet(503746808, "2544 STORE", e3cg), //
-			newOutlet(503746953, "3K STORE", e3ck), //
-			newOutlet(503747162, "888 STORE", e3cj), //
-			newOutlet(503747201, "A.M. EATERY", e3ch), //
-			newOutlet(503747217, "A-24 MINI GROCERY", e3cg), //
-			newOutlet(503747238, "ABA SARI SARI STORE", e3cg), //
-			newOutlet(503747281, "ABES STORE", e3cj), //
-			newOutlet(503747379, "ADAN STORE", e3cg), //
-			newOutlet(503747698, "AIZEL KAYE STORE", e3cg), //
-			newOutlet(503747623, "AIJO STORE", e3ck), //
-			newOutlet(503747831, "ALCAPAL STORE", e3ck), //
-			newOutlet(503747911, "ALEXINE STORE", e3ck), //
-			newOutlet(503747912, "ALEXIS BAKERY", e3ch), //
-			newOutlet(503747925, "ALFRED STORE", e3cg), //
-			newOutlet(504606047, "ALFIE & ROWENA STORE", e3cg), //
-			newOutlet(503748295, "ALLOY STORE", e3ck), //
-			newOutlet(503748407, "ALVIN STORE", e3cg), //
-			newOutlet(503748530, "AMMY STORE", e3ch), //
-			newOutlet(503748713, "ANDDYS STORE", e3cj), //
-			newOutlet(504432704, "ARIOLA NELGEN LUZARA", e3ck), //
-			newOutlet(503749662, "ASHA STORE", e3ck), //
-			newOutlet(503751264, "BLESS SARI SARI STORE", e3ch), //
-			newOutlet(503750019, "BABY PANDA STORE", e3cg), //
-			newOutlet(503750237, "BALBIN EATERY", e3cg), //
-			newOutlet(503750579, "BELEN CARENDERIA", e3cg), //
-			newOutlet(503750892, "BEST FRIEND", e3cg), //
-			newOutlet(503750913, "BETH BAKERY", e3cj), //
-			newOutlet(503750926, "BETH STORE(3CH)", e3ch), //
-			newOutlet(503750934, "BETH STORE(3CK)", e3ck), //
-			newOutlet(503751022, "BETTRY STORE", e3cg), //
-			newOutlet(503751360, "BOMBERO STORE", e3cj), //
-			newOutlet(503751484, "BOTIKANG BARANGAY AT SARI SARI STORE", e3cg), //
-			newOutlet(503752200, "CAROLINA STORE", e3cg), //
-			newOutlet(503752446, "CELY STORE", e3ch), //
-			newOutlet(503752363, "CECILE STORE", e3ck), //
-			newOutlet(504877694, "CHE'S STORE", e3ck), //
-			newOutlet(503752543, "CHAREMEL SARI-SARI STORE", e3ch), //
-			newOutlet(503753068, "C-JR TAPSI TRIP FOOD HAUZ", e3cg), //
-			newOutlet(503753244, "COMIAS BAKERY", e3cg), //
-			newOutlet(503753258, "CONCHING SARI SARI STORE", e3cg), //
-			newOutlet(503753300, "CONNIE STORE", e3cj), //
-			newOutlet(503933776, "CRISDAN STORE", e3ck), //
-			newOutlet(503753608, "CRISTINA STORE", e3cg), //
-			newOutlet(503752934, "CHRISMA STORE", e3cg), //
-			newOutlet(503753723, "CUEVAS BAKERY(3CJ)", e3cj), //
-			newOutlet(504479809, "CUEVAS BAKERY(3CK)", e3ck), //
-			newOutlet(503753772, "CYNTHIA STORE", e3ci), //
-			newOutlet(503753825, "D SISTERS", e3ci), //
-			newOutlet(503754145, "DE ASIA STORE", e3ci), //
-			newOutlet(503754670, "D-JELL STORE", e3ch), //
-			newOutlet(503754508, "DIANHIRANG STORE", e3ck), //
-			newOutlet(503754865, "DORA STORE", e3cg), //
-			newOutlet(503755035, "E CUEBAS BAKERY", e3cj), //
-			newOutlet(503755109, "EBIANG STORE", e3cj), //
-			newOutlet(503755157, "EDDIE STORE", e3cj), //
-			newOutlet(503755595, "EMILY EATERY", e3cg), //
-			newOutlet(503755844, "ELVINS MIREI STORE", e3cg), //
-			newOutlet(503755864, "ELY STORE", e3ci), //
-			newOutlet(503755582, "ELIJAH STORE", e3ch), //
-			newOutlet(503756018, "EMMA STORE(3CJ)", e3cj), //
-			newOutlet(503756020, "EMMA STORE(3CG)", e3cg), //
-			newOutlet(503756476, "ESTEVES STORE", e3cj), //
-			newOutlet(503756477, "ESTHER EATERY", e3ci), //
-			newOutlet(503755039, "E Q BAKERY", e3ch), //
-			newOutlet(503756717, "F AND F", e3ch), //
-			newOutlet(503757101, "FEL-CON ENTERPRISES", e3ch), //
-			newOutlet(503757213, "FERGEM STORE", e3ch), //
-			newOutlet(503757301, "FIRST NEPTUNE", e3cj), //
-			newOutlet(503757526, "FRANKS'S STORE", e3ch), //
-			newOutlet(503757537, "FRANZINE STORE", e3ci), //
-			newOutlet(503757684, "GABRIEL STORE", e3cg), //
-			newOutlet(503757929, "GEMS STORE", e3cj), //
-			newOutlet(503757980, "GERALDINE BAKERY", e3cg), //
-			newOutlet(503758116, "GIL STORE", e3cj), //
-			newOutlet(503758473, "GOLDEN BREAD BAKERY", e3ck), //
-			newOutlet(503758485, "GOLDEN SON HOUZ", e3cg), //
-			newOutlet(503758699, "GUINTO STORE", e3ch), //
-			newOutlet(503758813, "HAPINOY PHARMACY", e3ch), //
-			newOutlet(503758814, "HAPON STORE", e3ck), //
-			newOutlet(503758894, "HEAVEN STORE", e3cg), //
-			newOutlet(503759376, "INA STORE/EATERY", e3cg), //
-			newOutlet(503759306, "ILLUMINA DRUGSTORE", e3ch), //
-			newOutlet(503759670, "J MAGS STORE", e3cg), //
-			newOutlet(503759825, "JAGORING STORE", e3ck), //
-			newOutlet(503759842, "JAIRA STORE", e3cg), //
-			newOutlet(503901657, "JAIHO STORE", e3ck), //
-			newOutlet(503760351, "JEFF STORE", e3cj), //
-			newOutlet(503760622, "JESSICA STORE", e3cj), //
-			newOutlet(503760766, "JIECELS STORE", e3cj), //
-			newOutlet(503760771, "JILIET STORE", e3cj), //
-			newOutlet(503760995, "JNK STORE", e3ci), //
-			newOutlet(503761282, "JOJI'S GEN. STORE", e3cg), //
-			newOutlet(503761290, "JOJO STORE", e3cg), //
-			newOutlet(503761403, "JONA'S STORE", e3cj), //
-			newOutlet(503761418, "JONES VARIETY STORE", e3cg), //
-			newOutlet(503761785, "JOYNA'S STORE", e3cg), //
-			newOutlet(503761561, "JOSHUA STORE", e3cg), //
-			newOutlet(503761285, "JOJO AND MALOU STORE", e3cg), //
-			newOutlet(503760720, "JHO-A STORE", e3ck), //
-			newOutlet(503761824, "JR STORE", e3cj), //
-			newOutlet(503762287, "KAI MICHAEL CARENDERIA", e3ck), //
-			newOutlet(503762333, "KAINAN SA KANTO", e3ch), //
-			newOutlet(503762589, "KEECE STORE", e3ch), //
-			newOutlet(503762626, "KENIS SARI SARI STORE", e3ci), //
-			newOutlet(503762755, "KIM AND KURT STORE", e3cj), //
-			newOutlet(503763083, "KYLE'S STORE", e3cj), //
-			newOutlet(503763537, "LEGASPI STORE", e3ci), //
-			newOutlet(503763637, "LENNY STORE", e3ci), //
-			newOutlet(503763801, "LETTY STORE", e3cg), //
-			newOutlet(503764422, "LIZA STORE", e3cg), //
-			newOutlet(503763930, "LIGAYA BAKERY", e3ck), //
-			newOutlet(503764899, "LOURDES STORE", e3cg), //
-			newOutlet(503839793, "LUCKY BEE", e3ck), //
-			newOutlet(503765005, "LT STORE", e3ci), //
-			newOutlet(503765520, "M3M EATERY", e3ck), //
-			newOutlet(503765626, "MADEL STORE", e3ck), //
-			newOutlet(503765915, "MAMAYS STORE", e3cj), //
-			newOutlet(503766123, "MAPALAD BAKERY", e3cg), //
-			newOutlet(503766146, "MAR-AN BAKE SHOP", e3cg), //
-			newOutlet(503766357, "MARICEL STORE", e3ch), //
-			newOutlet(503766418, "MARIE STORE", e3cg), //
-			newOutlet(503766607, "MARIS STORE", e3ck), //
-			newOutlet(503766930, "MARRY CHERISE", e3cj), //
-			newOutlet(503766206, "MARGARETH STORE", e3cg), //
-			newOutlet(503767719, "MERCY STORE", e3cg), //
-			newOutlet(503767671, "MENGGIE STORE", e3ck), //
-			newOutlet(503768215, "MILA EATERY", e3ci), //
-			newOutlet(503768858, "MOPPHEN STORE", e3ch), //
-			newOutlet(503768715, "MOMMY STORE", e3ck), //
-			newOutlet(503769772, "NICO STORE", e3cg), //
-			newOutlet(503769864, "NIDEN-J STORE", e3cj), //
-			newOutlet(503769484, "NENE STORE", e3cg), //
-			newOutlet(503769366, "NECKIE ESPESYAL PALABOK", e3cg), //
-			newOutlet(503770480, "OCEAN PARK STORE", e3ch), //
-			newOutlet(503842532, "OVI STORE", e3ck), //
-			newOutlet(503770772, "PAGDONZALAN STORE", e3cg), //
-			newOutlet(503770853, "PANADEIA DE MADREMARIA", e3cj), //
-			newOutlet(503771123, "PAUREES STORE", e3cj), //
-			newOutlet(503838180, "PENYO GEN. MDSE", e3ck), //
-			newOutlet(503771628, "PREMIUM STORE", e3cg), //
-			newOutlet(503771738, "PURE BEST STORE", e3cg), //
-			newOutlet(503771671, "PRINCESS DIANE STORE", e3cg), //
-			newOutlet(503772004, "RAMAS BAKERY", e3ck), //
-			newOutlet(504762683, "RAINE'S STORE", e3ck), //
-			newOutlet(503773439, "REIGN BLESS BAKERY", e3ch), //
-			newOutlet(503774396, "RRJM STORE", e3ck), //
-			newOutlet(504491845, "ROSE ANN EATERY & STORE", e3ck), //
-			newOutlet(503747182, "A ANON DRUG STORE", e3ch), //
-			newOutlet(503774419, "RSM STORE", e3cj), //
-			newOutlet(503774438, "TINDAHAN NI JOSE", e3ch), //
-			newOutlet(503774792, "SAMSON STORE", e3cg), //
-			newOutlet(503775016, "SENY STOP HAMBURGER", e3cj), //
-			newOutlet(503775277, "SIAK LABAT STORE", e3cg), //
-			newOutlet(503775077, "SHAMMES STORE", e3cj), //
-			newOutlet(503775342, "SINKO KATORSE MECHANDIZING", e3cj), //
-			newOutlet(503775457, "SMILE GEN. MDSE.", e3ch), //
-			newOutlet(503775509, "SOL STORE", e3cg), //
-			newOutlet(503775536, "SOMERA STORE", e3ck), //
-			newOutlet(503775697, "STARLIGAT STORE", e3ch), //
-			newOutlet(503775715, "STELLA STORE", e3cg), //
-			newOutlet(503775742, "STIANGELA STORE", e3ci), //
-			newOutlet(503776010, "T.N.B. STORE", e3cg), //
-			newOutlet(503776719, "TINA STORE", e3cg), //
-			newOutlet(503776891, "TJR STORE", e3cg), //
-			newOutlet(503776916, "TOLITS EATERY", e3cg), //
-			newOutlet(503776949, "TONGLAN STORE", e3cj), //
-			newOutlet(503776993, "TOP J SARI SARI STORE", e3ck), //
-			newOutlet(503777529, "VENTURA STORE", e3ch), //
-			newOutlet(503777815, "VINCE EATERY", e3cg), //
-			newOutlet(503777774, "VILMA STORE", e3cg), //
-			newOutlet(503778037, "VTC GEN.MDSE", e3cg), //
-			newOutlet(503778077, "WANSON STORE", e3ci), //
-			newOutlet(503778079, "WAREN STORE", e3ck), //
-			newOutlet(503778412, "YANNAS STORE", e3cj), //
-			newOutlet(504107365, "ZAMORA EATERY", e3ck), //
-			newOutlet(503838181, "2M BAKERY AND SARISARI ", e3ch), //
-			newOutlet(503880977, "AM STORE", e3cg), //
-			newOutlet(503842528, "CHECHE STORE", e3cg), //
-			newOutlet(503842493, "DANZOVEN STORE", e3cg), //
-			newOutlet(503841872, "HOLY FAMILY PARISH MPC", e3ck), //
-			newOutlet(503880974, "MERLYMAR EATERY", e3cg), //
-			newOutlet(503842491, "NINA STORE", e3cg), //
-			newOutlet(503880669, "PAPUS CORNER STORE", e3ch), //
-			newOutlet(503880675, "VIDAL STORE", e3ch), //
-			newOutlet(503931983, "148 STORE", e3cg), //
-			newOutlet(503932976, "ARIEL JOY TAPSI B ", e3ci), //
-			newOutlet(503933164, "ALING LUDING STORE", e3cg), //
-			newOutlet(503931879, "ALING ANCHING STORE", e3cg), //
-			newOutlet(503931997, "ADELAINE STORE", e3ci), //
-			newOutlet(503900649, "CHIEYIENNE STORE", e3cg), //
-			newOutlet(503931981, "CJMK TRADING", e3ch), //
-			newOutlet(503907248, "DIDAY STORE", e3cg), //
-			newOutlet(503931864, "FLORA STORE", e3ci), //
-			newOutlet(503931945, "FAMILY STORE", e3ck), //
-			newOutlet(503931972, "JCC GEN.MDSE", e3cg), //
-			newOutlet(503932943, "IRENE STORE", e3ch), //
-			newOutlet(503931420, "LABIAL PHARMACY", e3ci), //
-			newOutlet(503931965, "MINDA EATERY(3CK)", e3ck), //
-			newOutlet(503900659, "PERJAN FOOD HOUSE", e3cg), //
-			newOutlet(503926144, "ROSAVIE STORE", e3ci), //
-			newOutlet(503931979, "SALLY STORE", e3ci), //
-			newOutlet(503900660, "SILVESTRE STORE", e3cg), //
-			newOutlet(503931937, "TONIROSE", e3ck), //
-			newOutlet(503900658, "UNO STORE", e3cg), //
-			newOutlet(504107341, "FLORENCIO CANTEEN", e3ci), //
-			newOutlet(504129589, "JAELOU EATERY", e3ch), //
-			newOutlet(504101850, "DJH BAKESHOP", e3ch), //
-			newOutlet(504107368, "HELEN & RONA EATERY", e3cg), //
-			newOutlet(504107391, "MELINDA EATERY", e3cg), //
-			newOutlet(504115738, "ARDABIE EATERY", e3cg), //
-			newOutlet(504124334, "MICHAEL STORE", e3ch), //
-			newOutlet(504235426, "ICL ", e3ci), //
-			newOutlet(504259858, "YOU AND I EATERY", e3ch), //
-			newOutlet(504448585, "A & V STORE AND TAPSILOGAN", e3ch), //
-			newOutlet(504404283, "VILMAR STORE", e3ck), //
-			newOutlet(504408512, "JOY'S STORE", e3cj), //
-			newOutlet(504448611, "JEPRIL STORE", e3ck), //
-			newOutlet(504408553, "SUSAN STORE", e3cg), //
-			newOutlet(504408554, "ALLAN STORE", e3cg), //
-			newOutlet(504408557, "RENE CARINDERIA", e3ci), //
-			newOutlet(504408560, "LUGAWAN", e3cg), //
-			newOutlet(504408563, "KEN'S BAKERY", e3cg), //
-			newOutlet(504408565, "HUMBLE STORE", e3cg), //
-			newOutlet(504410792, "YOUR NEIGHBORHOOD", e3ch), //
-			newOutlet(504411756, "RO-NA DRUG AND GENERAL MDSE", e3cj), //
-			newOutlet(504411759, "TTM STORE", e3cj), //
-			newOutlet(504423619, "FLOUR BAKESHOP", e3cj), //
-			newOutlet(504423621, "MAESTRA'S SARI SARI STORE", e3cj), //
-			newOutlet(504423984, "CHENOK'S EATERY", e3ck), //
-			newOutlet(504423986, "LUCKY CHOY", e3ck), //
-			newOutlet(504426447, "BELLA EATERY", e3ck), //
-			newOutlet(504428318, "TESS STORE", e3cj), //
-			newOutlet(504428825, "MEKHAM STORE", e3ci), //
-			newOutlet(504451112, "MV CUEVAS BAKERY AND EATERY", e3ch), //
-			newOutlet(504490326, "JIM DRUG & GEN", e3ck), //
-			newOutlet(504425768, "USMAND GENERAL MDSE", e3ci), //
-			newOutlet(504549747, "KOKIKS FOOD STATION", e3ch), //
-			newOutlet(504626966, "ALDRIN'S STORE", e3ck), //
-			newOutlet(504627641, "MINDA EATERY(3CI)", e3ci), //
-			newOutlet(504649368, "JAZEL STORE", e3cg), //
-			newOutlet(504630858, "JOY STORE", e3ci), //
-			newOutlet(504630870, "SONY'S STORE", e3ci), //
-			newOutlet(504630874, "LAURA STORE", e3ci), //
-			newOutlet(504649332, "3'S ATENGS", e3cg), //
-			newOutlet(504650923, "EIGYERS STORE", e3ch), //
-			newOutlet(504650979, "PALANAS STORE", e3ch), //
-			newOutlet(504650980, "MEL STORE", e3cg), //
-			newOutlet(504660554, "ALING MELING STORE", e3ci), //
-			newOutlet(504660558, "DOROTEA STORE", e3cj), //
-			newOutlet(504666957, "FLORENCIO BAKERY 2", e3ci), //
-			newOutlet(504666967, "HABIBI STORE", e3ci), //
-			newOutlet(504696211, "RICH GOAL", e3cg), //
-			newOutlet(504697319, "PRIMA STORE", e3ck), //
-			newOutlet(504650981, "NORMA STORE", e3cg), //
-			newOutlet(504765291, "BLEZA STORE", e3cg), //
-			newOutlet(504702510, "FLORENCIO BAKERY 1", e3ci), //
-			newOutlet(504710384, "KARLKEN STORE", e3ch), //
-			newOutlet(504768710, "RIVERA BOTIKA", e3ch), //
-			newOutlet(504710910, "GOT GOLD EATERY", e3cg), //
-			newOutlet(504717525, "RHIZA KITCHENETTE", e3ch), //
-			newOutlet(504717526, "BUY N SAVE", e3ch), //
-			newOutlet(504721051, "SHAKE STORE", e3ci), //
-			newOutlet(504721054, "GTAM ENTERPRISE", e3ci), //
-			newOutlet(504721060, "AG-EL BAKERY", e3ck), //
-			newOutlet(504721133, "GARAJE EATERY", e3cg), //
-			newOutlet(504725985, "ZULUETA STORE", e3ch), //
-			newOutlet(504784877, "MARY'S STORE", e3ci), //
-			newOutlet(504727831, "MELJI'S STORE", e3ch), //
-			newOutlet(504747872, "ERIC MARANAN", e3cg), //
-			newOutlet(504758674, "EMERALD'S STORE", e3ch), //
-			newOutlet(504778817, "ADA STORE", e3ck), //
-			newOutlet(504769733, "ANN STORE", e3cg), //
-			newOutlet(504782127, "BELINA OCAMPO STORE", e3cg), //
-			newOutlet(504767938, "CHAIRMAN EBONG", e3ch), //
-			newOutlet(504758680, "GUIA BURGER", e3ch), //
-			newOutlet(504759804, "JASRICK FOOD TRIP", e3cg), //
-			newOutlet(504765879, "JHAY AR STORE", e3cg), //
-			newOutlet(504759802, "MARICEL EATERY", e3cg), //
-			newOutlet(504782124, "MD/RD", e3cg), //
-			newOutlet(504762684, "KENNA'S STORE", e3ck), //
-			newOutlet(504759877, "STA ANA SUPER STORE", e3cg), //
-			newOutlet(504762392, "RIVERA STORE", e3ch), //
-			newOutlet(504762829, "ROSE STORE", e3cj), //
-			newOutlet(504765872, "IYA'S STORE", e3ck), //
-			newOutlet(504788865, "MELCHOR DTORE", e3cg), //
-			newOutlet(504736501, "TINDAHAN NI BATANG", e3ch), //
-			newOutlet(504882613, "ZOE MAE STORE", e3ch), //
-			newOutlet(504886279, "VHEK'S STORE", e3ch), //
-			newOutlet(504428799, "VINCENT STORE", e3ck), //
-			newOutlet(504889399, "BOBBY ANN'S STORE", e3cj), //
-			newOutlet(504903060, "JM CARINDERIA ", e3ch) //
+		return asList( 
+			newOutlet(503746808, "2544 STORE", e3cg), 
+			newOutlet(503746953, "3K STORE", e3ck), 
+			newOutlet(503747162, "888 STORE", e3cj), 
+			newOutlet(503747201, "A.M. EATERY", e3ch), 
+			newOutlet(503747217, "A-24 MINI GROCERY", e3cg), 
+			newOutlet(503747238, "ABA SARI SARI STORE", e3cg), 
+			newOutlet(503747281, "ABES STORE", e3cj), 
+			newOutlet(503747379, "ADAN STORE", e3cg), 
+			newOutlet(503747698, "AIZEL KAYE STORE", e3cg), 
+			newOutlet(503747623, "AIJO STORE", e3ck), 
+			newOutlet(503747831, "ALCAPAL STORE", e3ck), 
+			newOutlet(503747911, "ALEXINE STORE", e3ck), 
+			newOutlet(503747912, "ALEXIS BAKERY", e3ch), 
+			newOutlet(503747925, "ALFRED STORE", e3cg), 
+			newOutlet(504606047, "ALFIE & ROWENA STORE", e3cg), 
+			newOutlet(503748295, "ALLOY STORE", e3ck), 
+			newOutlet(503748407, "ALVIN STORE", e3cg), 
+			newOutlet(503748530, "AMMY STORE", e3ch), 
+			newOutlet(503748713, "ANDDYS STORE", e3cj), 
+			newOutlet(504432704, "ARIOLA NELGEN LUZARA", e3ck), 
+			newOutlet(503749662, "ASHA STORE", e3ck), 
+			newOutlet(503751264, "BLESS SARI SARI STORE", e3ch), 
+			newOutlet(503750019, "BABY PANDA STORE", e3cg), 
+			newOutlet(503750237, "BALBIN EATERY", e3cg), 
+			newOutlet(503750579, "BELEN CARENDERIA", e3cg), 
+			newOutlet(503750892, "BEST FRIEND", e3cg), 
+			newOutlet(503750913, "BETH BAKERY", e3cj), 
+			newOutlet(503750926, "BETH STORE(3CH)", e3ch), 
+			newOutlet(503750934, "BETH STORE(3CK)", e3ck), 
+			newOutlet(503751022, "BETTRY STORE", e3cg), 
+			newOutlet(503751360, "BOMBERO STORE", e3cj), 
+			newOutlet(503751484, "BOTIKANG BARANGAY AT SARI SARI STORE", e3cg), 
+			newOutlet(503752200, "CAROLINA STORE", e3cg), 
+			newOutlet(503752446, "CELY STORE", e3ch), 
+			newOutlet(503752363, "CECILE STORE", e3ck), 
+			newOutlet(504877694, "CHE'S STORE", e3ck), 
+			newOutlet(503752543, "CHAREMEL SARI-SARI STORE", e3ch), 
+			newOutlet(503753068, "C-JR TAPSI TRIP FOOD HAUZ", e3cg), 
+			newOutlet(503753244, "COMIAS BAKERY", e3cg), 
+			newOutlet(503753258, "CONCHING SARI SARI STORE", e3cg), 
+			newOutlet(503753300, "CONNIE STORE", e3cj), 
+			newOutlet(503933776, "CRISDAN STORE", e3ck), 
+			newOutlet(503753608, "CRISTINA STORE", e3cg), 
+			newOutlet(503752934, "CHRISMA STORE", e3cg), 
+			newOutlet(503753723, "CUEVAS BAKERY(3CJ)", e3cj), 
+			newOutlet(504479809, "CUEVAS BAKERY(3CK)", e3ck), 
+			newOutlet(503753772, "CYNTHIA STORE", e3ci), 
+			newOutlet(503753825, "D SISTERS", e3ci), 
+			newOutlet(503754145, "DE ASIA STORE", e3ci), 
+			newOutlet(503754670, "D-JELL STORE", e3ch), 
+			newOutlet(503754508, "DIANHIRANG STORE", e3ck), 
+			newOutlet(503754865, "DORA STORE", e3cg), 
+			newOutlet(503755035, "E CUEBAS BAKERY", e3cj), 
+			newOutlet(503755109, "EBIANG STORE", e3cj), 
+			newOutlet(503755157, "EDDIE STORE", e3cj), 
+			newOutlet(503755595, "EMILY EATERY", e3cg), 
+			newOutlet(503755844, "ELVINS MIREI STORE", e3cg), 
+			newOutlet(503755864, "ELY STORE", e3ci), 
+			newOutlet(503755582, "ELIJAH STORE", e3ch), 
+			newOutlet(503756018, "EMMA STORE(3CJ)", e3cj), 
+			newOutlet(503756020, "EMMA STORE(3CG)", e3cg), 
+			newOutlet(503756476, "ESTEVES STORE", e3cj), 
+			newOutlet(503756477, "ESTHER EATERY", e3ci), 
+			newOutlet(503755039, "E Q BAKERY", e3ch), 
+			newOutlet(503756717, "F AND F", e3ch), 
+			newOutlet(503757101, "FEL-CON ENTERPRISES", e3ch), 
+			newOutlet(503757213, "FERGEM STORE", e3ch), 
+			newOutlet(503757301, "FIRST NEPTUNE", e3cj), 
+			newOutlet(503757526, "FRANKS'S STORE", e3ch), 
+			newOutlet(503757537, "FRANZINE STORE", e3ci), 
+			newOutlet(503757684, "GABRIEL STORE", e3cg), 
+			newOutlet(503757929, "GEMS STORE", e3cj), 
+			newOutlet(503757980, "GERALDINE BAKERY", e3cg), 
+			newOutlet(503758116, "GIL STORE", e3cj), 
+			newOutlet(503758473, "GOLDEN BREAD BAKERY", e3ck), 
+			newOutlet(503758485, "GOLDEN SON HOUZ", e3cg), 
+			newOutlet(503758699, "GUINTO STORE", e3ch), 
+			newOutlet(503758813, "HAPINOY PHARMACY", e3ch), 
+			newOutlet(503758814, "HAPON STORE", e3ck), 
+			newOutlet(503758894, "HEAVEN STORE", e3cg), 
+			newOutlet(503759376, "INA STORE/EATERY", e3cg), 
+			newOutlet(503759306, "ILLUMINA DRUGSTORE", e3ch), 
+			newOutlet(503759670, "J MAGS STORE", e3cg), 
+			newOutlet(503759825, "JAGORING STORE", e3ck), 
+			newOutlet(503759842, "JAIRA STORE", e3cg), 
+			newOutlet(503901657, "JAIHO STORE", e3ck), 
+			newOutlet(503760351, "JEFF STORE", e3cj), 
+			newOutlet(503760622, "JESSICA STORE", e3cj), 
+			newOutlet(503760766, "JIECELS STORE", e3cj), 
+			newOutlet(503760771, "JILIET STORE", e3cj), 
+			newOutlet(503760995, "JNK STORE", e3ci), 
+			newOutlet(503761282, "JOJI'S GEN. STORE", e3cg), 
+			newOutlet(503761290, "JOJO STORE", e3cg), 
+			newOutlet(503761403, "JONA'S STORE", e3cj), 
+			newOutlet(503761418, "JONES VARIETY STORE", e3cg), 
+			newOutlet(503761785, "JOYNA'S STORE", e3cg), 
+			newOutlet(503761561, "JOSHUA STORE", e3cg), 
+			newOutlet(503761285, "JOJO AND MALOU STORE", e3cg), 
+			newOutlet(503760720, "JHO-A STORE", e3ck), 
+			newOutlet(503761824, "JR STORE", e3cj), 
+			newOutlet(503762287, "KAI MICHAEL CARENDERIA", e3ck), 
+			newOutlet(503762333, "KAINAN SA KANTO", e3ch), 
+			newOutlet(503762589, "KEECE STORE", e3ch), 
+			newOutlet(503762626, "KENIS SARI SARI STORE", e3ci), 
+			newOutlet(503762755, "KIM AND KURT STORE", e3cj), 
+			newOutlet(503763083, "KYLE'S STORE", e3cj), 
+			newOutlet(503763537, "LEGASPI STORE", e3ci), 
+			newOutlet(503763637, "LENNY STORE", e3ci), 
+			newOutlet(503763801, "LETTY STORE", e3cg), 
+			newOutlet(503764422, "LIZA STORE", e3cg), 
+			newOutlet(503763930, "LIGAYA BAKERY", e3ck), 
+			newOutlet(503764899, "LOURDES STORE", e3cg), 
+			newOutlet(503839793, "LUCKY BEE", e3ck), 
+			newOutlet(503765005, "LT STORE", e3ci), 
+			newOutlet(503765520, "M3M EATERY", e3ck), 
+			newOutlet(503765626, "MADEL STORE", e3ck), 
+			newOutlet(503765915, "MAMAYS STORE", e3cj), 
+			newOutlet(503766123, "MAPALAD BAKERY", e3cg), 
+			newOutlet(503766146, "MAR-AN BAKE SHOP", e3cg), 
+			newOutlet(503766357, "MARICEL STORE", e3ch), 
+			newOutlet(503766418, "MARIE STORE", e3cg), 
+			newOutlet(503766607, "MARIS STORE", e3ck), 
+			newOutlet(503766930, "MARRY CHERISE", e3cj), 
+			newOutlet(503766206, "MARGARETH STORE", e3cg), 
+			newOutlet(503767719, "MERCY STORE", e3cg), 
+			newOutlet(503767671, "MENGGIE STORE", e3ck), 
+			newOutlet(503768215, "MILA EATERY", e3ci), 
+			newOutlet(503768858, "MOPPHEN STORE", e3ch), 
+			newOutlet(503768715, "MOMMY STORE", e3ck), 
+			newOutlet(503769772, "NICO STORE", e3cg), 
+			newOutlet(503769864, "NIDEN-J STORE", e3cj), 
+			newOutlet(503769484, "NENE STORE", e3cg), 
+			newOutlet(503769366, "NECKIE ESPESYAL PALABOK", e3cg), 
+			newOutlet(503770480, "OCEAN PARK STORE", e3ch), 
+			newOutlet(503842532, "OVI STORE", e3ck), 
+			newOutlet(503770772, "PAGDONZALAN STORE", e3cg), 
+			newOutlet(503770853, "PANADEIA DE MADREMARIA", e3cj), 
+			newOutlet(503771123, "PAUREES STORE", e3cj), 
+			newOutlet(503838180, "PENYO GEN. MDSE", e3ck), 
+			newOutlet(503771628, "PREMIUM STORE", e3cg), 
+			newOutlet(503771738, "PURE BEST STORE", e3cg), 
+			newOutlet(503771671, "PRINCESS DIANE STORE", e3cg), 
+			newOutlet(503772004, "RAMAS BAKERY", e3ck), 
+			newOutlet(504762683, "RAINE'S STORE", e3ck), 
+			newOutlet(503773439, "REIGN BLESS BAKERY", e3ch), 
+			newOutlet(503774396, "RRJM STORE", e3ck), 
+			newOutlet(504491845, "ROSE ANN EATERY & STORE", e3ck), 
+			newOutlet(503747182, "A ANON DRUG STORE", e3ch), 
+			newOutlet(503774419, "RSM STORE", e3cj), 
+			newOutlet(503774438, "TINDAHAN NI JOSE", e3ch), 
+			newOutlet(503774792, "SAMSON STORE", e3cg), 
+			newOutlet(503775016, "SENY STOP HAMBURGER", e3cj), 
+			newOutlet(503775277, "SIAK LABAT STORE", e3cg), 
+			newOutlet(503775077, "SHAMMES STORE", e3cj), 
+			newOutlet(503775342, "SINKO KATORSE MECHANDIZING", e3cj), 
+			newOutlet(503775457, "SMILE GEN. MDSE.", e3ch), 
+			newOutlet(503775509, "SOL STORE", e3cg), 
+			newOutlet(503775536, "SOMERA STORE", e3ck), 
+			newOutlet(503775697, "STARLIGAT STORE", e3ch), 
+			newOutlet(503775715, "STELLA STORE", e3cg), 
+			newOutlet(503775742, "STIANGELA STORE", e3ci), 
+			newOutlet(503776010, "T.N.B. STORE", e3cg), 
+			newOutlet(503776719, "TINA STORE", e3cg), 
+			newOutlet(503776891, "TJR STORE", e3cg), 
+			newOutlet(503776916, "TOLITS EATERY", e3cg), 
+			newOutlet(503776949, "TONGLAN STORE", e3cj), 
+			newOutlet(503776993, "TOP J SARI SARI STORE", e3ck), 
+			newOutlet(503777529, "VENTURA STORE", e3ch), 
+			newOutlet(503777815, "VINCE EATERY", e3cg), 
+			newOutlet(503777774, "VILMA STORE", e3cg), 
+			newOutlet(503778037, "VTC GEN.MDSE", e3cg), 
+			newOutlet(503778077, "WANSON STORE", e3ci), 
+			newOutlet(503778079, "WAREN STORE", e3ck), 
+			newOutlet(503778412, "YANNAS STORE", e3cj), 
+			newOutlet(504107365, "ZAMORA EATERY", e3ck), 
+			newOutlet(503838181, "2M BAKERY AND SARISARI ", e3ch), 
+			newOutlet(503880977, "AM STORE", e3cg), 
+			newOutlet(503842528, "CHECHE STORE", e3cg), 
+			newOutlet(503842493, "DANZOVEN STORE", e3cg), 
+			newOutlet(503841872, "HOLY FAMILY PARISH MPC", e3ck), 
+			newOutlet(503880974, "MERLYMAR EATERY", e3cg), 
+			newOutlet(503842491, "NINA STORE", e3cg), 
+			newOutlet(503880669, "PAPUS CORNER STORE", e3ch), 
+			newOutlet(503880675, "VIDAL STORE", e3ch), 
+			newOutlet(503931983, "148 STORE", e3cg), 
+			newOutlet(503932976, "ARIEL JOY TAPSI B ", e3ci), 
+			newOutlet(503933164, "ALING LUDING STORE", e3cg), 
+			newOutlet(503931879, "ALING ANCHING STORE", e3cg), 
+			newOutlet(503931997, "ADELAINE STORE", e3ci), 
+			newOutlet(503900649, "CHIEYIENNE STORE", e3cg), 
+			newOutlet(503931981, "CJMK TRADING", e3ch), 
+			newOutlet(503907248, "DIDAY STORE", e3cg), 
+			newOutlet(503931864, "FLORA STORE", e3ci), 
+			newOutlet(503931945, "FAMILY STORE", e3ck), 
+			newOutlet(503931972, "JCC GEN.MDSE", e3cg), 
+			newOutlet(503932943, "IRENE STORE", e3ch), 
+			newOutlet(503931420, "LABIAL PHARMACY", e3ci), 
+			newOutlet(503931965, "MINDA EATERY(3CK)", e3ck), 
+			newOutlet(503900659, "PERJAN FOOD HOUSE", e3cg), 
+			newOutlet(503926144, "ROSAVIE STORE", e3ci), 
+			newOutlet(503931979, "SALLY STORE", e3ci), 
+			newOutlet(503900660, "SILVESTRE STORE", e3cg), 
+			newOutlet(503931937, "TONIROSE", e3ck), 
+			newOutlet(503900658, "UNO STORE", e3cg), 
+			newOutlet(504107341, "FLORENCIO CANTEEN", e3ci), 
+			newOutlet(504129589, "JAELOU EATERY", e3ch), 
+			newOutlet(504101850, "DJH BAKESHOP", e3ch), 
+			newOutlet(504107368, "HELEN & RONA EATERY", e3cg), 
+			newOutlet(504107391, "MELINDA EATERY", e3cg), 
+			newOutlet(504115738, "ARDABIE EATERY", e3cg), 
+			newOutlet(504124334, "MICHAEL STORE", e3ch), 
+			newOutlet(504235426, "ICL ", e3ci), 
+			newOutlet(504259858, "YOU AND I EATERY", e3ch), 
+			newOutlet(504448585, "A & V STORE AND TAPSILOGAN", e3ch), 
+			newOutlet(504404283, "VILMAR STORE", e3ck), 
+			newOutlet(504408512, "JOY'S STORE", e3cj), 
+			newOutlet(504448611, "JEPRIL STORE", e3ck), 
+			newOutlet(504408553, "SUSAN STORE", e3cg), 
+			newOutlet(504408554, "ALLAN STORE", e3cg), 
+			newOutlet(504408557, "RENE CARINDERIA", e3ci), 
+			newOutlet(504408560, "LUGAWAN", e3cg), 
+			newOutlet(504408563, "KEN'S BAKERY", e3cg), 
+			newOutlet(504408565, "HUMBLE STORE", e3cg), 
+			newOutlet(504410792, "YOUR NEIGHBORHOOD", e3ch), 
+			newOutlet(504411756, "RO-NA DRUG AND GENERAL MDSE", e3cj), 
+			newOutlet(504411759, "TTM STORE", e3cj), 
+			newOutlet(504423619, "FLOUR BAKESHOP", e3cj), 
+			newOutlet(504423621, "MAESTRA'S SARI SARI STORE", e3cj), 
+			newOutlet(504423984, "CHENOK'S EATERY", e3ck), 
+			newOutlet(504423986, "LUCKY CHOY", e3ck), 
+			newOutlet(504426447, "BELLA EATERY", e3ck), 
+			newOutlet(504428318, "TESS STORE", e3cj), 
+			newOutlet(504428825, "MEKHAM STORE", e3ci), 
+			newOutlet(504451112, "MV CUEVAS BAKERY AND EATERY", e3ch), 
+			newOutlet(504490326, "JIM DRUG & GEN", e3ck), 
+			newOutlet(504425768, "USMAND GENERAL MDSE", e3ci), 
+			newOutlet(504549747, "KOKIKS FOOD STATION", e3ch), 
+			newOutlet(504626966, "ALDRIN'S STORE", e3ck), 
+			newOutlet(504627641, "MINDA EATERY(3CI)", e3ci), 
+			newOutlet(504649368, "JAZEL STORE", e3cg), 
+			newOutlet(504630858, "JOY STORE", e3ci), 
+			newOutlet(504630870, "SONY'S STORE", e3ci), 
+			newOutlet(504630874, "LAURA STORE", e3ci), 
+			newOutlet(504649332, "3'S ATENGS", e3cg), 
+			newOutlet(504650923, "EIGYERS STORE", e3ch), 
+			newOutlet(504650979, "PALANAS STORE", e3ch), 
+			newOutlet(504650980, "MEL STORE", e3cg), 
+			newOutlet(504660554, "ALING MELING STORE", e3ci), 
+			newOutlet(504660558, "DOROTEA STORE", e3cj), 
+			newOutlet(504666957, "FLORENCIO BAKERY 2", e3ci), 
+			newOutlet(504666967, "HABIBI STORE", e3ci), 
+			newOutlet(504696211, "RICH GOAL", e3cg), 
+			newOutlet(504697319, "PRIMA STORE", e3ck), 
+			newOutlet(504650981, "NORMA STORE", e3cg), 
+			newOutlet(504765291, "BLEZA STORE", e3cg), 
+			newOutlet(504702510, "FLORENCIO BAKERY 1", e3ci), 
+			newOutlet(504710384, "KARLKEN STORE", e3ch), 
+			newOutlet(504768710, "RIVERA BOTIKA", e3ch), 
+			newOutlet(504710910, "GOT GOLD EATERY", e3cg), 
+			newOutlet(504717525, "RHIZA KITCHENETTE", e3ch), 
+			newOutlet(504717526, "BUY N SAVE", e3ch), 
+			newOutlet(504721051, "SHAKE STORE", e3ci), 
+			newOutlet(504721054, "GTAM ENTERPRISE", e3ci), 
+			newOutlet(504721060, "AG-EL BAKERY", e3ck), 
+			newOutlet(504721133, "GARAJE EATERY", e3cg), 
+			newOutlet(504725985, "ZULUETA STORE", e3ch), 
+			newOutlet(504784877, "MARY'S STORE", e3ci), 
+			newOutlet(504727831, "MELJI'S STORE", e3ch), 
+			newOutlet(504747872, "ERIC MARANAN", e3cg), 
+			newOutlet(504758674, "EMERALD'S STORE", e3ch), 
+			newOutlet(504778817, "ADA STORE", e3ck), 
+			newOutlet(504769733, "ANN STORE", e3cg), 
+			newOutlet(504782127, "BELINA OCAMPO STORE", e3cg), 
+			newOutlet(504767938, "CHAIRMAN EBONG", e3ch), 
+			newOutlet(504758680, "GUIA BURGER", e3ch), 
+			newOutlet(504759804, "JASRICK FOOD TRIP", e3cg), 
+			newOutlet(504765879, "JHAY AR STORE", e3cg), 
+			newOutlet(504759802, "MARICEL EATERY", e3cg), 
+			newOutlet(504782124, "MD/RD", e3cg), 
+			newOutlet(504762684, "KENNA'S STORE", e3ck), 
+			newOutlet(504759877, "STA ANA SUPER STORE", e3cg), 
+			newOutlet(504762392, "RIVERA STORE", e3ch), 
+			newOutlet(504762829, "ROSE STORE", e3cj), 
+			newOutlet(504765872, "IYA'S STORE", e3ck), 
+			newOutlet(504788865, "MELCHOR DTORE", e3cg), 
+			newOutlet(504736501, "TINDAHAN NI BATANG", e3ch), 
+			newOutlet(504882613, "ZOE MAE STORE", e3ch), 
+			newOutlet(504886279, "VHEK'S STORE", e3ch), 
+			newOutlet(504428799, "VINCENT STORE", e3ck), 
+			newOutlet(504889399, "BOBBY ANN'S STORE", e3cj), 
+			newOutlet(504903060, "JM CARINDERIA ", e3ch) 
 		);
 	}
 
@@ -838,9 +807,9 @@ public class PersistenceConfiguration {
 	private void addEmptiestoPickListDetail() {
 		if (!syncRepository.exists(BACKUP)) {
 			Iterable<PickListDetailEntity> i = pickListDetailRepository.findAll();
-			StreamSupport.stream(i.spliterator(), false) //
-				.collect(Collectors.groupingBy(PickListDetailEntity::getPicking, Collectors.toList())) //
-				.entrySet().forEach(p -> addEmptiesToPickListDetails(p));
+			StreamSupport.stream(i.spliterator(), false) 
+				.collect(Collectors.groupingBy(PickListDetailEntity::getPicking, Collectors.toList())) 
+				.entrySet().forEach(this::addEmptiesToPickListDetails);
 			syncRepository.save(newSync(BACKUP, toUtilDate(LocalDate.now())));
 		}
 	}
@@ -860,7 +829,7 @@ public class PersistenceConfiguration {
 	}
 
 	private List<ItemEntity> empties(List<PickListDetailEntity> list) {
-		return list.stream().map(d -> d.getItem().getEmpties()).filter(i -> i != null).distinct()
+		return list.stream().map(d -> d.getItem().getEmpties()).filter(Objects::nonNull).distinct()
 			.collect(Collectors.toList());
 	}
 
@@ -878,7 +847,7 @@ public class PersistenceConfiguration {
 	}
 
 	private List<ItemEntity> bottles(List<ItemEntity> empties) {
-		return empties.stream().map(d -> d.getEmpties()).filter(i -> i != null).distinct().collect(Collectors.toList());
+		return empties.stream().map(ItemEntity::getEmpties).filter(Objects::nonNull).distinct().collect(Collectors.toList());
 	}
 
 	private PickListEntity addEmpties(PickListEntity pickList,

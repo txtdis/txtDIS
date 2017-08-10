@@ -1,20 +1,19 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.FRACTION;
-
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.SalesItemVariance;
 import ph.txtdis.mgdc.ccbpi.app.DeliveryListListApp;
 import ph.txtdis.mgdc.ccbpi.app.OrderConfirmationListApp;
 import ph.txtdis.mgdc.ccbpi.app.OrderReturnListApp;
 import ph.txtdis.mgdc.ccbpi.service.BookingVarianceService;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.FRACTION;
 
 @Scope("prototype")
 @Component("bookingVarianceTable")

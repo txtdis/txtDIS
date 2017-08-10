@@ -1,11 +1,11 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.time.LocalDate;
-
 import ph.txtdis.dto.Route;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.service.DateValidated;
 import ph.txtdis.service.SavableAsExcelService;
+
+import java.time.LocalDate;
 
 public interface ItemDeliveredCustomerService //
 	extends DateValidated,

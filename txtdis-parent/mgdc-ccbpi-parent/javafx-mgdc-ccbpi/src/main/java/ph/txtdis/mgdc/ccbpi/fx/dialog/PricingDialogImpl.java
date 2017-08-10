@@ -1,17 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.Price;
 import ph.txtdis.dto.PricingType;
 import ph.txtdis.fx.control.InputNode;
@@ -20,6 +11,14 @@ import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.ccbpi.service.BommedDiscountedPricedValidatedItemService;
 import ph.txtdis.util.DateTimeUtils;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.CURRENCY;
 
 @Scope("prototype")
 @Component("pricingDialog")

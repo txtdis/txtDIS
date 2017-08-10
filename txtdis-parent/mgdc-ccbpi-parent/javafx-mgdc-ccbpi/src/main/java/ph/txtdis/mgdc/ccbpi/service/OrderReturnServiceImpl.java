@@ -1,22 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.OrderReturnType.INVALID;
-import static ph.txtdis.type.OrderReturnType.OWN_FAULT;
-import static ph.txtdis.util.NumberUtils.isPositive;
-import static ph.txtdis.util.UserUtils.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.dto.PickList;
@@ -26,7 +11,20 @@ import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.service.PickListService;
 import ph.txtdis.type.OrderConfirmationType;
 import ph.txtdis.type.OrderReturnType;
-import ph.txtdis.util.UserUtils;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.OrderReturnType.INVALID;
+import static ph.txtdis.type.OrderReturnType.OWN_FAULT;
+import static ph.txtdis.util.NumberUtils.isPositive;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("orderReturnService")
 public class OrderReturnServiceImpl //

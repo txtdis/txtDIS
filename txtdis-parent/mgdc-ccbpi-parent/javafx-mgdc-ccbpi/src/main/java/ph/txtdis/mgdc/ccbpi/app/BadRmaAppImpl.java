@@ -1,25 +1,24 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.ID;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.app.BadRmaApp;
 import ph.txtdis.mgdc.ccbpi.service.BadRmaService;
 import ph.txtdis.mgdc.fx.table.BadRmaTable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.ID;
 
 @Scope("prototype")
 @Component("badRmaApp")
@@ -148,7 +147,7 @@ public class BadRmaAppImpl //
 		try {
 			service.saveReturnReceiptData();
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {

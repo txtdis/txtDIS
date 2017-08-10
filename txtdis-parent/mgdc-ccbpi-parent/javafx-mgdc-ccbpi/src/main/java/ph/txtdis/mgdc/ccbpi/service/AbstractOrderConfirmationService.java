@@ -1,19 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.math.BigDecimal.ZERO;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
-import static ph.txtdis.type.OrderConfirmationType.MANUAL;
-import static ph.txtdis.type.OrderConfirmationType.WAREHOUSE;
-import static ph.txtdis.type.PriceType.DEALER;
-import static ph.txtdis.util.DateTimeUtils.getServerDate;
-import static ph.txtdis.util.DateTimeUtils.toLocalDateFromOrderConfirmationFormat;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.exception.NotFoundException;
@@ -21,6 +9,17 @@ import ph.txtdis.info.Information;
 import ph.txtdis.info.SuccessfulSaveInfo;
 import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.OrderConfirmationType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static java.math.BigDecimal.ZERO;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static ph.txtdis.type.OrderConfirmationType.MANUAL;
+import static ph.txtdis.type.OrderConfirmationType.WAREHOUSE;
+import static ph.txtdis.type.PriceType.DEALER;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.DateTimeUtils.toLocalDateFromOrderConfirmationFormat;
 
 public abstract class AbstractOrderConfirmationService //
 	extends AbstractCokeBillableService {

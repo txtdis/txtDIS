@@ -1,8 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.math.BigDecimal;
-
 import ph.txtdis.exception.InvalidException;
+
+import java.math.BigDecimal;
 
 public interface UpToReturnableQtyReceivingService //
 	extends ReceivingService {

@@ -1,7 +1,5 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.time.LocalDate;
-
 import ph.txtdis.dto.Route;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.service.FinancialService;
@@ -9,6 +7,8 @@ import ph.txtdis.service.ListedAndResettableService;
 import ph.txtdis.service.MasterService;
 import ph.txtdis.service.ResettableService;
 import ph.txtdis.type.PartnerType;
+
+import java.time.LocalDate;
 
 public interface CustomerService //
 	extends FinancialService,

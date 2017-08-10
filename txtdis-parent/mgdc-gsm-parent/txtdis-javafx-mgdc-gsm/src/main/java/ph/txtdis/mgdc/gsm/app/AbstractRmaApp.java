@@ -139,7 +139,7 @@ public abstract class AbstractRmaApp<RS extends RmaService, BT extends BillableT
 		try {
 			service.saveReturnReceiptData();
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {

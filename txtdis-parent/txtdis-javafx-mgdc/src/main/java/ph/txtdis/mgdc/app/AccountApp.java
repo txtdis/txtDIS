@@ -19,7 +19,7 @@ public class AccountApp
 		try {
 			open(ids);
 		} catch (Exception e) {
-			messageDialog.show(e).addParent(this).start();
+			showErrorDialog(e);
 		}
 	}
 
@@ -35,7 +35,7 @@ public class AccountApp
 			refreshTitleAndHeader();
 			goToDefaultFocus();
 		} catch (Exception e) {
-			messageDialog.show(e).addParent(this).start();
+			showErrorDialog(e);
 		}
 	}
 }

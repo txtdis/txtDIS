@@ -1,21 +1,18 @@
 package ph.txtdis.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.LocalDatePicker;
 import ph.txtdis.fx.pane.AppGridPane;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 @Scope("prototype")
 @Component("openByDateDialog")
@@ -23,12 +20,14 @@ public class OpenByDateDialog
 	extends AbstractInputDialog {
 
 	@Autowired
-	protected AppGridPane grid;
-
-	@Autowired
 	private LocalDatePicker datePicker;
 
 	private LocalDate date;
+
+	@Override
+	protected List<AppButton> buttons() {
+		return singletonList(closeButton());
+	}
 
 	public LocalDate getDate() {
 		return date;
@@ -40,20 +39,14 @@ public class OpenByDateDialog
 	}
 
 	@Override
-	protected List<AppButton> buttons() {
-		return singletonList(closeButton());
-	}
-
-	@Override
 	protected List<Node> nodes() {
-		grid.getChildren().clear();
+		AppGridPane grid = pane.grid();
 		grid.add(label.name(prompt), 0, 0);
 		grid.add(datePicker(), 0, 1);
 		return asList(header(), grid, buttonBox());
 	}
 
 	private LocalDatePicker datePicker() {
-		datePicker.setValue(null);
 		datePicker.onAction(e -> onPick());
 		return datePicker;
 	}

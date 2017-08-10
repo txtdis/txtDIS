@@ -1,12 +1,11 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.time.LocalDate;
-
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.type.PriceType;
+
+import java.time.LocalDate;
 
 @Service("loadManifestService")
 public class LoadManifestServiceImpl //

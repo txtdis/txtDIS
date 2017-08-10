@@ -7,6 +7,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ph.txtdis.dyvek.fx.dialog.AssignmentDialog;
@@ -18,26 +19,23 @@ import static ph.txtdis.util.NumberUtils.isPositive;
 
 @Scope("prototype")
 @Component("assignmentContextMenu")
-public class AssignmentContextMenuImpl //
+public class AssignmentContextMenuImpl 
 	implements AssignmentContextMenu {
 
 	private TableView<BillableDetail> table;
 
-	private AssignmentDialog dialog;
-
 	@Override
-	public void addMenu(TableView<BillableDetail> table, AssignmentDialog dialog) {
+	public void addMenu(TableView<BillableDetail> table) {
 		this.table = table;
-		this.dialog = dialog;
-		table.setRowFactory(t -> createRowMenu(t));
+		table.setRowFactory(this::createRowMenu);
 	}
 
 	private TableRow<BillableDetail> createRowMenu(TableView<BillableDetail> table) {
 		TableRow<BillableDetail> row = new TableRow<>();
-		row.contextMenuProperty().bind(when( //
-			row.itemProperty().isNotNull() //
-				.and(table.editableProperty())) //
-			.then(createRowMenu(table, row))//
+		row.contextMenuProperty().bind(when(
+			row.itemProperty().isNotNull()
+				.and(table.editableProperty()))
+			.then(createRowMenu(table, row))
 			.otherwise((ContextMenu) null));
 		return row;
 	}
@@ -68,10 +66,16 @@ public class AssignmentContextMenuImpl //
 	}
 
 	private void assignQtyToSelection(BillableDetail unassigned) {
-		dialog.setDetail(unassigned).addParent(getStage()).start();
-		BillableDetail assigned = dialog.getDetail();
+		AssignmentDialog d = assignmentDialog();
+		d.setDetail(unassigned).addParent(getStage()).start();
+		BillableDetail assigned = d.getDetail();
 		if (assigned != null && isPositive(assigned.getAssignedQty()))
 			assignQtyToSelection(unassigned, assigned);
+	}
+
+	@Lookup
+	AssignmentDialog assignmentDialog() {
+		return null;
 	}
 
 	private Stage getStage() {

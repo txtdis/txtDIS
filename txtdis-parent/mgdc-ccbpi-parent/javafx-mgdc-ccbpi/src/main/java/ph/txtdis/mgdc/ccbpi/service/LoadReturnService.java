@@ -1,10 +1,10 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.PickListDetail;
 import ph.txtdis.mgdc.service.LoadingService;
 import ph.txtdis.service.AppendableDetailService;
+
+import java.util.List;
 
 public interface LoadReturnService //
 	extends AppendableDetailService,

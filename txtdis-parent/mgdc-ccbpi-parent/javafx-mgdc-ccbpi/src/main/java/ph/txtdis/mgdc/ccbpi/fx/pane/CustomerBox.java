@@ -1,12 +1,5 @@
 package ph.txtdis.mgdc.ccbpi.fx.pane;
 
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ObservableBooleanValue;
@@ -14,6 +7,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.FocusRequested;
@@ -24,6 +20,9 @@ import ph.txtdis.mgdc.ccbpi.app.CustomerListAppImpl;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.service.CustomerIdAndNameService;
 import ph.txtdis.service.CustomerSearchableService;
+
+import static ph.txtdis.type.Type.ID;
+import static ph.txtdis.type.Type.TEXT;
 
 @Scope("prototype")
 @Component("customerBox")

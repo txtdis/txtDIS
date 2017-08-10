@@ -1,19 +1,18 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.apache.log4j.Logger.getLogger;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.SalesItemVariance;
+import ph.txtdis.type.BeverageType;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.SalesItemVariance;
-import ph.txtdis.type.BeverageType;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static org.apache.log4j.Logger.getLogger;
 
 @Service("remittanceVarianceService")
 public class RemittanceVarianceServiceImpl //

@@ -111,7 +111,7 @@ public class RemittanceAppImpl //
 
 	private void actOnPending(String id) {
 		String msg = "Validate, deposit or receive\nRemittance No. " + id + "\nfirst, to proceed.";
-		messageDialog.showError(msg).addParent(this).start();
+		messageDialog().showError(msg).addParent(this).start();
 		actOn(id, "");
 	}
 }

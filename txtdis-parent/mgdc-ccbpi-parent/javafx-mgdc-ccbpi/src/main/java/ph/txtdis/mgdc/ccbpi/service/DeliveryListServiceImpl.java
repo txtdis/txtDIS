@@ -1,24 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.util.Arrays.asList;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static ph.txtdis.type.PriceType.PURCHASE;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.DateTimeUtils.toLocalDateFromOrderConfirmationFormat;
-import static ph.txtdis.util.DateTimeUtils.toOrderConfirmationDate;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.exception.DuplicateException;
@@ -27,6 +12,18 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.info.Information;
 import ph.txtdis.info.SuccessfulSaveInfo;
 import ph.txtdis.type.UomType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static ph.txtdis.type.PriceType.PURCHASE;
+import static ph.txtdis.util.DateTimeUtils.*;
 
 @Service("deliveryListService")
 public class DeliveryListServiceImpl //

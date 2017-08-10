@@ -1,14 +1,13 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import java.util.List;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.mgdc.ccbpi.service.CokeBillableService;
 import ph.txtdis.mgdc.fx.dialog.BillableDialog;
+
+import java.util.List;
 
 @Scope("prototype")
 @Component("receivingDialog")

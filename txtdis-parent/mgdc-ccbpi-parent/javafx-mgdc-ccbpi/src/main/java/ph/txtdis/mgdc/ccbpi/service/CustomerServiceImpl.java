@@ -1,17 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static ph.txtdis.type.PriceType.DEALER;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.PricingType;
 import ph.txtdis.dto.Routing;
 import ph.txtdis.mgdc.ccbpi.dto.Channel;
@@ -20,6 +11,14 @@ import ph.txtdis.mgdc.service.PricingTypeService;
 import ph.txtdis.mgdc.service.RouteService;
 import ph.txtdis.type.PartnerType;
 import ph.txtdis.util.DateTimeUtils;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static ph.txtdis.type.PriceType.DEALER;
 
 @Service("customerService")
 public class CustomerServiceImpl //

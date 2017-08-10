@@ -162,7 +162,7 @@ public class BillingAppImpl //
 	protected void renew() {
 		super.renew();
 		if (service.findUncorrectedInvalidBilling()) {
-			messageDialog.showError("Correct invalid S/I & D/R's first").addParent(this).start();
+			messageDialog().showError("Correct invalid S/I & D/R's first").addParent(this).start();
 			refresh();
 			table.requestFocus();
 		}
@@ -334,7 +334,7 @@ public class BillingAppImpl //
 
 	private void showCorrectedBillingMustBeValidatedFirstMessage(String orderNo) {
 		String msg = "Validate corrected\nS/I/(D/R) No. " + orderNo + "\nfirst, to proceed.";
-		messageDialog.showError(msg).addParent(this).start();
+		messageDialog().showError(msg).addParent(this).start();
 	}
 
 	@Override

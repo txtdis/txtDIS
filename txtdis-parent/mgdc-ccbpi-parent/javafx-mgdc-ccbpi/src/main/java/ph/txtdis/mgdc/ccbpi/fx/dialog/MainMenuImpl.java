@@ -1,10 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
+import javafx.scene.layout.GridPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.layout.GridPane;
 import ph.txtdis.app.*;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.LabelFactory;
@@ -14,16 +13,7 @@ import ph.txtdis.fx.dialog.UserApp;
 import ph.txtdis.mgdc.app.BadRmaApp;
 import ph.txtdis.mgdc.app.InventoryApp;
 import ph.txtdis.mgdc.app.RouteApp;
-import ph.txtdis.mgdc.ccbpi.app.BlanketBalanceApp;
-import ph.txtdis.mgdc.ccbpi.app.BookingVarianceApp;
-import ph.txtdis.mgdc.ccbpi.app.DeliveryListApp;
-import ph.txtdis.mgdc.ccbpi.app.DeliveryReturnApp;
-import ph.txtdis.mgdc.ccbpi.app.LoadManifestApp;
-import ph.txtdis.mgdc.ccbpi.app.LoadReturnApp;
-import ph.txtdis.mgdc.ccbpi.app.OrderConfirmationApp;
-import ph.txtdis.mgdc.ccbpi.app.OrderReturnApp;
-import ph.txtdis.mgdc.ccbpi.app.PaymentApp;
-import ph.txtdis.mgdc.ccbpi.app.RemittanceVarianceApp;
+import ph.txtdis.mgdc.ccbpi.app.*;
 
 @Scope("prototype")
 @Component("mainMenu")
@@ -36,10 +26,10 @@ public class MainMenuImpl //
 		loadReturnButton,
 		bookingVarianceButton, //
 
-		badRmaButton, blanketBalanceButton, remittanceButton, remittanceVarianceButton, deliveryReturnButton,
+	badRmaButton, blanketBalanceButton, remittanceButton, remittanceVarianceButton, deliveryReturnButton,
 		paymentButton, inventoryButton, //
 
-		stockTakeButton, stockTakeVarianceButton, itemButton, routeButton, truckButton, userButton, styleButton;
+	stockTakeButton, stockTakeVarianceButton, itemButton, routeButton, truckButton, userButton, styleButton;
 
 	@Autowired
 	private LabelFactory label;

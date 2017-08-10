@@ -1,10 +1,5 @@
 package ph.txtdis.fx.dialog;
 
-import static javafx.geometry.Pos.CENTER;
-import static javafx.stage.Modality.WINDOW_MODAL;
-
-import java.util.List;
-
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -21,6 +16,11 @@ import ph.txtdis.app.App;
 import ph.txtdis.fx.control.ButtonFactory;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.pane.PaneFactory;
+
+import java.util.List;
+
+import static javafx.geometry.Pos.CENTER;
+import static javafx.stage.Modality.WINDOW_MODAL;
 
 public abstract class AbstractDialog 
 	extends Stage 
@@ -55,15 +55,10 @@ public abstract class AbstractDialog
 
 	@Override
 	public App addParent(Stage stage) {
-		if (stage != null && stage.getOwner() == null && getOwner() == null)
-			initialize(stage);
-		return this;
-	}
-
-	private void initialize(Stage stage) {
 		initOwner(stage);
 		initModality(WINDOW_MODAL);
 		initStyle(StageStyle.TRANSPARENT);
+		return this;
 	}
 
 	public App addParent(Tab tab) {

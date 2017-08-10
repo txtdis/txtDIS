@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.fx.control.*;
 import ph.txtdis.fx.dialog.OpenByIdDialog;
@@ -30,7 +31,7 @@ public abstract class AbstractKeyedApp<
 	extends AbstractApp<AS>
 	implements LaunchableApp {
 
-	protected AppButton decisionButton, newButton, backButton, openByIdButton, nextButton, saveButton;
+	protected AppButton decisionButton, newButton, openByIdButton, saveButton;
 
 	@Autowired
 	protected AppFieldImpl<LocalDate> orderDateDisplay;
@@ -45,16 +46,17 @@ public abstract class AbstractKeyedApp<
 	protected AppGridPane gridPane;
 
 	@Autowired
+	protected ButtonFactory button;
+
+	@Autowired
 	protected DecisionNeededApp decisionNeededApp;
 
 	@Autowired
 	protected LocalDatePicker orderDatePicker;
 
-	@Autowired
 	protected OpenByIdDialog<ID> openByIdDialog;
 
-	@Autowired
-	protected ButtonFactory button;
+	private AppButton backButton, nextButton;
 
 	@Override
 	public void actOn(String... keys) {
@@ -170,11 +172,17 @@ public abstract class AbstractKeyedApp<
 	}
 
 	protected String getDialogInput() {
+		openByIdDialog = openByIdDialog();
 		openByIdDialog
 			.header(service.getOpenDialogHeader())
 			.prompt(service.getOpenDialogPrompt())
 			.addParent(this).start();
 		return openByIdDialog.getKey();
+	}
+
+	@Lookup
+	OpenByIdDialog<ID> openByIdDialog() {
+		return null;
 	}
 
 	@Override
@@ -267,7 +275,7 @@ public abstract class AbstractKeyedApp<
 		try {
 			post();
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			e.printStackTrace();
 			showErrorDialog(e);

@@ -1,9 +1,14 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.math.BigDecimal.ZERO;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
-import static ph.txtdis.util.UserUtils.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import ph.txtdis.dto.SalesItemVariance;
+import ph.txtdis.excel.ExcelReportWriter;
+import ph.txtdis.fx.table.AppTable;
+import ph.txtdis.service.RestClientService;
+import ph.txtdis.util.ClientTypeMap;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -11,16 +16,10 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import ph.txtdis.dto.SalesItemVariance;
-import ph.txtdis.excel.ExcelReportWriter;
-import ph.txtdis.fx.table.AppTable;
-import ph.txtdis.service.RestClientService;
-import ph.txtdis.util.ClientTypeMap;
+import static java.math.BigDecimal.ZERO;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.util.DateTimeUtils.toDateDisplay;
+import static ph.txtdis.util.UserUtils.username;
 
 public abstract class AbstractListService //
 	implements ListService {

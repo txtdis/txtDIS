@@ -1,9 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
+import javafx.beans.binding.BooleanBinding;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.beans.binding.BooleanBinding;
 import ph.txtdis.app.AbstractRemittanceApp;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.service.RemittanceService;

@@ -1,15 +1,14 @@
 package ph.txtdis.fx.pane;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 @Scope("prototype")
 @Component("appGridPane")
-public class AppGridPane //
+public class AppGridPane
 	extends GridPane {
 
 	public AppGridPane() {

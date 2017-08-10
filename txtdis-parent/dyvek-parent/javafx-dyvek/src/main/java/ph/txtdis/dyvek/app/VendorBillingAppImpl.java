@@ -1,12 +1,14 @@
 package ph.txtdis.dyvek.app;
 
 import javafx.scene.Node;
+import javafx.scene.image.WritableImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ph.txtdis.dyvek.fx.dialog.CheckPaymentDialog;
 import ph.txtdis.dyvek.fx.dialog.VendorBillDialog;
+import ph.txtdis.dyvek.fx.dialog.VoucherPrintingDialog;
 import ph.txtdis.dyvek.service.VendorBillingService;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
@@ -48,6 +50,7 @@ public class VendorBillingAppImpl
 		List<AppButton> b = super.addButtons();
 		b.add(billActionButton = button.icon("intray").tooltip("SOA...").build());
 		b.add(paymentButton = button.icon("payment").tooltip("Payment...").build());
+		b.add(printButton = button.icon("print").tooltip("Voucher...").build());
 		return b;
 	}
 
@@ -60,6 +63,7 @@ public class VendorBillingAppImpl
 	protected void buttonListeners() {
 		super.buttonListeners();
 		paymentButton.onAction(e -> openPaymentDialog());
+		printButton.onAction(e -> openPrintingDialog());
 	}
 
 	private void openPaymentDialog() {
@@ -68,7 +72,7 @@ public class VendorBillingAppImpl
 			d.addParent(this).start();
 			service.setPaymentData(d.getAddedItems());
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			e.printStackTrace();
 			showErrorDialog(e);
@@ -79,6 +83,22 @@ public class VendorBillingAppImpl
 
 	@Lookup
 	CheckPaymentDialog checkPaymentDialog() {
+		return null;
+	}
+
+	private void openPrintingDialog() {
+		try {
+			VoucherPrintingDialog d = voucherPrintingDialog();
+			WritableImage image = getScene().snapshot(null);
+			d.toPrint(image).addParent(this).start();
+		} catch (Exception e) {
+			e.printStackTrace();
+			showErrorDialog(e);
+		}
+	}
+
+	@Lookup
+	VoucherPrintingDialog voucherPrintingDialog() {
 		return null;
 	}
 
@@ -118,7 +138,7 @@ public class VendorBillingAppImpl
 			d.addParent(this).start();
 			service.setBillData(d.getAddedItems());
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			e.printStackTrace();
 			showErrorDialog(e);
@@ -156,6 +176,7 @@ public class VendorBillingAppImpl
 		super.setBindings();
 		paymentButton.disableIf(billActedOnDisplay.isEmpty()
 			.or(paidOnDisplay.isNotEmpty()));
+		printButton.disableIf(paymentValueDisplay.isEmpty());
 	}
 
 	@Override

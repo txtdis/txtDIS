@@ -10,8 +10,6 @@ import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.service.HolidayService;
 import ph.txtdis.service.RestClientService;
-import ph.txtdis.service.RestClientService;
-import ph.txtdis.service.SyncService;
 import ph.txtdis.service.UserService;
 import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;

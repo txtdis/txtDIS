@@ -1,14 +1,13 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.util.stream.Collectors.toList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.Warehouse;
+import ph.txtdis.service.RestClientService;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.Warehouse;
-import ph.txtdis.service.RestClientService;
+import static java.util.stream.Collectors.toList;
 
 @Service("warehouseService")
 public class WarehouseServiceImpl //

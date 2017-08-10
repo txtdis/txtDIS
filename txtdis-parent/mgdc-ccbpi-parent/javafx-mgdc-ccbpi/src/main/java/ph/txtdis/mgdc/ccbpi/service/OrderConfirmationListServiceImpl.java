@@ -1,14 +1,13 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static org.apache.log4j.Logger.getLogger;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.SalesItemVariance;
+import ph.txtdis.type.ModuleType;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.SalesItemVariance;
-import ph.txtdis.type.ModuleType;
+import static org.apache.log4j.Logger.getLogger;
 
 @Service("orderConfirmationListService")
 public class OrderConfirmationListServiceImpl //

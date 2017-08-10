@@ -2,7 +2,6 @@ package ph.txtdis.mgdc.ccbpi.app;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.app.AbstractExcelApp;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.mgdc.ccbpi.fx.table.CustomerListTable;

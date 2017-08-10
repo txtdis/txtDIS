@@ -1,17 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.ENUM;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.math.BigDecimal;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.scene.control.TableColumn;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.fx.table.AbstractTable;
 import ph.txtdis.fx.table.AppendContextMenu;
@@ -22,6 +12,12 @@ import ph.txtdis.mgdc.fx.dialog.BillableDialog;
 import ph.txtdis.mgdc.fx.table.BillableTable;
 import ph.txtdis.type.QualityType;
 import ph.txtdis.type.UomType;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
 
 public abstract class AbstractBillableTable<AS extends BillableService, BD extends BillableDialog> // 
 	extends AbstractTable<BillableDetail> //

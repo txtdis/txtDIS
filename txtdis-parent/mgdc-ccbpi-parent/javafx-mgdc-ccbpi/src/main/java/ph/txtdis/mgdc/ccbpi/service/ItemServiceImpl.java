@@ -1,24 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.util.Collections.emptyList;
-import static ph.txtdis.type.BeverageType.EMPTIES;
-import static ph.txtdis.type.BeverageType.FULL_GOODS;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.STORE_KEEPER;
-import static ph.txtdis.util.UserUtils.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Price;
 import ph.txtdis.dto.PricingType;
 import ph.txtdis.exception.DuplicateException;
@@ -26,7 +9,21 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.PriceType;
-import ph.txtdis.util.UserUtils;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptyList;
+import static ph.txtdis.type.BeverageType.EMPTIES;
+import static ph.txtdis.type.BeverageType.FULL_GOODS;
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.type.UserType.STORE_KEEPER;
+import static ph.txtdis.util.UserUtils.isUser;
 
 @Service("itemService")
 public class ItemServiceImpl //
@@ -115,6 +112,16 @@ public class ItemServiceImpl //
 	}
 
 	@Override
+	public void setEmpties(boolean b) {
+		try {
+			String name = b ? EMPTIES.toString() : FULL_GOODS.toString();
+			get().setFamily(itemFamilyService.findByName(name));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
 	public void setEmpties(String empties) {
 		get().setEmpties(empties);
 	}
@@ -152,15 +159,5 @@ public class ItemServiceImpl //
 	@Override
 	public void openByOpenDialogInputtedKey(String id) throws Exception {
 		set(findByVendorNo(id));
-	}
-
-	@Override
-	public void setEmpties(boolean b) {
-		try {
-			String name = b ? EMPTIES.toString() : FULL_GOODS.toString();
-			get().setFamily(itemFamilyService.findByName(name));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 }

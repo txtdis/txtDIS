@@ -9,7 +9,6 @@ import ph.txtdis.dyvek.service.VendorAndClientCheckPaymentDetailedRemittanceServ
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LocalDatePicker;
 import ph.txtdis.fx.pane.AppGridPane;
-import ph.txtdis.service.RemittanceService;
 
 import java.time.LocalDate;
 
@@ -17,7 +16,7 @@ import static ph.txtdis.type.Type.*;
 
 @Scope("prototype")
 @Component("remittanceApp")
-public class RemittanceAppImpl 
+public class RemittanceAppImpl
 	extends AbstractPaymentDetailedRemittanceApp<VendorAndClientCheckPaymentDetailedRemittanceService> {
 
 	@Autowired
@@ -37,37 +36,19 @@ public class RemittanceAppImpl
 	}
 
 	private void paymentReceiptGridNodes() {
-		comboAndInputGridNodes( 
-			"Received from", 
-			receivedFromCombo.width(180).items(service.getReceivedFromList()), 
-			"Amount", 
-			amountInput.width(110).build(CURRENCY), 
-			0, 
-			1);
-		dateGridNodes( 
-			"Date", 
-			orderDateDisplay, 
-			orderDatePicker, 
-			4, 
-			0, 
-			1);
+		comboAndInputGridNodes(
+			"Received from", receivedFromCombo.width(180).items(service.getReceivedFromList()),
+			"Amount", amountInput.width(110).build(CURRENCY), 0, 1);
+		dateGridNodes(
+			"Date", orderDateDisplay, orderDatePicker, 4, 0, 1);
 	}
 
 	private void chequeGridNodes() {
-		comboAndInputGridNodes( 
-			"Drawn from", 
-			draweeBankCombo.width(180).items(service.listBanks()), 
-			"Check No.", 
-			checkIdInput.width(110).build(ID), 
-			1, 
-			1);
+		comboAndInputGridNodes(
+			"Drawn from", draweeBankCombo.width(180).items(service.listBanks()),
+			"Check No.", checkIdInput.width(110).build(ID), 1, 1);
 		dateGridNodes(
-			"Check Date", 
-			checkDateDisplay, 
-			checkDatePicker, 
-			4, 
-			1, 
-			1);
+			"Check Date", checkDateDisplay, checkDatePicker, 4, 1, 1);
 	}
 
 	private void depositGridNodes() {
@@ -77,8 +58,8 @@ public class RemittanceAppImpl
 
 	private Node depositGridNode() {
 		return pane.forGridGroup(
-			depositedToDisplay.readOnly().width(180).build(OTHERS), 
-			label.field("on"), 
+			depositedToDisplay.readOnly().width(180).build(OTHERS),
+			label.field("on"),
 			depositedOnDisplay.readOnly().build(TIMESTAMP));
 	}
 

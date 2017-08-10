@@ -49,7 +49,7 @@ public class HolidayDialog
 		try {
 			service.validateDate(datePicker.getValue());
 		} catch (Exception e) {
-			messageDialog().show(e).addParent(this).start();
+			showErrorDialog(e);
 			refresh();
 		}
 	}

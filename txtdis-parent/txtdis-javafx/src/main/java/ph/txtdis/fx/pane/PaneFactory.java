@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,7 +17,9 @@ import static javafx.geometry.Pos.*;
 public class PaneFactory {
 
 	public HBox forDialogButtons(List<? extends Node> nodes) {
-		return horizontal(nodes, CENTER_RIGHT, 0, 0, 20, 0);
+		HBox b = horizontal(nodes, CENTER_RIGHT, 0, 0, 20, 0);
+		b.setSpacing(10);
+		return b;
 	}
 
 	private HBox horizontal(List<? extends Node> nodes, Pos pos, int top, int right, int bottom, int left) {
@@ -77,6 +80,11 @@ public class PaneFactory {
 
 	public HBox forTableTotals(List<? extends Node> totalDisplays) {
 		return horizontal(totalDisplays, CENTER_RIGHT, 0, 20, 0, 0);
+	}
+
+	@Lookup
+	public AppGridPane grid() {
+		return null;
 	}
 
 	public VBox topCenteredVertical(List<? extends Node> nodes) {

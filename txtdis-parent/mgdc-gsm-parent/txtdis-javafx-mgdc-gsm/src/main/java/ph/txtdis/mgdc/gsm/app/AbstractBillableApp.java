@@ -26,11 +26,11 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static ph.txtdis.type.Type.*;
 
-public abstract class AbstractBillableApp< //
-	BS extends BillableService, //
-	BT extends BillableTable, //
-	PK> //
-	extends AbstractDecisionNeededApp<BS, Billable, Long, PK> //
+public abstract class AbstractBillableApp<
+	BS extends BillableService,
+	BT extends BillableTable,
+	PK>
+	extends AbstractDecisionNeededApp<BS, Billable, Long, PK> 
 	implements BillableApp {
 
 	protected static final String PROMPT = "Select date whose first entry will opened";
@@ -253,7 +253,7 @@ public abstract class AbstractBillableApp< //
 	protected void setInputFieldBindings() {
 		orderDateBinding();
 		setReferenceIdBindings();
-		remarksDisplay.editableIf(isNew() //
+		remarksDisplay.editableIf(isNew() 
 			.and(customerBox.isEmpty().not()));
 	}
 
@@ -270,7 +270,7 @@ public abstract class AbstractBillableApp< //
 	}
 
 	protected BooleanBinding saveButtonDisableBinding() {
-		return isPosted() //
+		return isPosted() 
 			.or(table.isEmpty());
 	}
 
@@ -295,14 +295,14 @@ public abstract class AbstractBillableApp< //
 	}
 
 	protected List<Control> actionAfterReceivingNodes(String prompt) {
-		return asList(//
-			label.name(prompt + " by"), afterReceivingActionByDisplay, //
+		return asList(
+			label.name(prompt + " by"), afterReceivingActionByDisplay, 
 			label.name(ON), afterReceivingActionOnDisplay);
 	}
 
 	protected List<Node> billingNodes(String prompt) {
-		return asList( //
-			label.name(prompt + " by"), billedByDisplay, //
+		return asList(
+			label.name(prompt + " by"), billedByDisplay, 
 			label.name(ON), billedOnDisplay);
 	}
 
@@ -312,8 +312,8 @@ public abstract class AbstractBillableApp< //
 	}
 
 	protected List<Node> printNodes() {
-		return new ArrayList<>(asList(//
-			label.name("Printed by"), printedByDisplay, //
+		return new ArrayList<>(asList(
+			label.name("Printed by"), printedByDisplay, 
 			label.name(ON), printedOnDisplay));
 	}
 
@@ -323,8 +323,8 @@ public abstract class AbstractBillableApp< //
 	}
 
 	protected List<Node> receivingNodes() {
-		return asList(//
-			label.name("Received by"), receivedByDisplay, //
+		return asList(
+			label.name("Received by"), receivedByDisplay, 
 			label.name(ON), receivedOnDisplay);
 	}
 
@@ -340,8 +340,8 @@ public abstract class AbstractBillableApp< //
 	}
 
 	protected List<Node> vatNodes() {
-		return asList(//
-			label.name("VATable"), vatableDisplay, //
+		return asList(
+			label.name("VATable"), vatableDisplay, 
 			label.name("VAT"), vatDisplay);
 	}
 

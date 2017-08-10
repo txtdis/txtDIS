@@ -1,16 +1,15 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import static java.io.File.separator;
-import static java.lang.System.getProperty;
-
-import java.io.File;
-
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+
+import static java.io.File.separator;
+import static java.lang.System.getProperty;
 
 @Scope("prototype")
 @Component("ocpChooser")

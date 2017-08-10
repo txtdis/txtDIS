@@ -79,9 +79,9 @@ public class StyleApp
 			saveChanges();
 			close();
 		} catch (Information i) {
-			messageDialog().show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
-			messageDialog().show(e).addParent(this).start();
+			showErrorDialog(e);
 		}
 	}
 

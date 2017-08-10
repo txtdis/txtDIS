@@ -76,7 +76,7 @@ public abstract class AbstractStockTakeVarianceApp //
 		try {
 			service.saveUponValidation(table.getItems());
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			showErrorDialog(e);
 		}

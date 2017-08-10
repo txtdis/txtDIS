@@ -1,21 +1,18 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.FRACTION;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.math.BigDecimal;
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.apache.commons.lang3.math.Fraction;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.app.LaunchableApp;
 import ph.txtdis.dto.SalesItemVariance;
 import ph.txtdis.fx.table.AbstractTable;
 import ph.txtdis.fx.table.Column;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
 
 public abstract class AbstractOrderListTable<App extends LaunchableApp> // 
 	extends AbstractTable<SalesItemVariance> {

@@ -1,15 +1,9 @@
 package ph.txtdis.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
 import ph.txtdis.app.App;
 import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.fx.control.AppButton;
@@ -19,6 +13,11 @@ import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.fx.table.RoleTable;
 import ph.txtdis.info.Information;
 import ph.txtdis.service.UserService;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.TEXT;
 
 @Scope("prototype")
 @Component("userApp")
@@ -58,17 +57,12 @@ public class UserApp
 		try {
 			service.save(roleTable.getItems());
 		} catch (Information i) {
-			messageDialog().show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {
 			refresh();
 		}
-	}
-
-	private void showErrorDialog(Exception e) {
-		e.printStackTrace();
-		messageDialog().show(e).addParent(this).start();
 	}
 
 	@Override

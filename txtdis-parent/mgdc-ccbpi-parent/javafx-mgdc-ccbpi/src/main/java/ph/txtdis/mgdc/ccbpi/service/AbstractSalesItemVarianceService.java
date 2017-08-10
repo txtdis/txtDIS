@@ -1,14 +1,14 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.util.Arrays.asList;
+import ph.txtdis.dto.SalesItemVariance;
+import ph.txtdis.service.AbstractVarianceService;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.function.Function;
 
-import ph.txtdis.dto.SalesItemVariance;
-import ph.txtdis.service.AbstractVarianceService;
+import static java.math.BigDecimal.ZERO;
+import static java.util.Arrays.asList;
 
 public abstract class AbstractSalesItemVarianceService //
 	extends AbstractVarianceService<SalesItemVariance> //

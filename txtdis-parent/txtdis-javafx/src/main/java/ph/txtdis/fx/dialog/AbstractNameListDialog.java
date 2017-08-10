@@ -1,20 +1,17 @@
 package ph.txtdis.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.info.Information;
 import ph.txtdis.service.SavedByName;
 import ph.txtdis.service.UniqueNamedService;
+
+import java.util.List;
+
+import static java.util.Collections.singletonList;
+import static ph.txtdis.type.Type.TEXT;
 
 public abstract class AbstractNameListDialog<T extends Keyed<Long>, S extends UniqueNamedService<T>> //
 	extends AbstractFieldDialog<T> {
@@ -36,7 +33,7 @@ public abstract class AbstractNameListDialog<T extends Keyed<Long>, S extends Un
 		try {
 			findDuplicate(nameField.getValue());
 		} catch (Exception e) {
-			messageDialog().show(e).addParent(this).start();
+			showErrorDialog(e);
 			refresh();
 		}
 	}

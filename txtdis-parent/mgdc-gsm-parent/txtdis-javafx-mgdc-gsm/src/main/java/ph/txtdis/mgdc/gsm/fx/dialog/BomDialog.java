@@ -8,7 +8,6 @@ import ph.txtdis.dto.Bom;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.fx.dialog.AbstractFieldDialog;
-import ph.txtdis.fx.dialog.SearchDialog;
 import ph.txtdis.mgdc.gsm.app.ItemListApp;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.gsm.service.BommedDiscountedPricedValidatedItemService;
@@ -41,9 +40,6 @@ public class BomDialog
 	@Autowired
 	private LabeledField<BigDecimal> qtyField;
 
-	@Autowired
-	private SearchDialog searchDialog;
-
 	@Override
 	public void nextFocus() {
 		qtyField.requestFocus();
@@ -74,7 +70,7 @@ public class BomDialog
 	private LabeledField<Long> itemIdField() {
 		itemIdField.name("Item No.").isSearchable().build(ID);
 		itemIdField.onAction(e -> updateNameAndUomUponVerificationIfInputted());
-		itemIdField.setOnSearch(e -> openSearchDialog(service, this, itemListApp, messageDialog(), searchDialog));
+		itemIdField.setOnSearch(e -> openSearchDialog(service, this, itemListApp));
 		return itemIdField;
 	}
 

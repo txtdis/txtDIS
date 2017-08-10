@@ -1,11 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.util;
 
-import java.util.List;
-
-import lombok.EqualsAndHashCode;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.PickList;
 import ph.txtdis.dto.SalesItemVariance;
@@ -13,6 +9,8 @@ import ph.txtdis.mgdc.ccbpi.dto.Channel;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.util.AbstractMgdcClientTypeMap;
 import ph.txtdis.util.TypeReference;
+
+import java.util.List;
 
 @Component("typeMap")
 public class CokeTypeMapImpl //

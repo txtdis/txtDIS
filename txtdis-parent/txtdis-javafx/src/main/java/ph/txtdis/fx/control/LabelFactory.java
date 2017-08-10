@@ -4,8 +4,6 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +34,7 @@ public class LabelFactory {
 	}
 
 	@Lookup
-	protected AppLabel create() {
+	AppLabel create() {
 		return null;
 	}
 

@@ -12,10 +12,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.fx.pane.PaneFactory;
+import ph.txtdis.info.Information;
 import ph.txtdis.service.ResettableService;
 import ph.txtdis.util.FontIcon;
 import ph.txtdis.util.TypeMap;
@@ -31,9 +33,6 @@ import static javafx.stage.Modality.WINDOW_MODAL;
 public abstract class AbstractApp<RS extends ResettableService>
 	extends Stage
 	implements App {
-
-	@Autowired
-	protected MessageDialog messageDialog;
 
 	@Autowired
 	protected LabelFactory label;
@@ -175,6 +174,15 @@ public abstract class AbstractApp<RS extends ResettableService>
 
 	protected void showErrorDialog(Exception e) {
 		e.printStackTrace();
-		messageDialog.show(e).addParent(this).start();
+		showErrorDialog(e);
+	}
+
+	protected void showInfoDialog(Information i) {
+		messageDialog().show(i).addParent(this).start();
+	}
+
+	@Lookup
+	public MessageDialog messageDialog() {
+		return null;
 	}
 }

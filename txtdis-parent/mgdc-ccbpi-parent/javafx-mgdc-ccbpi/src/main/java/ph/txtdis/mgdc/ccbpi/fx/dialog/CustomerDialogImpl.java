@@ -1,27 +1,23 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.Arrays;
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.fx.control.AppFieldImpl;
-import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.dialog.AbstractInputDialog;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.mgdc.ccbpi.service.CokeCustomerService;
 import ph.txtdis.type.Type;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.TEXT;
 
 @Scope("prototype")
 @Component("customerDialog")
@@ -78,7 +74,7 @@ public class CustomerDialogImpl //
 	}
 
 	private void handleError(Exception e) {
-		messageDialog().show(e).addParent(this).start();
+		showErrorDialog(e);
 		refresh();
 	}
 
@@ -160,7 +156,7 @@ public class CustomerDialogImpl //
 		try {
 			validateName(nameField.getText());
 		} catch (Exception e) {
-			messageDialog().show(e).addParent(this).start();
+			showErrorDialog(e);
 			refresh();
 		}
 	}

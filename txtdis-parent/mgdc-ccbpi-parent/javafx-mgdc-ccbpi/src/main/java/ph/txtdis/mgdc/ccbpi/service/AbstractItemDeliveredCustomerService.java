@@ -1,14 +1,6 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static ph.txtdis.type.DeliveryType.PICK_UP;
-import static ph.txtdis.type.RouteType.PRE_SELL;
-import static ph.txtdis.util.DateTimeUtils.getServerDate;
-import static ph.txtdis.util.DateTimeUtils.toHypenatedYearMonthDay;
-
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.Route;
 import ph.txtdis.dto.Routing;
 import ph.txtdis.excel.ExcelReportWriter;
@@ -17,6 +9,13 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.fx.table.AppTable;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.service.SyncService;
+
+import java.time.LocalDate;
+
+import static ph.txtdis.type.DeliveryType.PICK_UP;
+import static ph.txtdis.type.RouteType.PRE_SELL;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.DateTimeUtils.toHypenatedYearMonthDay;
 
 public abstract class AbstractItemDeliveredCustomerService //
 	extends AbstractCustomerService //

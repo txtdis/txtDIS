@@ -1,13 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import java.util.Arrays;
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
 import ph.txtdis.app.TotaledTableApp;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.fx.control.AppCombo;
@@ -16,6 +12,9 @@ import ph.txtdis.mgdc.ccbpi.fx.table.OrderReturnTable;
 import ph.txtdis.mgdc.ccbpi.service.OrderReturnService;
 import ph.txtdis.type.OrderReturnType;
 import ph.txtdis.type.Type;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Scope("prototype")
 @Component("orderReturnApp")

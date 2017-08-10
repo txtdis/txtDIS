@@ -1,23 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.util.stream.Collectors.toList;
-import static ph.txtdis.type.BeverageType.EMPTIES;
-import static ph.txtdis.type.DeliveryType.PICK_UP;
-import static ph.txtdis.util.UserUtils.username;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.Billable;
-import ph.txtdis.dto.Booking;
-import ph.txtdis.dto.PickList;
-import ph.txtdis.dto.PickListDetail;
-import ph.txtdis.dto.ReceivingDetail;
+import ph.txtdis.dto.*;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.InvalidException;
 import ph.txtdis.info.Information;
@@ -25,6 +10,16 @@ import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.service.AbstractLoadingService;
 import ph.txtdis.mgdc.service.PickListService;
 import ph.txtdis.util.NumberUtils;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
+import static ph.txtdis.type.BeverageType.EMPTIES;
+import static ph.txtdis.type.DeliveryType.PICK_UP;
+import static ph.txtdis.util.UserUtils.username;
 
 @Service("loadReturnService")
 public class LoadReturnServiceImpl //

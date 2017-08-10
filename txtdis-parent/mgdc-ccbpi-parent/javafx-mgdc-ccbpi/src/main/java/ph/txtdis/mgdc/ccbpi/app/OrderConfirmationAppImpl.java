@@ -1,17 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-import static ph.txtdis.type.OrderConfirmationType.REGULAR;
-
-import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
 import ph.txtdis.app.App;
 import ph.txtdis.app.TotaledTableApp;
 import ph.txtdis.dto.BillableDetail;
@@ -19,6 +11,7 @@ import ph.txtdis.exception.NotFoundException;
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.control.LocalDatePicker;
+import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.mgdc.ccbpi.exception.NoDeliveryRouteException;
 import ph.txtdis.mgdc.ccbpi.fx.dialog.CustomerDialogImpl;
 import ph.txtdis.mgdc.ccbpi.fx.table.OrderConfirmationTable;
@@ -27,10 +20,17 @@ import ph.txtdis.type.ModuleType;
 import ph.txtdis.type.OrderConfirmationType;
 import ph.txtdis.type.Type;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+import static ph.txtdis.type.OrderConfirmationType.REGULAR;
+
 @Scope("prototype")
 @Component("orderConfirmationApp")
-public class OrderConfirmationAppImpl //
-	extends AbstractBillableApp<OrderConfirmationService, OrderConfirmationTable, Long> //
+public class OrderConfirmationAppImpl
+	extends AbstractBillableApp<OrderConfirmationService, OrderConfirmationTable, Long>
 	implements OrderConfirmationApp {
 
 	@Autowired
@@ -51,6 +51,8 @@ public class OrderConfirmationAppImpl //
 	@Autowired
 	private TotaledTableApp<BillableDetail> totaledTableApp;
 
+	private MessageDialog messageDialog;
+
 	@Override
 	protected void addressAndOrRemarksGridLine() {
 		remarksGridLineAtRowSpanning(2, 10);
@@ -64,10 +66,10 @@ public class OrderConfirmationAppImpl //
 
 	@Override
 	protected String getDialogInput() {
-		openByIdDialog //
-			.idPrompt(service.getOpenDialogKeyPrompt()) //
-			.header(service.getOpenDialogHeader()) //
-			.prompt(service.getOpenDialogPrompt()) //
+		openByIdDialog
+			.idPrompt(service.getOpenDialogKeyPrompt())
+			.header(service.getOpenDialogHeader())
+			.prompt(service.getOpenDialogPrompt())
 			.addParent(this).start();
 		return openByIdDialog.getKey();
 	}
@@ -80,9 +82,9 @@ public class OrderConfirmationAppImpl //
 	@Override
 	protected List<Node> mainVerticalPaneNodes() {
 		buildFields();
-		return Arrays.asList( //
-			gridPane(), //
-			totaledTableApp.addNoSubHeadTablePane(table), //
+		return Arrays.asList(
+			gridPane(),
+			totaledTableApp.addNoSubHeadTablePane(table),
 			trackedPane());
 	}
 
@@ -157,7 +159,7 @@ public class OrderConfirmationAppImpl //
 	}
 
 	private void setCustomerBoxBindings() {
-		customerBox.disableIdInputIf(isPosted(). //
+		customerBox.disableIdInputIf(isPosted().
 			or(orderDatePicker.isEmpty()));
 		customerBox.setSearchButtonVisibleIfNot(isPosted());
 	}
@@ -266,10 +268,11 @@ public class OrderConfirmationAppImpl //
 	}
 
 	private void showCreateNewOutletOrExitDialog(Exception x, Long id) {
-		messageDialog.showOption(x.getMessage(), "Create", "Exit");
-		messageDialog.setOnOptionSelection(e -> openOutletDialog(null, id));
-		messageDialog.setOnDefaultSelection(e -> exitDialog());
-		messageDialog.addParent(this).start();
+		messageDialog = messageDialog();
+		messageDialog.showOption(x.getMessage(), "Create", "Exit")
+			.setOnOptionSelection(e -> openOutletDialog(null, id))
+			.setOnDefaultSelection(e -> exitDialog())
+			.addParent(this).start();
 	}
 
 	private void exitDialog() {

@@ -1,23 +1,20 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.FRACTION;
-import static ph.txtdis.type.Type.TEXT;
+import javafx.scene.control.TableColumn;
+import org.apache.commons.lang3.math.Fraction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.dto.SalesItemVariance;
+import ph.txtdis.fx.table.AbstractTable;
+import ph.txtdis.fx.table.Column;
+import ph.txtdis.mgdc.ccbpi.app.DeliveryListApp;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.math.Fraction;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
-import ph.txtdis.dto.SalesItemVariance;
-import ph.txtdis.fx.table.AbstractTable;
-import ph.txtdis.fx.table.Column;
-import ph.txtdis.mgdc.ccbpi.app.DeliveryListApp;
+import static ph.txtdis.type.Type.*;
 
 @Scope("prototype")
 @Component("deliveryListListTable")

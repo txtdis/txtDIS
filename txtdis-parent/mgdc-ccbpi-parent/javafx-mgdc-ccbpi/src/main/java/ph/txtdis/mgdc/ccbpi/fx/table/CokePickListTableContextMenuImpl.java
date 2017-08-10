@@ -1,12 +1,11 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import ph.txtdis.dto.Booking;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.mgdc.ccbpi.service.CokePickListService;

@@ -1,9 +1,15 @@
 package ph.txtdis;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.SyncType.BACKUP;
-import static ph.txtdis.type.UserType.SYSGEN;
-import static ph.txtdis.util.DateTimeUtils.toLocalDate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import ph.txtdis.domain.SyncEntity;
+import ph.txtdis.mgdc.ccbpi.domain.CustomerDiscountEntity;
+import ph.txtdis.mgdc.ccbpi.domain.CustomerEntity;
+import ph.txtdis.mgdc.ccbpi.repository.CustomerRepository;
+import ph.txtdis.repository.SyncRepository;
+import ph.txtdis.util.DateTimeUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,17 +17,11 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import ph.txtdis.domain.SyncEntity;
-import ph.txtdis.mgdc.ccbpi.domain.CustomerDiscountEntity;
-import ph.txtdis.mgdc.ccbpi.domain.CustomerEntity;
-import ph.txtdis.mgdc.ccbpi.repository.CustomerRepository;
-import ph.txtdis.repository.SyncRepository;
-import ph.txtdis.util.DateTimeUtils;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static ph.txtdis.type.SyncType.BACKUP;
+import static ph.txtdis.type.UserType.SYSGEN;
+import static ph.txtdis.util.DateTimeUtils.toLocalDate;
 
 @Component("revision3")
 public class Revision3Impl //
@@ -66,7 +66,7 @@ public class Revision3Impl //
 	private void givePickUpDiscountsToApprovedCustomers() {
 		List<Long> vendorIds =
 			asList(13L, 21L, 26L, 29L, 35L, 504990464L, 503760889L, 503773439L, 504777816L, 504696211L);
-		vendorIds.stream().forEach(v -> giveDiscountToCustomer(v));
+		vendorIds.forEach(this::giveDiscountToCustomer);
 	}
 
 	private SyncEntity updateSync(SyncEntity sync, Date date) {
@@ -88,7 +88,7 @@ public class Revision3Impl //
 		d.setIsValid(true);
 		d.setDecidedBy(SYSGEN.toString());
 		d.setDecidedOn(ZonedDateTime.now());
-		return asList(d);
+		return singletonList(d);
 	}
 
 	private LocalDate goLiveDate() {

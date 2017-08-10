@@ -1,15 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import static java.util.Arrays.asList;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.app.AbstractTotaledReportApp;
 import ph.txtdis.dto.SalesItemVariance;
 import ph.txtdis.fx.control.AppButton;
@@ -17,6 +11,11 @@ import ph.txtdis.mgdc.ccbpi.fx.dialog.FilterByRouteDialog;
 import ph.txtdis.mgdc.ccbpi.fx.table.BookingVarianceTable;
 import ph.txtdis.mgdc.ccbpi.service.BookingVarianceService;
 import ph.txtdis.type.ModuleType;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Scope("prototype")
 @Component("bookingVarianceApp")

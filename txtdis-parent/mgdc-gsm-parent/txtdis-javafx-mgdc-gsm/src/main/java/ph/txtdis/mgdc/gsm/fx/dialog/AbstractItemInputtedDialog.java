@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.fx.dialog.AbstractInputDialog;
-import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.mgdc.gsm.dto.Item;
 import ph.txtdis.mgdc.gsm.service.BommedDiscountedPricedValidatedItemService;
 
@@ -16,7 +15,7 @@ import static java.util.Arrays.asList;
 import static ph.txtdis.type.Type.ID;
 import static ph.txtdis.type.Type.TEXT;
 
-public abstract class AbstractItemInputtedDialog //
+public abstract class AbstractItemInputtedDialog 
 	implements ItemInputtedDialog {
 
 	@Autowired
@@ -24,9 +23,6 @@ public abstract class AbstractItemInputtedDialog //
 
 	@Autowired
 	protected LabeledField<Long> itemIdField;
-
-	@Autowired
-	protected MessageDialog errorDialog;
 
 	@Autowired
 	protected BommedDiscountedPricedValidatedItemService itemService;

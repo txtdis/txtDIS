@@ -152,7 +152,7 @@ public abstract class AbstractRefundedRmaApp< //
 		try {
 			service.saveReturnPaymentData(d);
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {

@@ -12,6 +12,6 @@ public class StockTakeVarianceAppImpl
 	public void start() {
 		super.start();
 		close();
-		messageDialog.showInfo("Please use GSM2 App").addParent(this).start();
+		messageDialog().showInfo("Please use GSM2 App").addParent(this).start();
 	}
 }

@@ -11,7 +11,6 @@ import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.service.PickListService;
 import ph.txtdis.service.RestClientService;
-import ph.txtdis.service.RestClientService;
 import ph.txtdis.util.ClientTypeMap;
 
 import java.time.LocalDate;

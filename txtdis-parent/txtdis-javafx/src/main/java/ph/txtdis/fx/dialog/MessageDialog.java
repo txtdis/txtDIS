@@ -1,64 +1,34 @@
 package ph.txtdis.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static org.apache.log4j.Logger.getLogger;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
-import ph.txtdis.fx.control.AppButtonImpl;
-import ph.txtdis.fx.control.LabelFactory;
-import ph.txtdis.fx.pane.DialogMessageBox;
-import ph.txtdis.fx.pane.MessageDialogButtonBox;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.info.Information;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Collections.singletonList;
 
 @Scope("prototype")
 @Component("messageDialog")
-public class MessageDialog //
-		extends AbstractDialog {
-
-	private static Logger logger = getLogger(MessageDialog.class);
-
-	@Autowired
-	private AppButtonImpl closeButton, optionButton;
-
-	@Autowired
-	private LabelFactory label;
-
-	@Autowired
-	private MessageDialogButtonBox buttonBox;
-
-	@Autowired
-	private DialogMessageBox messageBox;
-
-	private String text, unicode, closeText, color, optionText;
+public class MessageDialog
+	extends AbstractDialog {
 
 	private boolean withOption;
 
-	public List<Button> buttons() {
-		List<Button> l = new ArrayList<>();
-		if (withOption)
-			l.add(optionButton());
-		l.add(closeButton());
-		return l;
-	}
+	private AppButton closeButton, optionButton;
+
+	private String text, unicode, closeText, color, optionText;
 
 	@Override
 	public void refresh() {
 		goToDefaultFocus();
-	}
-
-	public void setErrorStyle() {
 	}
 
 	@Override
@@ -69,20 +39,20 @@ public class MessageDialog //
 			closeButton.requestFocus();
 	}
 
-	public void setOnDefaultSelection(EventHandler<ActionEvent> e) {
-		closeButton.onAction(e);
+	public MessageDialog setOnDefaultSelection(EventHandler<ActionEvent> e) {
+		if (closeButton != null)
+			closeButton.onAction(e);
+		return this;
 	}
 
-	public void setOnOptionSelection(EventHandler<ActionEvent> e) {
-		optionButton.onAction(e);
+	public MessageDialog setOnOptionSelection(EventHandler<ActionEvent> e) {
+		if (optionButton != null)
+			optionButton.onAction(e);
+		return this;
 	}
 
 	public MessageDialog show(Exception e) {
 		return showError(e.getMessage());
-	}
-
-	public MessageDialog show(Information i) {
-		return showInfo(i.getMessage());
 	}
 
 	public MessageDialog showError(String error) {
@@ -92,6 +62,10 @@ public class MessageDialog //
 		color = "maroon";
 		closeText = "OK";
 		return this;
+	}
+
+	public MessageDialog show(Information i) {
+		return showInfo(i.getMessage());
 	}
 
 	public MessageDialog showInfo(String info) {
@@ -114,27 +88,29 @@ public class MessageDialog //
 	}
 
 	@Override
-	public void start() {
-		super.start();
-		logger.info("Option button label = " + optionButton.getText());
-		logger.info("Close button label = " + closeButton.getText());
+	protected List<Node> nodes() {
+		HBox buttonBox = pane.forMessageDialogButtons(buttons());
+		HBox messageAndButtonBox = pane.forDialogMessages(label.message(text), buttonBox);
+		HBox iconAndMessageAndButton = pane.horizontal(label.icon(unicode, color), messageAndButtonBox);
+		return singletonList(iconAndMessageAndButton);
 	}
 
-	private Button closeButton() {
-		closeButton.large(closeText).build();
-		if (!withOption)
-			closeButton.onAction(e -> close());
-		return closeButton;
+	public List<Button> buttons() {
+		List<Button> l = new ArrayList<>();
+		if (withOption)
+			l.add(optionButton());
+		l.add(closeButton());
+		return l;
 	}
 
 	private Button optionButton() {
-		return optionButton.large(optionText).build();
+		return optionButton = button.large(optionText).build();
 	}
 
-	@Override
-	protected List<Node> nodes() {
-		buttonBox.addButtons(buttons());
-		messageBox.addNodes(label.message(text), buttonBox);
-		return asList(new HBox(label.icon(unicode, color), messageBox));
+	private Button closeButton() {
+		closeButton = button.large(closeText).build();
+		if (!withOption)
+			closeButton.onAction(e -> close());
+		return closeButton;
 	}
 }

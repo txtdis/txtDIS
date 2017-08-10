@@ -1,12 +1,11 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.util.Collections.emptyList;
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.SalesItemVariance;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.SalesItemVariance;
+import static java.util.Collections.emptyList;
 
 @Service("bookingVarianceService")
 public class BookingVarianceServiceImpl //

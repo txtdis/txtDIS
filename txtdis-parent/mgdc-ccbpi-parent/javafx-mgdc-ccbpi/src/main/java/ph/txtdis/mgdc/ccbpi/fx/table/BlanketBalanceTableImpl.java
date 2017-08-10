@@ -1,18 +1,17 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.SalesItemVariance;
 import ph.txtdis.fx.table.Column;
 import ph.txtdis.mgdc.ccbpi.service.BlanketBalanceService;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.TEXT;
 
 @Scope("prototype")
 @Component("blanketBalanceTable")

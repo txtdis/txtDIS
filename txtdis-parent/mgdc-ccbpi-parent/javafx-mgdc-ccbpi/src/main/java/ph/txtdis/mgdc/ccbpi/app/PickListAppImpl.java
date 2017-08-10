@@ -1,10 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
+import javafx.beans.binding.BooleanBinding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.beans.binding.BooleanBinding;
 import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.mgdc.app.AbstractPickListApp;
 import ph.txtdis.mgdc.service.SellerLessPickListService;

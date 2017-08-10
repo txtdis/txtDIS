@@ -1,16 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.OTHERS;
-
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.app.DialogClosingOnlyApp;
 import ph.txtdis.dto.Route;
 import ph.txtdis.fx.table.AbstractTable;
@@ -18,6 +11,12 @@ import ph.txtdis.fx.table.Column;
 import ph.txtdis.mgdc.ccbpi.dto.Channel;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.type.Type;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.ID;
+import static ph.txtdis.type.Type.OTHERS;
 
 @Scope("prototype")
 @Component("customerListTable")

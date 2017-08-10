@@ -1,10 +1,10 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import java.util.List;
-
 import ph.txtdis.dto.ReceivingDetail;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.mgdc.ccbpi.service.UpToReturnableQtyReceivingService;
+
+import java.util.List;
 
 public abstract class AbstractUpToReturnableQtyCasesAndBottlesReceivingDialog<//
 	AS extends UpToReturnableQtyReceivingService, //

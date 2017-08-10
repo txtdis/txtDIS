@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import org.springframework.beans.factory.annotation.Lookup;
 import ph.txtdis.fx.control.AppButton;
+import ph.txtdis.info.Information;
 
 import java.util.List;
 
@@ -51,9 +52,9 @@ public abstract class AbstractInputDialog
 	}
 
 	protected AppButton closeButton(String name) {
-		AppButton closeButton = button.large(name).build();
-		closeButton.onAction(event -> setOnClickedCloseButton());
-		return closeButton;
+		AppButton b = button.large(name).build();
+		b.onAction(event -> setOnClickedCloseButton());
+		return b;
 	}
 
 	protected void setOnClickedCloseButton() {
@@ -76,13 +77,21 @@ public abstract class AbstractInputDialog
 	}
 
 	protected void resetNodesOnError(Exception e) {
-		e.printStackTrace();
-		messageDialog().show(e).addParent(this).start();
+		showErrorDialog(e);
 		refresh();
 	}
 
+	protected void showErrorDialog(Exception e) {
+		e.printStackTrace();
+		messageDialog().show(e).addParent(this).start();
+	}
+
 	@Lookup
-	protected MessageDialog messageDialog() {
+	public MessageDialog messageDialog() {
 		return null;
+	}
+
+	protected void showInfoDialog(Information i) {
+		messageDialog().show(i).addParent(this).start();
 	}
 }

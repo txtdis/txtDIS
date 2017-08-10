@@ -1,53 +1,41 @@
 package ph.txtdis.dyvek.fx.dialog;
 
-import static ph.txtdis.type.ModuleType.DELIVERY_TO_PURCHASE_ORDER;
-import static ph.txtdis.type.ModuleType.DELIVERY_TO_SALES_ORDER;
-import static ph.txtdis.type.ModuleType.PURCHASE_ORDER;
-import static ph.txtdis.type.ModuleType.SALES_BILLING;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.layout.GridPane;
-import javafx.stage.Stage;
 import ph.txtdis.app.LaunchableApp;
 import ph.txtdis.app.RemittanceApp;
-import ph.txtdis.dyvek.app.CashAdvanceApp;
-import ph.txtdis.dyvek.app.ClientBillAssignmentApp;
-import ph.txtdis.dyvek.app.ClientBillingApp;
-import ph.txtdis.dyvek.app.DeliveryApp;
-import ph.txtdis.dyvek.app.ExpenseApp;
-import ph.txtdis.dyvek.app.PurchaseApp;
-import ph.txtdis.dyvek.app.RemoteStockApp;
-import ph.txtdis.dyvek.app.SalesApp;
-import ph.txtdis.dyvek.app.ToDoApp;
-import ph.txtdis.dyvek.app.VendorBillingApp;
+import ph.txtdis.dyvek.app.*;
 import ph.txtdis.dyvek.service.ReminderService;
-import ph.txtdis.fx.control.AppButtonImpl;
+import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.dialog.AbstractMenu;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.info.Information;
 import ph.txtdis.type.ModuleType;
 import ph.txtdis.util.FontIcon;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+
+import static ph.txtdis.type.ModuleType.*;
+import static ph.txtdis.util.UserUtils.username;
+
 @Scope("prototype")
 @Component("tradingMenu")
-public class TradingMenuImpl //
-		extends AbstractMenu //
-		implements TradingMenu {
+public class TradingMenuImpl
+	extends AbstractMenu
+	implements TradingMenu {
 
 	@Autowired
 	private MessageDialog dialog;
 
 	@Autowired
-	private AppButtonImpl salesButton, deliveryButton, clientBillAssignmentButton, clientBillingButton, remittanceButton, //
-			purchaseButton, vendorBillingButton, cashAdvanceButton, remoteStockButton, expenseButton;
+	private AppButton salesButton, deliveryButton, clientBillAssignmentButton, clientBillingButton, remittanceButton,
+		purchaseButton, vendorBillingButton, cashAdvanceButton, remoteStockButton, expenseButton;
 
 	@Autowired
 	private SalesApp salesApp;
@@ -95,9 +83,9 @@ public class TradingMenuImpl //
 
 		gp.add(label.menu("Cust P/O"), 0, 1);
 		gp.add(label.menu("Deliveries"), 1, 1);
-		gp.add(label.menu("D/R to S/O"), 2, 1);
+		gp.add(label.menu("P/O of D/R"), 2, 1);
 		gp.add(label.menu("Cust Billing"), 3, 1);
-		gp.add(label.menu("Cust Pymt"), 4, 1);
+		gp.add(label.menu("Payments"), 4, 1);
 
 		gp.add(button(purchaseApp, purchaseButton, "purchaseOrder"), 0, 2);
 		gp.add(button(vendorBillingApp, vendorBillingButton, "vendorBill"), 1, 2);
@@ -120,29 +108,31 @@ public class TradingMenuImpl //
 	}
 
 	@Override
-	public void goToDefaultFocus() {
-		requestFocus();
-	}
-
-	@Override
-	public void initialize() {
-		getIcons().add(new FontIcon("\ue954"));
-		setTitle(credentialService.username() + "@" + modulePrefix + " Trading Menu");
-		setScene(createScene());
-	}
-
-	@Override
 	public void refresh() {
 		goToDefaultFocus();
+	}
+
+	@Override
+	public void goToDefaultFocus() {
+		requestFocus();
 	}
 
 	@Override
 	public void start() {
 		initialize();
 		show();
-		//createModuleAppMap();
-		//service.setThingsToDo();
-		//getToDo();
+		/*
+		createModuleAppMap();
+		service.setThingsToDo();
+		getToDo();
+		*/
+	}
+
+	@Override
+	public void initialize() {
+		getIcons().add(new FontIcon("\ue954"));
+		setTitle(username() + "@" + modulePrefix + " Trading Menu");
+		setScene(createScene());
 	}
 
 	@SuppressWarnings("unused")
@@ -174,13 +164,18 @@ public class TradingMenuImpl //
 		dialog.start();
 	}
 
+	private void removeOnHiddenHandler() {
+		appMap.entrySet().stream().forEach(a -> a.getValue().removeOnHidden());
+	}
+
+	private void takeAction() {
+		dialog.close();
+		startApp(service.getThingToDo());
+	}
+
 	private void ignore() {
 		dialog.close();
 		service.ignore();
-	}
-
-	private void removeOnHiddenHandler() {
-		appMap.entrySet().stream().forEach(a -> a.getValue().removeOnHidden());
 	}
 
 	private void startApp(List<String> l) {
@@ -188,10 +183,5 @@ public class TradingMenuImpl //
 		app.start();
 		app.actOn(l.get(1), "");
 		app.refresh();
-	}
-
-	private void takeAction() {
-		dialog.close();
-		startApp(service.getThingToDo());
 	}
 }

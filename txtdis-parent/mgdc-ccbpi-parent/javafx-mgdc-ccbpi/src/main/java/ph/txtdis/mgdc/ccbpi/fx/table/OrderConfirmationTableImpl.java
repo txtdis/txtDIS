@@ -1,16 +1,15 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.mgdc.ccbpi.fx.dialog.OrderConfirmationDialog;
 import ph.txtdis.mgdc.ccbpi.service.OrderConfirmationService;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
 
 @Scope("prototype")
 @Component("orderConfirmationTable")

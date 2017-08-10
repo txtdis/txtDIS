@@ -1,23 +1,20 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.CURRENCY;
-import static ph.txtdis.type.Type.FRACTION;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.math.BigDecimal;
-import java.util.List;
-
+import javafx.scene.control.TableColumn;
 import org.apache.commons.lang3.math.Fraction;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.SalesItemVariance;
 import ph.txtdis.fx.table.AbstractTable;
 import ph.txtdis.fx.table.Column;
 import ph.txtdis.mgdc.fx.table.SellerFilterContextMenu;
 import ph.txtdis.service.VarianceService;
 import ph.txtdis.type.Type;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
 
 public abstract class AbstractVarianceTable<AS extends VarianceService<SalesItemVariance>> //
 	extends AbstractTable<SalesItemVariance> //

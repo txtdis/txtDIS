@@ -1,9 +1,5 @@
 package ph.txtdis.dyvek.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dyvek.model.CashAdvance;
 import ph.txtdis.info.Information;
 import ph.txtdis.service.BankDrawnCheckService;
@@ -11,12 +7,16 @@ import ph.txtdis.service.ListedAndResettableService;
 import ph.txtdis.service.TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService;
 import ph.txtdis.type.PartnerType;
 
-public interface CashAdvanceService //
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+public interface CashAdvanceService
 	extends BankDrawnCheckService<CashAdvance>,
 	ListedAndResettableService<CashAdvance>,
 	TitleAndHeaderAndIconAndModuleNamedAndTypeMappedService {
 
-	static final String CASH_ADVANCE = "-CASH ADVANCE-";
+	String CASH_ADVANCE = "-CASH ADVANCE-";
 
 	List<String> listCustomers();
 

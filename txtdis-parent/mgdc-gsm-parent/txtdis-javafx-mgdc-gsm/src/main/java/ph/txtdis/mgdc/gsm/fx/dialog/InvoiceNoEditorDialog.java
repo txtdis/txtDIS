@@ -59,8 +59,8 @@ public class InvoiceNoEditorDialog
 		try {
 			service.updateRemarksAfterInvoiceNoEdit();
 			service.save();
-		} catch (Information e) {
-			messageDialog().show(e).addParent(this).start();
+		} catch (Information i) {
+			showInfoDialog(i);
 		} catch (Exception e) {
 			resetNodesOnError(e);
 		}

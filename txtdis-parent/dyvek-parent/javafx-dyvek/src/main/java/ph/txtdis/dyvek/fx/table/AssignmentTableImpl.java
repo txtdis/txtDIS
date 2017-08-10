@@ -6,7 +6,6 @@ import javafx.scene.control.TableColumn;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ph.txtdis.dyvek.fx.dialog.AssignmentDialog;
 import ph.txtdis.dyvek.model.BillableDetail;
 import ph.txtdis.fx.table.Column;
 
@@ -19,8 +18,8 @@ import static ph.txtdis.type.Type.QUANTITY;
 
 @Scope("prototype")
 @Component("assignmentTable")
-public class AssignmentTableImpl //
-	extends AbstractBillableDetailTable //
+public class AssignmentTableImpl 
+	extends AbstractBillableDetailTable 
 	implements AssignmentTable {
 
 	@Autowired
@@ -28,9 +27,6 @@ public class AssignmentTableImpl //
 
 	@Autowired
 	private AssignmentContextMenu menu;
-
-	@Autowired
-	private AssignmentDialog dialog;
 
 	private ChangeListener<? super Boolean> changeListener;
 
@@ -47,7 +43,7 @@ public class AssignmentTableImpl //
 	@Override
 	protected void addProperties() {
 		setQtyColumnVisibility();
-		menu.addMenu(this, dialog);
+		menu.addMenu(this);
 	}
 
 	private void setQtyColumnVisibility() {

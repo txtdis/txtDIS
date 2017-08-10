@@ -1,10 +1,10 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
+import ph.txtdis.mgdc.ccbpi.dto.Customer;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
-import ph.txtdis.mgdc.ccbpi.dto.Customer;
 
 public interface CokeCustomerService //
 	extends ItemDeliveredCustomerService,

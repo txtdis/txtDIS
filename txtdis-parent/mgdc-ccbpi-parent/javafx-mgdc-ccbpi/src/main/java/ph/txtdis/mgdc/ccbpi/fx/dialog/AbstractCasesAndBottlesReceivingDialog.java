@@ -1,14 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static org.apache.log4j.Logger.getLogger;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import ph.txtdis.dto.ReceivingDetail;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledCombo;
@@ -16,6 +9,12 @@ import ph.txtdis.fx.dialog.AbstractFieldDialog;
 import ph.txtdis.mgdc.ccbpi.service.ReceivingService;
 import ph.txtdis.mgdc.fx.dialog.QuantitiesInCasesAndBottlesDialogImpl;
 import ph.txtdis.mgdc.fx.dialog.ReceivingDialog;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.apache.log4j.Logger.getLogger;
 
 public abstract class AbstractCasesAndBottlesReceivingDialog< //
 	AS extends ReceivingService, //

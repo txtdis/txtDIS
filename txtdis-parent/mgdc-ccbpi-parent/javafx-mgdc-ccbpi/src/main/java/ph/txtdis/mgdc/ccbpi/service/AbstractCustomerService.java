@@ -5,7 +5,6 @@ import ph.txtdis.dto.Keyed;
 import ph.txtdis.exception.DeactivatedException;
 import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.service.RestClientService;
-import ph.txtdis.service.RestClientService;
 import ph.txtdis.type.PartnerType;
 import ph.txtdis.util.ClientTypeMap;
 

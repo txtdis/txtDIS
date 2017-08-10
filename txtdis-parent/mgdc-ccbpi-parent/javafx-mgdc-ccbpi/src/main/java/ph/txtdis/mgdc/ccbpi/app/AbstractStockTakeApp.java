@@ -1,16 +1,10 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.DATE;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.app.AbstractRemarkedKeyedApp;
 import ph.txtdis.app.StockTakeApp;
 import ph.txtdis.dto.StockTake;
@@ -18,6 +12,11 @@ import ph.txtdis.fx.control.AppCombo;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.fx.table.StockTakeTable;
 import ph.txtdis.mgdc.ccbpi.service.StockTakeService;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.DATE;
 
 public abstract class AbstractStockTakeApp //
 	extends AbstractRemarkedKeyedApp<StockTakeService, StockTake, Long, Long> //

@@ -2,7 +2,6 @@ package ph.txtdis.mgdc.ccbpi.app;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
 import ph.txtdis.mgdc.ccbpi.fx.table.DeliveryListListTable;
 import ph.txtdis.mgdc.ccbpi.service.DeliveryListListService;
 

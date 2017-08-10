@@ -1,16 +1,15 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static ph.txtdis.type.Type.TEXT;
+import javafx.scene.control.TableColumn;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import ph.txtdis.dto.Booking;
+import ph.txtdis.mgdc.fx.table.AbstractPickListTable;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import javafx.scene.control.TableColumn;
-import ph.txtdis.dto.Booking;
-import ph.txtdis.mgdc.fx.table.AbstractPickListTable;
+import static ph.txtdis.type.Type.TEXT;
 
 @Scope("prototype")
 @Component("pickListTable")

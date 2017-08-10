@@ -1,9 +1,6 @@
 package ph.txtdis.dyvek.service.server;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import ph.txtdis.dto.RemittanceDetail;
 import ph.txtdis.dyvek.domain.CashAdvanceEntity;
 import ph.txtdis.dyvek.domain.CustomerEntity;
 import ph.txtdis.dyvek.domain.RemittanceEntity;
@@ -17,10 +14,9 @@ import java.util.List;
 
 import static java.math.BigDecimal.ZERO;
 
-@Lazy
 @Service("cashAdvanceService")
-public class CashAdvanceServiceImpl 
-	extends AbstractSavedKeyedService<CashAdvanceRepository, CashAdvanceEntity, CashAdvance, Long> 
+public class CashAdvanceServiceImpl
+	extends AbstractSavedKeyedService<CashAdvanceRepository, CashAdvanceEntity, CashAdvance, Long>
 	implements CashAdvanceService {
 
 	private final CustomerService customerService;

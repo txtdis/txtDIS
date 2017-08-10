@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.dto.User;
 import ph.txtdis.exception.DifferentPasswordException;
 import ph.txtdis.fx.control.AppButton;
-import ph.txtdis.fx.control.LabelFactory;
 import ph.txtdis.fx.control.PasswordInput;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.info.Information;
@@ -71,7 +70,7 @@ public abstract class AbstractPasswordDialog //
 	}
 
 	private void handleError(Exception e) {
-		messageDialog().show(e).addParent(this).start();
+		showErrorDialog(e);
 		refresh();
 	}
 

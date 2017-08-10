@@ -15,6 +15,7 @@ import ph.txtdis.exception.BadCreditException;
 import ph.txtdis.exception.ExceededCreditLimitException;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppCombo;
+import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.info.Information;
 import ph.txtdis.mgdc.app.MultiTypeBillingApp;
 import ph.txtdis.mgdc.app.SalesOrderApp;
@@ -30,8 +31,8 @@ import static org.apache.log4j.Logger.getLogger;
 
 @Scope("prototype")
 @Component("bookingApp")
-public class BookingAppImpl //
-	extends AbstractBillableApp<GsmBookingService, SalesOrderTable, Long> //
+public class BookingAppImpl
+	extends AbstractBillableApp<GsmBookingService, SalesOrderTable, Long>
 	implements SalesOrderApp {
 
 	private static Logger logger = getLogger(BookingAppImpl.class);
@@ -51,6 +52,8 @@ public class BookingAppImpl //
 	private BooleanProperty canChangeDetails, detailsChanged, invalidSalesOrderCanBeOverriden;
 
 	private ModuleType type;
+
+	private MessageDialog messageDialog;
 
 	@Override
 	protected List<AppButton> addButtons() {
@@ -141,7 +144,7 @@ public class BookingAppImpl //
 	}
 
 	private void correctInvalidBilling(Billable b) {
-		messageDialog.showError("Correct invalid S/I & D/R's first").addParent(this).start();
+		messageDialog().showError("Correct invalid S/I & D/R's first").addParent(this).start();
 		close();
 		billingApp.type(b.type()).start();
 		billingApp.show(b);
@@ -154,10 +157,10 @@ public class BookingAppImpl //
 
 	@Override
 	protected BooleanBinding saveButtonDisableBinding() {
-		return table.isEmpty() //
-			.or(changeDetailsButton.disabledProperty().not()) //
-			.or(isPosted() //
-				.and(canChangeDetails.not() //
+		return table.isEmpty()
+			.or(changeDetailsButton.disabledProperty().not())
+			.or(isPosted()
+				.and(canChangeDetails.not()
 					.and(detailsChanged.not())));
 	}
 
@@ -173,8 +176,8 @@ public class BookingAppImpl //
 		super.setButtonBindings();
 		overrideButton.disableIf(invalidSalesOrderCanBeOverriden.not());
 		decisionButton.disable();
-		changeDetailsButton.disableIf( //
-			canChangeDetails.not() //
+		changeDetailsButton.disableIf(
+			canChangeDetails.not()
 				.or(detailsChanged));
 	}
 
@@ -186,7 +189,7 @@ public class BookingAppImpl //
 		orderDatePicker.disable();
 		exTruckCombo.disableIf(orderDatePicker.disabled());
 		if (isExTruck())
-			remarksDisplay.editableIf(isNew() //
+			remarksDisplay.editableIf(isNew()
 				.and(exTruckCombo.isNotEmpty()));
 	}
 
@@ -216,10 +219,11 @@ public class BookingAppImpl //
 	}
 
 	private void showProceedAndGetApprovalLaterOrExitDialog(String badCreditMsg) {
-		messageDialog.showOption(badCreditMsg, "Book—get approval later", "Exit");
-		messageDialog.setOnOptionSelection(e -> setCustomerDataAndTemporarilyInvalidateAwaitingApproval(badCreditMsg));
-		messageDialog.setOnDefaultSelection(e -> resetCustomerData());
-		messageDialog.addParent(this).start();
+		messageDialog = messageDialog();
+		messageDialog.showOption(badCreditMsg, "Book—get approval later", "Exit")
+			.setOnOptionSelection(e -> setCustomerDataAndTemporarilyInvalidateAwaitingApproval(badCreditMsg))
+			.setOnDefaultSelection(e -> resetCustomerData())
+			.addParent(this).start();
 	}
 
 	private void setCustomerDataAndTemporarilyInvalidateAwaitingApproval(String badCreditMessage) {
@@ -238,7 +242,7 @@ public class BookingAppImpl //
 		try {
 			service.overrideInvalidation();
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} finally {

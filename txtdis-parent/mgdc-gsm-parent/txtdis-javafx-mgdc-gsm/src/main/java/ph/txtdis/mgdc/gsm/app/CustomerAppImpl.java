@@ -130,7 +130,7 @@ public class CustomerAppImpl //
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} finally {
 			refresh();
 		}

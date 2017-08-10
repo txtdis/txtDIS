@@ -1,34 +1,8 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.math.BigDecimal.ZERO;
-import static java.time.DayOfWeek.SUNDAY;
-import static java.time.temporal.ChronoUnit.DAYS;
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.apache.log4j.Logger.getLogger;
-import static ph.txtdis.type.OrderConfirmationType.BLANKET;
-import static ph.txtdis.type.OrderConfirmationType.BUFFER;
-import static ph.txtdis.type.OrderConfirmationType.MANUAL;
-import static ph.txtdis.type.OrderConfirmationType.PARTIAL;
-import static ph.txtdis.type.OrderConfirmationType.REGULAR;
-import static ph.txtdis.type.OrderConfirmationType.STOCK_OUT;
-import static ph.txtdis.type.OrderConfirmationType.UNDELIVERED;
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.type.UserType.SALES_ENCODER;
-import static ph.txtdis.util.DateTimeUtils.getServerDate;
-import static ph.txtdis.util.NumberUtils.isPositive;
-import static ph.txtdis.util.UserUtils.isUser;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.dto.Booking;
@@ -43,6 +17,25 @@ import ph.txtdis.mgdc.ccbpi.exception.NoDeliveryRouteException;
 import ph.txtdis.mgdc.service.HolidayService;
 import ph.txtdis.mgdc.service.RouteService;
 import ph.txtdis.type.OrderConfirmationType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static java.math.BigDecimal.ZERO;
+import static java.time.DayOfWeek.SUNDAY;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
+import static org.apache.log4j.Logger.getLogger;
+import static ph.txtdis.type.OrderConfirmationType.*;
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.type.UserType.SALES_ENCODER;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.NumberUtils.isPositive;
+import static ph.txtdis.util.UserUtils.isUser;
 
 @Service("orderConfirmationService")
 public class OrderConfirmationServiceImpl //

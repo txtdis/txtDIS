@@ -1,18 +1,9 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.DATE;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import javafx.scene.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import javafx.scene.Node;
 import ph.txtdis.app.AbstractKeyedApp;
 import ph.txtdis.dto.PickList;
 import ph.txtdis.fx.control.AppButton;
@@ -20,6 +11,12 @@ import ph.txtdis.fx.control.AppFieldImpl;
 import ph.txtdis.fx.pane.AppGridPane;
 import ph.txtdis.mgdc.ccbpi.fx.table.LoadReturnTable;
 import ph.txtdis.mgdc.ccbpi.service.LoadReturnService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.*;
 
 @Scope("prototype")
 @Component("loadReturnApp")

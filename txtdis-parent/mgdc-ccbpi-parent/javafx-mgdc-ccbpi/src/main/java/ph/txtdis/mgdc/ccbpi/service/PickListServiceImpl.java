@@ -1,18 +1,17 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static java.util.Arrays.asList;
-import static org.apache.log4j.Logger.getLogger;
-
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Booking;
 import ph.txtdis.exception.AlreadyAssignedPersonException;
 import ph.txtdis.mgdc.service.AbstractPickListService;
 import ph.txtdis.type.UserType;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static org.apache.log4j.Logger.getLogger;
 
 @Service("pickListService")
 public class PickListServiceImpl //

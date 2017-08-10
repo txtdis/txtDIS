@@ -42,7 +42,7 @@ public class ClientBillAssignmentAppImpl
 			d.addParent(this).start();
 			service.setAdjustments(d.getAddedItems());
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} catch (Exception e) {
 			e.printStackTrace();
 			showErrorDialog(e);

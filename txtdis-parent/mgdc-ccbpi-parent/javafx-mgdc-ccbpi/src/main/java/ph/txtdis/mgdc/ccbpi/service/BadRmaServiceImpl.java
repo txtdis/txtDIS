@@ -1,16 +1,7 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static ph.txtdis.type.UserType.MANAGER;
-import static ph.txtdis.util.DateTimeUtils.getServerDate;
-import static ph.txtdis.util.UserUtils.isUser;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import ph.txtdis.dto.Billable;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.exception.ToBeReturnedItemNotPurchasedWithinTheLastSixMonthException;
@@ -19,6 +10,14 @@ import ph.txtdis.mgdc.ccbpi.dto.Customer;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.service.TotaledBillableService;
 import ph.txtdis.type.QualityType;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import static ph.txtdis.type.UserType.MANAGER;
+import static ph.txtdis.util.DateTimeUtils.getServerDate;
+import static ph.txtdis.util.UserUtils.isUser;
 
 @Service("badRmaService")
 public class BadRmaServiceImpl //

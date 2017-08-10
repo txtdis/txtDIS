@@ -53,7 +53,7 @@ public abstract class AbstractOrderApp<
 
 	private void openSearchDialog() {
 		SearchDialog dialog = searchDialog();
-		dialog.criteria(service.getAlternateName() + " No.").start();
+		dialog.criteria(service.getAlternateName() + " No.").addParent(this).start();
 		search(dialog.getText());
 	}
 

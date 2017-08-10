@@ -1,15 +1,14 @@
 package ph.txtdis.mgdc.ccbpi.app;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.scene.Node;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.app.TotaledTableApp;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.mgdc.ccbpi.service.ShippedBillableService;
 import ph.txtdis.mgdc.fx.table.BillableTable;
+
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class AbstractShippedBillableApp<AS extends ShippedBillableService, AT extends BillableTable> //
 	extends AbstractBillableApp<AS, AT, Long> {

@@ -10,7 +10,6 @@ import ph.txtdis.app.SelectableListApp;
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.fx.control.AppButton;
 import ph.txtdis.fx.control.AppFieldImpl;
-import ph.txtdis.fx.dialog.SearchDialog;
 import ph.txtdis.info.Information;
 import ph.txtdis.service.MasterService;
 
@@ -36,9 +35,6 @@ public abstract class AbstractMasterApp<AS extends MasterService<T>, T extends K
 
 	@Autowired
 	private AppFieldImpl<ZonedDateTime> deactivatedOnDisplay, lastModifiedOnDisplay;
-
-	@Autowired
-	private SearchDialog searchDialog;
 
 	@Override
 	protected List<AppButton> addButtons() {
@@ -114,27 +110,27 @@ public abstract class AbstractMasterApp<AS extends MasterService<T>, T extends K
 			.or(isAlreadyDeactivated()));
 	}
 
-	protected BooleanBinding isAlreadyDeactivated() {
+	BooleanBinding isAlreadyDeactivated() {
 		return deactivatedByDisplay.isNotEmpty();
 	}
 
 	@Override
 	protected void setListeners() {
 		super.setListeners();
-		searchButton.onAction(e -> openSearchDialog(service, this, getSelectableListApp(), messageDialog, searchDialog));
+		searchButton.onAction(e -> openSearchDialog(service, this, getSelectableListApp()));
 		deOrReActivationButton.onAction(e -> deactivate());
 		decisionNeededApp.setDecisionButtonOnAction(e -> showDecisionDialogToValidateOrder());
 	}
 
 	protected abstract SelectableListApp<T> getSelectableListApp();
 
-	protected void deactivate() {
+	void deactivate() {
 		try {
 			service.deactivate();
 		} catch (Exception e) {
 			showErrorDialog(e);
 		} catch (Information i) {
-			messageDialog.show(i).addParent(this).start();
+			showInfoDialog(i);
 		} finally {
 			refresh();
 		}

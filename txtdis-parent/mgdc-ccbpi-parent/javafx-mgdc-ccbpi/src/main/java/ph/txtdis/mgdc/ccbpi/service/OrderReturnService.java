@@ -1,10 +1,10 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.util.List;
-
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.service.TotaledService;
 import ph.txtdis.type.OrderReturnType;
+
+import java.util.List;
 
 public interface OrderReturnService //
 	extends BillableService,

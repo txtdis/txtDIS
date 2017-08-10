@@ -1,15 +1,15 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import static ph.txtdis.type.ItemType.FREE;
-import static ph.txtdis.util.Util.areEqual;
-
-import java.util.List;
-
 import ph.txtdis.dto.Keyed;
 import ph.txtdis.exception.DuplicateException;
 import ph.txtdis.exception.NotSellableItemException;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.type.UomType;
+
+import java.util.List;
+
+import static ph.txtdis.type.ItemType.FREE;
+import static ph.txtdis.util.Util.areEqual;
 
 public interface ItemBasedService<T extends Keyed<Long>> {
 

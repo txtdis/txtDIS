@@ -1,17 +1,12 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import ph.txtdis.dto.StockTake;
 import ph.txtdis.dto.StockTakeDetail;
-import ph.txtdis.service.ItemInputtedService;
-import ph.txtdis.service.QtyPerUomService;
-import ph.txtdis.service.QuantityValidated;
-import ph.txtdis.service
-	.RemarkedAndSpunAndSavedAndOpenDialogAndTitleAndHeaderAndIconAndModuleNamedAndResettableAndTypeMappedService;
-import ph.txtdis.service.ResettableService;
+import ph.txtdis.service.*;
 import ph.txtdis.type.QualityType;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public interface StockTakeService //
 	extends ItemBasedService<StockTakeDetail>,

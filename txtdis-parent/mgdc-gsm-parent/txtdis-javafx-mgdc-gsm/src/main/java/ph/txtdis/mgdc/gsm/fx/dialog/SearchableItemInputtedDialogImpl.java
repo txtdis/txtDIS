@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ph.txtdis.app.Searchable;
 import ph.txtdis.fx.control.LabeledField;
-import ph.txtdis.fx.dialog.SearchDialog;
 import ph.txtdis.mgdc.gsm.app.ItemListApp;
 import ph.txtdis.mgdc.gsm.dto.Item;
 
@@ -20,13 +19,10 @@ public class SearchableItemInputtedDialogImpl
 	@Autowired
 	private ItemListApp itemListApp;
 
-	@Autowired
-	private SearchDialog searchDialog;
-
 	@Override
 	protected LabeledField<Long> itemIdField() {
 		itemIdField.name("Item No.").isSearchable().build(ID);
-		itemIdField.setOnSearch(e -> openSearchDialog(itemService, inputDialog, itemListApp, errorDialog, searchDialog));
+		itemIdField.setOnSearch(e -> openSearchDialog(itemService, inputDialog, itemListApp));
 		return itemIdField;
 	}
 

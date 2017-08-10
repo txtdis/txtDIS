@@ -88,7 +88,7 @@ public class ItemAppImpl //
 	protected void setListeners() {
 		super.setListeners();
 		itemPane.setListeners();
-		searchButton.onAction(e -> openSearchDialog(service, this, itemListApp, messageDialog, searchDialog));
+		searchButton.onAction(e -> openSearchDialog(service, this, itemListApp));
 	}
 
 	@Override

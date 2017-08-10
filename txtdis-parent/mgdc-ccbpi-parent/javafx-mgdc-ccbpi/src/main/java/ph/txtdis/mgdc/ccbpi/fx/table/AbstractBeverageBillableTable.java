@@ -1,16 +1,15 @@
 package ph.txtdis.mgdc.ccbpi.fx.table;
 
-import static ph.txtdis.type.Type.CODE;
-import static ph.txtdis.type.Type.FRACTION;
-
+import javafx.scene.control.TableColumn;
 import org.apache.commons.lang3.math.Fraction;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import javafx.scene.control.TableColumn;
 import ph.txtdis.dto.BillableDetail;
 import ph.txtdis.fx.table.Column;
 import ph.txtdis.mgdc.ccbpi.service.BillableService;
 import ph.txtdis.mgdc.fx.dialog.BillableDialog;
+
+import static ph.txtdis.type.Type.CODE;
+import static ph.txtdis.type.Type.FRACTION;
 
 public class AbstractBeverageBillableTable<AS extends BillableService, BD extends BillableDialog> //
 	extends AbstractBillableTable<AS, BD> {

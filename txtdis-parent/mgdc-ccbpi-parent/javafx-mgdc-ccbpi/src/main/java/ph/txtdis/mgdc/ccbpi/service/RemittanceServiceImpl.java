@@ -1,13 +1,12 @@
 package ph.txtdis.mgdc.ccbpi.service;
 
+import org.springframework.stereotype.Service;
+import ph.txtdis.dto.Remittance;
+import ph.txtdis.service.AbstractRemittanceService;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-
-import ph.txtdis.dto.Remittance;
-import ph.txtdis.service.AbstractRemittanceService;
 
 @Service("remittanceService")
 public class RemittanceServiceImpl //

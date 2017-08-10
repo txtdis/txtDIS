@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
+import static ph.txtdis.dyvek.service.CashAdvanceService.CASH_ADVANCE;
 import static ph.txtdis.util.DateTimeUtils.toDate;
 import static ph.txtdis.util.NumberUtils.isPositive;
 import static ph.txtdis.util.NumberUtils.toBigDecimal;
@@ -22,7 +23,7 @@ public class VendorBillingServiceImpl
 
 	@Override
 	public String getCashAdvance() {
-		return getCashAdvanceDate() == null ? null : "CASH ADVANCE";
+		return CASH_ADVANCE;
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class VendorBillingServiceImpl
 
 	@Override
 	public BigDecimal getCashAdvanceValue() {
-		return  get().getCashAdvanceValue();
+		return get().getCashAdvanceValue();
 	}
 
 	@Override
@@ -70,8 +71,18 @@ public class VendorBillingServiceImpl
 	}
 
 	@Override
+	public BigDecimal getGrossWeight() {
+		return get().getGrossWeight();
+	}
+
+	@Override
 	public String getHeaderName() {
 		return "Supplier Billing";
+	}
+
+	@Override
+	public BigDecimal getIodineValue() {
+		return get().getIodineQty();
 	}
 
 	@Override
@@ -90,33 +101,23 @@ public class VendorBillingServiceImpl
 	}
 
 	@Override
-	public BigDecimal getIodineValue() {
-		return null;
-	}
-
-	@Override
 	public BigDecimal getPercentFreeFattyAcid() {
-		return null;
-	}
-
-	@Override
-	public BigDecimal getGrossWeight() {
-		return null;
+		return get().getFfaPercent();
 	}
 
 	@Override
 	public BigDecimal getTareWeight() {
-		return null;
-	}
-
-	@Override
-	public String getTruckScaleNo() {
-		return null;
+		return get().getTareWeight();
 	}
 
 	@Override
 	public String getTruckPlateNo() {
-		return null;
+		return get().getTruckPlateNo();
+	}
+
+	@Override
+	public String getTruckScaleNo() {
+		return get().getTruckScaleNo();
 	}
 
 	@Override

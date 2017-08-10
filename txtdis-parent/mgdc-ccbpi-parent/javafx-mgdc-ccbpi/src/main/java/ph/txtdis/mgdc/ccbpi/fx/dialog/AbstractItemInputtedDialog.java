@@ -1,21 +1,20 @@
 package ph.txtdis.mgdc.ccbpi.fx.dialog;
 
-import static java.util.Arrays.asList;
-import static ph.txtdis.type.Type.ID;
-import static ph.txtdis.type.Type.TEXT;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import ph.txtdis.fx.control.InputNode;
 import ph.txtdis.fx.control.LabeledField;
 import ph.txtdis.fx.dialog.AbstractInputDialog;
 import ph.txtdis.fx.dialog.MessageDialog;
 import ph.txtdis.mgdc.ccbpi.dto.Item;
 import ph.txtdis.mgdc.ccbpi.service.BommedDiscountedPricedValidatedItemService;
+
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static ph.txtdis.type.Type.ID;
+import static ph.txtdis.type.Type.TEXT;
 
 public abstract class AbstractItemInputtedDialog //
 	implements ItemInputtedDialog {

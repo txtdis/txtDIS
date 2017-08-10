@@ -30,7 +30,7 @@ public class InventoryApp
 			super.refresh();
 		} catch (Exception e) {
 			e.printStackTrace();
-			messageDialog.show(e).addParent(this).start();
+			showErrorDialog(e);
 		}
 	}
 

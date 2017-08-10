@@ -11,7 +11,7 @@ import ph.txtdis.service.RemittanceService;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractPaymentDetailedRemittanceApp<AS extends RemittanceService> //
+public abstract class AbstractPaymentDetailedRemittanceApp<AS extends RemittanceService>
 	extends AbstractRemittanceApp<AS> {
 
 	@Autowired
@@ -43,14 +43,14 @@ public abstract class AbstractPaymentDetailedRemittanceApp<AS extends Remittance
 	@Override
 	protected void setBindings() {
 		super.setBindings();
-		table.disableIf(paymentCombo.disabledProperty() //
+		table.disableIf(paymentCombo.disabledProperty()
 			.or(cash().not().and(draweeBankCombo.disabledProperty())));
 	}
 
 	@Override
 	protected BooleanBinding saveButtonDisableBindings() {
-		return isPosted() //
-			.or(table.isEmpty().and(remarksDisplay.doesNotContain(CANCELLED))) //
+		return isPosted()
+			.or(table.isEmpty().and(remarksDisplay.doesNotContain(CANCELLED)))
 			.or(canPostPaymentData.not());
 	}
 }
